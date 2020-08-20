@@ -1,0 +1,36 @@
+[package]
+name = "jupiter-rpc"
+version = "0.1.0"
+authors = ["Jupiter <https://github.com/patractlabs/jupiter>"]
+edition = "2018"
+
+[package.metadata.docs.rs]
+targets = ["x86_64-unknown-linux-gnu"]
+
+[dependencies]
+jsonrpc-core = "14.2.0"
+
+sc-client-api = { version = "2.0.0-rc5" }
+sc-rpc = { version = "2.0.0-rc5" }
+
+sp-api = { version = "2.0.0-rc5" }
+sp-runtime = { version = "2.0.0-rc5" }
+sp-transaction-pool = { version = "2.0.0-rc5" }
+sc-keystore = { version = "2.0.0-rc5" }
+sp-blockchain = { version = "2.0.0-rc5" }
+sc-rpc-api = { version = "0.8.0-rc5" }
+sp-block-builder = { version = "2.0.0-rc5" }
+sp-consensus = { version = "0.8.0-rc5" }
+sc-consensus-epochs = { version = "0.8.0-rc5" }
+#sc-consensus-babe = { version = "0.8.0-rc5" }
+#sc-consensus-babe-rpc = { version = "0.8.0-rc5" }
+#sp-consensus-babe = { version = "0.8.0-rc5" }
+sc-finality-grandpa = { version = "0.8.0-rc5" }
+sc-finality-grandpa-rpc = { version = "0.8.0-rc5" }
+
+substrate-frame-rpc-system = { version = "2.0.0-rc5" }
+pallet-transaction-payment-rpc = { version = "2.0.0-rc5" }
+
+jupiter-primitives = { path = "../primitives" }
+jupiter-runtime = { path = "../runtime" }
+
