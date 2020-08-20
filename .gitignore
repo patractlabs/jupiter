@@ -1,0 +1,17 @@
+**/target/
+**/*.rs.bk
+*.swp
+.wasm-binaries
+**/._*
+.vscode/
+.DS_Store
+*.o
+*.so
+*.rlib
+*.dll
+/target/
+*.exe
+.vs/
+.idea/
+.sub/
+log/
