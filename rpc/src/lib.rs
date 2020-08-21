@@ -90,10 +90,12 @@ where
         Balance,
         UncheckedExtrinsic,
     >,
+    C::Api: pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance, BlockNumber>,
     C::Api: BlockBuilder<Block>,
     P: TransactionPool + 'static,
     M: jsonrpc_core::Metadata + Default,
 {
+    use pallet_contracts_rpc::{Contracts, ContractsApi};
     use pallet_transaction_payment_rpc::{TransactionPayment, TransactionPaymentApi};
     use substrate_frame_rpc_system::{FullSystem, SystemApi};
 
@@ -120,6 +122,10 @@ where
     io.extend_with(sc_finality_grandpa_rpc::GrandpaApi::to_delegate(
         GrandpaRpcHandler::new(shared_authority_set, shared_voter_state),
     ));
+    // Making synchronous calls in light client freezes the browser currently,
+    // more context: https://github.com/paritytech/substrate/pull/3480
+    // These RPCs should use an asynchronous caller instead.
+    io.extend_with(ContractsApi::to_delegate(Contracts::new(client.clone())));
 
     io
 }

@@ -6,8 +6,8 @@ use sp_runtime::traits::{IdentifyAccount, Verify};
 
 use jupiter_runtime::{AccountId, SessionKeys, Signature};
 use jupiter_runtime::{
-    AuraConfig, BalancesConfig, GenesisConfig, GrandpaConfig, IndicesConfig, SessionConfig,
-    SudoConfig, SystemConfig, WASM_BINARY,
+    AuraConfig, BalancesConfig, ContractsConfig, GenesisConfig, GrandpaConfig, IndicesConfig,
+    SessionConfig, SudoConfig, SystemConfig, WASM_BINARY,
 };
 
 // The URL for the telemetry server.
@@ -148,7 +148,7 @@ fn testnet_genesis(
     initial_authorities: Vec<AuthorityKeysTuple>,
     root_key: AccountId,
     endowed_accounts: Vec<AccountId>,
-    _enable_println: bool,
+    enable_println: bool,
 ) -> GenesisConfig {
     GenesisConfig {
         frame_system: Some(SystemConfig {
@@ -182,6 +182,12 @@ fn testnet_genesis(
                     )
                 })
                 .collect::<Vec<_>>(),
+        }),
+        pallet_contracts: Some(ContractsConfig {
+            current_schedule: pallet_contracts::Schedule {
+                enable_println, // this should only be enabled on development chains
+                ..Default::default()
+            },
         }),
         pallet_sudo: Some(SudoConfig {
             // Assign network admin rights.
