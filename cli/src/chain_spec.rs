@@ -4,9 +4,10 @@ use sp_core::{sr25519, Pair, Public};
 use sp_finality_grandpa::AuthorityId as GrandpaId;
 use sp_runtime::traits::{IdentifyAccount, Verify};
 
+use jupiter_runtime::{AccountId, SessionKeys, Signature};
 use jupiter_runtime::{
-    AccountId, AuraConfig, BalancesConfig, GenesisConfig, GrandpaConfig, Signature, SudoConfig,
-    SystemConfig, WASM_BINARY,
+    AuraConfig, BalancesConfig, GenesisConfig, GrandpaConfig, IndicesConfig, SessionConfig,
+    SudoConfig, SystemConfig, WASM_BINARY,
 };
 
 // The URL for the telemetry server.
@@ -33,8 +34,23 @@ where
 }
 
 /// Generate an Aura authority key.
-pub fn authority_keys_from_seed(s: &str) -> (AuraId, GrandpaId) {
-    (get_from_seed::<AuraId>(s), get_from_seed::<GrandpaId>(s))
+type AuthorityKeysTuple = (
+    AccountId, // ValidatorId
+    AccountId, // (SessionKey)
+    AuraId,
+    GrandpaId,
+);
+/// Helper function to generate stash, controller and session key from seed
+pub fn authority_keys_from_seed(seed: &str) -> AuthorityKeysTuple {
+    (
+        get_account_id_from_seed::<sr25519::Public>(seed),
+        get_account_id_from_seed::<sr25519::Public>(&format!("{}//stash", seed)),
+        get_from_seed::<AuraId>(seed),
+        get_from_seed::<GrandpaId>(seed),
+    )
+}
+fn session_keys(aura: AuraId, grandpa: GrandpaId) -> SessionKeys {
+    SessionKeys { aura, grandpa }
 }
 
 pub fn development_config() -> Result<ChainSpec, String> {
@@ -129,7 +145,7 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
 /// Configure initial storage state for FRAME modules.
 fn testnet_genesis(
     wasm_binary: &[u8],
-    initial_authorities: Vec<(AuraId, GrandpaId)>,
+    initial_authorities: Vec<AuthorityKeysTuple>,
     root_key: AccountId,
     endowed_accounts: Vec<AccountId>,
     _enable_println: bool,
@@ -148,14 +164,24 @@ fn testnet_genesis(
                 .map(|k| (k, 1 << 60))
                 .collect(),
         }),
+        pallet_indices: Some(IndicesConfig { indices: vec![] }),
         pallet_aura: Some(AuraConfig {
-            authorities: initial_authorities.iter().map(|x| (x.0.clone())).collect(),
+            authorities: vec![],
         }),
         pallet_grandpa: Some(GrandpaConfig {
-            authorities: initial_authorities
+            authorities: vec![],
+        }),
+        pallet_session: Some(SessionConfig {
+            keys: initial_authorities
                 .iter()
-                .map(|x| (x.1.clone(), 1))
-                .collect(),
+                .map(|x| {
+                    (
+                        x.0.clone(),
+                        x.0.clone(),
+                        session_keys(x.2.clone(), x.3.clone()),
+                    )
+                })
+                .collect::<Vec<_>>(),
         }),
         pallet_sudo: Some(SudoConfig {
             // Assign network admin rights.

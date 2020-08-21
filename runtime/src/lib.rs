@@ -8,7 +8,9 @@ include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 
 use sp_api::impl_runtime_apis;
 use sp_core::{crypto::KeyTypeId, OpaqueMetadata};
-use sp_runtime::traits::{BlakeTwo256, Block as BlockT, IdentityLookup, NumberFor, Saturating};
+use sp_runtime::traits::{
+    BlakeTwo256, Block as BlockT, Convert, IdentityLookup, NumberFor, OpaqueKeys, Saturating,
+};
 use sp_runtime::{
     create_runtime_str, generic, impl_opaque_keys,
     transaction_validity::{TransactionSource, TransactionValidity},
@@ -42,6 +44,7 @@ pub use frame_support::{
     StorageValue,
 };
 pub use pallet_balances::Call as BalancesCall;
+pub use pallet_session::historical as pallet_session_historical;
 pub use pallet_timestamp::Call as TimestampCall;
 
 pub use jupiter_primitives::{
@@ -49,6 +52,8 @@ pub use jupiter_primitives::{
 };
 
 pub mod constants;
+pub mod impls;
+use crate::constants::fee::WeightToFee;
 pub use constants::{currency::*, time::*};
 impl_opaque_keys! {
     pub struct SessionKeys {
@@ -86,11 +91,12 @@ parameter_types! {
     pub MaximumExtrinsicWeight: Weight = AvailableBlockRatio::get()
         .saturating_sub(Perbill::from_percent(10)) * MaximumBlockWeight::get();
     pub const MaximumBlockLength: u32 = 5 * 1024 * 1024;
-    pub const Version: RuntimeVersion = VERSION;
 }
 
 // Configure FRAME pallets to include in runtime.
-
+parameter_types! {
+    pub const Version: RuntimeVersion = VERSION;
+}
 impl frame_system::Trait for Runtime {
     /// The basic call filter to use in dispatchable.
     type BaseCallFilter = ();
@@ -154,6 +160,18 @@ impl pallet_aura::Trait for Runtime {
     type AuthorityId = AuraId;
 }
 
+parameter_types! {
+    pub const UncleGenerations: u32 = 0;
+}
+
+// TODO: substrate#2986 implement this properly
+impl pallet_authorship::Trait for Runtime {
+    type FindAuthor = pallet_session::FindAccountFromAuthorIndex<Self, Aura>;
+    type UncleGenerations = UncleGenerations;
+    type FilterUncle = ();
+    type EventHandler = ();
+}
+
 impl pallet_grandpa::Trait for Runtime {
     type Event = Event;
     type Call = Call;
@@ -172,6 +190,60 @@ impl pallet_grandpa::Trait for Runtime {
 }
 
 parameter_types! {
+    pub const DisabledValidatorsThreshold: Perbill = Perbill::from_percent(17);
+}
+pub struct SimpleValidatorIdConverter;
+impl Convert<AccountId, Option<AccountId>> for SimpleValidatorIdConverter {
+    fn convert(controller: AccountId) -> Option<AccountId> {
+        Some(controller)
+    }
+}
+pub struct SimpleSessionManager;
+impl<BlockNumber> pallet_session::ShouldEndSession<BlockNumber> for SimpleSessionManager {
+    fn should_end_session(_: BlockNumber) -> bool {
+        false
+    }
+}
+impl<BlockNumber> frame_support::traits::EstimateNextSessionRotation<BlockNumber>
+    for SimpleSessionManager
+{
+    fn estimate_next_session_rotation(_: BlockNumber) -> Option<BlockNumber> {
+        None
+    }
+
+    fn weight(_: BlockNumber) -> Weight {
+        0
+    }
+}
+impl pallet_session::SessionManager<AccountId> for SimpleSessionManager {
+    fn new_session(_new_index: u32) -> Option<Vec<AccountId>> {
+        None
+    }
+
+    fn end_session(_end_index: u32) {}
+
+    fn start_session(_start_index: u32) {}
+}
+
+impl pallet_session::Trait for Runtime {
+    type Event = Event;
+    type ValidatorId = AccountId;
+    type ValidatorIdOf = SimpleValidatorIdConverter;
+    type ShouldEndSession = SimpleSessionManager;
+    type NextSessionRotation = SimpleSessionManager;
+    type SessionManager = SimpleSessionManager;
+    type SessionHandler = <SessionKeys as OpaqueKeys>::KeyTypeIdProviders;
+    type Keys = SessionKeys;
+    type DisabledValidatorsThreshold = DisabledValidatorsThreshold;
+    type WeightInfo = ();
+}
+
+impl pallet_session_historical::Trait for Runtime {
+    type FullIdentification = AccountId;
+    type FullIdentificationOf = ();
+}
+
+parameter_types! {
     pub const MinimumPeriod: u64 = SLOT_DURATION / 2;
 }
 
@@ -184,30 +256,42 @@ impl pallet_timestamp::Trait for Runtime {
 }
 
 parameter_types! {
-    pub const ExistentialDeposit: u128 = 500;
+    pub const IndexDeposit: Balance = 10 * DOLLARS;
+}
+
+impl pallet_indices::Trait for Runtime {
+    type AccountIndex = AccountIndex;
+    type Currency = Balances;
+    type Deposit = IndexDeposit;
+    type Event = Event;
+    type WeightInfo = ();
+}
+
+parameter_types! {
+    pub const ExistentialDeposit: Balance = 100 * CENTS;
 }
 
 impl pallet_balances::Trait for Runtime {
     /// The type for recording an account's balance.
     type Balance = Balance;
+    type DustRemoval = ();
     /// The ubiquitous event type.
     type Event = Event;
-    type DustRemoval = ();
     type ExistentialDeposit = ExistentialDeposit;
     type AccountStore = System;
     type WeightInfo = ();
 }
 
 parameter_types! {
-    pub const TransactionByteFee: Balance = 1;
+    pub const TransactionByteFee: Balance = 10 * MILLICENTS;
 }
 
 impl pallet_transaction_payment::Trait for Runtime {
-    type Currency = pallet_balances::Module<Runtime>;
-    type OnTransactionPayment = ();
+    type Currency = Balances;
+    type OnTransactionPayment = impls::ToAuthor<Self>;
     type TransactionByteFee = TransactionByteFee;
-    type WeightToFee = IdentityFee<Balance>;
-    type FeeMultiplierUpdate = ();
+    type WeightToFee = WeightToFee;
+    type FeeMultiplierUpdate = impls::SlowAdjustingFeeUpdate<Self>;
 }
 
 impl pallet_sudo::Trait for Runtime {
@@ -222,13 +306,22 @@ construct_runtime!(
         NodeBlock = jupiter_primitives::Block,
         UncheckedExtrinsic = UncheckedExtrinsic
     {
+        // Basic stuff; balances is uncallable initially.
         System: frame_system::{Module, Call, Config, Storage, Event<T>},
         RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Module, Call, Storage},
-        Timestamp: pallet_timestamp::{Module, Call, Storage, Inherent},
+
         Aura: pallet_aura::{Module, Config<T>, Inherent},
+        // Consensus support.
+        Authorship: pallet_authorship::{Module, Call, Storage},
         Grandpa: pallet_grandpa::{Module, Call, Storage, Config, Event},
+        Historical: pallet_session_historical::{Module},
+        Session: pallet_session::{Module, Call, Storage, Event, Config<T>},
+
+        Timestamp: pallet_timestamp::{Module, Call, Storage, Inherent},
         Balances: pallet_balances::{Module, Call, Storage, Config<T>, Event<T>},
+        Indices: pallet_indices::{Module, Call, Storage, Config<T>, Event<T>},
         TransactionPayment: pallet_transaction_payment::{Module, Storage},
+
         Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>},
     }
 );
