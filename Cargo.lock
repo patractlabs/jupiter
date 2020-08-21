@@ -2096,6 +2096,40 @@ dependencies = [
 ]
 
 [[package]]
+name = "jupiter-dev-cli"
+version = "0.1.0"
+dependencies = [
+ "futures 0.3.5",
+ "jupiter-primitives",
+ "jupiter-rpc",
+ "jupiter-runtime",
+ "log",
+ "pallet-contracts",
+ "parking_lot 0.10.2",
+ "sc-basic-authorship",
+ "sc-cli",
+ "sc-client-api",
+ "sc-consensus",
+ "sc-consensus-manual-seal",
+ "sc-executor",
+ "sc-finality-grandpa",
+ "sc-network",
+ "sc-service",
+ "sc-transaction-pool",
+ "sp-api",
+ "sp-consensus",
+ "sp-consensus-aura",
+ "sp-core",
+ "sp-finality-grandpa",
+ "sp-inherents",
+ "sp-runtime",
+ "sp-timestamp",
+ "sp-transaction-pool",
+ "structopt",
+ "substrate-build-script-utils",
+]
+
+[[package]]
 name = "jupiter-primitives"
 version = "0.1.0"
 dependencies = [
@@ -2932,6 +2966,9 @@ dependencies = [
 [[package]]
 name = "node-dev"
 version = "0.1.0"
+dependencies = [
+ "jupiter-dev-cli",
+]
 
 [[package]]
 name = "nodrop"
@@ -4631,6 +4668,32 @@ dependencies = [
  "sc-client-api",
  "sp-blockchain",
  "sp-runtime",
+]
+
+[[package]]
+name = "sc-consensus-manual-seal"
+version = "0.8.0-rc5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "29bfffa3c9a92b7dd968883ab4aec9a94e68ec7fd6592395d3a27a480011c9bd"
+dependencies = [
+ "assert_matches",
+ "derive_more",
+ "futures 0.3.5",
+ "jsonrpc-core",
+ "jsonrpc-core-client",
+ "jsonrpc-derive",
+ "log",
+ "parking_lot 0.10.2",
+ "sc-client-api",
+ "sc-transaction-pool",
+ "serde",
+ "sp-blockchain",
+ "sp-consensus",
+ "sp-core",
+ "sp-inherents",
+ "sp-runtime",
+ "sp-transaction-pool",
+ "substrate-prometheus-endpoint",
 ]
 
 [[package]]

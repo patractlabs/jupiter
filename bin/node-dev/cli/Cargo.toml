@@ -1,0 +1,45 @@
+[package]
+name = "jupiter-dev-cli"
+version = "0.1.0"
+authors = ["Jupiter <https://github.com/patractlabs/jupiter>"]
+edition = "2018"
+
+[package.metadata.docs.rs]
+targets = ["x86_64-unknown-linux-gnu"]
+
+[dependencies]
+futures = "0.3.4"
+log = "0.4.8"
+structopt = "0.3.8"
+parking_lot = "0.10.0"
+
+
+sc-cli = { version = "0.8.0-rc5" }
+sp-core = { version = "2.0.0-rc5" }
+sc-executor = { version = "0.8.0-rc5" }
+sc-service = { version = "0.8.0-rc5" }
+sp-inherents = { version = "2.0.0-rc5" }
+sc-transaction-pool = { version = "2.0.0-rc5" }
+sp-transaction-pool = { version = "2.0.0-rc5" }
+sc-network = { version = "0.8.0-rc5" }
+#sc-consensus-aura = { version = "0.8.0-rc5" }
+sp-consensus-aura = { version = "0.8.0-rc5" }
+sp-consensus = { version = "0.8.0-rc5" }
+sc-consensus = { version = "0.8.0-rc5" }
+sc-consensus-manual-seal = { version = "0.8.0-rc5" }
+sc-finality-grandpa = { version = "0.8.0-rc5" }
+sp-finality-grandpa = { version = "2.0.0-rc5" }
+sc-client-api = { version = "2.0.0-rc5" }
+sp-api = { version = "2.0.0-rc5" }
+sp-runtime = { version = "2.0.0-rc5" }
+sp-timestamp = { version = "2.0.0-rc5" }
+sc-basic-authorship = { version = "0.8.0-rc5" }
+
+pallet-contracts = { version = "2.0.0-rc5" }
+
+jupiter-primitives = { path = "../../../primitives" }
+jupiter-runtime = { path = "../../../runtime" }
+jupiter-rpc = { path = "../../../rpc" }
+
+[build-dependencies]
+substrate-build-script-utils = { version = "2.0.0-rc5" }

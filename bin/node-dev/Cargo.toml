@@ -6,3 +6,4 @@ edition = "2018"
 description = ""
 
 [dependencies]
+cli = { package = "jupiter-dev-cli", path = "cli" }
