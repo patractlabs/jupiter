@@ -2145,6 +2145,7 @@ dependencies = [
  "pallet-balances",
  "pallet-grandpa",
  "pallet-im-online",
+ "pallet-indices",
  "pallet-multisig",
  "pallet-offences",
  "pallet-randomness-collective-flip",
@@ -2156,6 +2157,7 @@ dependencies = [
  "pallet-utility",
  "parity-scale-codec",
  "serde",
+ "smallvec 1.4.1",
  "sp-api",
  "sp-block-builder",
  "sp-consensus-aura",
@@ -3175,6 +3177,23 @@ dependencies = [
  "sp-io",
  "sp-runtime",
  "sp-staking",
+ "sp-std",
+]
+
+[[package]]
+name = "pallet-indices"
+version = "2.0.0-rc5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "972a5079a31585bd032271fd3a2d91b6f354fb91b9d0e03688f602183f0cb3e3"
+dependencies = [
+ "frame-support",
+ "frame-system",
+ "parity-scale-codec",
+ "serde",
+ "sp-core",
+ "sp-io",
+ "sp-keyring",
+ "sp-runtime",
  "sp-std",
 ]
 
