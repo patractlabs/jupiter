@@ -101,10 +101,10 @@ pub fn new_full_params(
                 client: client.clone(),
                 pool: pool.clone(),
                 deny_unsafe,
-                grandpa: jupiter_rpc::GrandpaDeps {
+                grandpa: Some(jupiter_rpc::GrandpaDeps {
                     shared_voter_state: shared_voter_state.clone(),
                     shared_authority_set: shared_authority_set.clone(),
-                },
+                }),
             };
 
             jupiter_rpc::create_full(deps)
