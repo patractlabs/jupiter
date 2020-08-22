@@ -36,9 +36,9 @@ then:
 ```
 ### 3. compile this repo
 ```bash
-> cargo build --release
+> WASM_BUILD_TYPE=release cargo build --release
 ```
-
+or we advice you to add `WASM_BUILD_TYPE=release` in your global environment variables
 ### 4. run
 now the directory `target/release` would contain two executable files.
 * `jupiter`, which is Jupiter Testnet node
@@ -59,7 +59,7 @@ use `Native`
 2. `jupiter-dev`
     ```bash
     ./target/release/jupiter-dev --dev -d .sub --execution=Native
-    # or 
+    # or (notice if you have not set `WASM_BUILD_TYPE=release` in environment variables, put this before `cargo run`)
     cargo run --release --bin jupiter-dev -- --dev -d .sub --execution=Native
     ```
 
