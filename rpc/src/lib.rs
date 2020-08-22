@@ -72,7 +72,7 @@ pub struct FullDeps<C, P> {
     /// Whether to deny unsafe calls
     pub deny_unsafe: DenyUnsafe,
     /// GRANDPA specific dependencies.
-    pub grandpa: GrandpaDeps,
+    pub grandpa: Option<GrandpaDeps>,
 }
 
 /// A IO handler that uses all Full RPC extensions.
@@ -106,10 +106,15 @@ where
         deny_unsafe,
         grandpa,
     } = deps;
-    let GrandpaDeps {
-        shared_voter_state,
-        shared_authority_set,
-    } = grandpa;
+    if let Some(grandpa) = grandpa {
+        let GrandpaDeps {
+            shared_voter_state,
+            shared_authority_set,
+        } = grandpa;
+        io.extend_with(sc_finality_grandpa_rpc::GrandpaApi::to_delegate(
+            GrandpaRpcHandler::new(shared_authority_set, shared_voter_state),
+        ));
+    }
 
     io.extend_with(SystemApi::to_delegate(FullSystem::new(
         client.clone(),
@@ -119,9 +124,7 @@ where
     io.extend_with(TransactionPaymentApi::to_delegate(TransactionPayment::new(
         client.clone(),
     )));
-    io.extend_with(sc_finality_grandpa_rpc::GrandpaApi::to_delegate(
-        GrandpaRpcHandler::new(shared_authority_set, shared_voter_state),
-    ));
+
     // Making synchronous calls in light client freezes the browser currently,
     // more context: https://github.com/paritytech/substrate/pull/3480
     // These RPCs should use an asynchronous caller instead.

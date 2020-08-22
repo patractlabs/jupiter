@@ -34,7 +34,7 @@ type OurServiceParams = sc_service::ServiceParams<
     FullClient,
     BasicQueue<Block, TransactionFor<FullClient, Block>>,
     sc_transaction_pool::FullPool<Block, FullClient>,
-    (),
+    jupiter_rpc::IoHandler,
     FullBackend,
 >;
 
@@ -78,12 +78,32 @@ pub fn new_full_params(
         config.prometheus_registry(),
     );
 
+    let rpc_extensions_builder = {
+        let client = client.clone();
+        let pool = transaction_pool.clone();
+
+        let rpc_extensions_builder = Box::new(move |deny_unsafe| {
+            let deps = jupiter_rpc::FullDeps {
+                client: client.clone(),
+                pool: pool.clone(),
+                deny_unsafe,
+                grandpa: None,
+            };
+
+            jupiter_rpc::create_full(deps)
+        });
+
+        rpc_extensions_builder
+    };
+
+
     let params = sc_service::ServiceParams {
         backend,
         client,
         import_queue,
         keystore,
         task_manager,
+        rpc_extensions_builder,
         transaction_pool,
         config,
         block_announce_validator_builder: None,
@@ -91,7 +111,6 @@ pub fn new_full_params(
         finality_proof_provider: None,
         on_demand: None,
         remote_blockchain: None,
-        rpc_extensions_builder: Box::new(|_| ()),
     };
 
     Ok((params, select_chain, inherent_data_providers))
