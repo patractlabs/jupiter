@@ -2096,6 +2096,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "jupiter-dev"
+version = "0.1.0"
+dependencies = [
+ "jupiter-dev-cli",
+]
+
+[[package]]
 name = "jupiter-dev-cli"
 version = "0.1.0"
 dependencies = [
@@ -2961,13 +2968,6 @@ dependencies = [
  "cfg-if",
  "libc",
  "void",
-]
-
-[[package]]
-name = "node-dev"
-version = "0.1.0"
-dependencies = [
- "jupiter-dev-cli",
 ]
 
 [[package]]
