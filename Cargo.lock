@@ -1066,8 +1066,6 @@ dependencies = [
 [[package]]
 name = "frame-executive"
 version = "2.0.0-rc5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9ec91c36be8039bfb57805be12ccb6402e096681ad3c987a3d0e86f3ecb9edff"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -1078,6 +1076,13 @@ dependencies = [
  "sp-std",
  "sp-tracing",
 ]
+
+[[package]]
+name = "frame-executive"
+version = "2.0.0-rc5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9ec91c36be8039bfb57805be12ccb6402e096681ad3c987a3d0e86f3ecb9edff"
+replace = "frame-executive 2.0.0-rc5"
 
 [[package]]
 name = "frame-metadata"
@@ -2179,7 +2184,7 @@ dependencies = [
 name = "jupiter-runtime"
 version = "0.1.0"
 dependencies = [
- "frame-executive",
+ "frame-executive 2.0.0-rc5 (registry+https://github.com/rust-lang/crates.io-index)",
  "frame-support",
  "frame-system",
  "frame-system-rpc-runtime-api",

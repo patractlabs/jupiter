@@ -10,3 +10,6 @@ members = [
 
 [profile.release]
 panic = "unwind"
+
+[replace]
+"frame-executive:2.0.0-rc5" = { path = "./frame/executive" }
