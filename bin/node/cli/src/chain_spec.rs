@@ -86,7 +86,16 @@ pub fn development_config() -> Result<ChainSpec, String> {
         // Protocol ID
         None,
         // Properties
-        None,
+        Some(
+            json!({
+                "ss58Format": 42,
+                "tokenDecimals": 10,
+                "tokenSymbol": "DOT (new)"
+            })
+            .as_object()
+            .expect("network properties generation can not fail; qed")
+            .to_owned(),
+        ),
         // Extensions
         None,
     ))
@@ -136,7 +145,16 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
         // Protocol ID
         None,
         // Properties
-        None,
+        Some(
+            json!({
+                "ss58Format": 42,
+                "tokenDecimals": 10,
+                "tokenSymbol": "DOT (new)"
+            })
+            .as_object()
+            .expect("network properties generation can not fail; qed")
+            .to_owned(),
+        ),
         // Extensions
         None,
     ))
