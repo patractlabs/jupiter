@@ -32,16 +32,17 @@
 
 use std::sync::Arc;
 
-use sc_finality_grandpa::{SharedAuthoritySet, SharedVoterState};
+use jsonrpc_pubsub::manager::SubscriptionManager;
+
+use sc_finality_grandpa::{GrandpaJustificationStream, SharedAuthoritySet, SharedVoterState};
 use sc_finality_grandpa_rpc::GrandpaRpcHandler;
-use sc_rpc_api::DenyUnsafe;
+pub use sc_rpc_api::DenyUnsafe;
 use sp_api::ProvideRuntimeApi;
 use sp_block_builder::BlockBuilder;
 use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
 use sp_transaction_pool::TransactionPool;
 
 use jupiter_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Index};
-use jupiter_runtime::UncheckedExtrinsic;
 
 /// Light client extra dependencies.
 pub struct LightDeps<C, F, P> {
@@ -61,6 +62,10 @@ pub struct GrandpaDeps {
     pub shared_voter_state: SharedVoterState,
     /// Authority set info.
     pub shared_authority_set: SharedAuthoritySet<Hash, BlockNumber>,
+    /// Receives notifications about justification events from Grandpa.
+    pub justification_stream: GrandpaJustificationStream<Block>,
+    /// Subscription manager to keep track of pubsub subscribers.
+    pub subscriptions: SubscriptionManager,
 }
 
 /// Full client dependencies.
@@ -79,21 +84,16 @@ pub struct FullDeps<C, P> {
 pub type IoHandler = jsonrpc_core::IoHandler<sc_rpc::Metadata>;
 
 /// Instantiate all Full RPC extensions.
-pub fn create_full<C, P, M>(deps: FullDeps<C, P>) -> jsonrpc_core::IoHandler<M>
+pub fn create_full<C, P>(deps: FullDeps<C, P>) -> jsonrpc_core::IoHandler<sc_rpc_api::Metadata>
 where
     C: ProvideRuntimeApi<Block>,
     C: HeaderBackend<Block> + HeaderMetadata<Block, Error = BlockChainError> + 'static,
     C: Send + Sync + 'static,
     C::Api: substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Index>,
-    C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<
-        Block,
-        Balance,
-        UncheckedExtrinsic,
-    >,
+    C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance>,
     C::Api: pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance, BlockNumber>,
     C::Api: BlockBuilder<Block>,
     P: TransactionPool + 'static,
-    M: jsonrpc_core::Metadata + Default,
 {
     use pallet_contracts_rpc::{Contracts, ContractsApi};
     use pallet_transaction_payment_rpc::{TransactionPayment, TransactionPaymentApi};
@@ -110,9 +110,16 @@ where
         let GrandpaDeps {
             shared_voter_state,
             shared_authority_set,
+            justification_stream,
+            subscriptions,
         } = grandpa;
         io.extend_with(sc_finality_grandpa_rpc::GrandpaApi::to_delegate(
-            GrandpaRpcHandler::new(shared_authority_set, shared_voter_state),
+            GrandpaRpcHandler::new(
+                shared_authority_set,
+                shared_voter_state,
+                justification_stream,
+                subscriptions,
+            ),
         ));
     }
 
