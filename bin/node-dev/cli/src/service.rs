@@ -96,7 +96,6 @@ pub fn new_full_params(
         rpc_extensions_builder
     };
 
-
     let params = sc_service::ServiceParams {
         backend,
         client,
