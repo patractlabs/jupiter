@@ -23,6 +23,7 @@ This repo provide two type node:
 ```bash
 > git clone https://github.com/patractlabs/jupiter.git
 ```
+
 ### 2. init building environment
 *note: if you have build substrate successfully, you do not need to do this any more*
 
@@ -34,11 +35,13 @@ then:
 > cd jupiter/scripts
 > bash init.sh
 ```
+
 ### 3. compile this repo
 ```bash
 > WASM_BUILD_TYPE=release cargo build --release
 ```
 or we advice you to add `WASM_BUILD_TYPE=release` in your global environment variables
+
 ### 4. run
 now the directory `target/release` would contain two executable files.
 * `jupiter`, which is Jupiter Testnet node
@@ -63,3 +66,17 @@ use `Native`
     cargo run --release --bin jupiter-dev -- --dev -d .sub --execution=Native
     ```
 
+### 4. https://polkadot.js.org/apps/ or https://github.com/polkadot-js/apps
+If developer try to use `apps` to operate jupiter, he should add those types for `apps` to parse chain type.
+```json
+{
+  "Address": "AccountId",
+  "LookupSource": "AccountId"
+}
+```
+1. Click left top and choose `DEVELOPMENT`, `LOCAL NODE`, and click `Swich` on top.(optional, if you run you node on your machine. We would launch a public jupiter network later, so that
+all developer could connect to public test network directly).
+2. Click `Settings` tab and click `Developer` in this tab view, parse the above json into it, and click `Save`.
+3. Refresh website and you could use `apps` to do transfer and other basic operation.
+4. NOTE: current `apps` do not suit to substrate-rc6 version(current jupiter substrate version.), thus could not use `apps` to operate contracts.
+ 
