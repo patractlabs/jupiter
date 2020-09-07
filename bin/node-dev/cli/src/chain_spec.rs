@@ -6,8 +6,8 @@ use sp_runtime::traits::{IdentifyAccount, Verify};
 
 use jupiter_dev_runtime::{AccountId, Signature};
 use jupiter_dev_runtime::{
-    BalancesConfig, ContractsConfig, GenesisConfig, IndicesConfig,
-    SudoConfig, SystemConfig, WASM_BINARY,
+    BalancesConfig, ContractsConfig, GenesisConfig, IndicesConfig, SudoConfig, SystemConfig,
+    WASM_BINARY,
 };
 
 // The URL for the telemetry server.
@@ -40,7 +40,7 @@ pub fn development_config() -> Result<ChainSpec, String> {
         // Name
         "Development",
         // ID
-        "dev",
+        "jupiter-dev",
         ChainType::Development,
         move || {
             testnet_genesis(

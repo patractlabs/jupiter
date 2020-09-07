@@ -53,8 +53,8 @@ use jupiter_runtime_common::{
 pub fn wasm_binary_unwrap() -> &'static [u8] {
     WASM_BINARY.expect(
         "Development wasm binary is not available. This means the client is \
-						built with `BUILD_DUMMY_WASM_BINARY` flag and it is only usable for \
-						production chains. Please rebuild with the flag disabled.",
+                        built with `BUILD_DUMMY_WASM_BINARY` flag and it is only usable for \
+                        production chains. Please rebuild with the flag disabled.",
     )
 }
 
@@ -164,7 +164,7 @@ impl pallet_authorship::Trait for Runtime {
 }
 
 parameter_types! {
-    pub const MinimumPeriod: u64 = 0;
+    pub const MinimumPeriod: u64 = 1;
 }
 
 impl pallet_timestamp::Trait for Runtime {
@@ -365,16 +365,16 @@ impl_runtime_apis! {
     }
 
     impl sp_session::SessionKeys<Block> for Runtime {
-		fn generate_session_keys(_seed: Option<Vec<u8>>) -> Vec<u8> {
-			Vec::new()
-		}
+        fn generate_session_keys(_seed: Option<Vec<u8>>) -> Vec<u8> {
+            Vec::new()
+        }
 
-		fn decode_session_keys(
-			_encoded: Vec<u8>,
-		) -> Option<Vec<(Vec<u8>, sp_core::crypto::KeyTypeId)>> {
-			None
-		}
-	}
+        fn decode_session_keys(
+            _encoded: Vec<u8>,
+        ) -> Option<Vec<(Vec<u8>, sp_core::crypto::KeyTypeId)>> {
+            None
+        }
+    }
 
     impl frame_system_rpc_runtime_api::AccountNonceApi<Block, AccountId, Index> for Runtime {
         fn account_nonce(account: AccountId) -> Index {

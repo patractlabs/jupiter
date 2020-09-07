@@ -8,8 +8,8 @@ pub use sc_executor::NativeExecutor;
 use sc_service::{error::Error as ServiceError, Configuration, TaskManager};
 use sp_inherents::InherentDataProviders;
 
-use jupiter_primitives::Block;
 use jupiter_dev_runtime::{self, RuntimeApi};
+use jupiter_primitives::Block;
 
 use sc_network::config::DummyFinalityProofRequestBuilder;
 
