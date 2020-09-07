@@ -32,10 +32,11 @@ pub mod time {
 
 /// Fee-related.
 pub mod fee {
-    use crate::{Balance, ExtrinsicBaseWeight};
     use frame_support::weights::{
-        WeightToFeeCoefficient, WeightToFeeCoefficients, WeightToFeePolynomial,
+        constants::ExtrinsicBaseWeight, WeightToFeeCoefficient, WeightToFeeCoefficients,
+        WeightToFeePolynomial,
     };
+    use jupiter_primitives::Balance;
     use smallvec::smallvec;
     pub use sp_runtime::Perbill;
 

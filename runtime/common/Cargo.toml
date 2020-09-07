@@ -1,0 +1,36 @@
+[package]
+name = "jupiter-runtime-common"
+version = "0.1.0"
+authors = ["Jupiter <https://github.com/patractlabs/jupiter>"]
+edition = "2018"
+
+[dependencies]
+smallvec = "1.4.1"
+
+sp-std = { version = "2.0.0-rc6", default-features = false }
+sp-runtime = { version = "2.0.0-rc6", default-features = false }
+
+frame-support = { version = "2.0.0-rc6", default-features = false }
+frame-system = { version = "2.0.0-rc6", default-features = false }
+pallet-balances = { version = "2.0.0-rc6", default-features = false }
+pallet-transaction-payment = { version = "2.0.0-rc6", default-features = false }
+pallet-authorship = { version = "2.0.0-rc6", default-features = false }
+pallet-timestamp = { version = "2.0.0-rc6", default-features = false }
+
+jupiter-primitives = { path = "../../primitives", default-features = false }
+
+[features]
+default = ["std"]
+std = [
+    "sp-std/std",
+    "sp-runtime/std",
+
+    "frame-support/std",
+    "frame-system/std",
+    "pallet-balances/std",
+    "pallet-transaction-payment/std",
+    "pallet-authorship/std",
+    "pallet-timestamp/std",
+
+    "jupiter-primitives/std",
+]

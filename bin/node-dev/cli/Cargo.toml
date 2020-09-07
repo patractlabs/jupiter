@@ -22,13 +22,9 @@ sp-inherents = { version = "2.0.0-rc6" }
 sc-transaction-pool = { version = "2.0.0-rc6" }
 sp-transaction-pool = { version = "2.0.0-rc6" }
 sc-network = { version = "0.8.0-rc6" }
-#sc-consensus-aura = { version = "0.8.0-rc6" }
-sp-consensus-aura = { version = "0.8.0-rc6" }
 sp-consensus = { version = "0.8.0-rc6" }
 sc-consensus = { version = "0.8.0-rc6" }
 sc-consensus-manual-seal = { version = "0.8.0-rc6" }
-sc-finality-grandpa = { version = "0.8.0-rc6" }
-sp-finality-grandpa = { version = "2.0.0-rc6" }
 sc-client-api = { version = "2.0.0-rc6" }
 sp-api = { version = "2.0.0-rc6" }
 sp-runtime = { version = "2.0.0-rc6" }
@@ -38,7 +34,7 @@ sc-basic-authorship = { version = "0.8.0-rc6" }
 pallet-contracts = { version = "2.0.0-rc6" }
 
 jupiter-primitives = { path = "../../../primitives" }
-jupiter-runtime = { path = "../../../runtime" }
+jupiter-dev-runtime = { path = "../../../runtime/jupiter-dev" }
 jupiter-rpc = { path = "../../../rpc" }
 
 [build-dependencies]

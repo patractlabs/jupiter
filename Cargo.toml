@@ -3,7 +3,8 @@
 members = [
     "bin/node",
     "bin/node-dev",
-    "runtime",
+    "runtime/jupiter",
+    "runtime/jupiter-dev",
     "primitives",
     "rpc",
 ]

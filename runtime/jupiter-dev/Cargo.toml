@@ -1,5 +1,5 @@
 [package]
-name = "jupiter-runtime"
+name = "jupiter-dev-runtime"
 version = "0.1.0"
 authors = ["Jupiter <https://github.com/patractlabs/jupiter>"]
 edition = "2018"
@@ -11,7 +11,6 @@ targets = ["x86_64-unknown-linux-gnu"]
 codec = { package = "parity-scale-codec", version = "1.3.4", default-features = false, features = ["derive"] }
 serde = { version = "1.0.101", optional = true, features = ["derive"] }
 static_assertions = "1.1.0"
-smallvec = "1.4.1"
 
 # Substrate primitives
 sp-api = { version = "2.0.0-rc6", default-features = false }
@@ -32,14 +31,10 @@ frame-executive = { version = "2.0.0-rc6", default-features = false }
 frame-support = { version = "2.0.0-rc6", default-features = false }
 frame-system = { version = "2.0.0-rc6", default-features = false }
 frame-system-rpc-runtime-api = { version = "2.0.0-rc6", default-features = false }
-pallet-aura = { version = "2.0.0-rc6", default-features = false }
 pallet-authorship = { version = "2.0.0-rc6", default-features = false }
-pallet-grandpa = { version = "2.0.0-rc6", default-features = false }
-pallet-im-online = { version = "2.0.0-rc6", default-features = false }
 pallet-randomness-collective-flip = { version = "2.0.0-rc6", default-features = false }
 pallet-sudo = { version = "2.0.0-rc6", default-features = false }
 pallet-offences = { version = "2.0.0-rc6", default-features = false }
-pallet-session = { version = "2.0.0-rc6", default-features = false, features = ["historical"] }
 pallet-timestamp = { version = "2.0.0-rc6", default-features = false }
 pallet-indices = { version = "2.0.0-rc6", default-features = false }
 pallet-balances = { version = "2.0.0-rc6", default-features = false }
@@ -51,7 +46,8 @@ pallet-contracts = { version = "2.0.0-rc6", default-features = false }
 pallet-contracts-primitives = { version = "2.0.0-rc6", default-features = false }
 pallet-contracts-rpc-runtime-api = { version = "0.8.0-rc6", default-features = false }
 
-jupiter-primitives = { path = "../primitives", default-features = false }
+jupiter-primitives = { path = "../../primitives", default-features = false }
+jupiter-runtime-common = { path = "../common", default-features = false }
 
 [build-dependencies]
 wasm-builder-runner = { package = "substrate-wasm-builder-runner", version = "1.0.6", default-features = false }
@@ -80,13 +76,9 @@ std = [
     "frame-system/std",
     "frame-system-rpc-runtime-api/std",
 
-    "pallet-aura/std",
     "pallet-authorship/std",
-    "pallet-grandpa/std",
-    "pallet-im-online/std",
     "pallet-randomness-collective-flip/std",
     "pallet-sudo/std",
-    "pallet-session/std",
     "pallet-offences/std",
     "pallet-timestamp/std",
     "pallet-indices/std",
@@ -100,4 +92,5 @@ std = [
     "pallet-contracts-rpc-runtime-api/std",
 
     "jupiter-primitives/std",
+    "jupiter-runtime-common/std",
 ]

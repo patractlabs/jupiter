@@ -2231,9 +2231,9 @@ name = "jupiter-dev-cli"
 version = "0.1.0"
 dependencies = [
  "futures 0.3.5",
+ "jupiter-dev-runtime",
  "jupiter-primitives",
  "jupiter-rpc",
- "jupiter-runtime",
  "log",
  "pallet-contracts",
  "parking_lot 0.10.2",
@@ -2243,22 +2243,61 @@ dependencies = [
  "sc-consensus",
  "sc-consensus-manual-seal",
  "sc-executor",
- "sc-finality-grandpa",
  "sc-network",
  "sc-service",
  "sc-transaction-pool",
  "serde_json",
  "sp-api",
  "sp-consensus",
- "sp-consensus-aura",
  "sp-core",
- "sp-finality-grandpa",
  "sp-inherents",
  "sp-runtime",
  "sp-timestamp",
  "sp-transaction-pool",
  "structopt",
  "substrate-build-script-utils",
+]
+
+[[package]]
+name = "jupiter-dev-runtime"
+version = "0.1.0"
+dependencies = [
+ "frame-executive 2.0.0-rc6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "frame-support",
+ "frame-system",
+ "frame-system-rpc-runtime-api",
+ "jupiter-primitives",
+ "jupiter-runtime-common",
+ "pallet-authorship",
+ "pallet-balances",
+ "pallet-contracts",
+ "pallet-contracts-primitives",
+ "pallet-contracts-rpc-runtime-api",
+ "pallet-indices",
+ "pallet-multisig",
+ "pallet-offences",
+ "pallet-randomness-collective-flip",
+ "pallet-sudo",
+ "pallet-timestamp",
+ "pallet-transaction-payment",
+ "pallet-transaction-payment-rpc-runtime-api",
+ "pallet-utility",
+ "parity-scale-codec",
+ "serde",
+ "sp-api",
+ "sp-block-builder",
+ "sp-consensus-aura",
+ "sp-core",
+ "sp-inherents",
+ "sp-io",
+ "sp-offchain",
+ "sp-runtime",
+ "sp-session",
+ "sp-std",
+ "sp-transaction-pool",
+ "sp-version",
+ "static_assertions",
+ "substrate-wasm-builder-runner",
 ]
 
 [[package]]
@@ -2308,6 +2347,7 @@ dependencies = [
  "frame-system",
  "frame-system-rpc-runtime-api",
  "jupiter-primitives",
+ "jupiter-runtime-common",
  "pallet-aura",
  "pallet-authorship",
  "pallet-balances",
@@ -2328,7 +2368,6 @@ dependencies = [
  "pallet-utility",
  "parity-scale-codec",
  "serde",
- "smallvec 1.4.1",
  "sp-api",
  "sp-block-builder",
  "sp-consensus-aura",
@@ -2343,6 +2382,22 @@ dependencies = [
  "sp-version",
  "static_assertions",
  "substrate-wasm-builder-runner",
+]
+
+[[package]]
+name = "jupiter-runtime-common"
+version = "0.1.0"
+dependencies = [
+ "frame-support",
+ "frame-system",
+ "jupiter-primitives",
+ "pallet-authorship",
+ "pallet-balances",
+ "pallet-timestamp",
+ "pallet-transaction-payment",
+ "smallvec 1.4.1",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
