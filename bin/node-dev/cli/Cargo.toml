@@ -38,7 +38,7 @@ sc-basic-authorship = { version = "0.8.0-rc6" }
 pallet-contracts = { version = "2.0.0-rc6" }
 
 jupiter-primitives = { path = "../../../primitives" }
-jupiter-runtime = { path = "../../../runtime" }
+jupiter-runtime = { path = "../../../runtime/jupiter" }
 jupiter-rpc = { path = "../../../rpc" }
 
 [build-dependencies]
