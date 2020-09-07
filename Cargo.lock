@@ -2308,6 +2308,7 @@ dependencies = [
  "frame-system",
  "frame-system-rpc-runtime-api",
  "jupiter-primitives",
+ "jupiter-runtime-common",
  "pallet-aura",
  "pallet-authorship",
  "pallet-balances",
@@ -2343,6 +2344,22 @@ dependencies = [
  "sp-version",
  "static_assertions",
  "substrate-wasm-builder-runner",
+]
+
+[[package]]
+name = "jupiter-runtime-common"
+version = "0.1.0"
+dependencies = [
+ "frame-support",
+ "frame-system",
+ "jupiter-primitives",
+ "pallet-authorship",
+ "pallet-balances",
+ "pallet-timestamp",
+ "pallet-transaction-payment",
+ "smallvec 1.4.1",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]

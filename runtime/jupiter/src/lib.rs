@@ -2,8 +2,6 @@
 // `construct_runtime!` does a lot of recursion and requires us to increase the limit to 256.
 #![recursion_limit = "256"]
 
-mod weights;
-
 // Make the WASM binary available.
 #[cfg(feature = "std")]
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
@@ -53,11 +51,11 @@ pub use pallet_timestamp::Call as TimestampCall;
 pub use jupiter_primitives::{
     AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Signature,
 };
+use jupiter_runtime_common::{
+    constants::{currency::*, fee::WeightToFee, time::*},
+    impls, weights,
+};
 
-pub mod constants;
-pub mod impls;
-use crate::constants::fee::WeightToFee;
-pub use constants::{currency::*, time::*};
 impl_opaque_keys! {
     pub struct SessionKeys {
         pub aura: Aura,
