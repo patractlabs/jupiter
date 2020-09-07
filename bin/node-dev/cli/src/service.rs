@@ -5,20 +5,19 @@ use std::sync::Arc;
 use sc_client_api::RemoteBackend;
 use sc_executor::native_executor_instance;
 pub use sc_executor::NativeExecutor;
-use sc_finality_grandpa::FinalityProofProvider as GrandpaFinalityProofProvider;
 use sc_service::{error::Error as ServiceError, Configuration, TaskManager};
 use sp_inherents::InherentDataProviders;
 
 use jupiter_primitives::Block;
-use jupiter_runtime::{self, RuntimeApi};
+use jupiter_dev_runtime::{self, RuntimeApi};
 
 use sc_network::config::DummyFinalityProofRequestBuilder;
 
 // Our native executor instance.
 native_executor_instance!(
     pub Executor,
-    jupiter_runtime::api::dispatch,
-    jupiter_runtime::native_version,
+    jupiter_dev_runtime::api::dispatch,
+    jupiter_dev_runtime::native_version,
 );
 
 type FullClient = sc_service::TFullClient<Block, RuntimeApi, Executor>;
@@ -217,9 +216,6 @@ pub fn new_light(config: Configuration) -> Result<TaskManager, ServiceError> {
 
     let fprb = Box::new(DummyFinalityProofRequestBuilder::default()) as Box<_>;
 
-    let finality_proof_provider =
-        GrandpaFinalityProofProvider::new_for_service(backend.clone(), client.clone());
-
     let (network, network_status_sinks, system_rpc_tx, network_starter) =
         sc_service::build_network(sc_service::BuildNetworkParams {
             config: &config,
@@ -230,7 +226,7 @@ pub fn new_light(config: Configuration) -> Result<TaskManager, ServiceError> {
             on_demand: Some(on_demand.clone()),
             block_announce_validator_builder: None,
             finality_proof_request_builder: Some(fprb),
-            finality_proof_provider: Some(finality_proof_provider),
+            finality_proof_provider: None,
         })?;
 
     if config.offchain_worker.enabled {

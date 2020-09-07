@@ -1,5 +1,5 @@
 [package]
-name = "jupiter-runtime"
+name = "jupiter-dev-runtime"
 version = "0.1.0"
 authors = ["Jupiter <https://github.com/patractlabs/jupiter>"]
 edition = "2018"
@@ -31,14 +31,10 @@ frame-executive = { version = "2.0.0-rc6", default-features = false }
 frame-support = { version = "2.0.0-rc6", default-features = false }
 frame-system = { version = "2.0.0-rc6", default-features = false }
 frame-system-rpc-runtime-api = { version = "2.0.0-rc6", default-features = false }
-pallet-aura = { version = "2.0.0-rc6", default-features = false }
 pallet-authorship = { version = "2.0.0-rc6", default-features = false }
-pallet-grandpa = { version = "2.0.0-rc6", default-features = false }
-pallet-im-online = { version = "2.0.0-rc6", default-features = false }
 pallet-randomness-collective-flip = { version = "2.0.0-rc6", default-features = false }
 pallet-sudo = { version = "2.0.0-rc6", default-features = false }
 pallet-offences = { version = "2.0.0-rc6", default-features = false }
-pallet-session = { version = "2.0.0-rc6", default-features = false, features = ["historical"] }
 pallet-timestamp = { version = "2.0.0-rc6", default-features = false }
 pallet-indices = { version = "2.0.0-rc6", default-features = false }
 pallet-balances = { version = "2.0.0-rc6", default-features = false }
@@ -80,13 +76,9 @@ std = [
     "frame-system/std",
     "frame-system-rpc-runtime-api/std",
 
-    "pallet-aura/std",
     "pallet-authorship/std",
-    "pallet-grandpa/std",
-    "pallet-im-online/std",
     "pallet-randomness-collective-flip/std",
     "pallet-sudo/std",
-    "pallet-session/std",
     "pallet-offences/std",
     "pallet-timestamp/std",
     "pallet-indices/std",
