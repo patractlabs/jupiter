@@ -168,38 +168,46 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
 pub fn staging_testnet_config() -> Result<ChainSpec, String> {
     let wasm_binary = WASM_BINARY.ok_or("Testnet wasm binary not available".to_string())?;
 
+    // subkey inspect-key --uri "$SECRET"
+    // 5FC7Y5AHZgsGsdPpkZzhNNMVEvwkV1JDBhFgoDRifbnfFQhp
     let root_key: AccountId =
         hex!["8a5b214c82362a8aba60af2a5fee63989f1ae4ce3ec802251c0b3ff9f4ad1826"].into();
-    // 1
-    let (stash_1, controller_1): (AccountId, AccountId) = (
+    // bash:
+    // for i in 1 2; do for j in stash controller; do subkey inspect-key --uri "$SECRET//$i//$j"; done; done
+    // for i in 1 2; do for j in aura; do subkey inspect-key --scheme sr25519 --uri "$SECRET//$i//$j"; done; done
+    // for i in 1 2; do for j in grandpa; do subkey inspect-key --scheme ed25519 --uri "$SECRET//$i//$j"; done; done
+
+    // stash & controller
+    let (stash1, controller1): (AccountId, AccountId) = (
         // 5FbxS7sovNuk5DddziwwQL9MzsNbidQnf5NEuqzNWcPj1pW4
         hex!["9c8a60a79c1a5fe62597915c56659be3b390f8d52a0ee573a92d8dc55a460a4a"].into(),
         // 5F4KwD8s2y2GNRjKUrZNw5eExocPaVm1Nsf5rTvouZYrRVJN
         hex!["846ae7c3e25ea7762db990854800a24a10a5255e7de6c467a277ed288a1e9577"].into(),
     );
-    let (aura_1, grandpa_1): (AuraId, GrandpaId) = (
-        // 5EtZp8WCs4yRDvfLapwU8GrSoS9e7qpXVtYZVCNDFBXuVsiW
-        hex!["7cf92b27e280cef89900a7d351e37cdc6a578104a71f918165f52fee77aef647"].unchecked_into(),
-        // 5EFhVePXcH3bQ8z4QQjqeBQGi6QqJyR4NpEYSpVjV59gwy6w
-        hex!["60daf23817b1b4f247c08ed3b93480dd45c021e7ddeb95ecff74a09fe6acec0a"].unchecked_into(),
-    );
-    // 2
-    let (stash_2, controller_2): (AccountId, AccountId) = (
+    let (stash2, controller2): (AccountId, AccountId) = (
         // 5CVTFqhjfPfMWHrKXJAZNb3qVahz32pYKQww2o5rFFCgHg2Y
         hex!["12dffc4900a3dc57d9ffb464f8a6af677839329b7b6c7d6a514db1ce55d17c12"].into(),
         // 5DMRmiSn4DTdo7HZM2frH88UZFapYGMCgEQukpD6yd5fc1Pm
         hex!["38fd41ccf5b2020e4f79ab9007e0496096ff5edd692c57cba1dbfce5eaa77c69"].into(),
     );
-    let (aura_2, grandpa_2): (AuraId, GrandpaId) = (
-        // 5GRaVtCnSKjeXXXu6S5cVEcqn5yGbnCTGYYeKodxiRbnnZBd
-        hex!["c0dc511c88d7ef3bc5b465de48aac4efc643283f179b93d413f97e4a7aac714b"].unchecked_into(),
-        // 5ESFwnQnTTFPgtBNxDWoPwrSvPSz9TYUndePjQ7ct2Cc4XdS
-        hex!["68e8a38d283644652f0e8848a3db718f62bf8bccd0cbaa5b0dfeb8073c101a6a"].unchecked_into(),
-    );
+    // aura
+    // 5EtZp8WCs4yRDvfLapwU8GrSoS9e7qpXVtYZVCNDFBXuVsiW
+    let aura1: AuraId =
+        hex!["7cf92b27e280cef89900a7d351e37cdc6a578104a71f918165f52fee77aef647"].unchecked_into();
+    // 5GRaVtCnSKjeXXXu6S5cVEcqn5yGbnCTGYYeKodxiRbnnZBd
+    let aura2: AuraId =
+        hex!["c0dc511c88d7ef3bc5b465de48aac4efc643283f179b93d413f97e4a7aac714b"].unchecked_into();
+    // grandpa
+    // 5CwDbbQZY7dWGhgPvGqbi2WnhcFw7WkpW2ZrmvSvhtM7qVKn
+    let grandpa1: GrandpaId =
+        hex!["26866260bb8dabbe84fe7d2fee7bed533104a8e890fefc0001813bbd0e5c9cb9"].unchecked_into();
+    // 5G6VvSAqrqNLoqoRM4GUxrKQkfHuZ3ggnW8bbsQZbi187kfu
+    let grandpa2: GrandpaId =
+        hex!["b24f3f629e5cc692b50f08b9714c67be656b057293bb077beb44781a9a0e2992"].unchecked_into();
 
     let initial_authorities: Vec<AuthorityKeysTuple> = vec![
-        (controller_1.clone(), stash_1.clone(), aura_1, grandpa_1),
-        (controller_2.clone(), stash_2.clone(), aura_2, grandpa_2),
+        (controller1.clone(), stash1.clone(), aura1, grandpa1),
+        (controller2.clone(), stash2.clone(), aura2, grandpa2),
     ];
 
     Ok(ChainSpec::from_genesis(
@@ -218,18 +226,18 @@ pub fn staging_testnet_config() -> Result<ChainSpec, String> {
                 // Pre-funded accounts
                 vec![
                     root_key.clone(),
-                    controller_1.clone(),
-                    stash_1.clone(),
-                    controller_2.clone(),
-                    stash_2.clone(),
+                    controller1.clone(),
+                    stash1.clone(),
+                    controller2.clone(),
+                    stash2.clone(),
                 ],
                 true,
             )
         },
         // Bootnodes
         vec![
-            "/dns/p2p.staging-1.patract.io/tcp/30333/p2p/12D3KooWERffViUKxaPU1XEpQ11wPyjBM775XZU6jkApz25wxzEZ".to_string().try_into().unwrap(),
-            "/dns/p2p.staging-2.patract.io/tcp/30333/p2p/12D3KooWK4YK8jbwirhMsmfMX4QgyihZJGQz72G1Jd4iV8zLjjpq".to_string().try_into().unwrap(),
+            "/dns/p2p.staging-1.patract.io/tcp/30333/p2p/12D3KooWERffViUKxaPU1XEpQ11wPyjBM775XZU6jkApz25wxzEZ".to_string().try_into().expect("must be valid bootnode"),
+            "/dns/p2p.staging-2.patract.io/tcp/30334/p2p/12D3KooWK4YK8jbwirhMsmfMX4QgyihZJGQz72G1Jd4iV8zLjjpq".to_string().try_into().expect("must be valid bootnode"),
         ],
         // Telemetry
         None,
