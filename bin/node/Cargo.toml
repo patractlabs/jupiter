@@ -8,3 +8,6 @@ default-run = "jupiter"
 
 [dependencies]
 cli = { package = "jupiter-cli", path = "cli" }
+
+[target.'cfg(target_arch="x86_64")'.dependencies]
+cli = { package = "jupiter-cli", path = "cli", features = [ "wasmtime" ] }

@@ -1,0 +1,18 @@
+[package]
+name = "jupiter-executor"
+version = "0.1.0"
+authors = ["Jupiter <https://github.com/patractlabs/jupiter>"]
+edition = "2018"
+
+[dependencies]
+frame-benchmarking = { version = "2.0.0-rc6" }
+sc-executor = { version = "0.8.0-rc6" }
+jupiter-runtime = { path = "../../../runtime/jupiter" }
+
+[features]
+wasmtime = [
+    "sc-executor/wasmtime",
+]
+wasmi-errno = [
+    "sc-executor/wasmi-errno",
+]
