@@ -1,4 +1,5 @@
 use serde_json::json;
+use std::convert::TryInto;
 
 use hex_literal::hex;
 
@@ -226,7 +227,10 @@ pub fn staging_testnet_config() -> Result<ChainSpec, String> {
             )
         },
         // Bootnodes
-        vec![],
+        vec![
+            "/dns/p2p.staging-1.patract.io/tcp/30333/p2p/12D3KooWERffViUKxaPU1XEpQ11wPyjBM775XZU6jkApz25wxzEZ".to_string().try_into().unwrap(),
+            "/dns/p2p.staging-2.patract.io/tcp/30333/p2p/12D3KooWK4YK8jbwirhMsmfMX4QgyihZJGQz72G1Jd4iV8zLjjpq".to_string().try_into().unwrap(),
+        ],
         // Telemetry
         None,
         // Protocol ID
