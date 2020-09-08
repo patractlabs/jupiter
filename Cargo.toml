@@ -2,6 +2,7 @@
 [workspace]
 members = [
     "bin/node",
+    "bin/node/executor",
     "bin/node-dev",
     "runtime/jupiter",
     "runtime/jupiter-dev",

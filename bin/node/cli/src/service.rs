@@ -4,8 +4,6 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use sc_client_api::{ExecutorProvider, RemoteBackend};
-use sc_executor::native_executor_instance;
-pub use sc_executor::NativeExecutor;
 use sc_finality_grandpa::FinalityProofProvider as GrandpaFinalityProofProvider;
 use sc_service::{error::Error as ServiceError, Configuration, TaskManager};
 use sp_consensus_aura::sr25519::AuthorityPair as AuraPair;
@@ -13,13 +11,7 @@ use sp_inherents::InherentDataProviders;
 
 use jupiter_primitives::Block;
 use jupiter_runtime::{self, RuntimeApi};
-
-// Our native executor instance.
-native_executor_instance!(
-    pub Executor,
-    jupiter_runtime::api::dispatch,
-    jupiter_runtime::native_version,
-);
+use jupiter_executor::Executor;
 
 type FullClient = sc_service::TFullClient<Block, RuntimeApi, Executor>;
 type FullBackend = sc_service::TFullBackend<Block>;
