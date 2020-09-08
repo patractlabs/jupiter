@@ -2189,6 +2189,7 @@ name = "jupiter-cli"
 version = "0.1.0"
 dependencies = [
  "futures 0.3.5",
+ "hex-literal",
  "jsonrpc-pubsub",
  "jupiter-primitives",
  "jupiter-rpc",
