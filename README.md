@@ -18,7 +18,7 @@ This repo provide two type node:
     for producing block**, which would produce block only when receiving an extrinsic. This feature let developers do not 
     need to waste time for waiting producing blocks in develop and test.
     
-**Note: current jupiter is dependent on substrate-rc6 version. `pallet-contracts` for rc6 version is still in refactoring, 
+**Note: current jupiter is dependent on substrate v2.0.0 version. `pallet-contracts` for v2.0.0 version is still in refactoring, 
 and newest ink! do not match for current `pallet-contracts`, some example contracts could not play well in current version.**
     
 ## compile and run
@@ -133,4 +133,4 @@ For apps, developer or user could do following things:
     
 2. Click `Settings` tab and click `Developer` in this tab view, parse the above json into it, and click `Save`.
 3. Refresh website and you could use `apps` to do transfer and other basic operation.
-4. NOTE: current `apps` do not suit to substrate-rc6 version(current jupiter substrate version.), thus could not use `apps` to operate contracts.
+4. NOTE: current `apps` do not suit to substrate v2.0.0 version(current jupiter substrate version.), thus could not use `apps` to operate contracts.
