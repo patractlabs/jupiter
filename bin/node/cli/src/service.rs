@@ -5,13 +5,15 @@ use std::time::Duration;
 
 use sc_client_api::{ExecutorProvider, RemoteBackend};
 use sc_finality_grandpa::FinalityProofProvider as GrandpaFinalityProofProvider;
+use sc_network::NetworkService;
 use sc_service::{error::Error as ServiceError, Configuration, TaskManager};
 use sp_consensus_aura::sr25519::AuthorityPair as AuraPair;
 use sp_inherents::InherentDataProviders;
+use sp_runtime::traits::Block as BlockT;
 
+use jupiter_executor::Executor;
 use jupiter_primitives::Block;
 use jupiter_runtime::{self, RuntimeApi};
-use jupiter_executor::Executor;
 
 type FullClient = sc_service::TFullClient<Block, RuntimeApi, Executor>;
 type FullBackend = sc_service::TFullBackend<Block>;
@@ -27,10 +29,7 @@ pub fn new_partial(
         sp_consensus::DefaultImportQueue<Block, FullClient>,
         sc_transaction_pool::FullPool<Block, FullClient>,
         (
-            impl Fn(
-                jupiter_rpc::DenyUnsafe,
-                jsonrpc_pubsub::manager::SubscriptionManager,
-            ) -> jupiter_rpc::IoHandler,
+            impl Fn(jupiter_rpc::DenyUnsafe, sc_rpc::SubscriptionTaskExecutor) -> jupiter_rpc::IoHandler,
             (
                 sc_finality_grandpa::GrandpaBlockImport<
                     FullBackend,
@@ -40,7 +39,10 @@ pub fn new_partial(
                 >,
                 sc_finality_grandpa::LinkHalf<Block, FullClient, FullSelectChain>,
             ),
-            sc_finality_grandpa::SharedVoterState,
+            (
+                sc_finality_grandpa::SharedVoterState,
+                Arc<GrandpaFinalityProofProvider<FullBackend, Block>>,
+            ),
         ),
     >,
     ServiceError,
@@ -92,13 +94,15 @@ pub fn new_partial(
         let justification_stream = grandpa_link.justification_stream();
         let shared_authority_set = grandpa_link.shared_authority_set().clone();
         let shared_voter_state = sc_finality_grandpa::SharedVoterState::empty();
+        let finality_proof_provider =
+            GrandpaFinalityProofProvider::new_for_service(backend.clone(), client.clone());
 
-        let rpc_setup = shared_voter_state.clone();
+        let rpc_setup = (shared_voter_state.clone(), finality_proof_provider.clone());
 
         let client = client.clone();
         let pool = transaction_pool.clone();
 
-        let rpc_extensions_builder = Box::new(move |deny_unsafe, subscriptions| {
+        let rpc_extensions_builder = Box::new(move |deny_unsafe, subscription_executor| {
             let deps = jupiter_rpc::FullDeps {
                 client: client.clone(),
                 pool: pool.clone(),
@@ -107,7 +111,8 @@ pub fn new_partial(
                     shared_voter_state: shared_voter_state.clone(),
                     shared_authority_set: shared_authority_set.clone(),
                     justification_stream: justification_stream.clone(),
-                    subscriptions,
+                    subscription_executor,
+                    finality_provider: finality_proof_provider.clone(),
                 }),
             };
 
@@ -129,8 +134,17 @@ pub fn new_partial(
     })
 }
 
-/// Builds a new service for a full client.
-pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
+pub struct NewFullBase {
+    pub task_manager: TaskManager,
+    pub inherent_data_providers: InherentDataProviders,
+    pub client: Arc<FullClient>,
+    pub network: Arc<NetworkService<Block, <Block as BlockT>::Hash>>,
+    pub network_status_sinks: sc_service::NetworkStatusSinks<Block>,
+    pub transaction_pool: Arc<sc_transaction_pool::FullPool<Block, FullClient>>,
+}
+
+/// Creates a full service from the configuration.
+pub fn new_full_base(config: Configuration) -> Result<NewFullBase, ServiceError> {
     let sc_service::PartialComponents {
         client,
         backend,
@@ -143,8 +157,7 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
         other: (rpc_extensions_builder, (block_import, grandpa_link), rpc_setup),
     } = new_partial(&config)?;
 
-    let finality_proof_provider =
-        GrandpaFinalityProofProvider::new_for_service(backend.clone(), client.clone());
+    let (shared_voter_state, finality_proof_provider) = rpc_setup;
 
     let (network, network_status_sinks, system_rpc_tx, network_starter) =
         sc_service::build_network(sc_service::BuildNetworkParams {
@@ -188,16 +201,14 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
         on_demand: None,
         remote_blockchain: None,
         telemetry_connection_sinks: telemetry_connection_sinks.clone(),
-        network_status_sinks,
+        network_status_sinks: network_status_sinks.clone(),
         system_rpc_tx,
     })?;
-
-    let shared_voter_state = rpc_setup;
 
     if role.is_authority() {
         let proposer = sc_basic_authorship::ProposerFactory::new(
             client.clone(),
-            transaction_pool,
+            transaction_pool.clone(),
             prometheus_registry.as_ref(),
         );
 
@@ -252,8 +263,8 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
         let grandpa_config = sc_finality_grandpa::GrandpaParams {
             config: grandpa_config,
             link: grandpa_link,
-            network,
-            inherent_data_providers,
+            network: network.clone(),
+            inherent_data_providers: inherent_data_providers.clone(),
             telemetry_on_connect: Some(telemetry_connection_sinks.on_connect_stream()),
             voting_rule: sc_finality_grandpa::VotingRulesBuilder::default().build(),
             prometheus_registry,
@@ -267,11 +278,27 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
             sc_finality_grandpa::run_grandpa_voter(grandpa_config)?,
         );
     } else {
-        sc_finality_grandpa::setup_disabled_grandpa(client, &inherent_data_providers, network)?;
+        sc_finality_grandpa::setup_disabled_grandpa(
+            client.clone(),
+            &inherent_data_providers,
+            network.clone(),
+        )?;
     }
 
     network_starter.start_network();
-    Ok(task_manager)
+    Ok(NewFullBase {
+        task_manager,
+        inherent_data_providers,
+        client,
+        network,
+        network_status_sinks,
+        transaction_pool,
+    })
+}
+
+/// Builds a new service for a full client.
+pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
+    new_full_base(config).map(|NewFullBase { task_manager, .. }| task_manager)
 }
 
 /// Builds a new service for a light client.

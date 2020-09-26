@@ -7,15 +7,17 @@ edition = "2018"
 [dependencies]
 smallvec = "1.4.1"
 
-sp-std = { version = "2.0.0-rc6", default-features = false }
-sp-runtime = { version = "2.0.0-rc6", default-features = false }
+sp-std = { version = "2.0.0", default-features = false }
+sp-runtime = { version = "2.0.0", default-features = false }
 
-frame-support = { version = "2.0.0-rc6", default-features = false }
-frame-system = { version = "2.0.0-rc6", default-features = false }
-pallet-balances = { version = "2.0.0-rc6", default-features = false }
-pallet-transaction-payment = { version = "2.0.0-rc6", default-features = false }
-pallet-authorship = { version = "2.0.0-rc6", default-features = false }
-pallet-timestamp = { version = "2.0.0-rc6", default-features = false }
+frame-support = { version = "2.0.0", default-features = false }
+frame-system = { version = "2.0.0", default-features = false }
+pallet-balances = { version = "2.0.0", default-features = false }
+pallet-transaction-payment = { version = "2.0.0", default-features = false }
+pallet-authorship = { version = "2.0.0", default-features = false }
+pallet-timestamp = { version = "2.0.0", default-features = false }
+pallet-indices = { version = "2.0.0", default-features = false }
+pallet-session = { version = "2.0.0", default-features = false }
 
 jupiter-primitives = { path = "../../primitives", default-features = false }
 
@@ -31,6 +33,8 @@ std = [
     "pallet-transaction-payment/std",
     "pallet-authorship/std",
     "pallet-timestamp/std",
+    "pallet-indices/std",
+    "pallet-session/std",
 
     "jupiter-primitives/std",
 ]

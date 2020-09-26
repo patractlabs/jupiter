@@ -13,5 +13,6 @@ members = [
 [profile.release]
 panic = "unwind"
 
-[replace]
-"frame-executive:2.0.0-rc6" = { path = "./frame/executive" }
+[patch.crates-io]
+# patch for substrate runtime module
+frame-executive = { path = "./frame/executive" }
