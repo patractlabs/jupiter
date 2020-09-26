@@ -61,18 +61,16 @@ pub fn run() -> sc_cli::Result<()> {
         Some(Subcommand::Sign(cmd)) => cmd.run(),
         Some(Subcommand::Verify(cmd)) => cmd.run(),
         Some(Subcommand::Vanity(cmd)) => cmd.run(),
-        Some(Subcommand::Base(subcommand)) => {
-            let runner = cli.create_runner(subcommand)?;
+        Some(Subcommand::ExportState(cmd)) => {
+            let runner = cli.create_runner(cmd)?;
 
-            runner.run_subcommand(subcommand, |config| {
+            runner.async_run(|config| {
                 let PartialComponents {
                     client,
-                    backend,
                     task_manager,
-                    import_queue,
                     ..
                 } = new_partial(&config)?;
-                Ok((client, backend, import_queue, task_manager))
+                Ok((cmd.run(client, config.chain_spec), task_manager))
             })
         }
     }
