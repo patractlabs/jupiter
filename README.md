@@ -115,7 +115,13 @@ If developer try to use `apps` to operate jupiter, he should add those types for
 ```json
 {
   "Address": "AccountId",
-  "LookupSource": "AccountId"
+  "LookupSource": "AccountId",
+  "GeneratedContractAddressType": {
+    "_enum": [
+      "Original",
+      "Repeatable"
+    ]
+  }
 }
 ```
 Above json also use for types in `polkadot-js` sdk, please refer to [https://polkadot.js.org/api/start/types.extend.html](https://polkadot.js.org/api/start/types.extend.html)

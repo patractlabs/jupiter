@@ -342,6 +342,11 @@ impl pallet_sudo::Trait for Runtime {
     type Call = Call;
 }
 
+impl pallet_contracts_ext::Trait for Runtime {
+    type Event = Event;
+    type WeightInfo = ();
+}
+
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
     pub enum Runtime where
@@ -366,6 +371,7 @@ construct_runtime!(
         TransactionPayment: pallet_transaction_payment::{Module, Storage},
 
         Contracts: pallet_contracts::{Module, Call, Config, Storage, Event<T>},
+        ContractsExt: pallet_contracts_ext::{Module, Call, Storage, Event<T>},
 
         Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>},
     }
