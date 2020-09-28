@@ -323,7 +323,7 @@ impl pallet_contracts::Trait for Runtime {
     type Randomness = RandomnessCollectiveFlip;
     type Currency = Balances;
     type Event = Event;
-    type DetermineContractAddress = pallet_contracts::SimpleAddressDeterminer<Runtime>;
+    type DetermineContractAddress = ContractsExt;
     type TrieIdGenerator = pallet_contracts::TrieIdFromParentCounter<Runtime>;
     type RentPayment = ();
     type SignedClaimHandicap = pallet_contracts::DefaultSignedClaimHandicap;
@@ -340,6 +340,11 @@ impl pallet_contracts::Trait for Runtime {
 impl pallet_sudo::Trait for Runtime {
     type Event = Event;
     type Call = Call;
+}
+
+impl pallet_contracts_ext::Trait for Runtime {
+    type Event = Event;
+    type WeightInfo = ();
 }
 
 // Create the runtime by composing the FRAME pallets that were previously configured.
@@ -366,6 +371,7 @@ construct_runtime!(
         TransactionPayment: pallet_transaction_payment::{Module, Storage},
 
         Contracts: pallet_contracts::{Module, Call, Config, Storage, Event<T>},
+        ContractsExt: pallet_contracts_ext::{Module, Call, Storage, Event<T>},
 
         Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>},
     }

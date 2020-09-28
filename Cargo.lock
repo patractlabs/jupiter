@@ -2385,6 +2385,7 @@ dependencies = [
  "pallet-authorship",
  "pallet-balances",
  "pallet-contracts",
+ "pallet-contracts-ext",
  "pallet-contracts-primitives",
  "pallet-contracts-rpc-runtime-api",
  "pallet-indices",
@@ -2474,6 +2475,7 @@ dependencies = [
  "pallet-authorship",
  "pallet-balances",
  "pallet-contracts",
+ "pallet-contracts-ext",
  "pallet-contracts-primitives",
  "pallet-contracts-rpc-runtime-api",
  "pallet-grandpa",
@@ -3670,6 +3672,19 @@ dependencies = [
  "sp-sandbox",
  "sp-std",
  "wasmi-validation",
+]
+
+[[package]]
+name = "pallet-contracts-ext"
+version = "0.1.0"
+dependencies = [
+ "frame-support",
+ "frame-system",
+ "pallet-contracts",
+ "parity-scale-codec",
+ "sp-core",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
