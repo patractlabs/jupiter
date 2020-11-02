@@ -10,24 +10,24 @@ targets = ["x86_64-unknown-linux-gnu"]
 [dependencies]
 jsonrpc-core = "15.0.0"
 
-sc-client-api = { version = "2.0.0" }
-sc-rpc = { version = "2.0.0" }
+sc-client-api = { version = "2.0.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
+sc-rpc = { version = "2.0.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
 
-sp-api = { version = "2.0.0" }
-sp-runtime = { version = "2.0.0" }
-sp-transaction-pool = { version = "2.0.0" }
-sc-keystore = { version = "2.0.0" }
-sp-blockchain = { version = "2.0.0" }
-sc-rpc-api = { version = "0.8.0" }
-sp-block-builder = { version = "2.0.0" }
-sp-consensus = { version = "0.8.0" }
-sc-consensus-epochs = { version = "0.8.0" }
-sc-finality-grandpa = { version = "0.8.0" }
-sc-finality-grandpa-rpc = { version = "0.8.0" }
+sp-api = { version = "2.0.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
+sp-runtime = { version = "2.0.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
+sp-transaction-pool = { version = "2.0.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
+sc-keystore = { version = "2.0.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
+sp-blockchain = { version = "2.0.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
+sc-rpc-api = { version = "0.8.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
+sp-block-builder = { version = "2.0.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
+sp-consensus = { version = "0.8.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
+sc-consensus-epochs = { version = "0.8.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
+sc-finality-grandpa = { version = "0.8.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
+sc-finality-grandpa-rpc = { version = "0.8.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
 
-substrate-frame-rpc-system = { version = "2.0.0" }
-pallet-transaction-payment-rpc = { version = "2.0.0" }
-pallet-contracts-rpc = { version = "0.8.0" }
+substrate-frame-rpc-system = { version = "2.0.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
+pallet-transaction-payment-rpc = { version = "2.0.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
+pallet-contracts-rpc = { version = "0.8.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
 
 jupiter-primitives = { path = "../primitives" }
 
