@@ -155,12 +155,12 @@ parameter_types! {
     pub const UncleGenerations: u32 = 0;
 }
 
-impl pallet_authorship::Trait for Runtime {
-    type FindAuthor = (); // would set Default::default() for author
-    type UncleGenerations = UncleGenerations;
-    type FilterUncle = ();
-    type EventHandler = ();
-}
+// impl pallet_authorship::Trait for Runtime {
+//     type FindAuthor = (); // would set Default::default() for author
+//     type UncleGenerations = UncleGenerations;
+//     type FilterUncle = ();
+//     type EventHandler = ();
+// }
 
 parameter_types! {
     pub const MinimumPeriod: u64 = SLOT_DURATION / 2;
@@ -288,8 +288,8 @@ construct_runtime!(
         System: frame_system::{Module, Call, Config, Storage, Event<T>},
         RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Module, Call, Storage},
 
-        // Consensus support.
-        Authorship: pallet_authorship::{Module, Call, Storage},
+        // // Consensus support.
+        // Authorship: pallet_authorship::{Module, Call, Storage},
 
         Timestamp: pallet_timestamp::{Module, Call, Storage, Inherent},
         Balances: pallet_balances::{Module, Call, Storage, Config<T>, Event<T>},

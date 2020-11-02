@@ -62,7 +62,7 @@ jupiter-primitives = { path = "../../primitives", default-features = false }
 jupiter-runtime-common = { path = "../common", default-features = false }
 
 [build-dependencies]
-wasm-builder-runner = { package = "substrate-wasm-builder-runner", version = "1.0.6", git = "https://github.com/paritytech/substrate", branch = "rococo-branch", default-features = false }
+wasm-builder-runner = { package = "substrate-wasm-builder-runner", version = "1.0.6", git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
 
 [features]
 default = ["std"]
@@ -108,11 +108,11 @@ std = [
     "jupiter-primitives/std",
     "jupiter-runtime-common/std",
 
-    "cumulus-runtime/std",
-    "cumulus-parachain-upgrade/std",
     "cumulus-message-broker/std",
-    "cumulus-upward-message/std",
+    "cumulus-parachain-upgrade/std",
     "cumulus-primitives/std",
+    "cumulus-runtime/std",
+    "cumulus-upward-message/std",
     "parachain-info/std",
 #    "cumulus-token-dealer/std",
 ]
