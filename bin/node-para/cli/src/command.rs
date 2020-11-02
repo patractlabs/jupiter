@@ -1,16 +1,16 @@
 use crate::chain_spec;
-use crate::cli::{Cli, Subcommand, RelayChainCli};
+use crate::cli::{Cli, RelayChainCli, Subcommand};
 use crate::service::{self, new_full_base, new_partial, NewFullBase};
-use std::{io::Write, net::SocketAddr, sync::Arc};
+use jupiter_para_runtime::Block;
 use polkadot_parachain::primitives::AccountIdConversion;
-use sp_core::hexdisplay::HexDisplay;
 use sc_cli::{
     ChainSpec, CliConfiguration, DefaultConfigurationValues, ImportParams, KeystoreParams,
     NetworkParams, Result, RuntimeVersion, SharedParams, SubstrateCli,
 };
 use sc_service::config::{BasePath, PrometheusConfig};
-use jupiter_para_runtime::Block;
+use sp_core::hexdisplay::HexDisplay;
 use sp_runtime::traits::{Block as BlockT, Hash as HashT, Header as HeaderT, Zero};
+use std::{io::Write, net::SocketAddr, sync::Arc};
 
 impl SubstrateCli for Cli {
     fn impl_name() -> String {
@@ -202,13 +202,7 @@ pub fn run() -> Result<()> {
                     if cli.run.base.validator { "yes" } else { "no" }
                 );
 
-                crate::service::start_node(
-                    config,
-                    key,
-                    polkadot_config,
-                    id,
-                    cli.run.base.validator,
-                )
+                crate::service::start_node(config, key, polkadot_config, id, cli.run.base.validator)
                     .map(|r| r.0)
             })
         }

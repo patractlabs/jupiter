@@ -4,17 +4,17 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use sc_client_api::{ExecutorProvider, RemoteBackend};
+use sc_executor::native_executor_instance;
+pub use sc_executor::NativeExecutor;
 use sc_finality_grandpa::FinalityProofProvider as GrandpaFinalityProofProvider;
 use sc_network::NetworkService;
 use sc_service::{error::Error as ServiceError, Configuration, TaskManager};
 use sp_consensus_aura::sr25519::AuthorityPair as AuraPair;
 use sp_inherents::InherentDataProviders;
 use sp_runtime::traits::Block as BlockT;
-use sc_executor::native_executor_instance;
-pub use sc_executor::NativeExecutor;
 
-use jupiter_primitives::Block;
 use jupiter_para_runtime::{self, RuntimeApi};
+use jupiter_primitives::Block;
 
 // Declare an instance of the native executor named `Executor`. Include the wasm binary as the
 // equivalent wasm code.

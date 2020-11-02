@@ -52,8 +52,8 @@ cumulus-parachain-upgrade = { git = "https://github.com/paritytech/cumulus", def
 cumulus-primitives = { git = "https://github.com/paritytech/cumulus", default-features = false }
 cumulus-runtime = { git = "https://github.com/paritytech/cumulus", default-features = false }
 cumulus-upward-message = { git = "https://github.com/paritytech/cumulus", default-features = false }
-cumulus-token-dealer = { path = "../../pallets/token-dealer", default-features = false}
 parachain-info = { git = "https://github.com/paritytech/cumulus", default-features = false }
+# cumulus-token-dealer = { path = "../../pallets/token-dealer", default-features = false}
 
 # local runtime module
 pallet-contracts-ext = { path = "../../frame/contracts-ext", default-features = false }
@@ -62,7 +62,7 @@ jupiter-primitives = { path = "../../primitives", default-features = false }
 jupiter-runtime-common = { path = "../common", default-features = false }
 
 [build-dependencies]
-wasm-builder-runner = { package = "substrate-wasm-builder-runner", version = "1.0.6", default-features = false }
+wasm-builder-runner = { package = "substrate-wasm-builder-runner", version = "1.0.6", git = "https://github.com/paritytech/substrate", branch = "rococo-branch", default-features = false }
 
 [features]
 default = ["std"]
@@ -113,6 +113,6 @@ std = [
     "cumulus-message-broker/std",
     "cumulus-upward-message/std",
     "cumulus-primitives/std",
-    "cumulus-token-dealer/std",
     "parachain-info/std",
+#    "cumulus-token-dealer/std",
 ]

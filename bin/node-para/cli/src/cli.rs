@@ -1,6 +1,6 @@
-use sc_cli::{KeySubcommand, SignCmd, VanityCmd, VerifyCmd, BuildSyncSpecCmd};
-use structopt::StructOpt;
+use sc_cli::{BuildSyncSpecCmd, KeySubcommand, SignCmd, VanityCmd, VerifyCmd};
 use std::path::PathBuf;
+use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
 pub enum Subcommand {

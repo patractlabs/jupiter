@@ -1008,8 +1008,8 @@ name = "cumulus-message-broker"
 version = "0.1.0"
 source = "git+https://github.com/paritytech/cumulus#4d150a01993265d62ab05032db6f24db7503e6ee"
 dependencies = [
- "cumulus-primitives 0.1.0 (git+https://github.com/paritytech/cumulus)",
- "cumulus-upward-message 0.1.0 (git+https://github.com/paritytech/cumulus)",
+ "cumulus-primitives",
+ "cumulus-upward-message",
  "frame-support",
  "frame-system",
  "parity-scale-codec",
@@ -1024,7 +1024,7 @@ name = "cumulus-parachain-upgrade"
 version = "0.1.0"
 source = "git+https://github.com/paritytech/cumulus#4d150a01993265d62ab05032db6f24db7503e6ee"
 dependencies = [
- "cumulus-primitives 0.1.0 (git+https://github.com/paritytech/cumulus)",
+ "cumulus-primitives",
  "cumulus-runtime",
  "frame-support",
  "frame-system",
@@ -1057,26 +1057,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "cumulus-primitives"
-version = "0.1.0"
-source = "git+https://github.com/paritytech/cumulus?rev=4e7f138c828bcf118df1c988a400d4dac8e904d9#4e7f138c828bcf118df1c988a400d4dac8e904d9"
-dependencies = [
- "impl-trait-for-tuples",
- "parity-scale-codec",
- "polkadot-core-primitives",
- "polkadot-parachain",
- "polkadot-primitives",
- "sp-inherents",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
 name = "cumulus-runtime"
 version = "0.1.0"
 source = "git+https://github.com/paritytech/cumulus#4d150a01993265d62ab05032db6f24db7503e6ee"
 dependencies = [
- "cumulus-primitives 0.1.0 (git+https://github.com/paritytech/cumulus)",
+ "cumulus-primitives",
  "frame-executive",
  "hash-db",
  "memory-db",
@@ -1091,35 +1076,9 @@ dependencies = [
 ]
 
 [[package]]
-name = "cumulus-token-dealer"
-version = "0.1.0"
-dependencies = [
- "cumulus-primitives 0.1.0 (git+https://github.com/paritytech/cumulus?rev=4e7f138c828bcf118df1c988a400d4dac8e904d9)",
- "cumulus-upward-message 0.1.0 (git+https://github.com/paritytech/cumulus?rev=4e7f138c828bcf118df1c988a400d4dac8e904d9)",
- "frame-support",
- "frame-system",
- "parity-scale-codec",
- "polkadot-parachain",
-]
-
-[[package]]
 name = "cumulus-upward-message"
 version = "0.1.0"
 source = "git+https://github.com/paritytech/cumulus#4d150a01993265d62ab05032db6f24db7503e6ee"
-dependencies = [
- "kusama-runtime",
- "polkadot-core-primitives",
- "polkadot-parachain",
- "polkadot-runtime",
- "rococo-runtime",
- "sp-std",
- "westend-runtime",
-]
-
-[[package]]
-name = "cumulus-upward-message"
-version = "0.1.0"
-source = "git+https://github.com/paritytech/cumulus?rev=4e7f138c828bcf118df1c988a400d4dac8e904d9#4e7f138c828bcf118df1c988a400d4dac8e904d9"
 dependencies = [
  "kusama-runtime",
  "polkadot-core-primitives",
@@ -2691,7 +2650,7 @@ dependencies = [
  "sp-transaction-pool",
  "sp-version",
  "static_assertions",
- "substrate-wasm-builder-runner",
+ "substrate-wasm-builder-runner 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -2754,10 +2713,9 @@ version = "0.1.0"
 dependencies = [
  "cumulus-message-broker",
  "cumulus-parachain-upgrade",
- "cumulus-primitives 0.1.0 (git+https://github.com/paritytech/cumulus)",
+ "cumulus-primitives",
  "cumulus-runtime",
- "cumulus-token-dealer",
- "cumulus-upward-message 0.1.0 (git+https://github.com/paritytech/cumulus)",
+ "cumulus-upward-message",
  "frame-executive",
  "frame-support",
  "frame-system",
@@ -2795,7 +2753,7 @@ dependencies = [
  "sp-transaction-pool",
  "sp-version",
  "static_assertions",
- "substrate-wasm-builder-runner",
+ "substrate-wasm-builder-runner 1.0.6 (git+https://github.com/paritytech/substrate?branch=rococo-branch)",
 ]
 
 [[package]]
@@ -2879,7 +2837,7 @@ dependencies = [
  "sp-transaction-pool",
  "sp-version",
  "static_assertions",
- "substrate-wasm-builder-runner",
+ "substrate-wasm-builder-runner 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -2979,7 +2937,7 @@ dependencies = [
  "sp-transaction-pool",
  "sp-version",
  "static_assertions",
- "substrate-wasm-builder-runner",
+ "substrate-wasm-builder-runner 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -4555,7 +4513,7 @@ name = "parachain-info"
 version = "0.1.0"
 source = "git+https://github.com/paritytech/cumulus#4d150a01993265d62ab05032db6f24db7503e6ee"
 dependencies = [
- "cumulus-primitives 0.1.0 (git+https://github.com/paritytech/cumulus)",
+ "cumulus-primitives",
  "frame-support",
  "frame-system",
  "parity-scale-codec",
@@ -4997,7 +4955,7 @@ dependencies = [
  "sp-transaction-pool",
  "sp-version",
  "static_assertions",
- "substrate-wasm-builder-runner",
+ "substrate-wasm-builder-runner 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -5770,7 +5728,7 @@ dependencies = [
  "sp-transaction-pool",
  "sp-version",
  "static_assertions",
- "substrate-wasm-builder-runner",
+ "substrate-wasm-builder-runner 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -7877,6 +7835,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d2a965994514ab35d3893e9260245f2947fd1981cdd4fffd2c6e6d1a9ce02e6a"
 
 [[package]]
+name = "substrate-wasm-builder-runner"
+version = "1.0.6"
+source = "git+https://github.com/paritytech/substrate?branch=rococo-branch#83544d41abcc0e3d3cbbd6aa510e04dc50863e5c"
+
+[[package]]
 name = "substrate-wasmtime"
 version = "0.19.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -9077,7 +9040,7 @@ dependencies = [
  "sp-transaction-pool",
  "sp-version",
  "static_assertions",
- "substrate-wasm-builder-runner",
+ "substrate-wasm-builder-runner 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
