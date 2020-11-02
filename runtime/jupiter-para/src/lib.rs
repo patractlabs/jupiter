@@ -151,9 +151,9 @@ impl frame_system::Trait for Runtime {
     type SystemWeightInfo = (); //weights::frame_system::WeightInfo;
 }
 
-parameter_types! {
-    pub const UncleGenerations: u32 = 0;
-}
+// parameter_types! {
+//     pub const UncleGenerations: u32 = 0;
+// }
 
 // impl pallet_authorship::Trait for Runtime {
 //     type FindAuthor = (); // would set Default::default() for author
@@ -211,7 +211,8 @@ parameter_types! {
 
 impl pallet_transaction_payment::Trait for Runtime {
     type Currency = Balances;
-    type OnTransactionPayment = impls::ToAuthor<Self>;
+    // TODO: For now, parachain doesn't have an author. Pls set author in future.
+    type OnTransactionPayment = ();
     type TransactionByteFee = TransactionByteFee;
     type WeightToFee = WeightToFee;
     type FeeMultiplierUpdate = impls::SlowAdjustingFeeUpdate<Self>;
