@@ -29,7 +29,7 @@ pub fn new_partial(
         sp_consensus::DefaultImportQueue<Block, FullClient>,
         sc_transaction_pool::FullPool<Block, FullClient>,
         (
-            impl Fn(jupiter_rpc::DenyUnsafe, sc_rpc::SubscriptionTaskExecutor) -> jupiter_rpc::IoHandler,
+            impl Fn(jupiter_rpc::DenyUnsafe) -> jupiter_rpc::IoHandler,
             (
                 sc_finality_grandpa::GrandpaBlockImport<
                     FullBackend,
@@ -74,7 +74,7 @@ pub fn new_partial(
     );
 
     let inherent_data_providers = sp_inherents::InherentDataProviders::new();
-    let import_queue = sc_consensus_aura::import_queue::<_, _, _, AuraPair, _, _>(
+    let import_queue = sc_consensus_aura::import_queue::<_, _, _, AuraPair, _>(
         sc_consensus_aura::slot_duration(&*client)?,
         aura_block_import,
         Some(Box::new(justification_import)),
@@ -83,7 +83,6 @@ pub fn new_partial(
         inherent_data_providers.clone(),
         &task_manager.spawn_handle(),
         config.prometheus_registry(),
-        sp_consensus::CanAuthorWithNativeVersion::new(client.executor().clone()),
     )?;
 
     let import_setup = (grandpa_block_import, grandpa_link);
@@ -91,7 +90,6 @@ pub fn new_partial(
     let (rpc_extensions_builder, rpc_setup) = {
         let (_, grandpa_link) = &import_setup;
 
-        let justification_stream = grandpa_link.justification_stream();
         let shared_authority_set = grandpa_link.shared_authority_set().clone();
         let shared_voter_state = sc_finality_grandpa::SharedVoterState::empty();
         let finality_proof_provider =
@@ -102,7 +100,7 @@ pub fn new_partial(
         let client = client.clone();
         let pool = transaction_pool.clone();
 
-        let rpc_extensions_builder = Box::new(move |deny_unsafe, subscription_executor| {
+        let rpc_extensions_builder = Box::new(move |deny_unsafe| {
             let deps = jupiter_rpc::FullDeps {
                 client: client.clone(),
                 pool: pool.clone(),
@@ -110,9 +108,6 @@ pub fn new_partial(
                 grandpa: Some(jupiter_rpc::GrandpaDeps {
                     shared_voter_state: shared_voter_state.clone(),
                     shared_authority_set: shared_authority_set.clone(),
-                    justification_stream: justification_stream.clone(),
-                    subscription_executor,
-                    finality_provider: finality_proof_provider.clone(),
                 }),
             };
 
@@ -325,7 +320,7 @@ pub fn new_light(config: Configuration) -> Result<TaskManager, ServiceError> {
     let finality_proof_request_builder =
         finality_proof_import.create_finality_proof_request_builder();
 
-    let import_queue = sc_consensus_aura::import_queue::<_, _, _, AuraPair, _, _>(
+    let import_queue = sc_consensus_aura::import_queue::<_, _, _, AuraPair, _>(
         sc_consensus_aura::slot_duration(&*client)?,
         grandpa_block_import,
         None,
@@ -334,7 +329,6 @@ pub fn new_light(config: Configuration) -> Result<TaskManager, ServiceError> {
         InherentDataProviders::new(),
         &task_manager.spawn_handle(),
         config.prometheus_registry(),
-        sp_consensus::NeverCanAuthor,
     )?;
 
     let finality_proof_provider =

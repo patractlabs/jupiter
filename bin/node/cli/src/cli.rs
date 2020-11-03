@@ -1,4 +1,4 @@
-use sc_cli::{KeySubcommand, RunCmd, SignCmd, VanityCmd, VerifyCmd};
+use sc_cli::{RunCmd};
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
@@ -12,23 +12,8 @@ pub struct Cli {
 
 #[derive(Debug, StructOpt)]
 pub enum Subcommand {
-    /// Key management cli utilities
-    Key(KeySubcommand),
-
-    /// Verify a signature for a message, provided on STDIN, with a given (public or secret) key.
-    Verify(VerifyCmd),
-
-    /// Generate a seed that provides a vanity address.
-    Vanity(VanityCmd),
-
-    /// Sign a message, with a given (secret) key.
-    Sign(SignCmd),
-
     /// Build a chain specification.
     BuildSpec(sc_cli::BuildSpecCmd),
-
-    /// Build a chain specification with a light client sync state.
-    BuildSyncSpec(sc_cli::BuildSyncSpecCmd),
 
     /// Validate blocks.
     CheckBlock(sc_cli::CheckBlockCmd),
