@@ -1,4 +1,4 @@
-use sc_cli::{BuildSyncSpecCmd, KeySubcommand, SignCmd, VanityCmd, VerifyCmd};
+use sc_cli;
 use std::path::PathBuf;
 use structopt::StructOpt;
 
@@ -6,21 +6,6 @@ use structopt::StructOpt;
 pub enum Subcommand {
     #[structopt(flatten)]
     Base(sc_cli::Subcommand),
-
-    /// Key management cli utilities
-    Key(KeySubcommand),
-
-    /// Verify a signature for a message, provided on STDIN, with a given (public or secret) key.
-    Verify(VerifyCmd),
-
-    /// Generate a seed that provides a vanity address.
-    Vanity(VanityCmd),
-
-    /// Sign a message, with a given (secret) key.
-    Sign(SignCmd),
-
-    /// Build a chain specification with a light client sync state.
-    BuildSyncSpec(BuildSyncSpecCmd),
 
     /// Export the genesis state of the parachain.
     #[structopt(name = "export-genesis-state")]

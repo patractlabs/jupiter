@@ -1,19 +1,20 @@
 use serde_json::json;
 use std::convert::TryInto;
+use serde::{Deserialize, Serialize};
 
 use hex_literal::hex;
 
+use sc_chain_spec::{ChainSpecExtension, ChainSpecGroup};
 use sc_service::ChainType;
-use sp_consensus_aura::sr25519::AuthorityId as AuraId;
-use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public};
-use sp_finality_grandpa::AuthorityId as GrandpaId;
+use sp_core::{sr25519, Pair, Public};
 use sp_runtime::traits::{IdentifyAccount, Verify};
 
-use jupiter_runtime::{AccountId, SessionKeys, Signature};
-use jupiter_runtime::{
-    AuraConfig, BalancesConfig, ContractsConfig, GenesisConfig, GrandpaConfig, IndicesConfig,
-    SessionConfig, SudoConfig, SystemConfig, WASM_BINARY,
+use jupiter_para_runtime::{AccountId, Signature};
+use jupiter_para_runtime::{
+    BalancesConfig, ContractsConfig, GenesisConfig, IndicesConfig,
+    SudoConfig, SystemConfig, WASM_BINARY, ParachainInfoConfig
 };
+use cumulus_primitives::ParaId;
 
 // The URL for the telemetry server.
 // const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
@@ -28,6 +29,23 @@ pub fn get_from_seed<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Pu
         .public()
 }
 
+/// The extensions for the [`ChainSpec`].
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, ChainSpecGroup, ChainSpecExtension)]
+#[serde(deny_unknown_fields)]
+pub struct Extensions {
+    /// The relay chain of the Parachain.
+    pub relay_chain: String,
+    /// The id of the Parachain.
+    pub para_id: u32,
+}
+
+impl Extensions {
+    /// Try to get the extension from the given `ChainSpec`.
+    pub fn try_get(chain_spec: &Box<dyn sc_service::ChainSpec>) -> Option<&Self> {
+        sc_chain_spec::get_extension(chain_spec.extensions())
+    }
+}
+
 type AccountPublic = <Signature as Verify>::Signer;
 
 /// Generate an account ID from seed.
@@ -38,27 +56,7 @@ where
     AccountPublic::from(get_from_seed::<TPublic>(seed)).into_account()
 }
 
-/// Generate an Aura authority key.
-type AuthorityKeysTuple = (
-    AccountId, // ValidatorId
-    AccountId, // (SessionKey)
-    AuraId,
-    GrandpaId,
-);
-/// Helper function to generate stash, controller and session key from seed
-pub fn authority_keys_from_seed(seed: &str) -> AuthorityKeysTuple {
-    (
-        get_account_id_from_seed::<sr25519::Public>(seed),
-        get_account_id_from_seed::<sr25519::Public>(&format!("{}//stash", seed)),
-        get_from_seed::<AuraId>(seed),
-        get_from_seed::<GrandpaId>(seed),
-    )
-}
-fn session_keys(aura: AuraId, grandpa: GrandpaId) -> SessionKeys {
-    SessionKeys { aura, grandpa }
-}
-
-pub fn development_config() -> Result<ChainSpec, String> {
+pub fn development_config(id: ParaId) -> Result<ChainSpec, String> {
     let wasm_binary = WASM_BINARY.ok_or("Development wasm binary not available".to_string())?;
 
     Ok(ChainSpec::from_genesis(
@@ -70,8 +68,6 @@ pub fn development_config() -> Result<ChainSpec, String> {
         move || {
             testnet_genesis(
                 wasm_binary,
-                // Initial PoA authorities
-                vec![authority_keys_from_seed("Alice")],
                 // Sudo account
                 get_account_id_from_seed::<sr25519::Public>("Alice"),
                 // Pre-funded accounts
@@ -82,6 +78,7 @@ pub fn development_config() -> Result<ChainSpec, String> {
                     get_account_id_from_seed::<sr25519::Public>("Bob//stash"),
                 ],
                 true,
+                id,
             )
         },
         // Bootnodes
@@ -106,66 +103,7 @@ pub fn development_config() -> Result<ChainSpec, String> {
     ))
 }
 
-pub fn local_testnet_config() -> Result<ChainSpec, String> {
-    let wasm_binary = WASM_BINARY.ok_or("Development wasm binary not available".to_string())?;
-
-    Ok(ChainSpec::from_genesis(
-        // Name
-        "Local Testnet",
-        // ID
-        "local_testnet",
-        ChainType::Local,
-        move || {
-            testnet_genesis(
-                wasm_binary,
-                // Initial PoA authorities
-                vec![
-                    authority_keys_from_seed("Alice"),
-                    authority_keys_from_seed("Bob"),
-                ],
-                // Sudo account
-                get_account_id_from_seed::<sr25519::Public>("Alice"),
-                // Pre-funded accounts
-                vec![
-                    get_account_id_from_seed::<sr25519::Public>("Alice"),
-                    get_account_id_from_seed::<sr25519::Public>("Bob"),
-                    get_account_id_from_seed::<sr25519::Public>("Charlie"),
-                    get_account_id_from_seed::<sr25519::Public>("Dave"),
-                    get_account_id_from_seed::<sr25519::Public>("Eve"),
-                    get_account_id_from_seed::<sr25519::Public>("Ferdie"),
-                    get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
-                    get_account_id_from_seed::<sr25519::Public>("Bob//stash"),
-                    get_account_id_from_seed::<sr25519::Public>("Charlie//stash"),
-                    get_account_id_from_seed::<sr25519::Public>("Dave//stash"),
-                    get_account_id_from_seed::<sr25519::Public>("Eve//stash"),
-                    get_account_id_from_seed::<sr25519::Public>("Ferdie//stash"),
-                ],
-                true,
-            )
-        },
-        // Bootnodes
-        vec![],
-        // Telemetry
-        None,
-        // Protocol ID
-        None,
-        // Properties
-        Some(
-            json!({
-                "ss58Format": 42,
-                "tokenDecimals": 10,
-                "tokenSymbol": "DOT (new)"
-            })
-            .as_object()
-            .expect("network properties generation can not fail; qed")
-            .to_owned(),
-        ),
-        // Extensions
-        None,
-    ))
-}
-
-pub fn staging_testnet_config() -> Result<ChainSpec, String> {
+pub fn staging_testnet_config(id: ParaId) -> Result<ChainSpec, String> {
     let wasm_binary = WASM_BINARY.ok_or("Testnet wasm binary not available".to_string())?;
 
     // subkey inspect-key --uri "$SECRET"
@@ -190,25 +128,6 @@ pub fn staging_testnet_config() -> Result<ChainSpec, String> {
         // 5DMRmiSn4DTdo7HZM2frH88UZFapYGMCgEQukpD6yd5fc1Pm
         hex!["38fd41ccf5b2020e4f79ab9007e0496096ff5edd692c57cba1dbfce5eaa77c69"].into(),
     );
-    // aura
-    // 5EtZp8WCs4yRDvfLapwU8GrSoS9e7qpXVtYZVCNDFBXuVsiW
-    let aura1: AuraId =
-        hex!["7cf92b27e280cef89900a7d351e37cdc6a578104a71f918165f52fee77aef647"].unchecked_into();
-    // 5GRaVtCnSKjeXXXu6S5cVEcqn5yGbnCTGYYeKodxiRbnnZBd
-    let aura2: AuraId =
-        hex!["c0dc511c88d7ef3bc5b465de48aac4efc643283f179b93d413f97e4a7aac714b"].unchecked_into();
-    // grandpa
-    // 5CwDbbQZY7dWGhgPvGqbi2WnhcFw7WkpW2ZrmvSvhtM7qVKn
-    let grandpa1: GrandpaId =
-        hex!["26866260bb8dabbe84fe7d2fee7bed533104a8e890fefc0001813bbd0e5c9cb9"].unchecked_into();
-    // 5G6VvSAqrqNLoqoRM4GUxrKQkfHuZ3ggnW8bbsQZbi187kfu
-    let grandpa2: GrandpaId =
-        hex!["b24f3f629e5cc692b50f08b9714c67be656b057293bb077beb44781a9a0e2992"].unchecked_into();
-
-    let initial_authorities: Vec<AuthorityKeysTuple> = vec![
-        (controller1.clone(), stash1.clone(), aura1, grandpa1),
-        (controller2.clone(), stash2.clone(), aura2, grandpa2),
-    ];
 
     Ok(ChainSpec::from_genesis(
         // Name
@@ -219,8 +138,6 @@ pub fn staging_testnet_config() -> Result<ChainSpec, String> {
         move || {
             testnet_genesis(
                 wasm_binary,
-                // Initial PoA authorities
-                initial_authorities.clone(),
                 // Sudo account
                 root_key.clone(),
                 // Pre-funded accounts
@@ -232,6 +149,7 @@ pub fn staging_testnet_config() -> Result<ChainSpec, String> {
                     stash2.clone(),
                 ],
                 true,
+                id,
             )
         },
         // Bootnodes
@@ -262,10 +180,10 @@ pub fn staging_testnet_config() -> Result<ChainSpec, String> {
 /// Configure initial storage state for FRAME modules.
 fn testnet_genesis(
     wasm_binary: &[u8],
-    initial_authorities: Vec<AuthorityKeysTuple>,
     root_key: AccountId,
     endowed_accounts: Vec<AccountId>,
     enable_println: bool,
+    id: ParaId,
 ) -> GenesisConfig {
     GenesisConfig {
         frame_system: Some(SystemConfig {
@@ -282,24 +200,6 @@ fn testnet_genesis(
                 .collect(),
         }),
         pallet_indices: Some(IndicesConfig { indices: vec![] }),
-        pallet_aura: Some(AuraConfig {
-            authorities: vec![],
-        }),
-        pallet_grandpa: Some(GrandpaConfig {
-            authorities: vec![],
-        }),
-        pallet_session: Some(SessionConfig {
-            keys: initial_authorities
-                .iter()
-                .map(|x| {
-                    (
-                        x.0.clone(),
-                        x.0.clone(),
-                        session_keys(x.2.clone(), x.3.clone()),
-                    )
-                })
-                .collect::<Vec<_>>(),
-        }),
         pallet_contracts: Some(ContractsConfig {
             current_schedule: pallet_contracts::Schedule {
                 enable_println, // this should only be enabled on development chains
@@ -310,5 +210,6 @@ fn testnet_genesis(
             // Assign network admin rights.
             key: root_key,
         }),
+        parachain_info: Some(ParachainInfoConfig { parachain_id: id }),
     }
 }

@@ -1,6 +1,10 @@
-use crate::chain_spec;
-use crate::cli::{Cli, RelayChainCli, Subcommand};
-use crate::service::{self, new_full_base, new_partial, NewFullBase};
+use crate::{
+    chain_spec,
+    cli::{Cli, RelayChainCli, Subcommand},
+};
+use codec::Encode;
+use cumulus_primitives::ParaId;
+use log::info;
 use jupiter_para_runtime::Block;
 use polkadot_parachain::primitives::AccountIdConversion;
 use sc_cli::{
@@ -11,6 +15,16 @@ use sc_service::config::{BasePath, PrometheusConfig};
 use sp_core::hexdisplay::HexDisplay;
 use sp_runtime::traits::{Block as BlockT, Hash as HashT, Header as HeaderT, Zero};
 use std::{io::Write, net::SocketAddr, sync::Arc};
+
+fn load_spec(id: &str, para_id: ParaId) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
+    Ok(match id {
+        "" | "dev" => Box::new(chain_spec::development_config(para_id)?),
+        "staging" => Box::new(chain_spec::staging_testnet_config(para_id)?),
+        path => Box::new(chain_spec::ChainSpec::from_json_file(
+            path.into(),
+        )?),
+    })
+}
 
 impl SubstrateCli for Cli {
     fn impl_name() -> String {
@@ -38,21 +52,54 @@ impl SubstrateCli for Cli {
     }
 
     fn load_spec(&self, id: &str) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
-        Ok(match id {
-            "dev" => Box::new(chain_spec::development_config()?),
-            "local" => Box::new(chain_spec::local_testnet_config()?),
-            "" | "staging" => Box::new(chain_spec::staging_testnet_config()?),
-            path => Box::new(chain_spec::ChainSpec::from_json_file(
-                std::path::PathBuf::from(path),
-            )?),
-        })
+        load_spec(id, self.run.parachain_id.unwrap_or(200).into())
     }
 
     fn native_runtime_version(_: &Box<dyn ChainSpec>) -> &'static RuntimeVersion {
-        &jupiter_runtime::VERSION
+        &jupiter_para_runtime::VERSION
     }
 }
 
+impl SubstrateCli for RelayChainCli {
+    fn impl_name() -> String {
+        "Parachain Collator Template".into()
+    }
+
+    fn impl_version() -> String {
+        env!("SUBSTRATE_CLI_IMPL_VERSION").into()
+    }
+
+    fn description() -> String {
+        "Parachain Collator Template\n\nThe command-line arguments provided first will be \
+		passed to the parachain node, while the arguments provided after -- will be passed \
+		to the relaychain node.\n\n\
+		parachain-collator [parachain-args] -- [relaychain-args]"
+            .into()
+    }
+
+    fn author() -> String {
+        env!("CARGO_PKG_AUTHORS").into()
+    }
+
+    fn support_url() -> String {
+        "https://github.com/paritytech/cumulus/issues/new".into()
+    }
+
+    fn copyright_start_year() -> i32 {
+        2017
+    }
+
+    fn load_spec(&self, id: &str) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
+        polkadot_cli::Cli::from_iter([RelayChainCli::executable_name().to_string()].iter())
+            .load_spec(id)
+    }
+
+    fn native_runtime_version(chain_spec: &Box<dyn ChainSpec>) -> &'static RuntimeVersion {
+        polkadot_cli::Cli::native_runtime_version(chain_spec)
+    }
+}
+
+/// create a file containing the parachain's entire genesis state, hex-encoded.
 pub fn generate_genesis_state(chain_spec: &Box<dyn sc_service::ChainSpec>) -> Result<Block> {
     let storage = chain_spec.build_storage()?;
 
@@ -81,6 +128,7 @@ pub fn generate_genesis_state(chain_spec: &Box<dyn sc_service::ChainSpec>) -> Re
     ))
 }
 
+/// produce the wasm blob that the relay chain needs to validate parachain blocks.
 fn extract_genesis_wasm(chain_spec: &Box<dyn sc_service::ChainSpec>) -> Result<Vec<u8>> {
     let mut storage = chain_spec.build_storage()?;
 
@@ -106,29 +154,6 @@ pub fn run() -> Result<()> {
                     params.backend,
                     params.import_queue,
                     params.task_manager,
-                ))
-            })
-        }
-        Some(Subcommand::Key(cmd)) => cmd.run(),
-        Some(Subcommand::Sign(cmd)) => cmd.run(),
-        Some(Subcommand::Verify(cmd)) => cmd.run(),
-        Some(Subcommand::Vanity(cmd)) => cmd.run(),
-        Some(Subcommand::BuildSyncSpec(cmd)) => {
-            let runner = cli.create_runner(cmd)?;
-
-            runner.async_run(|config| {
-                let chain_spec = config.chain_spec.cloned_box();
-                let network_config = config.network.clone();
-                let NewFullBase {
-                    task_manager,
-                    client,
-                    network_status_sinks,
-                    ..
-                } = new_full_base(config)?;
-
-                Ok((
-                    cmd.run(chain_spec, network_config, client, network_status_sinks),
-                    task_manager,
                 ))
             })
         }
@@ -164,7 +189,7 @@ pub fn run() -> Result<()> {
             Ok(())
         }
         None => {
-            let runner = cli.create_runner(&cli.run)?;
+            let runner = cli.create_runner(&*cli.run)?;
             runner.run_node_until_exit(|config| {
                 let key = Arc::new(sp_core::Pair::generate().0);
 
