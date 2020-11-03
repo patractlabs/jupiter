@@ -1076,6 +1076,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "cumulus-token-dealer"
+version = "0.1.0"
+dependencies = [
+ "cumulus-primitives",
+ "cumulus-upward-message",
+ "frame-support",
+ "frame-system",
+ "parity-scale-codec",
+ "polkadot-parachain",
+]
+
+[[package]]
 name = "cumulus-upward-message"
 version = "0.1.0"
 source = "git+https://github.com/paritytech/cumulus#4d150a01993265d62ab05032db6f24db7503e6ee"
@@ -2715,6 +2727,7 @@ dependencies = [
  "cumulus-parachain-upgrade",
  "cumulus-primitives",
  "cumulus-runtime",
+ "cumulus-token-dealer",
  "cumulus-upward-message",
  "frame-executive",
  "frame-support",
@@ -2739,8 +2752,6 @@ dependencies = [
  "pallet-utility",
  "parachain-info",
  "parity-scale-codec",
- "polkadot-parachain",
- "rococo-runtime",
  "serde",
  "sp-api",
  "sp-block-builder",

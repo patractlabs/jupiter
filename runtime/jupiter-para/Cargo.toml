@@ -53,12 +53,7 @@ cumulus-primitives = { git = "https://github.com/paritytech/cumulus", default-fe
 cumulus-runtime = { git = "https://github.com/paritytech/cumulus", default-features = false }
 cumulus-upward-message = { git = "https://github.com/paritytech/cumulus", default-features = false }
 parachain-info = { git = "https://github.com/paritytech/cumulus", default-features = false }
-# cumulus-token-dealer = { path = "../../pallets/token-dealer", default-features = false}
-
-polkadot-parachain = { git = "https://github.com/paritytech/polkadot", branch = "rococo-branch", default-features = false }
-
-rococo-runtime = { git = "https://github.com/paritytech/polkadot", branch = "rococo-branch", default-features = false }
-
+cumulus-token-dealer = { path = "../../pallets/token-dealer", default-features = false}
 
 # local runtime module
 pallet-contracts-ext = { path = "../../frame/contracts-ext", default-features = false }
@@ -119,7 +114,7 @@ std = [
     "cumulus-runtime/std",
     "cumulus-upward-message/std",
     "parachain-info/std",
-#    "cumulus-token-dealer/std",
+    "cumulus-token-dealer/std",
 ]
 
 # Will be enabled by the `wasm-builder` when building the runtime for WASM.

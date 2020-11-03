@@ -261,22 +261,22 @@ impl cumulus_parachain_upgrade::Trait for Runtime {
 
 impl cumulus_message_broker::Trait for Runtime {
     type Event = Event;
-    type DownwardMessageHandlers = (); //TokenDealer;
+    type DownwardMessageHandlers = TokenDealer;
     type UpwardMessage = cumulus_upward_message::RococoUpwardMessage;
     type ParachainId = ParachainInfo;
-    type XCMPMessage = (); //cumulus_token_dealer::XCMPMessage<AccountId, Balance>;
-    type XCMPMessageHandlers = (); //TokenDealer;
+    type XCMPMessage = cumulus_token_dealer::XCMPMessage<AccountId, Balance>;
+    type XCMPMessageHandlers = TokenDealer;
 }
 
 impl parachain_info::Trait for Runtime {}
 
-// impl cumulus_token_dealer::Trait for Runtime {
-//     type Event = Event;
-//     type UpwardMessageSender = MessageBroker;
-//     type UpwardMessage = cumulus_upward_message::RococoUpwardMessage;
-//     type Currency = Balances;
-//     type XCMPMessageSender = MessageBroker;
-// }
+impl cumulus_token_dealer::Trait for Runtime {
+    type Event = Event;
+    type UpwardMessageSender = MessageBroker;
+    type UpwardMessage = cumulus_upward_message::RococoUpwardMessage;
+    type Currency = Balances;
+    type XCMPMessageSender = MessageBroker;
+}
 
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
@@ -302,10 +302,10 @@ construct_runtime!(
 
         Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>},
 
-        // TokenDealer: cumulus_token_dealer::{Module, Call, Event<T>},
         ParachainUpgrade: cumulus_parachain_upgrade::{Module, Call, Storage, Inherent, Event},
         MessageBroker: cumulus_message_broker::{Module, Call, Inherent, Event<T>},
         ParachainInfo: parachain_info::{Module, Storage, Config},
+        TokenDealer: cumulus_token_dealer::{Module, Call, Event<T>},
     }
 );
 
