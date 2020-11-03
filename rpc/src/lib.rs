@@ -33,10 +33,11 @@
 use std::sync::Arc;
 
 use sc_finality_grandpa::{
-    FinalityProofProvider, GrandpaJustificationStream, SharedAuthoritySet, SharedVoterState,
+    SharedAuthoritySet,
+    SharedVoterState, //FinalityProofProvider, GrandpaJustificationStream,
 };
 use sc_finality_grandpa_rpc::GrandpaRpcHandler;
-use sc_rpc::SubscriptionTaskExecutor;
+// use sc_rpc::SubscriptionTaskExecutor;
 pub use sc_rpc_api::DenyUnsafe;
 use sp_api::ProvideRuntimeApi;
 use sp_block_builder::BlockBuilder;
@@ -58,21 +59,21 @@ pub struct LightDeps<C, F, P> {
 }
 
 /// Extra dependencies for GRANDPA
-pub struct GrandpaDeps<B> {
+pub struct GrandpaDeps {
     /// Voting round info.
     pub shared_voter_state: SharedVoterState,
     /// Authority set info.
     pub shared_authority_set: SharedAuthoritySet<Hash, BlockNumber>,
-    /// Receives notifications about justification events from Grandpa.
-    pub justification_stream: GrandpaJustificationStream<Block>,
-    /// Executor to drive the subscription manager in the Grandpa RPC handler.
-    pub subscription_executor: SubscriptionTaskExecutor,
-    /// Finality proof provider.
-    pub finality_provider: Arc<FinalityProofProvider<B, Block>>,
+    // /// Receives notifications about justification events from Grandpa.
+    // pub justification_stream: GrandpaJustificationStream<Block>,
+    // /// Executor to drive the subscription manager in the Grandpa RPC handler.
+    // pub subscription_executor: SubscriptionTaskExecutor,
+    // /// Finality proof provider.
+    // pub finality_provider: Arc<FinalityProofProvider<B, Block>>,
 }
 
 /// Full client dependencies.
-pub struct FullDeps<C, P, B> {
+pub struct FullDeps<C, P> {
     /// The client instance to use.
     pub client: Arc<C>,
     /// Transaction pool instance.
@@ -80,16 +81,14 @@ pub struct FullDeps<C, P, B> {
     /// Whether to deny unsafe calls
     pub deny_unsafe: DenyUnsafe,
     /// GRANDPA specific dependencies.
-    pub grandpa: Option<GrandpaDeps<B>>,
+    pub grandpa: Option<GrandpaDeps>,
 }
 
 /// A IO handler that uses all Full RPC extensions.
 pub type IoHandler = jsonrpc_core::IoHandler<sc_rpc::Metadata>;
 
 /// Instantiate all Full RPC extensions.
-pub fn create_full<C, P, B>(
-    deps: FullDeps<C, P, B>,
-) -> jsonrpc_core::IoHandler<sc_rpc_api::Metadata>
+pub fn create_full<C, P, M>(deps: FullDeps<C, P>) -> jsonrpc_core::IoHandler<M>
 where
     C: ProvideRuntimeApi<Block>,
     C: HeaderBackend<Block> + HeaderMetadata<Block, Error = BlockChainError> + 'static,
@@ -99,8 +98,9 @@ where
     C::Api: pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance, BlockNumber>,
     C::Api: BlockBuilder<Block>,
     P: TransactionPool + 'static,
-    B: sc_client_api::Backend<Block> + Send + Sync + 'static,
-    B::State: sc_client_api::backend::StateBackend<sp_runtime::traits::HashFor<Block>>,
+    // B: sc_client_api::Backend<Block> + Send + Sync + 'static,
+    // B::State: sc_client_api::backend::StateBackend<sp_runtime::traits::HashFor<Block>>,
+    M: jsonrpc_core::Metadata + Default,
 {
     use pallet_contracts_rpc::{Contracts, ContractsApi};
     use pallet_transaction_payment_rpc::{TransactionPayment, TransactionPaymentApi};
@@ -117,17 +117,17 @@ where
         let GrandpaDeps {
             shared_voter_state,
             shared_authority_set,
-            justification_stream,
-            subscription_executor,
-            finality_provider,
+            // justification_stream,
+            // subscription_executor,
+            // finality_provider,
         } = grandpa;
         io.extend_with(sc_finality_grandpa_rpc::GrandpaApi::to_delegate(
             GrandpaRpcHandler::new(
                 shared_authority_set,
                 shared_voter_state,
-                justification_stream,
-                subscription_executor,
-                finality_provider,
+                // justification_stream,
+                // subscription_executor,
+                // finality_provider,
             ),
         ));
     }

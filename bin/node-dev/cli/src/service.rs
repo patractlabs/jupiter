@@ -142,8 +142,8 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
         let client = client.clone();
         let pool = transaction_pool.clone();
 
-        Box::new(move |deny_unsafe, _| {
-            let deps = jupiter_rpc::FullDeps::<_, _, FullBackend> {
+        Box::new(move |deny_unsafe| {
+            let deps = jupiter_rpc::FullDeps {
                 client: client.clone(),
                 pool: pool.clone(),
                 deny_unsafe,
@@ -161,7 +161,7 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
         task_manager: &mut task_manager,
         transaction_pool: transaction_pool.clone(),
         telemetry_connection_sinks: telemetry_connection_sinks.clone(),
-        rpc_extensions_builder: rpc_extensions_builder,
+        rpc_extensions_builder,
         on_demand: None,
         remote_blockchain: None,
         backend,
@@ -177,16 +177,14 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
             prometheus_registry.as_ref(),
         );
 
-        let params = sc_consensus_manual_seal::InstantSealParams {
-            block_import: client.clone(),
-            env: proposer,
-            client: client.clone(),
-            pool: transaction_pool.pool().clone(),
+        let authorship_future = sc_consensus_manual_seal::run_instant_seal(
+            Box::new(client.clone()),
+            proposer,
+            client.clone(),
+            transaction_pool.pool().clone(),
             select_chain,
-            consensus_data_provider: None,
             inherent_data_providers,
-        };
-        let authorship_future = sc_consensus_manual_seal::run_instant_seal(params);
+        );
 
         task_manager
             .spawn_essential_handle()
@@ -246,7 +244,7 @@ pub fn new_light(config: Configuration) -> Result<TaskManager, ServiceError> {
         transaction_pool,
         task_manager: &mut task_manager,
         on_demand: Some(on_demand),
-        rpc_extensions_builder: Box::new(|_, _| ()),
+        rpc_extensions_builder: Box::new(|_| ()),
         telemetry_connection_sinks: sc_service::TelemetryConnectionSinks::default(),
         config,
         client,

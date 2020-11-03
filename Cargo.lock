@@ -2413,7 +2413,7 @@ checksum = "2773fa94a2a1fd51efb89a8f45b8861023dbb415d18d3c9235ae9388d780f9ec"
 dependencies = [
  "failure",
  "futures 0.1.30",
- "jsonrpc-core 14.2.0",
+ "jsonrpc-core",
  "jsonrpc-pubsub",
  "log 0.4.11",
  "serde",
@@ -2426,19 +2426,6 @@ name = "jsonrpc-core"
 version = "14.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a0747307121ffb9703afd93afbd0fb4f854c38fb873f2c8b90e0e902f27c7b62"
-dependencies = [
- "futures 0.1.30",
- "log 0.4.11",
- "serde",
- "serde_derive",
- "serde_json",
-]
-
-[[package]]
-name = "jsonrpc-core"
-version = "15.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0745a6379e3edc893c84ec203589790774e4247420033e71a76d3ab4687991fa"
 dependencies = [
  "futures 0.1.30",
  "log 0.4.11",
@@ -2475,7 +2462,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0da906d682799df05754480dac1b9e70ec92e12c19ebafd2662a5ea1c9fd6522"
 dependencies = [
  "hyper 0.12.35",
- "jsonrpc-core 14.2.0",
+ "jsonrpc-core",
  "jsonrpc-server-utils",
  "log 0.4.11",
  "net2",
@@ -2489,7 +2476,7 @@ version = "14.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dedccd693325d833963b549e959137f30a7a0ea650cde92feda81dc0c1393cb5"
 dependencies = [
- "jsonrpc-core 14.2.0",
+ "jsonrpc-core",
  "jsonrpc-server-utils",
  "log 0.4.11",
  "parity-tokio-ipc",
@@ -2503,7 +2490,7 @@ version = "14.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2d44f5602a11d657946aac09357956d2841299ed422035edf140c552cb057986"
 dependencies = [
- "jsonrpc-core 14.2.0",
+ "jsonrpc-core",
  "log 0.4.11",
  "parking_lot 0.10.2",
  "rand 0.7.3",
@@ -2518,7 +2505,7 @@ checksum = "56cbfb462e7f902e21121d9f0d1c2b77b2c5b642e1a4e8f4ebfa2e15b94402bb"
 dependencies = [
  "bytes 0.4.12",
  "globset",
- "jsonrpc-core 14.2.0",
+ "jsonrpc-core",
  "lazy_static",
  "log 0.4.11",
  "tokio 0.1.22",
@@ -2532,7 +2519,7 @@ version = "14.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "903d3109fe7c4acb932b567e1e607e0f524ed04741b09fb0e61841bc40a022fc"
 dependencies = [
- "jsonrpc-core 14.2.0",
+ "jsonrpc-core",
  "jsonrpc-server-utils",
  "log 0.4.11",
  "parking_lot 0.10.2",
@@ -2786,7 +2773,7 @@ dependencies = [
 name = "jupiter-rpc"
 version = "0.1.0"
 dependencies = [
- "jsonrpc-core 15.1.0",
+ "jsonrpc-core",
  "jupiter-primitives",
  "pallet-contracts-rpc",
  "pallet-transaction-payment-rpc",
@@ -4074,7 +4061,7 @@ name = "pallet-contracts-rpc"
 version = "0.8.0-rc5"
 source = "git+https://github.com/paritytech/substrate?branch=rococo-branch#83544d41abcc0e3d3cbbd6aa510e04dc50863e5c"
 dependencies = [
- "jsonrpc-core 14.2.0",
+ "jsonrpc-core",
  "jsonrpc-core-client",
  "jsonrpc-derive",
  "pallet-contracts-primitives",
@@ -4452,7 +4439,7 @@ name = "pallet-transaction-payment-rpc"
 version = "2.0.0-rc5"
 source = "git+https://github.com/paritytech/substrate?branch=rococo-branch#83544d41abcc0e3d3cbbd6aa510e04dc50863e5c"
 dependencies = [
- "jsonrpc-core 14.2.0",
+ "jsonrpc-core",
  "jsonrpc-core-client",
  "jsonrpc-derive",
  "pallet-transaction-payment-rpc-runtime-api",
@@ -6115,7 +6102,7 @@ dependencies = [
  "assert_matches",
  "derive_more",
  "futures 0.3.7",
- "jsonrpc-core 14.2.0",
+ "jsonrpc-core",
  "jsonrpc-core-client",
  "jsonrpc-derive",
  "log 0.4.11",
@@ -6282,7 +6269,7 @@ dependencies = [
  "derive_more",
  "finality-grandpa",
  "futures 0.3.7",
- "jsonrpc-core 14.2.0",
+ "jsonrpc-core",
  "jsonrpc-core-client",
  "jsonrpc-derive",
  "log 0.4.11",
@@ -6467,7 +6454,7 @@ source = "git+https://github.com/paritytech/substrate?branch=rococo-branch#83544
 dependencies = [
  "futures 0.3.7",
  "hash-db",
- "jsonrpc-core 14.2.0",
+ "jsonrpc-core",
  "jsonrpc-pubsub",
  "log 0.4.11",
  "parity-scale-codec",
@@ -6499,7 +6486,7 @@ source = "git+https://github.com/paritytech/substrate?branch=rococo-branch#83544
 dependencies = [
  "derive_more",
  "futures 0.3.7",
- "jsonrpc-core 14.2.0",
+ "jsonrpc-core",
  "jsonrpc-core-client",
  "jsonrpc-derive",
  "jsonrpc-pubsub",
@@ -6521,7 +6508,7 @@ name = "sc-rpc-server"
 version = "2.0.0-rc5"
 source = "git+https://github.com/paritytech/substrate?branch=rococo-branch#83544d41abcc0e3d3cbbd6aa510e04dc50863e5c"
 dependencies = [
- "jsonrpc-core 14.2.0",
+ "jsonrpc-core",
  "jsonrpc-http-server",
  "jsonrpc-ipc-server",
  "jsonrpc-pubsub",
@@ -7811,7 +7798,7 @@ source = "git+https://github.com/paritytech/substrate?branch=rococo-branch#83544
 dependencies = [
  "frame-system-rpc-runtime-api",
  "futures 0.3.7",
- "jsonrpc-core 14.2.0",
+ "jsonrpc-core",
  "jsonrpc-core-client",
  "jsonrpc-derive",
  "log 0.4.11",
