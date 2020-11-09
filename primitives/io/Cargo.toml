@@ -1,0 +1,17 @@
+[package]
+name = "io"
+version = "0.1.0"
+authors = ["Jupiter <https://github.com/patractlabs/jupiter>"]
+edition = "2018"
+
+[package.metadata.docs.rs]
+targets = ["x86_64-unknown-linux-gnu"]
+
+[dependencies]
+sp-runtime-interface = { version = "2.0.0", default-features = false }
+
+[features]
+default = ["std"]
+std = [
+    "sp-runtime-interface/std",
+]
