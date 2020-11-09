@@ -36,6 +36,7 @@ pallet-contracts = { version = "2.0.0" }
 jupiter-primitives = { path = "../../../primitives" }
 jupiter-dev-runtime = { path = "../../../runtime/jupiter-dev" }
 jupiter-rpc = { path = "../../../rpc" }
+jupiter-dev-executor = { path = "../executor" }
 
 [build-dependencies]
 substrate-build-script-utils = { version = "2.0.0" }

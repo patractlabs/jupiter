@@ -2302,13 +2302,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "io"
-version = "0.1.0"
-dependencies = [
- "sp-runtime-interface",
-]
-
-[[package]]
 name = "iovec"
 version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2548,6 +2541,7 @@ name = "jupiter-dev-cli"
 version = "0.1.0"
 dependencies = [
  "futures 0.3.7",
+ "jupiter-dev-executor",
  "jupiter-dev-runtime",
  "jupiter-primitives",
  "jupiter-rpc",
@@ -2573,6 +2567,16 @@ dependencies = [
  "sp-transaction-pool",
  "structopt",
  "substrate-build-script-utils",
+]
+
+[[package]]
+name = "jupiter-dev-executor"
+version = "0.1.0"
+dependencies = [
+ "frame-benchmarking",
+ "jupiter-io",
+ "jupiter-runtime",
+ "sc-executor",
 ]
 
 [[package]]
@@ -2625,6 +2629,13 @@ dependencies = [
  "frame-benchmarking",
  "jupiter-runtime",
  "sc-executor",
+]
+
+[[package]]
+name = "jupiter-io"
+version = "0.1.0"
+dependencies = [
+ "sp-runtime-interface",
 ]
 
 [[package]]

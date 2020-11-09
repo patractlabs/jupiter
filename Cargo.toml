@@ -4,6 +4,7 @@ members = [
     "bin/node",
     "bin/node/executor",
     "bin/node-dev",
+    "bin/node-dev/executor",
     "frame/contracts-ext",
     "runtime/jupiter",
     "runtime/jupiter-dev",

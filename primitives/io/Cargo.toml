@@ -1,5 +1,5 @@
 [package]
-name = "io"
+name = "jupiter-io"
 version = "0.1.0"
 authors = ["Jupiter <https://github.com/patractlabs/jupiter>"]
 edition = "2018"
