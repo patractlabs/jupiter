@@ -19,7 +19,9 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly-2020-10-06
-      - name: Cache Substrate Deps
+          target: wasm32-unknown-unknown
+          override: true
+      - name: Cache substrate deps
         uses: actions/cache@v1
         env:
           cache-name: substrate-cache
