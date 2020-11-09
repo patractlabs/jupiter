@@ -3,30 +3,22 @@
 use std::sync::Arc;
 
 use sc_client_api::RemoteBackend;
-use sc_executor::native_executor_instance;
 pub use sc_executor::NativeExecutor;
-use sc_service::{
-    construct_service_factory, error::Error as ServiceError, Configuration, TaskManager,
-};
+use sc_service::{error::Error as ServiceError, Configuration, TaskManager};
 use sp_inherents::InherentDataProviders;
 
+use jupiter_dev_executor::Executor;
 use jupiter_dev_runtime::{self, RuntimeApi};
 use jupiter_primitives::Block;
 
 use sc_network::config::DummyFinalityProofRequestBuilder;
 
 // Our native executor instance.
-native_executor_instance!(
-    pub Executor,
-    jupiter_dev_runtime::api::dispatch,
-    jupiter_dev_runtime::native_version,
-);
-
-construct_service_factory! {
-    struct Factory {
-        RuntimeDispatch = jupiter_dev_executor::Exectutor;
-    }
-}
+// native_executor_instance!(
+//     pub Executor,
+//     jupiter_dev_runtime::api::dispatch,
+//     jupiter_dev_runtime::native_version,
+// );
 
 type FullClient = sc_service::TFullClient<Block, RuntimeApi, Executor>;
 type FullBackend = sc_service::TFullBackend<Block>;
