@@ -2633,7 +2633,7 @@ dependencies = [
 
 [[package]]
 name = "jupiter-io"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "sp-runtime-interface",
 ]
