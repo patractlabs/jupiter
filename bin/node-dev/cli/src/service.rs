@@ -45,7 +45,7 @@ pub fn new_partial(
         .map_err(Into::into)
         .map_err(sp_consensus::error::Error::InherentData)?;
 
-    let (client, backend, keystore, task_manager) =
+    let (client, backend, keystore_container, task_manager) =
         sc_service::new_full_parts::<Block, RuntimeApi, Executor>(&config)?;
     let client = Arc::new(client);
 
@@ -69,7 +69,7 @@ pub fn new_partial(
         backend,
         task_manager,
         import_queue,
-        keystore,
+        keystore_container,
         select_chain,
         transaction_pool,
         inherent_data_providers,
@@ -89,7 +89,7 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
         backend,
         mut task_manager,
         import_queue,
-        keystore,
+        keystore_container,
         select_chain,
         transaction_pool,
         inherent_data_providers,
@@ -142,8 +142,8 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
         let client = client.clone();
         let pool = transaction_pool.clone();
 
-        Box::new(move |deny_unsafe| {
-            let deps = jupiter_rpc::FullDeps {
+        Box::new(move |deny_unsafe, _| {
+            let deps = jupiter_rpc::FullDeps::<_, _, FullBackend> {
                 client: client.clone(),
                 pool: pool.clone(),
                 deny_unsafe,
@@ -157,11 +157,11 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
     sc_service::spawn_tasks(sc_service::SpawnTasksParams {
         network: network.clone(),
         client: client.clone(),
-        keystore: keystore.clone(),
+        keystore: keystore_container.sync_keystore(),
         task_manager: &mut task_manager,
         transaction_pool: transaction_pool.clone(),
         telemetry_connection_sinks: telemetry_connection_sinks.clone(),
-        rpc_extensions_builder,
+        rpc_extensions_builder: rpc_extensions_builder,
         on_demand: None,
         remote_blockchain: None,
         backend,
@@ -172,19 +172,22 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
 
     if role.is_authority() {
         let proposer = sc_basic_authorship::ProposerFactory::new(
+            task_manager.spawn_handle(),
             client.clone(),
             transaction_pool.clone(),
             prometheus_registry.as_ref(),
         );
 
-        let authorship_future = sc_consensus_manual_seal::run_instant_seal(
-            Box::new(client.clone()),
-            proposer,
-            client.clone(),
-            transaction_pool.pool().clone(),
+        let params = sc_consensus_manual_seal::InstantSealParams {
+            block_import: client.clone(),
+            env: proposer,
+            client: client.clone(),
+            pool: transaction_pool.pool().clone(),
             select_chain,
+            consensus_data_provider: None,
             inherent_data_providers,
-        );
+        };
+        let authorship_future = sc_consensus_manual_seal::run_instant_seal(params);
 
         task_manager
             .spawn_essential_handle()
@@ -197,7 +200,7 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
 
 /// Builds a new service for a light client.
 pub fn new_light(config: Configuration) -> Result<TaskManager, ServiceError> {
-    let (client, backend, keystore, mut task_manager, on_demand) =
+    let (client, backend, keystore_container, mut task_manager, on_demand) =
         sc_service::new_light_parts::<Block, RuntimeApi, Executor>(&config)?;
 
     let transaction_pool = Arc::new(sc_transaction_pool::BasicPool::new_light(
@@ -244,11 +247,11 @@ pub fn new_light(config: Configuration) -> Result<TaskManager, ServiceError> {
         transaction_pool,
         task_manager: &mut task_manager,
         on_demand: Some(on_demand),
-        rpc_extensions_builder: Box::new(|_| ()),
+        rpc_extensions_builder: Box::new(|_, _| ()),
         telemetry_connection_sinks: sc_service::TelemetryConnectionSinks::default(),
         config,
         client,
-        keystore,
+        keystore: keystore_container.sync_keystore(),
         backend,
         network,
         network_status_sinks,

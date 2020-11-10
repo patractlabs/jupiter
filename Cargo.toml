@@ -8,6 +8,7 @@ members = [
     "frame/contracts-ext",
     "runtime/jupiter",
     "runtime/jupiter-dev",
+    "runtime/jupiter-para",
     "primitives",
     "rpc",
 ]

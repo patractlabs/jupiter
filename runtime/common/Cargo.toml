@@ -7,17 +7,17 @@ edition = "2018"
 [dependencies]
 smallvec = "1.4.1"
 
-sp-std = { version = "2.0.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch", default-features = false }
-sp-runtime = { version = "2.0.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch", default-features = false }
+sp-std = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+sp-runtime = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 
-frame-support = { version = "2.0.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch", default-features = false }
-frame-system = { version = "2.0.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch", default-features = false }
-pallet-balances = { version = "2.0.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch", default-features = false }
-pallet-transaction-payment = { version = "2.0.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch", default-features = false }
-pallet-authorship = { version = "2.0.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch", default-features = false }
-pallet-timestamp = { version = "2.0.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch", default-features = false }
-pallet-indices = { version = "2.0.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch", default-features = false }
-pallet-session = { version = "2.0.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch", default-features = false }
+frame-support = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+frame-system = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-balances = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-transaction-payment = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-authorship = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-timestamp = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-indices = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-session = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 
 jupiter-primitives = { path = "../../primitives", default-features = false }
 

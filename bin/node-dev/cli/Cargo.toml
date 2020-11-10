@@ -14,28 +14,27 @@ structopt = "0.3.8"
 parking_lot = "0.10.0"
 serde_json = "1.0"
 
-sc-cli = { version = "0.8.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
-sp-core = { version = "2.0.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
-sc-executor = { version = "0.8.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
-sc-service = { version = "0.8.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
-sp-inherents = { version = "2.0.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
-sc-transaction-pool = { version = "2.0.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
-sp-transaction-pool = { version = "2.0.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
-sc-network = { version = "0.8.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
-sp-consensus = { version = "0.8.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
-sc-consensus = { version = "0.8.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
-sc-consensus-manual-seal = { version = "0.8.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
-sc-client-api = { version = "2.0.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
-sp-api = { version = "2.0.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
-sp-runtime = { version = "2.0.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
-sp-timestamp = { version = "2.0.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
-sc-basic-authorship = { version = "0.8.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
+sc-cli = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+sp-core = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+sc-executor = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+sc-service = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+sp-inherents = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+sc-transaction-pool = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+sc-network = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+sc-consensus = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+sp-consensus = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+sc-consensus-manual-seal = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+sc-client-api = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+sp-api = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+sp-runtime = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+sp-timestamp = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+sc-basic-authorship = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 
-pallet-contracts = { version = "2.0.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
+pallet-contracts = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 
 jupiter-primitives = { path = "../../../primitives" }
 jupiter-dev-runtime = { path = "../../../runtime/jupiter-dev" }
 jupiter-rpc = { path = "../../../rpc" }
 
 [build-dependencies]
-substrate-build-script-utils = { version = "2.0.0-rc5", git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
+substrate-build-script-utils = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
