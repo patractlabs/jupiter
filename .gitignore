@@ -1,5 +1,6 @@
 **/target/
 **/*.rs.bk
+**/*.wasm
 *.swp
 .wasm-binaries
 **/._*

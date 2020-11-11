@@ -9,11 +9,16 @@ members = [
     "frame/contracts/common",
     "frame/contracts/rpc",
     "frame/contracts/rpc/runtime-api",
+    
     "runtime/jupiter",
     "runtime/jupiter-dev",
     "primitives",
     "primitives/io",
     "rpc",
+]
+
+exclude = [
+    "frame/contracts/examples/altbn128",
 ]
 
 [profile.release]
