@@ -1048,6 +1048,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "ctor"
+version = "0.1.16"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7fbaabec2c953050352311293be5c6aba8e141ba19d6811862b232d6fd020484"
+dependencies = [
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "cuckoofilter"
 version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1099,6 +1109,12 @@ dependencies = [
  "quote",
  "syn",
 ]
+
+[[package]]
+name = "difference"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "524cbf6897b527295dff137cec09ecf3a05f4fddffd7dfcd1585403449e74198"
 
 [[package]]
 name = "digest"
@@ -1412,7 +1428,7 @@ dependencies = [
  "frame-system",
  "linregress",
  "parity-scale-codec",
- "paste",
+ "paste 0.1.18",
  "sp-api",
  "sp-io",
  "sp-runtime",
@@ -1461,7 +1477,7 @@ dependencies = [
  "log",
  "once_cell 1.4.1",
  "parity-scale-codec",
- "paste",
+ "paste 0.1.18",
  "serde",
  "smallvec 1.4.2",
  "sp-arithmetic",
@@ -2504,7 +2520,7 @@ dependencies = [
  "jupiter-rpc",
  "jupiter-runtime",
  "log",
- "pallet-contracts",
+ "pallet-contracts 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "parking_lot 0.10.2",
  "sc-authority-discovery",
  "sc-basic-authorship",
@@ -2546,7 +2562,7 @@ dependencies = [
  "jupiter-primitives",
  "jupiter-rpc",
  "log",
- "pallet-contracts",
+ "pallet-contracts 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "parking_lot 0.10.2",
  "sc-basic-authorship",
  "sc-cli",
@@ -2591,9 +2607,9 @@ dependencies = [
  "jupiter-runtime-common",
  "pallet-authorship",
  "pallet-balances",
- "pallet-contracts",
+ "pallet-contracts 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "pallet-contracts-ext",
- "pallet-contracts-primitives",
+ "pallet-contracts-primitives 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "pallet-contracts-rpc-runtime-api",
  "pallet-indices",
  "pallet-multisig",
@@ -2657,7 +2673,7 @@ version = "0.1.0"
 dependencies = [
  "jsonrpc-core",
  "jupiter-primitives",
- "pallet-contracts-rpc",
+ "pallet-contracts-rpc 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "pallet-transaction-payment-rpc",
  "sc-client-api",
  "sc-consensus-epochs",
@@ -2688,9 +2704,9 @@ dependencies = [
  "pallet-aura",
  "pallet-authorship",
  "pallet-balances",
- "pallet-contracts",
+ "pallet-contracts 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "pallet-contracts-ext",
- "pallet-contracts-primitives",
+ "pallet-contracts-primitives 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "pallet-contracts-rpc-runtime-api",
  "pallet-grandpa",
  "pallet-im-online",
@@ -3836,6 +3852,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "77af24da69f9d9341038eba93a073b1fdaaa1b788221b00a69bce9e762cb32de"
 
 [[package]]
+name = "output_vt100"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "53cdc5b785b7a58c5aad8216b3dfa114df64b0b06ae6e1501cef91df2fbdf8f9"
+dependencies = [
+ "winapi 0.3.9",
+]
+
+[[package]]
 name = "owning_ref"
 version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3898,13 +3923,40 @@ dependencies = [
 [[package]]
 name = "pallet-contracts"
 version = "2.0.0"
+dependencies = [
+ "assert_matches",
+ "frame-support",
+ "frame-system",
+ "hex-literal 0.3.1",
+ "pallet-balances",
+ "pallet-contracts-primitives 2.0.0",
+ "pallet-randomness-collective-flip",
+ "pallet-timestamp",
+ "parity-scale-codec",
+ "parity-wasm",
+ "paste 1.0.3",
+ "pretty_assertions",
+ "pwasm-utils",
+ "serde",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-sandbox",
+ "sp-std",
+ "wasmi-validation",
+ "wat",
+]
+
+[[package]]
+name = "pallet-contracts"
+version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "908b373ca40975c48f79a95e8cd134c039ef1120abe4633465c5f690924c79c4"
 dependencies = [
  "bitflags",
  "frame-support",
  "frame-system",
- "pallet-contracts-primitives",
+ "pallet-contracts-primitives 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-scale-codec",
  "parity-wasm",
  "pwasm-utils",
@@ -3923,9 +3975,19 @@ version = "0.1.0"
 dependencies = [
  "frame-support",
  "frame-system",
- "pallet-contracts",
+ "pallet-contracts 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-scale-codec",
  "sp-core",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
+name = "pallet-contracts-primitives"
+version = "2.0.0"
+dependencies = [
+ "bitflags",
+ "parity-scale-codec",
  "sp-runtime",
  "sp-std",
 ]
@@ -3944,13 +4006,32 @@ dependencies = [
 [[package]]
 name = "pallet-contracts-rpc"
 version = "0.8.0"
+dependencies = [
+ "jsonrpc-core",
+ "jsonrpc-core-client",
+ "jsonrpc-derive",
+ "pallet-contracts-primitives 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "pallet-contracts-rpc-runtime-api",
+ "parity-scale-codec",
+ "serde",
+ "serde_json",
+ "sp-api",
+ "sp-blockchain",
+ "sp-core",
+ "sp-rpc",
+ "sp-runtime",
+]
+
+[[package]]
+name = "pallet-contracts-rpc"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5d3fa6317927f11d47c78263fd6363cbd7dda913fa9eb11c182fe2d13b5c6e8a"
 dependencies = [
  "jsonrpc-core",
  "jsonrpc-core-client",
  "jsonrpc-derive",
- "pallet-contracts-primitives",
+ "pallet-contracts-primitives 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "pallet-contracts-rpc-runtime-api",
  "parity-scale-codec",
  "serde",
@@ -3967,7 +4048,7 @@ version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9a7694e78c94d8fbf93386b199f41f378292f5379494b3af3a5f7c820bfc4392"
 dependencies = [
- "pallet-contracts-primitives",
+ "pallet-contracts-primitives 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-scale-codec",
  "sp-api",
  "sp-runtime",
@@ -4467,6 +4548,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "paste"
+version = "1.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7151b083b0664ed58ed669fcdd92f01c3d2fdbf10af4931a301474950b52bfa9"
+
+[[package]]
 name = "paste-impl"
 version = "0.1.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4621,6 +4708,18 @@ name = "ppv-lite86"
 version = "0.2.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ac74c624d6b2d21f425f752262f42188365d7b8ff1aff74c82e45136510a4857"
+
+[[package]]
+name = "pretty_assertions"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3f81e1644e1b54f5a68959a29aa86cde704219254669da328ecfdf6a1f09d427"
+dependencies = [
+ "ansi_term 0.11.0",
+ "ctor",
+ "difference",
+ "output_vt100",
+]
 
 [[package]]
 name = "primitive-types"
@@ -7017,7 +7116,7 @@ dependencies = [
  "log",
  "parity-scale-codec",
  "parity-util-mem",
- "paste",
+ "paste 0.1.18",
  "rand 0.7.3",
  "serde",
  "sp-application-crypto",
