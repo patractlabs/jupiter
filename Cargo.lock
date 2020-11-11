@@ -226,7 +226,7 @@ dependencies = [
  "concurrent-queue",
  "fastrand",
  "futures-lite",
- "once_cell 1.5.0",
+ "once_cell 1.5.1",
  "vec-arena",
 ]
 
@@ -240,7 +240,7 @@ dependencies = [
  "async-io",
  "futures-lite",
  "num_cpus",
- "once_cell 1.5.0",
+ "once_cell 1.5.1",
 ]
 
 [[package]]
@@ -255,7 +255,7 @@ dependencies = [
  "libc",
  "log",
  "nb-connect",
- "once_cell 1.5.0",
+ "once_cell 1.5.1",
  "parking",
  "polling",
  "vec-arena",
@@ -292,7 +292,7 @@ dependencies = [
  "log",
  "memchr",
  "num_cpus",
- "once_cell 1.5.0",
+ "once_cell 1.5.1",
  "pin-project-lite",
  "pin-utils",
  "slab",
@@ -566,7 +566,7 @@ dependencies = [
  "atomic-waker",
  "fastrand",
  "futures-lite",
- "once_cell 1.5.0",
+ "once_cell 1.5.1",
 ]
 
 [[package]]
@@ -1434,7 +1434,7 @@ dependencies = [
  "frame-system",
  "linregress",
  "parity-scale-codec",
- "paste 0.1.18",
+ "paste",
  "sp-api",
  "sp-io",
  "sp-runtime",
@@ -1481,9 +1481,9 @@ dependencies = [
  "frame-support-procedural",
  "impl-trait-for-tuples",
  "log",
- "once_cell 1.5.0",
+ "once_cell 1.5.1",
  "parity-scale-codec",
- "paste 0.1.18",
+ "paste",
  "serde",
  "smallvec 1.4.2",
  "sp-arithmetic",
@@ -1728,7 +1728,7 @@ version = "0.3.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7c554eb5bf48b2426c4771ab68c6b14468b6e76cc90996f528c3338d761a4d0d"
 dependencies = [
- "once_cell 1.5.0",
+ "once_cell 1.5.1",
 ]
 
 [[package]]
@@ -2526,7 +2526,7 @@ dependencies = [
  "jupiter-rpc",
  "jupiter-runtime",
  "log",
- "pallet-contracts 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "pallet-contracts",
  "parking_lot 0.10.2",
  "sc-authority-discovery",
  "sc-basic-authorship",
@@ -2568,7 +2568,7 @@ dependencies = [
  "jupiter-primitives",
  "jupiter-rpc",
  "log",
- "pallet-contracts 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "pallet-contracts",
  "parking_lot 0.10.2",
  "sc-basic-authorship",
  "sc-cli",
@@ -2613,10 +2613,10 @@ dependencies = [
  "jupiter-runtime-common",
  "pallet-authorship",
  "pallet-balances",
- "pallet-contracts 2.0.0",
+ "pallet-contracts",
  "pallet-contracts-ext",
- "pallet-contracts-primitives 2.0.0",
- "pallet-contracts-rpc-runtime-api 0.8.0",
+ "pallet-contracts-primitives",
+ "pallet-contracts-rpc-runtime-api",
  "pallet-indices",
  "pallet-multisig",
  "pallet-offences",
@@ -2679,7 +2679,7 @@ version = "0.1.0"
 dependencies = [
  "jsonrpc-core",
  "jupiter-primitives",
- "pallet-contracts-rpc 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "pallet-contracts-rpc",
  "pallet-transaction-payment-rpc",
  "sc-client-api",
  "sc-consensus-epochs",
@@ -2710,10 +2710,10 @@ dependencies = [
  "pallet-aura",
  "pallet-authorship",
  "pallet-balances",
- "pallet-contracts 2.0.0",
+ "pallet-contracts",
  "pallet-contracts-ext",
- "pallet-contracts-primitives 2.0.0",
- "pallet-contracts-rpc-runtime-api 0.8.0",
+ "pallet-contracts-primitives",
+ "pallet-contracts-rpc-runtime-api",
  "pallet-grandpa",
  "pallet-im-online",
  "pallet-indices",
@@ -3832,9 +3832,9 @@ dependencies = [
 
 [[package]]
 name = "once_cell"
-version = "1.5.0"
+version = "1.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "95c43eba5c640051fbde86a3377842386a94281df3ff0a5f0365c2075ed5c66f"
+checksum = "f53cef67919d7d247eb9a2f128ca9e522789967ef1eb4ccd8c71a95a8aedf596"
 dependencies = [
  "parking_lot 0.11.0",
 ]
@@ -3931,16 +3931,16 @@ name = "pallet-contracts"
 version = "2.0.0"
 dependencies = [
  "assert_matches",
+ "bitflags",
  "frame-support",
  "frame-system",
  "hex-literal 0.3.1",
  "pallet-balances",
- "pallet-contracts-primitives 2.0.0",
+ "pallet-contracts-primitives",
  "pallet-randomness-collective-flip",
  "pallet-timestamp",
  "parity-scale-codec",
  "parity-wasm",
- "paste 1.0.3",
  "pretty_assertions",
  "pwasm-utils",
  "serde",
@@ -3954,34 +3954,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "pallet-contracts"
-version = "2.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "908b373ca40975c48f79a95e8cd134c039ef1120abe4633465c5f690924c79c4"
-dependencies = [
- "bitflags",
- "frame-support",
- "frame-system",
- "pallet-contracts-primitives 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "parity-scale-codec",
- "parity-wasm",
- "pwasm-utils",
- "serde",
- "sp-core",
- "sp-io",
- "sp-runtime",
- "sp-sandbox",
- "sp-std",
- "wasmi-validation",
-]
-
-[[package]]
 name = "pallet-contracts-ext"
 version = "0.1.0"
 dependencies = [
  "frame-support",
  "frame-system",
- "pallet-contracts 2.0.0",
+ "pallet-contracts",
  "parity-scale-codec",
  "sp-core",
  "sp-runtime",
@@ -3991,18 +3969,6 @@ dependencies = [
 [[package]]
 name = "pallet-contracts-primitives"
 version = "2.0.0"
-dependencies = [
- "bitflags",
- "parity-scale-codec",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
-name = "pallet-contracts-primitives"
-version = "2.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e088e1deefd6ae4ceb104666e9c76d699cb975dad8114b4bc7182b07a4745ed9"
 dependencies = [
  "parity-scale-codec",
  "sp-runtime",
@@ -4016,8 +3982,8 @@ dependencies = [
  "jsonrpc-core",
  "jsonrpc-core-client",
  "jsonrpc-derive",
- "pallet-contracts-primitives 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "pallet-contracts-rpc-runtime-api 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "pallet-contracts-primitives",
+ "pallet-contracts-rpc-runtime-api",
  "parity-scale-codec",
  "serde",
  "serde_json",
@@ -4029,43 +3995,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "pallet-contracts-rpc"
-version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5d3fa6317927f11d47c78263fd6363cbd7dda913fa9eb11c182fe2d13b5c6e8a"
-dependencies = [
- "jsonrpc-core",
- "jsonrpc-core-client",
- "jsonrpc-derive",
- "pallet-contracts-primitives 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "pallet-contracts-rpc-runtime-api 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "parity-scale-codec",
- "serde",
- "sp-api",
- "sp-blockchain",
- "sp-core",
- "sp-rpc",
- "sp-runtime",
-]
-
-[[package]]
 name = "pallet-contracts-rpc-runtime-api"
 version = "0.8.0"
 dependencies = [
- "pallet-contracts-primitives 2.0.0",
- "parity-scale-codec",
- "sp-api",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
-name = "pallet-contracts-rpc-runtime-api"
-version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9a7694e78c94d8fbf93386b199f41f378292f5379494b3af3a5f7c820bfc4392"
-dependencies = [
- "pallet-contracts-primitives 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "pallet-contracts-primitives",
  "parity-scale-codec",
  "sp-api",
  "sp-runtime",
@@ -4563,12 +4496,6 @@ dependencies = [
  "paste-impl",
  "proc-macro-hack",
 ]
-
-[[package]]
-name = "paste"
-version = "1.0.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7151b083b0664ed58ed669fcdd92f01c3d2fdbf10af4931a301474950b52bfa9"
 
 [[package]]
 name = "paste-impl"
@@ -5267,7 +5194,7 @@ checksum = "952cd6b98c85bbc30efa1ba5783b8abf12fec8b3287ffa52605b9432313e34e4"
 dependencies = [
  "cc",
  "libc",
- "once_cell 1.5.0",
+ "once_cell 1.5.1",
  "spin",
  "untrusted",
  "web-sys",
@@ -7133,7 +7060,7 @@ dependencies = [
  "log",
  "parity-scale-codec",
  "parity-util-mem",
- "paste 0.1.18",
+ "paste",
  "rand 0.7.3",
  "serde",
  "sp-application-crypto",
@@ -7663,7 +7590,7 @@ checksum = "b0165e045cc2ae1660270ca65e1676dbaab60feb0f91b10f7d0665e9b47e31f2"
 dependencies = [
  "failure",
  "hmac",
- "once_cell 1.5.0",
+ "once_cell 1.5.1",
  "pbkdf2",
  "rand 0.7.3",
  "rustc-hash",

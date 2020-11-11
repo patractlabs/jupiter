@@ -47,10 +47,11 @@ pallet-transaction-payment-rpc-runtime-api = { version = "2.0.0", default-featur
 pallet-utility = { version = "2.0.0", default-features = false }
 pallet-multisig = { version = "2.0.0", default-features = false }
 
+
 # local runtime module
-pallet-contracts = { path = "../../frame/contracts", version = "2.0.0", default-features = false }
-pallet-contracts-primitives = { path = "../../frame/contracts/common", version = "2.0.0", default-features = false }
-pallet-contracts-rpc-runtime-api = { path = "../../frame/contracts/rpc/runtime-api", version = "0.8.0", default-features = false }
+pallet-contracts = { path = "../../frame/contracts", default-features = false }
+pallet-contracts-primitives = { path = "../../frame/contracts/common", default-features = false }
+pallet-contracts-rpc-runtime-api = { path = "../../frame/contracts/rpc/runtime-api", default-features = false }
 pallet-contracts-ext = { path = "../../frame/contracts-ext", default-features = false }
 
 jupiter-primitives = { path = "../../primitives", default-features = false }

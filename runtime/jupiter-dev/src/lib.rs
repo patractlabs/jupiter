@@ -20,7 +20,7 @@ use sp_std::prelude::*;
 use sp_version::NativeVersion;
 use sp_version::RuntimeVersion;
 
-use pallet_contracts_primitives::ContractExecResult;
+use pallet_contracts_rpc_runtime_api::ContractExecResult;
 use pallet_transaction_payment_rpc_runtime_api::RuntimeDispatchInfo;
 
 // A few exports that help ease life for downstream crates.
@@ -232,7 +232,6 @@ impl pallet_contracts::Trait for Runtime {
     type Event = Event;
     type DetermineContractAddress = ContractsExt;
     type TrieIdGenerator = pallet_contracts::TrieIdFromParentCounter<Runtime>;
-    type WeightInfo = ();
     type RentPayment = ();
     type SignedClaimHandicap = pallet_contracts::DefaultSignedClaimHandicap;
     type TombstoneDeposit = TombstoneDeposit;
@@ -274,7 +273,7 @@ construct_runtime!(
         Indices: pallet_indices::{Module, Call, Storage, Config<T>, Event<T>},
         TransactionPayment: pallet_transaction_payment::{Module, Storage},
 
-        Contracts: pallet_contracts::{Module, Call, Config<T>, Storage, Event<T>},
+        Contracts: pallet_contracts::{Module, Call, Config, Storage, Event<T>},
         ContractsExt: pallet_contracts_ext::{Module, Call, Storage, Event<T>},
 
         Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>},
@@ -412,17 +411,16 @@ impl_runtime_apis! {
             gas_limit: u64,
             input_data: Vec<u8>,
         ) -> ContractExecResult {
-            // let (exec_result, gas_consumed) =
-            //     Contracts::bare_call(origin, dest.into(), value, gas_limit, input_data);
-            // match exec_result {
-            //     Ok(v) => ContractExecResult::Success {
-            //         flags: v.flags.bits(),
-            //         data: v.data,
-            //         gas_consumed: gas_consumed,
-            //     },
-            //     Err(_) => ContractExecResult::Error,
-            // }
-            Contracts::bare_call(origin, dest, value, gas_limit, input_data)
+            let (exec_result, gas_consumed) =
+                Contracts::bare_call(origin, dest.into(), value, gas_limit, input_data);
+            match exec_result {
+                Ok(v) => ContractExecResult::Success {
+                    flags: v.flags.bits(),
+                    data: v.data,
+                    gas_consumed: gas_consumed,
+                },
+                Err(_) => ContractExecResult::Error,
+            }
         }
 
         fn get_storage(

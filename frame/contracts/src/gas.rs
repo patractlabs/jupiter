@@ -14,13 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Substrate. If not, see <http://www.gnu.org/licenses/>.
 
-use crate::Trait;
+use crate::{Trait, exec::ExecError};
 use sp_std::marker::PhantomData;
 use sp_runtime::traits::Zero;
 use frame_support::dispatch::{
 	DispatchResultWithPostInfo, PostDispatchInfo, DispatchErrorWithPostInfo,
 };
-use pallet_contracts_primitives::ExecError;
 
 #[cfg(test)]
 use std::{any::Any, fmt::Debug};
