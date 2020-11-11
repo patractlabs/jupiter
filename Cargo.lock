@@ -2607,10 +2607,10 @@ dependencies = [
  "jupiter-runtime-common",
  "pallet-authorship",
  "pallet-balances",
- "pallet-contracts 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "pallet-contracts 2.0.0",
  "pallet-contracts-ext",
- "pallet-contracts-primitives 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "pallet-contracts-rpc-runtime-api",
+ "pallet-contracts-primitives 2.0.0",
+ "pallet-contracts-rpc-runtime-api 0.8.0",
  "pallet-indices",
  "pallet-multisig",
  "pallet-offences",
@@ -2707,7 +2707,7 @@ dependencies = [
  "pallet-contracts 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "pallet-contracts-ext",
  "pallet-contracts-primitives 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "pallet-contracts-rpc-runtime-api",
+ "pallet-contracts-rpc-runtime-api 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "pallet-grandpa",
  "pallet-im-online",
  "pallet-indices",
@@ -3975,7 +3975,7 @@ version = "0.1.0"
 dependencies = [
  "frame-support",
  "frame-system",
- "pallet-contracts 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "pallet-contracts 2.0.0",
  "parity-scale-codec",
  "sp-core",
  "sp-runtime",
@@ -4011,7 +4011,7 @@ dependencies = [
  "jsonrpc-core-client",
  "jsonrpc-derive",
  "pallet-contracts-primitives 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "pallet-contracts-rpc-runtime-api",
+ "pallet-contracts-rpc-runtime-api 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-scale-codec",
  "serde",
  "serde_json",
@@ -4032,7 +4032,7 @@ dependencies = [
  "jsonrpc-core-client",
  "jsonrpc-derive",
  "pallet-contracts-primitives 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "pallet-contracts-rpc-runtime-api",
+ "pallet-contracts-rpc-runtime-api 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-scale-codec",
  "serde",
  "sp-api",
@@ -4040,6 +4040,17 @@ dependencies = [
  "sp-core",
  "sp-rpc",
  "sp-runtime",
+]
+
+[[package]]
+name = "pallet-contracts-rpc-runtime-api"
+version = "0.8.0"
+dependencies = [
+ "pallet-contracts-primitives 2.0.0",
+ "parity-scale-codec",
+ "sp-api",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]

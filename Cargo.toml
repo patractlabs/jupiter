@@ -8,6 +8,7 @@ members = [
     "frame/contracts",
     "frame/contracts/common",
     "frame/contracts/rpc",
+    "frame/contracts/rpc/runtime-api",
     "runtime/jupiter",
     "runtime/jupiter-dev",
     "primitives",

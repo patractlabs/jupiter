@@ -13,7 +13,7 @@ sp-runtime = { version = "2.0.0", default-features = false }
 
 frame-support = { version = "2.0.0", default-features = false }
 frame-system = { version = "2.0.0", default-features = false }
-pallet-contracts = { version = "2.0.0", default-features = false }
+pallet-contracts = { version = "2.0.0", default-features = false, path = "../contracts" }
 
 [features]
 default = ["std"]
