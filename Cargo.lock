@@ -3934,6 +3934,7 @@ dependencies = [
 name = "pallet-contracts"
 version = "2.0.0"
 dependencies = [
+ "altbn128",
  "assert_matches",
  "bitflags",
  "frame-support",
