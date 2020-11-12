@@ -20,10 +20,10 @@ use crate::exec::{ExecError, ExecResult, ExecReturnValue, Ext, ReturnFlags, Stor
 use crate::gas::{Gas, GasMeter, GasMeterResult, Token};
 use crate::wasm::env_def::ConvertibleToWasm;
 use crate::{BalanceOf, CodeHash, Error, Schedule, Trait};
-use altbn128::{bn256_add, bn256_mul};
 use codec::{Decode, Encode};
 use frame_support::dispatch::DispatchError;
 use frame_system;
+use jupiter_io::zk_snarks::{altbn_128_add as bn256_add, altbn_128_mul as bn256_mul};
 use parity_wasm::elements::ValueType;
 use sp_io::hashing::{blake2_128, blake2_256, keccak_256, sha2_256};
 use sp_runtime::traits::{Bounded, SaturatedConversion};
@@ -1262,8 +1262,8 @@ define_env!(Env, <E: Ext>,
     // - `output_ptr`: the pointer into the linear memory where the output
     //                 data is placed. The function will write the result
     //                 directly into this buffer.
-    seal_curve_bn_256_add(ctx, input_ptr: u32, input_len: u32, output_ptr: u32) => {
-        compute_curve_on_intermediate_buffer(ctx, bn256_add, input_ptr, input_len, output_ptr)
+    seal_curve_bn_256_add(ctx, lhs: u32, rhs: u32, output_ptr: u32) => {
+        compute_curve_on_intermediate_buffer(ctx, bn256_add, lhs, rhs, output_ptr)
     },
     // Computes the BLAKE2 128-bit hash on the given input buffer.
     //
@@ -1285,8 +1285,8 @@ define_env!(Env, <E: Ext>,
     // - `output_ptr`: the pointer into the linear memory where the output
     //                 data is placed. The function will write the result
     //                 directly into this buffer.
-    seal_curve_bn_256_mul(ctx, input_ptr: u32, input_len: u32, output_ptr: u32) => {
-        compute_curve_on_intermediate_buffer(ctx, bn256_mul, input_ptr, input_len, output_ptr)
+    seal_curve_bn_256_mul(ctx, lhs: u32, rhs: u32, output_ptr: u32) => {
+        compute_curve_on_intermediate_buffer(ctx, bn256_mul, lhs, rhs, output_ptr)
     },
 );
 
@@ -1337,22 +1337,20 @@ where
 /// The `input` and `output` buffers may overlap.
 fn compute_curve_on_intermediate_buffer<E, F, R>(
     ctx: &mut Runtime<E>,
-    hash_fn: F,
-    input_ptr: u32,
-    input_len: u32,
+    inflect_fn: F,
+    lhs: u32,
+    rhs: u32,
     output_ptr: u32,
 ) -> Result<(), sp_sandbox::HostError>
 where
     E: Ext,
-    F: FnOnce(&[u8]) -> R,
+    F: FnOnce(u32, u32) -> R,
     R: AsRef<[u8]>,
 {
-    // Copy input into supervisor memory.
-    let input = read_sandbox_memory(ctx, input_ptr, input_len)?;
     // Compute the hash on the input buffer using the given hash function.
-    let hash = hash_fn(&input);
+    let point = inflect_fn(lhs, rhs);
     // Write the resulting hash back into the sandboxed output buffer.
-    write_sandbox_memory(ctx, output_ptr, hash.as_ref())?;
+    write_sandbox_memory(ctx, output_ptr, point.as_ref())?;
     Ok(())
 }
 

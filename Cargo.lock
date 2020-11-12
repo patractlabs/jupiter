@@ -121,10 +121,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "altbn128"
-version = "0.1.0"
-
-[[package]]
 name = "ansi_term"
 version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3934,12 +3930,12 @@ dependencies = [
 name = "pallet-contracts"
 version = "2.0.0"
 dependencies = [
- "altbn128",
  "assert_matches",
  "bitflags",
  "frame-support",
  "frame-system",
  "hex-literal 0.3.1",
+ "jupiter-io",
  "pallet-balances",
  "pallet-contracts-primitives",
  "pallet-randomness-collective-flip",
