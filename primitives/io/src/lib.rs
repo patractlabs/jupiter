@@ -6,8 +6,7 @@ use sp_runtime_interface::runtime_interface;
 /// ZK-SNARKs runtime interface
 #[runtime_interface]
 pub trait ZkSnarks {
-    // /// altbn_128 add
-    // ///
+    /// altbn_128 add
     // /// ```
     // /// assert_eq!(jupiter_io::zk_snarks::altbn_128_add(1, 1), 2);
     // /// ```
@@ -19,8 +18,7 @@ pub trait ZkSnarks {
         res
     }
 
-    // /// altbn_128 mul
-    // ///
+    /// altbn_128 mul
     // /// ```
     // /// assert_eq!(jupiter_io::zk_snarks::altbn_128_mul(2, 2), 4);
     // /// ```
@@ -32,7 +30,7 @@ pub trait ZkSnarks {
         res
     }
 
-    // /// altbn_128 pairing
+    /// altbn_128 pairing
     // /// ```
     // /// assert_eq!(jupiter_io::zk_snarks::altbn_128_pairing(2, 2), (0, 2, 0, 2));
     // /// ```
