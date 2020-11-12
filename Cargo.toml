@@ -6,7 +6,7 @@ members = [
     "bin/node-dev/executor",
     "frame/contracts-ext",
     "frame/contracts",
-    "frame/contracts/altbn256",
+    "frame/contracts/altbn128",
     "frame/contracts/common",
     "frame/contracts/rpc",
     "frame/contracts/rpc/runtime-api",
