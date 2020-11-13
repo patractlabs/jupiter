@@ -48,9 +48,9 @@ pallet-utility = { version = "2.0.0", git = "https://github.com/paritytech/subst
 pallet-multisig = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 
 # vendor modules
-pallet-contracts = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "partract-contracts", default-features = false }
-pallet-contracts-primitives = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "partract-contracts", default-features = false }
-pallet-contracts-rpc-runtime-api = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "partract-contracts", default-features = false }
+pallet-contracts = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-contracts-primitives = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-contracts-rpc-runtime-api = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 
 # local runtime module
 pallet-contracts-ext = { path = "../../frame/contracts-ext", default-features = false }
