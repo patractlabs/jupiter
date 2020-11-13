@@ -5,11 +5,12 @@ authors = ["[your_name] <[your_email]>"]
 edition = "2018"
 
 [dependencies]
-ink_primitives = { version = "3.0.0-rc2", default-features = false, git = "https://github.com/patractlabs/ink.git" }
-ink_metadata = { version = "3.0.0-rc2", default-features = false, features = ["derive"], optional = true, git = "https://github.com/patractlabs/ink.git" }
-ink_env = { version = "3.0.0-rc2", default-features = false, git = "https://github.com/patractlabs/ink.git" }
-ink_storage = { version = "3.0.0-rc2", default-features = false, git = "https://github.com/patractlabs/ink.git" }
-ink_lang = { version = "3.0.0-rc2", default-features = false, git = "https://github.com/patractlabs/ink.git" }
+ink_primitives = { version = "3.0.0-rc2", default-features = false, git = "https://github.com/patractlabs/ink.git", branch = "altbn128/env" }
+ink_prelude = { version = "3.0.0-rc2", default-features = false, git = "https://github.com/patractlabs/ink.git", branch = "altbn128/env" }
+ink_metadata = { version = "3.0.0-rc2", default-features = false, features = ["derive"], optional = true, git = "https://github.com/patractlabs/ink.git", branch = "altbn128/env" }
+ink_env = { version = "3.0.0-rc2", default-features = false, git = "https://github.com/patractlabs/ink.git", branch = "altbn128/env" }
+ink_storage = { version = "3.0.0-rc2", default-features = false, git = "https://github.com/patractlabs/ink.git", branch = "altbn128/env" }
+ink_lang = { version = "3.0.0-rc2", default-features = false, git = "https://github.com/patractlabs/ink.git", branch = "altbn128/env" }
 
 scale = { package = "parity-scale-codec", version = "1.3", default-features = false, features = ["derive"] }
 scale-info = { version = "0.4.1", default-features = false, features = ["derive"], optional = true }
