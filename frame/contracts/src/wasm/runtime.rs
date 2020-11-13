@@ -1262,8 +1262,12 @@ define_env!(Env, <E: Ext>,
     // - `output_ptr`: the pointer into the linear memory where the output
     //                 data is placed. The function will write the result
     //                 directly into this buffer.
-    seal_curve_bn_256_add(ctx, lhs: u32, rhs: u32, output_ptr: u32) => {
-        compute_curve_on_intermediate_buffer(ctx, bn256_add, lhs, rhs, output_ptr)
+    seal_curve_bn_256_add(
+        ctx, g1_ptr: u32, g1_len: u32, g2_ptr: u32, g2_len: u32, output_ptr: u32
+    ) => {
+        compute_curve_add_on_intermediate_buffer(
+            ctx, bn256_add, g1_ptr, g1_len, g2_ptr, g2_len, output_ptr,
+        )
     },
     // Computes the BLAKE2 128-bit hash on the given input buffer.
     //
@@ -1285,8 +1289,10 @@ define_env!(Env, <E: Ext>,
     // - `output_ptr`: the pointer into the linear memory where the output
     //                 data is placed. The function will write the result
     //                 directly into this buffer.
-    seal_curve_bn_256_mul(ctx, lhs: u32, rhs: u32, output_ptr: u32) => {
-        compute_curve_on_intermediate_buffer(ctx, bn256_mul, lhs, rhs, output_ptr)
+    seal_curve_bn_256_mul(ctx, input_ptr: u32, input_len: u32, scalar: u64, output_ptr: u32) => {
+        compute_curve_mul_on_intermediate_buffer(
+            ctx, bn256_mul, input_ptr, input_len, scalar, output_ptr,
+        )
     },
 );
 
@@ -1335,20 +1341,59 @@ where
 /// # Note
 ///
 /// The `input` and `output` buffers may overlap.
-fn compute_curve_on_intermediate_buffer<E, F, R>(
+fn compute_curve_add_on_intermediate_buffer<E, F, R>(
     ctx: &mut Runtime<E>,
     inflect_fn: F,
-    lhs: u32,
-    rhs: u32,
+    g1_ptr: u32,
+    g1_len: u32,
+    g2_ptr: u32,
+    g2_len: u32,
     output_ptr: u32,
 ) -> Result<(), sp_sandbox::HostError>
 where
     E: Ext,
-    F: FnOnce(u32, u32) -> R,
+    F: FnOnce(&[u8], &[u8]) -> R,
     R: AsRef<[u8]>,
 {
+    // Copy g1 and g2 into supervisor memory.
+    let g1 = read_sandbox_memory(ctx, g1_ptr, g1_len)?;
+    let g2 = read_sandbox_memory(ctx, g2_ptr, g2_len)?;
     // Compute the hash on the input buffer using the given hash function.
-    let point = inflect_fn(lhs, rhs);
+    let point = inflect_fn(&g1, &g2);
+    // Write the resulting hash back into the sandboxed output buffer.
+    write_sandbox_memory(ctx, output_ptr, point.as_ref())?;
+    Ok(())
+}
+
+/// Computes the given hash function on the supplied input.
+///
+/// Reads from the sandboxed input buffer into an intermediate buffer.
+/// Returns the result directly to the output buffer of the sandboxed memory.
+///
+/// It is the callers responsibility to provide an output buffer that
+/// is large enough to hold the expected amount of bytes returned by the
+/// chosen hash function.
+///
+/// # Note
+///
+/// The `input` and `output` buffers may overlap.
+fn compute_curve_mul_on_intermediate_buffer<E, F, R>(
+    ctx: &mut Runtime<E>,
+    inflect_fn: F,
+    input_ptr: u32,
+    input_len: u32,
+    scalar: u64,
+    output_ptr: u32,
+) -> Result<(), sp_sandbox::HostError>
+where
+    E: Ext,
+    F: FnOnce(&[u8], u64) -> R,
+    R: AsRef<[u8]>,
+{
+    // Copy g1 into supervisor memory.
+    let input = read_sandbox_memory(ctx, input_ptr, input_len)?;
+    // Compute the hash on the input buffer using the given hash function.
+    let point = inflect_fn(&input, scalar);
     // Write the resulting hash back into the sandboxed output buffer.
     write_sandbox_memory(ctx, output_ptr, point.as_ref())?;
     Ok(())

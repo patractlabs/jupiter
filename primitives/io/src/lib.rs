@@ -10,31 +10,23 @@ pub trait ZkSnarks {
     // /// ```
     // /// assert_eq!(jupiter_io::zk_snarks::altbn_128_add(1, 1), 2);
     // /// ```
-    fn altbn_128_add(lhs: u32, rhs: u32) -> [u8; 64] {
-        use std::u8;
-        let mut res = [0; 64];
-        res[0] = lhs as u8;
-        res[63] = rhs as u8;
-        res
+    fn altbn_128_add(_g1: &[u8], _g2: &[u8]) -> [u8; 64] {
+        [0; 64]
     }
 
     /// altbn_128 mul
     // /// ```
     // /// assert_eq!(jupiter_io::zk_snarks::altbn_128_mul(2, 2), 4);
     // /// ```
-    fn altbn_128_mul(lhs: u32, rhs: u32) -> [u8; 64] {
-        use std::u8;
-        let mut res = [0; 64];
-        res[0] = lhs as u8;
-        res[63] = rhs as u8;
-        res
+    fn altbn_128_mul(_input: &[u8], _scalar: u64) -> [u8; 64] {
+        [1; 64]
     }
 
     /// altbn_128 pairing
     // /// ```
     // /// assert_eq!(jupiter_io::zk_snarks::altbn_128_pairing(2, 2), (0, 2, 0, 2));
     // /// ```
-    fn altbn_128_pairing(_lhs: u32, _rhs: u32) -> bool {
+    fn altbn_128_pairing() -> bool {
         true
     }
 }
