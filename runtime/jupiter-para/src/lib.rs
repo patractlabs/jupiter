@@ -44,7 +44,7 @@ pub use jupiter_primitives::{
     AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Signature,
 };
 use jupiter_runtime_common::{
-    constants::{currency::*, fee::WeightToFee},
+    constants::{currency::*, fee::WeightToFee, time::SLOT_DURATION},
     impls, weights,
 };
 use pallet_transaction_payment::CurrencyAdapter;
@@ -61,8 +61,8 @@ pub fn wasm_binary_unwrap() -> &'static [u8] {
 
 /// Runtime version.
 pub const VERSION: RuntimeVersion = RuntimeVersion {
-    spec_name: create_runtime_str!("jupiter-dev"),
-    impl_name: create_runtime_str!("jupiter-dev"),
+    spec_name: create_runtime_str!("jupiter-para"),
+    impl_name: create_runtime_str!("jupiter-para"),
     authoring_version: 1,
     spec_version: 1,
     impl_version: 1,
@@ -88,12 +88,10 @@ parameter_types! {
     pub MaximumExtrinsicWeight: Weight = AvailableBlockRatio::get()
         .saturating_sub(Perbill::from_percent(10)) * MaximumBlockWeight::get();
     pub const MaximumBlockLength: u32 = 5 * 1024 * 1024;
+    pub const Version: RuntimeVersion = VERSION;
 }
 
 // Configure FRAME pallets to include in runtime.
-parameter_types! {
-    pub const Version: RuntimeVersion = VERSION;
-}
 impl frame_system::Trait for Runtime {
     /// The basic call filter to use in dispatchable.
     type BaseCallFilter = ();
@@ -154,19 +152,7 @@ impl frame_system::Trait for Runtime {
 }
 
 parameter_types! {
-    pub const UncleGenerations: u32 = 0;
-}
-
-impl pallet_authorship::Trait for Runtime {
-    type FindAuthor = ();
-    // would set Default::default() for author
-    type UncleGenerations = UncleGenerations;
-    type FilterUncle = ();
-    type EventHandler = ();
-}
-
-parameter_types! {
-    pub const MinimumPeriod: u64 = 1;
+    pub const MinimumPeriod: u64 = SLOT_DURATION / 2;
 }
 
 impl pallet_timestamp::Trait for Runtime {
@@ -186,7 +172,7 @@ impl pallet_indices::Trait for Runtime {
     type Currency = Balances;
     type Deposit = IndexDeposit;
     type Event = Event;
-    type WeightInfo = ();
+    type WeightInfo = weights::pallet_indices::WeightInfo;
 }
 
 parameter_types! {
@@ -213,7 +199,7 @@ parameter_types! {
 }
 
 impl pallet_transaction_payment::Trait for Runtime {
-    type OnChargeTransaction = CurrencyAdapter<Balances, impls::ToAuthor<Self>>;
+    type OnChargeTransaction = CurrencyAdapter<Balances, ()>;
     type TransactionByteFee = TransactionByteFee;
     type WeightToFee = WeightToFee;
     type FeeMultiplierUpdate = impls::SlowAdjustingFeeUpdate<Self>;
@@ -256,6 +242,21 @@ impl pallet_contracts_ext::Trait for Runtime {
     type WeightInfo = ();
 }
 
+impl cumulus_parachain_upgrade::Trait for Runtime {
+    type Event = Event;
+    type OnValidationData = ();
+}
+
+impl parachain_info::Trait for Runtime {}
+
+// impl token_dealer::Trait for Runtime {
+//     type Event = Event;
+//     type UpwardMessageSender = MessageBroker;
+//     type UpwardMessage = cumulus_upward_message::RococoUpwardMessage;
+//     type Currency = Balances;
+//     type XCMPMessageSender = MessageBroker;
+// }
+
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
     pub enum Runtime where
@@ -267,9 +268,6 @@ construct_runtime!(
         System: frame_system::{Module, Call, Config, Storage, Event<T>},
         RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Module, Call, Storage},
 
-        // Consensus support.
-        Authorship: pallet_authorship::{Module, Call, Storage},
-
         Timestamp: pallet_timestamp::{Module, Call, Storage, Inherent},
         Balances: pallet_balances::{Module, Call, Storage, Config<T>, Event<T>},
         Indices: pallet_indices::{Module, Call, Storage, Config<T>, Event<T>},
@@ -279,6 +277,10 @@ construct_runtime!(
         ContractsExt: pallet_contracts_ext::{Module, Call, Storage, Event<T>},
 
         Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>},
+
+        ParachainUpgrade: cumulus_parachain_upgrade::{Module, Call, Storage, Inherent, Event},
+        ParachainInfo: parachain_info::{Module, Storage, Config},
+        // TokenDealer: token_dealer::{Module, Call, Event<T>},
     }
 );
 
@@ -430,3 +432,5 @@ impl_runtime_apis! {
         }
     }
 }
+
+cumulus_runtime::register_validate_block!(Block, Executive);

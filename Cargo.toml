@@ -3,9 +3,11 @@ members = [
     "bin/node",
     "bin/node/executor",
     "bin/node-dev",
+    "bin/node-para",
     "frame/contracts-ext",
     "runtime/jupiter",
     "runtime/jupiter-dev",
+    "runtime/jupiter-para",
     "primitives",
     "rpc",
 ]
@@ -13,6 +15,3 @@ members = [
 [profile.release]
 panic = "unwind"
 
-[patch.crates-io]
-# patch for substrate runtime module
-frame-executive = { path = "./frame/executive" }
