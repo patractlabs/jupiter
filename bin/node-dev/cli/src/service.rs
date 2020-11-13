@@ -37,7 +37,7 @@ pub fn new_partial(
         .map_err(Into::into)
         .map_err(sp_consensus::error::Error::InherentData)?;
 
-    let (client, backend, keystore, task_manager) =
+    let (client, backend, keystore_container, task_manager) =
         sc_service::new_full_parts::<Block, RuntimeApi, Executor>(&config)?;
     let client = Arc::new(client);
 
@@ -61,7 +61,7 @@ pub fn new_partial(
         backend,
         task_manager,
         import_queue,
-        keystore,
+        keystore_container,
         select_chain,
         transaction_pool,
         inherent_data_providers,
@@ -81,7 +81,7 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
         backend,
         mut task_manager,
         import_queue,
-        keystore,
+        keystore_container,
         select_chain,
         transaction_pool,
         inherent_data_providers,
@@ -149,7 +149,7 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
     sc_service::spawn_tasks(sc_service::SpawnTasksParams {
         network: network.clone(),
         client: client.clone(),
-        keystore: keystore.clone(),
+        keystore: keystore_container.sync_keystore(),
         task_manager: &mut task_manager,
         transaction_pool: transaction_pool.clone(),
         telemetry_connection_sinks: telemetry_connection_sinks.clone(),
@@ -164,6 +164,7 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
 
     if role.is_authority() {
         let proposer = sc_basic_authorship::ProposerFactory::new(
+            task_manager.spawn_handle(),
             client.clone(),
             transaction_pool.clone(),
             prometheus_registry.as_ref(),
@@ -191,7 +192,7 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
 
 /// Builds a new service for a light client.
 pub fn new_light(config: Configuration) -> Result<TaskManager, ServiceError> {
-    let (client, backend, keystore, mut task_manager, on_demand) =
+    let (client, backend, keystore_container, mut task_manager, on_demand) =
         sc_service::new_light_parts::<Block, RuntimeApi, Executor>(&config)?;
 
     let transaction_pool = Arc::new(sc_transaction_pool::BasicPool::new_light(
@@ -242,7 +243,7 @@ pub fn new_light(config: Configuration) -> Result<TaskManager, ServiceError> {
         telemetry_connection_sinks: sc_service::TelemetryConnectionSinks::default(),
         config,
         client,
-        keystore,
+        keystore: keystore_container.sync_keystore(),
         backend,
         network,
         network_status_sinks,

@@ -14,24 +14,23 @@ structopt = "0.3.8"
 parking_lot = "0.10.0"
 serde_json = "1.0"
 
-sc-cli = { version = "0.8.0" }
-sp-core = { version = "2.0.0" }
-sc-executor = { version = "0.8.0" }
-sc-service = { version = "0.8.0" }
-sp-inherents = { version = "2.0.0" }
-sc-transaction-pool = { version = "2.0.0" }
-sp-transaction-pool = { version = "2.0.0" }
-sc-network = { version = "0.8.0" }
-sp-consensus = { version = "0.8.0" }
-sc-consensus = { version = "0.8.0" }
-sc-consensus-manual-seal = { version = "0.8.0" }
-sc-client-api = { version = "2.0.0" }
-sp-api = { version = "2.0.0" }
-sp-runtime = { version = "2.0.0" }
-sp-timestamp = { version = "2.0.0" }
-sc-basic-authorship = { version = "0.8.0" }
+sc-cli = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+sp-core = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+sc-executor = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+sc-service = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+sp-inherents = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+sc-transaction-pool = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+sc-network = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+sc-consensus = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+sp-consensus = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+sc-consensus-manual-seal = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+sc-client-api = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+sp-api = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+sp-runtime = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+sp-timestamp = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+sc-basic-authorship = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 
-pallet-contracts = { path = "../../../frame/contracts" }
+pallet-contracts = { version = "2.0.0", git = "https://github.com/partractlabs/substrate", branch = "partract-contracts", default-features = false }
 
 jupiter-primitives = { path = "../../../primitives" }
 jupiter-dev-runtime = { path = "../../../runtime/jupiter-dev" }
@@ -39,4 +38,4 @@ jupiter-rpc = { path = "../../../rpc" }
 jupiter-dev-executor = { path = "../executor" }
 
 [build-dependencies]
-substrate-build-script-utils = { version = "2.0.0" }
+substrate-build-script-utils = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }

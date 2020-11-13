@@ -3,7 +3,7 @@ use sc_service::PartialComponents;
 
 use crate::chain_spec;
 use crate::cli::{Cli, Subcommand};
-use crate::service::{self, new_full_base, new_partial, NewFullBase};
+use crate::service::{self, new_partial};
 
 impl SubstrateCli for Cli {
     fn impl_name() -> String {
@@ -53,9 +53,11 @@ pub fn run() -> sc_cli::Result<()> {
     match &cli.subcommand {
         None => {
             let runner = cli.create_runner(&cli.run)?;
-            runner.run_node_until_exit(|config| match config.role {
-                Role::Light => service::new_light(config),
-                _ => service::new_full(config),
+            runner.run_node_until_exit(|config| async move {
+                match config.role {
+                    Role::Light => service::new_light(config),
+                    _ => service::new_full(config),
+                }
             })
         }
         Some(Subcommand::Key(cmd)) => cmd.run(),
@@ -66,25 +68,6 @@ pub fn run() -> sc_cli::Result<()> {
             let runner = cli.create_runner(cmd)?;
 
             runner.sync_run(|config| cmd.run(config.chain_spec, config.network))
-        }
-        Some(Subcommand::BuildSyncSpec(cmd)) => {
-            let runner = cli.create_runner(cmd)?;
-
-            runner.async_run(|config| {
-                let chain_spec = config.chain_spec.cloned_box();
-                let network_config = config.network.clone();
-                let NewFullBase {
-                    task_manager,
-                    client,
-                    network_status_sinks,
-                    ..
-                } = new_full_base(config)?;
-
-                Ok((
-                    cmd.run(chain_spec, network_config, client, network_status_sinks),
-                    task_manager,
-                ))
-            })
         }
         Some(Subcommand::CheckBlock(cmd)) => {
             let runner = cli.create_runner(cmd)?;

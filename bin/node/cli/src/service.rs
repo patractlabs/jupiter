@@ -47,7 +47,7 @@ pub fn new_partial(
     >,
     ServiceError,
 > {
-    let (client, backend, keystore, task_manager) =
+    let (client, backend, keystore_container, task_manager) =
         sc_service::new_full_parts::<Block, RuntimeApi, Executor>(&config)?;
     let client = Arc::new(client);
 
@@ -125,7 +125,7 @@ pub fn new_partial(
         client,
         backend,
         task_manager,
-        keystore,
+        keystore_container,
         select_chain,
         import_queue,
         transaction_pool,
@@ -150,7 +150,7 @@ pub fn new_full_base(config: Configuration) -> Result<NewFullBase, ServiceError>
         backend,
         mut task_manager,
         import_queue,
-        keystore,
+        keystore_container,
         select_chain,
         transaction_pool,
         inherent_data_providers,
@@ -193,7 +193,7 @@ pub fn new_full_base(config: Configuration) -> Result<NewFullBase, ServiceError>
         config,
         backend: backend.clone(),
         client: client.clone(),
-        keystore: keystore.clone(),
+        keystore: keystore_container.sync_keystore(),
         network: network.clone(),
         rpc_extensions_builder: Box::new(rpc_extensions_builder),
         transaction_pool: transaction_pool.clone(),
@@ -207,6 +207,7 @@ pub fn new_full_base(config: Configuration) -> Result<NewFullBase, ServiceError>
 
     if role.is_authority() {
         let proposer = sc_basic_authorship::ProposerFactory::new(
+            task_manager.spawn_handle(),
             client.clone(),
             transaction_pool.clone(),
             prometheus_registry.as_ref(),
@@ -224,7 +225,7 @@ pub fn new_full_base(config: Configuration) -> Result<NewFullBase, ServiceError>
             network.clone(),
             inherent_data_providers.clone(),
             force_authoring,
-            keystore.clone(),
+            keystore_container.sync_keystore(),
             can_author_with,
         )?;
 
@@ -238,7 +239,7 @@ pub fn new_full_base(config: Configuration) -> Result<NewFullBase, ServiceError>
     // if the node isn't actively participating in consensus then it doesn't
     // need a keystore, regardless of which protocol we use below.
     let keystore = if role.is_authority() {
-        Some(keystore as sp_core::traits::BareCryptoStorePtr)
+        Some(keystore_container.sync_keystore())
     } else {
         None
     };
@@ -264,7 +265,6 @@ pub fn new_full_base(config: Configuration) -> Result<NewFullBase, ServiceError>
             config: grandpa_config,
             link: grandpa_link,
             network: network.clone(),
-            inherent_data_providers: inherent_data_providers.clone(),
             telemetry_on_connect: Some(telemetry_connection_sinks.on_connect_stream()),
             voting_rule: sc_finality_grandpa::VotingRulesBuilder::default().build(),
             prometheus_registry,
@@ -278,11 +278,7 @@ pub fn new_full_base(config: Configuration) -> Result<NewFullBase, ServiceError>
             sc_finality_grandpa::run_grandpa_voter(grandpa_config)?,
         );
     } else {
-        sc_finality_grandpa::setup_disabled_grandpa(
-            client.clone(),
-            &inherent_data_providers,
-            network.clone(),
-        )?;
+        sc_finality_grandpa::setup_disabled_grandpa(network.clone())?;
     }
 
     network_starter.start_network();
@@ -303,7 +299,7 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
 
 /// Builds a new service for a light client.
 pub fn new_light(config: Configuration) -> Result<TaskManager, ServiceError> {
-    let (client, backend, keystore, mut task_manager, on_demand) =
+    let (client, backend, keystore_container, mut task_manager, on_demand) =
         sc_service::new_light_parts::<Block, RuntimeApi, Executor>(&config)?;
 
     let transaction_pool = Arc::new(sc_transaction_pool::BasicPool::new_light(
@@ -380,7 +376,7 @@ pub fn new_light(config: Configuration) -> Result<TaskManager, ServiceError> {
         client: client.clone(),
         transaction_pool: transaction_pool.clone(),
         config,
-        keystore,
+        keystore: keystore_container.sync_keystore(),
         backend,
         network_status_sinks,
         system_rpc_tx,
