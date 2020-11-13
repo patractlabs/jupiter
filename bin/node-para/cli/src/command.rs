@@ -22,7 +22,6 @@ use std::{io::Write, net::SocketAddr};
 fn load_spec(id: &str, para_id: ParaId) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
     Ok(match id {
         "" | "dev" => Box::new(chain_spec::development_config(para_id)?),
-        "staging" => Box::new(chain_spec::staging_testnet_config(para_id)?),
         path => Box::new(chain_spec::ChainSpec::from_json_file(
             path.into(),
         )?),
