@@ -13,7 +13,11 @@ use sp_std::prelude::*;
 
 use frame_support::{decl_error, decl_event, decl_module, decl_storage, weights::Weight};
 use frame_system::ensure_signed;
+
+#[cfg(feature = "paritytech")]
 use pallet_contracts::{CodeHash, ContractAddressFor};
+#[cfg(not(feature = "paritytech"))]
+use pallet_contracts_megaclite::{CodeHash, ContractAddressFor};
 
 pub trait Trait: frame_system::Trait {
     type Event: From<Event<Self>> + Into<<Self as frame_system::Trait>::Event>;

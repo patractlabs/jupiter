@@ -2849,7 +2849,7 @@ dependencies = [
 [[package]]
 name = "jupiter-io"
 version = "0.2.0"
-source = "git+https://github.com/patractlabs/jupiter.git?branch=altbn128#e4cecf1b926ed6836f899a1e98662e435a0106b1"
+source = "git+https://github.com/patractlabs/jupiter?branch=altbn128#6a191d9ad2e9c045e5f28995713309514f352da4"
 dependencies = [
  "sp-runtime-interface",
 ]
@@ -4384,7 +4384,7 @@ source = "git+https://github.com/patractlabs/substrate?branch=contracts#7a087beb
 dependencies = [
  "frame-support",
  "frame-system",
- "jupiter-io 0.2.0 (git+https://github.com/patractlabs/jupiter.git?branch=altbn128)",
+ "jupiter-io 0.2.0 (git+https://github.com/patractlabs/jupiter?branch=altbn128)",
  "pallet-contracts-primitives",
  "pallet-contracts-proc-macro",
  "parity-scale-codec",
@@ -4427,7 +4427,7 @@ source = "git+https://github.com/patractlabs/substrate?branch=partract-contracts
 dependencies = [
  "frame-support",
  "frame-system",
- "jupiter-io 0.2.0 (git+https://github.com/patractlabs/jupiter.git?branch=altbn128)",
+ "jupiter-io 0.2.0 (git+https://github.com/patractlabs/jupiter?branch=altbn128)",
  "pallet-contracts-primitives",
  "pallet-contracts-proc-macro",
  "parity-scale-codec",
@@ -4449,6 +4449,7 @@ dependencies = [
  "frame-support",
  "frame-system",
  "pallet-contracts 2.0.0 (git+https://github.com/patractlabs/substrate?branch=contracts)",
+ "pallet-contracts 2.0.0 (git+https://github.com/paritytech/substrate)",
  "parity-scale-codec",
  "sp-core",
  "sp-runtime",
