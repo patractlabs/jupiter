@@ -13,9 +13,6 @@ members = [
     "rpc",
 ]
 
-exclude = [
-    "frame/contracts/examples/altbn128",
-]
 
 [profile.release]
 panic = "unwind"
