@@ -13,13 +13,12 @@ sp-runtime = { version = "2.0.0", git = "https://github.com/paritytech/substrate
 
 frame-support = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 frame-system = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
-pallet-contracts = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false, optional = true }
+pallet-contracts = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-contracts-megaclite = { package = "pallet-contracts", version = "2.0.0", git = "https://github.com/patractlabs/substrate", branch = "contracts", default-features = false, optional = true }
 
 [features]
 default = ["std"]
-paritytech = [ "pallet-contracts" ]
-jupiter = ["pallet-contracts-megaclite"]
+megaclite = ["pallet-contracts-megaclite"]
 std = [
     "codec/std",
 

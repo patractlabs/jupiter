@@ -54,7 +54,7 @@ parachain-info = { git = "https://github.com/paritytech/cumulus", branch = "mast
 # token-dealer = { path = "../../pallets/token-dealer", default-features = false}
 
 # local runtime module
-pallet-contracts-ext = { path = "../../frame/contracts-ext", default-features = false, features = ["paritytech"] }
+pallet-contracts-ext = { path = "../../frame/contracts-ext", default-features = false }
 
 jupiter-primitives = { path = "../../primitives", default-features = false }
 jupiter-runtime-common = { path = "../common", default-features = false }

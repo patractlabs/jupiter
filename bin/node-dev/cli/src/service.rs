@@ -9,7 +9,6 @@ use sc_network::config::DummyFinalityProofRequestBuilder;
 use sc_service::{error::Error as ServiceError, Configuration, TaskManager};
 use sp_inherents::InherentDataProviders;
 
-use jupiter_dev_executor::Executor;
 use jupiter_dev_runtime::{self, RuntimeApi};
 use jupiter_primitives::Block;
 
