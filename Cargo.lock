@@ -2849,7 +2849,7 @@ dependencies = [
 [[package]]
 name = "jupiter-io"
 version = "0.2.0"
-source = "git+https://github.com/patractlabs/jupiter?branch=altbn128#6a191d9ad2e9c045e5f28995713309514f352da4"
+source = "git+https://github.com/patractlabs/jupiter?branch=altbn128#6a3e0ee427157f7d54e094b9efa273a84a18facc"
 dependencies = [
  "sp-runtime-interface",
 ]
