@@ -15,8 +15,9 @@ jobs:
         run: git submodule init && git submodule update
       - uses: actions-rs/toolchain@v1
         with:
-            toolchain: nightly-2020-10-05
             components: clippy
+            toolchain: nightly-2020-10-05
+            target: wasm32-unknown-unknown
             override: true
       - uses: actions-rs/clippy-check@v1
         with:
