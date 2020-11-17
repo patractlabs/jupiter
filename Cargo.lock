@@ -2801,7 +2801,7 @@ dependencies = [
  "jupiter-runtime-common",
  "pallet-authorship",
  "pallet-balances",
- "pallet-contracts 2.0.0 (git+https://github.com/patractlabs/substrate?branch=patract-contracts)",
+ "pallet-contracts 2.0.0",
  "pallet-contracts-ext",
  "pallet-contracts-primitives",
  "pallet-contracts-rpc-runtime-api",
@@ -4382,6 +4382,27 @@ dependencies = [
 [[package]]
 name = "pallet-contracts"
 version = "2.0.0"
+dependencies = [
+ "frame-support",
+ "frame-system",
+ "jupiter-io 0.2.0 (git+https://github.com/patractlabs/jupiter?branch=altbn128)",
+ "pallet-contracts-primitives",
+ "pallet-contracts-proc-macro",
+ "parity-scale-codec",
+ "parity-wasm",
+ "pwasm-utils 0.16.0",
+ "serde",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-sandbox",
+ "sp-std",
+ "wasmi-validation",
+]
+
+[[package]]
+name = "pallet-contracts"
+version = "2.0.0"
 source = "git+https://github.com/paritytech/substrate?branch=master#08b217a0650635f8430655979c581f0cebe4bed3"
 dependencies = [
  "frame-support",
@@ -4428,8 +4449,8 @@ version = "0.1.0"
 dependencies = [
  "frame-support",
  "frame-system",
+ "pallet-contracts 2.0.0",
  "pallet-contracts 2.0.0 (git+https://github.com/paritytech/substrate)",
- "pallet-contracts 2.0.0 (git+https://github.com/patractlabs/substrate?branch=patract-contracts)",
  "parity-scale-codec",
  "sp-core",
  "sp-runtime",

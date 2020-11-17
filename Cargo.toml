@@ -12,7 +12,7 @@ members = [
     "primitives/io",
     "rpc",
 ]
-
+exclude = ["vendor/substrate"]
 
 [profile.release]
 panic = "unwind"
