@@ -2767,7 +2767,7 @@ dependencies = [
  "jupiter-rpc",
  "jupiter-runtime",
  "log 0.4.11",
- "pallet-contracts 2.0.0 (git+https://github.com/patractlabs/substrate?branch=patract-contracts)",
+ "pallet-contracts 2.0.0",
  "parking_lot 0.10.2",
  "sc-basic-authorship",
  "sc-cli",
@@ -4407,28 +4407,6 @@ source = "git+https://github.com/paritytech/substrate?branch=master#08b217a06506
 dependencies = [
  "frame-support",
  "frame-system",
- "pallet-contracts-primitives",
- "pallet-contracts-proc-macro",
- "parity-scale-codec",
- "parity-wasm",
- "pwasm-utils 0.16.0",
- "serde",
- "sp-core",
- "sp-io",
- "sp-runtime",
- "sp-sandbox",
- "sp-std",
- "wasmi-validation",
-]
-
-[[package]]
-name = "pallet-contracts"
-version = "2.0.0"
-source = "git+https://github.com/patractlabs/substrate?branch=patract-contracts#e4373f42761481250ee05825023b4e561b59dd48"
-dependencies = [
- "frame-support",
- "frame-system",
- "jupiter-io 0.2.0 (git+https://github.com/patractlabs/jupiter?branch=altbn128)",
  "pallet-contracts-primitives",
  "pallet-contracts-proc-macro",
  "parity-scale-codec",
