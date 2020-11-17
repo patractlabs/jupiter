@@ -13,7 +13,12 @@ use sp_std::prelude::*;
 
 use frame_support::{decl_error, decl_event, decl_module, decl_storage, weights::Weight};
 use frame_system::ensure_signed;
+
 use pallet_contracts::{CodeHash, ContractAddressFor};
+#[cfg(feature = "megaclite")]
+use pallet_contracts_megaclite::{
+    CodeHash as MegacliteCodeHash, ContractAddressFor as MegacliteContractAddressFor,
+};
 
 pub trait Trait: frame_system::Trait {
     type Event: From<Event<Self>> + Into<<Self as frame_system::Trait>::Event>;
@@ -33,9 +38,11 @@ decl_event! {
         SetAccountGeneratedAddressType(AccountId, GeneratedContractAddressType),
     }
 }
+
 pub trait WeightInfo {
     fn set_generated_address_type() -> Weight;
 }
+
 decl_module! {
     pub struct Module<T: Trait> for enum Call where origin: T::Origin {
         type Error = Error<T>;
@@ -76,6 +83,36 @@ where
 {
     fn contract_address_for(
         code_hash: &CodeHash<T>,
+        data: &[u8],
+        origin: &T::AccountId,
+    ) -> T::AccountId {
+        let data_hash = T::Hashing::hash(data);
+
+        let mut buf = Vec::new();
+        buf.extend_from_slice(code_hash.as_ref());
+        buf.extend_from_slice(data_hash.as_ref());
+        buf.extend_from_slice(origin.as_ref());
+
+        match Self::account_generated_address_type(origin) {
+            GeneratedContractAddressType::Original => { /*do nothing*/ }
+            GeneratedContractAddressType::Repeatable => {
+                let nonce = frame_system::Module::<T>::account_nonce(origin);
+                let nonce: u32 = nonce.saturated_into::<u32>();
+                buf.extend_from_slice(&nonce.to_le_bytes()[..]);
+            }
+        }
+
+        UncheckedFrom::unchecked_from(T::Hashing::hash(&buf[..]))
+    }
+}
+
+#[cfg(feature = "megaclite")]
+impl<T: Trait> MegacliteContractAddressFor<MegacliteCodeHash<T>, T::AccountId> for Module<T>
+where
+    T::AccountId: UncheckedFrom<T::Hash> + AsRef<[u8]>,
+{
+    fn contract_address_for(
+        code_hash: &MegacliteCodeHash<T>,
         data: &[u8],
         origin: &T::AccountId,
     ) -> T::AccountId {

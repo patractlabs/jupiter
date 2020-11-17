@@ -46,18 +46,20 @@ pallet-transaction-payment = { version = "2.0.0", git = "https://github.com/pari
 pallet-transaction-payment-rpc-runtime-api = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-utility = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-multisig = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+
+# vendor modules
 pallet-contracts = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-contracts-primitives = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-contracts-rpc-runtime-api = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 
 # local runtime module
 pallet-contracts-ext = { path = "../../frame/contracts-ext", default-features = false }
-
 jupiter-primitives = { path = "../../primitives", default-features = false }
 jupiter-runtime-common = { path = "../common", default-features = false }
 
 [build-dependencies]
 wasm-builder-runner = { package = "substrate-wasm-builder-runner", git = "https://github.com/paritytech/substrate", branch = "master", version = "2.0.0"}
+
 [features]
 default = ["std"]
 std = [
@@ -98,6 +100,7 @@ std = [
     "pallet-utility/std",
     "pallet-multisig/std",
     "pallet-contracts/std",
+    "pallet-contracts-ext/std",
     "pallet-contracts-primitives/std",
     "pallet-contracts-rpc-runtime-api/std",
 

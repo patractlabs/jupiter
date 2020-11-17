@@ -9,8 +9,10 @@ members = [
     "runtime/jupiter-dev",
     "runtime/jupiter-para",
     "primitives",
+    "primitives/io",
     "rpc",
 ]
+
 
 [profile.release]
 panic = "unwind"

@@ -30,11 +30,15 @@ sp-runtime = { version = "2.0.0", git = "https://github.com/paritytech/substrate
 sp-timestamp = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 sc-basic-authorship = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 
-pallet-contracts = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+pallet-contracts = { version = "2.0.0", git = "https://github.com/patractlabs/substrate", branch = "patract-contracts" }
+
+frame-benchmarking = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 
 jupiter-primitives = { path = "../../../primitives" }
+jupiter-runtime = { path = "../../../runtime/jupiter" }
 jupiter-dev-runtime = { path = "../../../runtime/jupiter-dev" }
 jupiter-rpc = { path = "../../../rpc" }
+jupiter-io = { path = "../../../primitives/io" }
 
 [build-dependencies]
 substrate-build-script-utils = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
