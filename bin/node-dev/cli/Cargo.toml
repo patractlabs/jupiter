@@ -30,7 +30,7 @@ sp-runtime = { version = "2.0.0", git = "https://github.com/paritytech/substrate
 sp-timestamp = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 sc-basic-authorship = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 
-pallet-contracts = { version = "2.0.0", git = "https://github.com/patractlabs/substrate", branch = "patract-contracts" }
+pallet-contracts = { package = "pallet-contracts", path = "../../../vendor/substrate/frame/contracts" }
 
 frame-benchmarking = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 

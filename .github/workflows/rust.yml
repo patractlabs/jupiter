@@ -18,7 +18,7 @@ jobs:
       - name: Set nightly toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: nightly-2020-10-06
+          toolchain: nightly-2020-10-05
           target: wasm32-unknown-unknown
           override: true
       - name: Cache substrate deps
@@ -28,6 +28,8 @@ jobs:
         with:
           path: ./target
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('./Cargo.lock') }}
+      - name: Init
+        run: git submodule init && git submodule update
       - name: Update
         run: cargo update
       - name: Build
