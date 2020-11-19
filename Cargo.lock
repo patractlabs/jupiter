@@ -2762,7 +2762,7 @@ dependencies = [
  "frame-benchmarking",
  "futures 0.3.8",
  "jupiter-dev-runtime",
- "jupiter-io 0.2.0",
+ "jupiter-io",
  "jupiter-primitives",
  "jupiter-rpc",
  "jupiter-runtime",
@@ -2844,14 +2844,6 @@ dependencies = [
 [[package]]
 name = "jupiter-io"
 version = "0.2.0"
-dependencies = [
- "sp-runtime-interface",
-]
-
-[[package]]
-name = "jupiter-io"
-version = "0.2.0"
-source = "git+https://github.com/patractlabs/jupiter?branch=altbn128#6ea3466ac34968d5dad39522569a9dd4b8163638"
 dependencies = [
  "sp-runtime-interface",
 ]
@@ -4376,7 +4368,7 @@ version = "2.0.0"
 dependencies = [
  "frame-support",
  "frame-system",
- "jupiter-io 0.2.0 (git+https://github.com/patractlabs/jupiter?branch=altbn128)",
+ "jupiter-io",
  "pallet-contracts-primitives",
  "pallet-contracts-proc-macro",
  "parity-scale-codec",
