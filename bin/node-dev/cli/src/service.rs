@@ -20,8 +20,8 @@ type FullSelectChain = sc_consensus::LongestChain<FullBackend, Block>;
 // equivalent wasm code.
 native_executor_instance!(
     pub Executor,
-    jupiter_runtime::api::dispatch,
-    jupiter_runtime::native_version,
+    jupiter_dev_runtime::api::dispatch,
+    jupiter_dev_runtime::native_version,
     (frame_benchmarking::benchmarking::HostFunctions, jupiter_io::zk_snarks::HostFunctions),
 );
 
