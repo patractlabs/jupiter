@@ -18,7 +18,7 @@ jobs:
       - name: Set nightly toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: nightly-2020-10-05
+          toolchain: nightly
           target: wasm32-unknown-unknown
           override: true
       - name: Cache substrate deps
@@ -28,6 +28,10 @@ jobs:
         with:
           path: ./target
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('./Cargo.lock') }}
+      - name: Pre
+        run: |
+          sudo apt update
+          sudo apt install -y cmake pkg-config libssl-dev git build-essential clang libclang-dev curl
       - name: Init
         run: git submodule update --init --remote
       - name: Update
