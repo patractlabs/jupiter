@@ -35,7 +35,6 @@ pallet-contracts = { package = "pallet-contracts", path = "../../../vendor/subst
 frame-benchmarking = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 
 jupiter-primitives = { path = "../../../primitives" }
-jupiter-runtime = { path = "../../../runtime/jupiter" }
 jupiter-dev-runtime = { path = "../../../runtime/jupiter-dev" }
 jupiter-rpc = { path = "../../../rpc" }
 jupiter-io = { path = "../../../primitives/io" }
