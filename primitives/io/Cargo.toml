@@ -9,6 +9,7 @@ targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
 sp-runtime-interface = { git = "https://github.com/paritytech/substrate.git", branch = "master", default-features = false }
+megaclite = { git = "https://github.com/patractlabs/megaclite.git" }
 
 [features]
 default = ["std"]
