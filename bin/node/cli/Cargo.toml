@@ -19,7 +19,7 @@ sc-authority-discovery = { version = "0.8.0" }
 sc-basic-authorship = { version = "0.8.0" }
 sc-transaction-pool = { version = "2.0.0" }
 sc-network = { version = "0.8.0" }
-sc-consensus-aura = { version = "0.8.0" }
+sc-consensus-babe = { version = "0.8.0" }
 sc-consensus = { version = "0.8.0" }
 sc-finality-grandpa = { version = "0.8.0" }
 sc-client-api = { version = "2.0.0" }
@@ -28,7 +28,7 @@ sc-rpc = { version = "2.0.0" }
 sp-core = { version = "2.0.0" }
 sp-inherents = { version = "2.0.0" }
 sp-transaction-pool = { version = "2.0.0" }
-sp-consensus-aura = { version = "0.8.0" }
+sp-consensus-babe = { version = "0.8.0" }
 sp-consensus = { version = "0.8.0" }
 sp-finality-grandpa = { version = "2.0.0" }
 sp-runtime = { version = "2.0.0" }
