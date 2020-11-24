@@ -1,12 +1,7 @@
-use crate::{
-    chain_spec,
-    cli::{Cli, RelayChainCli, Subcommand},
-};
+use std::{io::Write, net::SocketAddr};
+
 use codec::Encode;
-use cumulus_primitives::ParaId;
-use log::info;
-use jupiter_para_runtime::Block;
-use polkadot_parachain::primitives::AccountIdConversion;
+
 use sc_cli::{
     ChainSpec, CliConfiguration, DefaultConfigurationValues, ImportParams, KeystoreParams,
     NetworkParams, Result, RuntimeVersion, SharedParams, SubstrateCli,
@@ -17,14 +12,25 @@ use sc_service::{
 };
 use sp_core::hexdisplay::HexDisplay;
 use sp_runtime::traits::{Block as BlockT, Hash as HashT, Header as HeaderT, Zero};
-use std::{io::Write, net::SocketAddr};
 
-fn load_spec(id: &str, para_id: ParaId) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
+use cumulus_primitives::ParaId;
+use jupiter_para_runtime::Block;
+use polkadot_parachain::primitives::AccountIdConversion;
+
+use log::info;
+
+use crate::{
+    chain_spec,
+    cli::{Cli, RelayChainCli, Subcommand},
+};
+
+fn load_spec(
+    id: &str,
+    para_id: ParaId,
+) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
     Ok(match id {
         "" | "dev" => Box::new(chain_spec::development_config(para_id)?),
-        path => Box::new(chain_spec::ChainSpec::from_json_file(
-            path.into(),
-        )?),
+        path => Box::new(chain_spec::ChainSpec::from_json_file(path.into())?),
     })
 }
 
@@ -267,7 +273,8 @@ pub fn run() -> Result<()> {
                     AccountIdConversion::<polkadot_primitives::v0::AccountId>::into_account(&id);
 
                 let block: Block =
-                    cumulus_primitives::genesis::generate_genesis_block(&config.chain_spec).map_err(|e| format!("{:?}", e))?;
+                    cumulus_primitives::genesis::generate_genesis_block(&config.chain_spec)
+                        .map_err(|e| format!("{:?}", e))?;
                 let genesis_state = format!("0x{:?}", HexDisplay::from(&block.header().encode()));
 
                 let task_executor = config.task_executor.clone();

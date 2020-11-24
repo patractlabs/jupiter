@@ -57,7 +57,6 @@ use jupiter_runtime_common::{
 };
 use pallet_transaction_payment::CurrencyAdapter;
 
-
 impl_opaque_keys! {
     pub struct SessionKeys {
         pub aura: Aura,

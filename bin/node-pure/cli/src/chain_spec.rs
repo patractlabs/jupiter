@@ -9,8 +9,8 @@ use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public};
 use sp_finality_grandpa::AuthorityId as GrandpaId;
 use sp_runtime::traits::{IdentifyAccount, Verify};
 
-use jupiter_runtime::{AccountId, SessionKeys, Signature};
-use jupiter_runtime::{
+use jupiter_pure_runtime::{AccountId, SessionKeys, Signature};
+use jupiter_pure_runtime::{
     AuraConfig, BalancesConfig, ContractsConfig, GenesisConfig, GrandpaConfig, IndicesConfig,
     SessionConfig, SudoConfig, SystemConfig, WASM_BINARY,
 };

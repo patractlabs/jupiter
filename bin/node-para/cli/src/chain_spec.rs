@@ -1,17 +1,17 @@
-use serde_json::json;
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 
 use sc_chain_spec::{ChainSpecExtension, ChainSpecGroup};
 use sc_service::ChainType;
 use sp_core::{sr25519, Pair, Public};
 use sp_runtime::traits::{IdentifyAccount, Verify};
 
+use cumulus_primitives::ParaId;
 use jupiter_para_runtime::{AccountId, Signature};
 use jupiter_para_runtime::{
-    BalancesConfig, ContractsConfig, GenesisConfig, IndicesConfig,
-    SudoConfig, SystemConfig, WASM_BINARY, ParachainInfoConfig
+    BalancesConfig, ContractsConfig, GenesisConfig, IndicesConfig, ParachainInfoConfig, SudoConfig,
+    SystemConfig, WASM_BINARY,
 };
-use cumulus_primitives::ParaId;
 
 /// Specialized `ChainSpec`. This is a specialization of the general Substrate ChainSpec type.
 pub type ChainSpec = sc_service::GenericChainSpec<GenesisConfig>;
