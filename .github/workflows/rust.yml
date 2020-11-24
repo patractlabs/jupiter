@@ -30,8 +30,6 @@ jobs:
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('./Cargo.lock') }}
       - name: Init
         run: git submodule update --init --remote
-      - name: Update
-        run: cargo update
       - name: Build
         run: cargo build --all -vv
       - name: Run tests
