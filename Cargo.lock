@@ -3900,7 +3900,7 @@ checksum = "60302e4db3a61da70c0cb7991976248362f30319e88850c487b9b95bbf059e00"
 [[package]]
 name = "megaclite"
 version = "0.1.0"
-source = "git+https://github.com/patractlabs/megaclite.git#fd92b9904ac96c547376e15c97e7cde874a0f47e"
+source = "git+https://github.com/patractlabs/megaclite.git#83484f7c6329fbfc74856c87d6fddf1ef033e43d"
 dependencies = [
  "bellman_ce",
 ]
