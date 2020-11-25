@@ -20,7 +20,6 @@ sc-executor = { version = "0.8.0", git = "https://github.com/paritytech/substrat
 sc-service = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 sp-inherents = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 sc-transaction-pool = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
-sc-network = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 sc-consensus = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 sp-consensus = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 sc-consensus-manual-seal = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master" }

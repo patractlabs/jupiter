@@ -61,6 +61,7 @@ jupiter-runtime-common = { path = "../common", default-features = false }
 
 [build-dependencies]
 wasm-builder-runner = { package = "substrate-wasm-builder-runner", version = "1.0.6"}
+#substrate-wasm-builder = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 
 [features]
 default = ["std"]
