@@ -20,7 +20,6 @@ use sp_std::prelude::*;
 use sp_version::NativeVersion;
 use sp_version::RuntimeVersion;
 
-use pallet_contracts_primitives::ContractExecResult;
 use pallet_transaction_payment_rpc_runtime_api::RuntimeDispatchInfo;
 
 // A few exports that help ease life for downstream crates.
@@ -224,6 +223,10 @@ parameter_types! {
     pub const RentByteFee: Balance = 4 * MILLICENTS;
     pub const RentDepositOffset: Balance = 1000 * MILLICENTS;
     pub const SurchargeReward: Balance = 150 * MILLICENTS;
+    pub const SignedClaimHandicap: u32 = 2;
+    pub const MaxDepth: u32 = 32;
+    pub const StorageSizeOffset: u32 = 8;
+    pub const MaxValueSize: u32 = 16 * 1024;
 }
 
 impl pallet_contracts::Trait for Runtime {
@@ -231,17 +234,15 @@ impl pallet_contracts::Trait for Runtime {
     type Randomness = RandomnessCollectiveFlip;
     type Currency = Balances;
     type Event = Event;
-    type DetermineContractAddress = ContractsExt;
-    type TrieIdGenerator = pallet_contracts::TrieIdFromParentCounter<Runtime>;
     type RentPayment = ();
-    type SignedClaimHandicap = pallet_contracts::DefaultSignedClaimHandicap;
+    type SignedClaimHandicap = SignedClaimHandicap;
     type TombstoneDeposit = TombstoneDeposit;
-    type StorageSizeOffset = pallet_contracts::DefaultStorageSizeOffset;
+    type StorageSizeOffset = StorageSizeOffset;
     type RentByteFee = RentByteFee;
     type RentDepositOffset = RentDepositOffset;
     type SurchargeReward = SurchargeReward;
-    type MaxDepth = pallet_contracts::DefaultMaxDepth;
-    type MaxValueSize = pallet_contracts::DefaultMaxValueSize;
+    type MaxDepth = MaxDepth;
+    type MaxValueSize = MaxValueSize;
     type WeightPrice = pallet_transaction_payment::Module<Self>;
     type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
 }
@@ -249,11 +250,6 @@ impl pallet_contracts::Trait for Runtime {
 impl pallet_sudo::Trait for Runtime {
     type Event = Event;
     type Call = Call;
-}
-
-impl pallet_contracts_ext::Trait for Runtime {
-    type Event = Event;
-    type WeightInfo = ();
 }
 
 // Create the runtime by composing the FRAME pallets that were previously configured.
@@ -276,7 +272,6 @@ construct_runtime!(
         TransactionPayment: pallet_transaction_payment::{Module, Storage},
 
         Contracts: pallet_contracts::{Module, Call, Config<T>, Storage, Event<T>},
-        ContractsExt: pallet_contracts_ext::{Module, Call, Storage, Event<T>},
 
         Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>},
     }
@@ -412,7 +407,7 @@ impl_runtime_apis! {
             value: Balance,
             gas_limit: u64,
             input_data: Vec<u8>,
-        ) -> ContractExecResult {
+        ) -> pallet_contracts_primitives::ContractExecResult {
             Contracts::bare_call(origin, dest.into(), value, gas_limit, input_data)
         }
 
