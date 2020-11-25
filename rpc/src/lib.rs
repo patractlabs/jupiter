@@ -43,7 +43,7 @@ use sp_block_builder::BlockBuilder;
 use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
 use sp_transaction_pool::TransactionPool;
 
-use jupiter_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Index};
+use jupiter_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Nonce};
 
 /// Light client extra dependencies.
 pub struct LightDeps<C, F, P> {
@@ -94,7 +94,7 @@ where
     C: ProvideRuntimeApi<Block>,
     C: HeaderBackend<Block> + HeaderMetadata<Block, Error = BlockChainError> + 'static,
     C: Send + Sync + 'static,
-    C::Api: substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Index>,
+    C::Api: substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Nonce>,
     C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance>,
     C::Api: pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance, BlockNumber>,
     C::Api: BlockBuilder<Block>,
@@ -167,7 +167,7 @@ where
         fetcher,
     } = deps;
     let mut io = jsonrpc_core::IoHandler::default();
-    io.extend_with(SystemApi::<Hash, AccountId, Index>::to_delegate(
+    io.extend_with(SystemApi::<Hash, AccountId, Nonce>::to_delegate(
         LightSystem::new(client, remote_blockchain, fetcher, pool),
     ));
 

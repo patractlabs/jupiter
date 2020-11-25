@@ -26,7 +26,7 @@ pub type Balance = u128;
 pub type Moment = u64;
 
 /// Index of a transaction in the chain.
-pub type Index = u32;
+pub type Nonce = u32;
 
 /// A hash of some data used by the chain.
 pub type Hash = sp_core::H256;
@@ -77,4 +77,14 @@ pub mod report {
         type GenericPublic = sp_core::sr25519::Public;
         type GenericSignature = sp_core::sr25519::Signature;
     }
+}
+
+/// V1 primitives.
+pub mod v1 {
+    pub use super::*;
+}
+
+/// V0 primitives.
+pub mod v0 {
+    pub use super::{Balance, BlockNumber, Moment};
 }

@@ -49,7 +49,7 @@ pub use pallet_session::historical as pallet_session_historical;
 pub use pallet_timestamp::Call as TimestampCall;
 
 pub use jupiter_primitives::{
-    AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Signature,
+    AccountId, AccountIndex, Balance, BlockNumber, Hash, Nonce, Moment, Signature,
 };
 use jupiter_runtime_common::{
     constants::{currency::*, fee::WeightToFee, time::*},
@@ -120,7 +120,7 @@ impl frame_system::Trait for Runtime {
     /// The lookup mechanism to get account ID from whatever is passed in dispatchers.
     type Lookup = IdentityLookup<AccountId>;
     /// The index type for storing how many extrinsics an account has signed.
-    type Index = Index;
+    type Index = Nonce;
     /// The index type for blocks.
     type BlockNumber = BlockNumber;
     /// The type for hashing blocks and tries.
@@ -516,8 +516,8 @@ impl_runtime_apis! {
         }
     }
 
-    impl frame_system_rpc_runtime_api::AccountNonceApi<Block, AccountId, Index> for Runtime {
-        fn account_nonce(account: AccountId) -> Index {
+    impl frame_system_rpc_runtime_api::AccountNonceApi<Block, AccountId, Nonce> for Runtime {
+        fn account_nonce(account: AccountId) -> Nonce {
             System::account_nonce(account)
         }
     }
