@@ -5,7 +5,6 @@ use std::sync::Arc;
 use sc_client_api::RemoteBackend;
 use sc_executor::native_executor_instance;
 pub use sc_executor::NativeExecutor;
-use sc_network::config::DummyFinalityProofRequestBuilder;
 use sc_service::{error::Error as ServiceError, Configuration, TaskManager};
 use sp_inherents::InherentDataProviders;
 
@@ -121,8 +120,6 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
             import_queue,
             on_demand: None,
             block_announce_validator_builder: None,
-            finality_proof_request_builder: None,
-            finality_proof_provider: None,
         })?;
 
     if config.offchain_worker.enabled {
@@ -218,8 +215,6 @@ pub fn new_light(config: Configuration) -> Result<TaskManager, ServiceError> {
         config.prometheus_registry(),
     );
 
-    let fprb = Box::new(DummyFinalityProofRequestBuilder::default()) as Box<_>;
-
     let (network, network_status_sinks, system_rpc_tx, network_starter) =
         sc_service::build_network(sc_service::BuildNetworkParams {
             config: &config,
@@ -229,8 +224,6 @@ pub fn new_light(config: Configuration) -> Result<TaskManager, ServiceError> {
             import_queue,
             on_demand: Some(on_demand.clone()),
             block_announce_validator_builder: None,
-            finality_proof_request_builder: Some(fprb),
-            finality_proof_provider: None,
         })?;
 
     if config.offchain_worker.enabled {
