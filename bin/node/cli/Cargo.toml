@@ -1,5 +1,5 @@
 [package]
-name = "jupiter-pure-cli"
+name = "jupiter-cli"
 version = "0.1.0"
 authors = ["Jupiter <https://github.com/patractlabs/jupiter>"]
 edition = "2018"
@@ -39,8 +39,8 @@ sc-service = { version = "0.8.0", git = "https://github.com/paritytech/substrate
 pallet-contracts = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 
 jupiter-primitives = { path = "../../../primitives" }
-jupiter-pure-runtime = { path = "../../../runtime/jupiter-pure" }
-jupiter-pure-executor = { path = "../executor" }
+jupiter-runtime = { path = "../../../runtime/jupiter" }
+jupiter-executor = { path = "../executor" }
 jupiter-rpc = { path = "../../../rpc" }
 
 [build-dependencies]
@@ -51,10 +51,10 @@ default = ["cli"]
 cli = [
     "sc-cli",
     "sc-service",
-    "jupiter-pure-executor/wasmi-errno",
+    "jupiter-executor/wasmi-errno",
 ]
 wasmtime = [
     "sc-cli/wasmtime",
     "sc-service/wasmtime",
-    "jupiter-pure-executor/wasmtime",
+    "jupiter-executor/wasmtime",
 ]

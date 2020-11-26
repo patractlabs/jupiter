@@ -2561,6 +2561,49 @@ dependencies = [
 ]
 
 [[package]]
+name = "jupiter"
+version = "0.1.0"
+dependencies = [
+ "jupiter-cli",
+]
+
+[[package]]
+name = "jupiter-cli"
+version = "0.1.0"
+dependencies = [
+ "futures 0.3.8",
+ "hex-literal 0.2.1",
+ "jupiter-executor",
+ "jupiter-primitives",
+ "jupiter-rpc",
+ "jupiter-runtime",
+ "log",
+ "pallet-contracts 2.0.0 (git+https://github.com/paritytech/substrate)",
+ "parking_lot 0.10.2",
+ "sc-authority-discovery",
+ "sc-basic-authorship",
+ "sc-cli",
+ "sc-client-api",
+ "sc-consensus",
+ "sc-consensus-aura",
+ "sc-finality-grandpa",
+ "sc-network",
+ "sc-rpc",
+ "sc-service",
+ "sc-transaction-pool",
+ "serde_json",
+ "sp-consensus",
+ "sp-consensus-aura",
+ "sp-core",
+ "sp-finality-grandpa",
+ "sp-inherents",
+ "sp-runtime",
+ "sp-transaction-pool",
+ "structopt",
+ "substrate-build-script-utils",
+]
+
+[[package]]
 name = "jupiter-dev"
 version = "0.1.0"
 dependencies = [
@@ -2639,6 +2682,15 @@ dependencies = [
  "sp-version",
  "static_assertions",
  "substrate-wasm-builder",
+]
+
+[[package]]
+name = "jupiter-executor"
+version = "0.1.0"
+dependencies = [
+ "frame-benchmarking",
+ "jupiter-runtime",
+ "sc-executor",
 ]
 
 [[package]]
@@ -2745,59 +2797,31 @@ dependencies = [
 ]
 
 [[package]]
-name = "jupiter-pure"
+name = "jupiter-rpc"
 version = "0.1.0"
 dependencies = [
- "jupiter-pure-cli",
-]
-
-[[package]]
-name = "jupiter-pure-cli"
-version = "0.1.0"
-dependencies = [
- "futures 0.3.8",
- "hex-literal 0.2.1",
+ "jsonrpc-core",
  "jupiter-primitives",
- "jupiter-pure-executor",
- "jupiter-pure-runtime",
- "jupiter-rpc",
- "log",
- "pallet-contracts 2.0.0 (git+https://github.com/paritytech/substrate)",
- "parking_lot 0.10.2",
- "sc-authority-discovery",
- "sc-basic-authorship",
- "sc-cli",
+ "pallet-contracts-rpc",
+ "pallet-transaction-payment-rpc",
  "sc-client-api",
- "sc-consensus",
- "sc-consensus-aura",
+ "sc-consensus-epochs",
  "sc-finality-grandpa",
- "sc-network",
+ "sc-finality-grandpa-rpc",
+ "sc-keystore",
  "sc-rpc",
- "sc-service",
- "sc-transaction-pool",
- "serde_json",
+ "sc-rpc-api",
+ "sp-api",
+ "sp-block-builder",
+ "sp-blockchain",
  "sp-consensus",
- "sp-consensus-aura",
- "sp-core",
- "sp-finality-grandpa",
- "sp-inherents",
  "sp-runtime",
  "sp-transaction-pool",
- "structopt",
- "substrate-build-script-utils",
+ "substrate-frame-rpc-system",
 ]
 
 [[package]]
-name = "jupiter-pure-executor"
-version = "0.1.0"
-dependencies = [
- "frame-benchmarking",
- "jupiter-pure-runtime",
- "sc-executor",
-]
-
-[[package]]
-name = "jupiter-pure-runtime"
+name = "jupiter-runtime"
 version = "0.1.0"
 dependencies = [
  "frame-executive",
@@ -2840,30 +2864,6 @@ dependencies = [
  "sp-version",
  "static_assertions",
  "substrate-wasm-builder",
-]
-
-[[package]]
-name = "jupiter-rpc"
-version = "0.1.0"
-dependencies = [
- "jsonrpc-core",
- "jupiter-primitives",
- "pallet-contracts-rpc",
- "pallet-transaction-payment-rpc",
- "sc-client-api",
- "sc-consensus-epochs",
- "sc-finality-grandpa",
- "sc-finality-grandpa-rpc",
- "sc-keystore",
- "sc-rpc",
- "sc-rpc-api",
- "sp-api",
- "sp-block-builder",
- "sp-blockchain",
- "sp-consensus",
- "sp-runtime",
- "sp-transaction-pool",
- "substrate-frame-rpc-system",
 ]
 
 [[package]]

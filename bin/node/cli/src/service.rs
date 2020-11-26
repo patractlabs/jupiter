@@ -11,9 +11,9 @@ use sp_consensus_aura::sr25519::AuthorityPair as AuraPair;
 use sp_inherents::InherentDataProviders;
 use sp_runtime::traits::Block as BlockT;
 
+use jupiter_executor::Executor;
 use jupiter_primitives::Block;
-use jupiter_pure_executor::Executor;
-use jupiter_pure_runtime::{self, RuntimeApi};
+use jupiter_runtime::{self, RuntimeApi};
 
 type FullClient = sc_service::TFullClient<Block, RuntimeApi, Executor>;
 type FullBackend = sc_service::TFullBackend<Block>;

@@ -5,7 +5,7 @@ pub use sc_executor::NativeExecutor;
 // equivalent wasm code.
 native_executor_instance!(
     pub Executor,
-    jupiter_pure_runtime::api::dispatch,
-    jupiter_pure_runtime::native_version,
+    jupiter_runtime::api::dispatch,
+    jupiter_runtime::native_version,
     frame_benchmarking::benchmarking::HostFunctions,
 );

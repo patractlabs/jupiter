@@ -157,7 +157,8 @@ pub fn run() -> Result<()> {
                 })
             } else {
                 Err("Benchmarking wasn't enabled when building the node. \
-				You can enable it with `--features runtime-benchmarks`.".into())
+				You can enable it with `--features runtime-benchmarks`."
+                    .into())
             }
         }
         Some(Subcommand::Key(cmd)) => cmd.run(),
