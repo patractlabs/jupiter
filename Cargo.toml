@@ -2,6 +2,7 @@
 members = [
     "bin/node-dev",
     "bin/node-kusama",
+    "bin/node-kusama/rpc",
 #    "bin/node-para",
     "bin/node-pure",
     "bin/node-pure/executor",

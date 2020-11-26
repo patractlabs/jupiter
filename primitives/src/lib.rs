@@ -86,5 +86,5 @@ pub mod v1 {
 
 /// V0 primitives.
 pub mod v0 {
-    pub use super::{Balance, BlockNumber, Moment};
+    pub use super::*;
 }

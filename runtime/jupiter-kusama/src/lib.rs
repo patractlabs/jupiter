@@ -35,27 +35,12 @@ use pallet_transaction_payment::CurrencyAdapter;
 use pallet_transaction_payment_rpc_runtime_api::RuntimeDispatchInfo;
 use parity_scale_codec::{Decode, Encode};
 use primitives::v1::{
-    AccountId,
-    AccountIndex,
-    Balance,
-    BlockNumber,
-    Hash,
-    Moment,
-    Nonce,
-    Signature,
+    AccountId, AccountIndex, Balance, BlockNumber, Hash, Moment, Nonce, Signature,
 };
 use runtime_common::{
-    impls::DealWithFees,
-    AvailableBlockRatio,
-    BlockExecutionWeight,
-    BlockHashCount,
-    CurrencyToVote,
-    ExtrinsicBaseWeight,
-    MaximumBlockLength,
-    MaximumBlockWeight,
-    MaximumExtrinsicWeight,
-    RocksDbWeight,
-    SlowAdjustingFeeUpdate,
+    impls::DealWithFees, AvailableBlockRatio, BlockExecutionWeight, BlockHashCount, CurrencyToVote,
+    ExtrinsicBaseWeight, MaximumBlockLength, MaximumBlockWeight, MaximumExtrinsicWeight,
+    RocksDbWeight, SlowAdjustingFeeUpdate,
 };
 use sp_core::u32_trait::{_1, _2, _3, _5};
 use sp_core::OpaqueMetadata;

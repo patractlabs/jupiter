@@ -40,7 +40,7 @@ pub use pallet_balances::Call as BalancesCall;
 pub use pallet_timestamp::Call as TimestampCall;
 
 pub use jupiter_primitives::{
-    AccountId, AccountIndex, Balance, BlockNumber, Hash, Nonce, Moment, Signature,
+    AccountId, AccountIndex, Balance, BlockNumber, Hash, Moment, Nonce, Signature,
 };
 use jupiter_runtime_common::{
     constants::{currency::*, fee::WeightToFee},
