@@ -49,5 +49,3 @@ substrate-build-script-utils = { version = "2.0.0", git = "https://github.com/pa
 runtime-benchmarks = [
 	"jupiter-dev-runtime/runtime-benchmarks",
 ]
-
-
