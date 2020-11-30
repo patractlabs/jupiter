@@ -1,3 +1,5 @@
+use jupiter_dev_executor::Executor;
+use jupiter_dev_runtime::Block;
 use sc_cli::{ChainSpec, Role, RuntimeVersion, SubstrateCli};
 use sc_service::PartialComponents;
 
@@ -74,6 +76,17 @@ pub fn run() -> sc_cli::Result<()> {
                 } = new_partial(&config)?;
                 Ok((cmd.run(client, config.chain_spec), task_manager))
             })
+        }
+        Some(Subcommand::Benchmark(cmd)) => {
+            if cfg!(feature = "runtime-benchmarks") {
+                let runner = cli.create_runner(cmd)?;
+
+                runner.sync_run(|config| cmd.run::<Block, Executor>(config))
+            } else {
+                Err("Benchmarking wasn't enabled when building the node. \
+				     You can enable it with `--features runtime-benchmarks`."
+                    .into())
+            }
         }
     }
 }

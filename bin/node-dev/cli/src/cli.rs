@@ -27,4 +27,8 @@ pub enum Subcommand {
 
     /// Export the state of a given block into a chain spec.
     ExportState(sc_cli::ExportStateCmd),
+
+    /// The custom benchmark subcommmand benchmarking runtime pallets.
+    #[structopt(name = "benchmark", about = "Benchmark runtime pallets.")]
+    Benchmark(frame_benchmarking_cli::BenchmarkCmd),
 }
