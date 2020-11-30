@@ -2594,7 +2594,7 @@ name = "jupiter-dev-executor"
 version = "0.1.0"
 dependencies = [
  "frame-benchmarking",
- "jupiter-runtime",
+ "jupiter-dev-runtime",
  "sc-executor",
 ]
 
