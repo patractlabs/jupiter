@@ -149,7 +149,7 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
                 deny_unsafe,
             };
 
-            jupiter_rpc::create_baisc(deps)
+            jupiter_rpc::create_basic(deps)
         })
     };
 

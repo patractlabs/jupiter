@@ -234,22 +234,6 @@ impl Convert<AccountId, Option<AccountId>> for SimpleValidatorIdConverter {
     }
 }
 pub struct SimpleSessionManager;
-impl<BlockNumber> pallet_session::ShouldEndSession<BlockNumber> for SimpleSessionManager {
-    fn should_end_session(_: BlockNumber) -> bool {
-        false
-    }
-}
-impl<BlockNumber> frame_support::traits::EstimateNextSessionRotation<BlockNumber>
-    for SimpleSessionManager
-{
-    fn estimate_next_session_rotation(_: BlockNumber) -> Option<BlockNumber> {
-        None
-    }
-
-    fn weight(_: BlockNumber) -> Weight {
-        0
-    }
-}
 impl pallet_session::SessionManager<AccountId> for SimpleSessionManager {
     fn new_session(_new_index: u32) -> Option<Vec<AccountId>> {
         None
@@ -264,8 +248,8 @@ impl pallet_session::Trait for Runtime {
     type Event = Event;
     type ValidatorId = AccountId;
     type ValidatorIdOf = SimpleValidatorIdConverter;
-    type ShouldEndSession = SimpleSessionManager;
-    type NextSessionRotation = SimpleSessionManager;
+    type ShouldEndSession = Babe;
+    type NextSessionRotation = Babe;
     type SessionManager = SimpleSessionManager;
     type SessionHandler = <SessionKeys as OpaqueKeys>::KeyTypeIdProviders;
     type Keys = SessionKeys;

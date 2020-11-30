@@ -111,7 +111,7 @@ pub struct FullDeps<C, P, SC, B> {
 pub type IoHandler = jsonrpc_core::IoHandler<sc_rpc::Metadata>;
 
 /// Instantiate Basic RPC extensions.
-pub fn create_baisc<C, P>(deps: BasicDeps<C, P>) -> jsonrpc_core::IoHandler<sc_rpc_api::Metadata>
+pub fn create_basic<C, P>(deps: BasicDeps<C, P>) -> jsonrpc_core::IoHandler<sc_rpc_api::Metadata>
 where
     C: ProvideRuntimeApi<Block>,
     C: HeaderBackend<Block> + HeaderMetadata<Block, Error = BlockChainError> + 'static,
@@ -177,7 +177,7 @@ where
 
     let client = basic.client.clone();
     let deny_unsafe = basic.deny_unsafe;
-    let mut io = create_baisc(basic);
+    let mut io = create_basic(basic);
 
     let BabeDeps {
         keystore,
