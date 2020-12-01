@@ -5054,7 +5054,7 @@ checksum = "feb3b2b1033b8a60b4da6ee470325f887758c95d5320f52f9ce0df055a55940e"
 
 [[package]]
 name = "polkadot-cli"
-version = "0.8.26"
+version = "0.1.0"
 dependencies = [
  "frame-benchmarking",
  "frame-benchmarking-cli",
