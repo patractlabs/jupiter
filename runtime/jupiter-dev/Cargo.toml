@@ -105,5 +105,8 @@ std = [
 runtime-benchmarks = [
     "hex-literal",
     "frame-benchmarking",
+    "frame-system/runtime-benchmarks",
     "frame-system-benchmarking",
+    "pallet-contracts/runtime-benchmarks",
+    "sp-runtime/runtime-benchmarks",
 ]

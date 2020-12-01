@@ -3915,6 +3915,7 @@ dependencies = [
 name = "pallet-contracts"
 version = "2.0.0"
 dependencies = [
+ "frame-benchmarking",
  "frame-support",
  "frame-system",
  "jupiter-io",
@@ -3923,6 +3924,8 @@ dependencies = [
  "parity-scale-codec",
  "parity-wasm 0.41.0",
  "pwasm-utils 0.16.0",
+ "rand 0.7.3",
+ "rand_pcg",
  "serde",
  "sp-core",
  "sp-io",
