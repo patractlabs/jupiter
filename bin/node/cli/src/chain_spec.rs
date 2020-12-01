@@ -4,6 +4,7 @@ use std::convert::TryInto;
 use hex_literal::hex;
 
 use sc_service::ChainType;
+use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_consensus_babe::AuthorityId as BabeId;
 use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public};
 use sp_finality_grandpa::AuthorityId as GrandpaId;
@@ -11,8 +12,8 @@ use sp_runtime::traits::{IdentifyAccount, Verify};
 
 use jupiter_runtime::{AccountId, SessionKeys, Signature};
 use jupiter_runtime::{
-    BabeConfig, BalancesConfig, ContractsConfig, GenesisConfig, GrandpaConfig, IndicesConfig,
-    SessionConfig, SudoConfig, SystemConfig, WASM_BINARY,
+    AuthorityDiscoveryConfig, BabeConfig, BalancesConfig, ContractsConfig, GenesisConfig,
+    GrandpaConfig, IndicesConfig, SessionConfig, SudoConfig, SystemConfig, WASM_BINARY,
 };
 
 // The URL for the telemetry server.
@@ -44,6 +45,7 @@ type AuthorityKeysTuple = (
     AccountId, // (SessionKey)
     BabeId,
     GrandpaId,
+    AuthorityDiscoveryId,
 );
 
 /// Helper function to generate stash, controller and session key from seed
@@ -53,11 +55,20 @@ pub fn authority_keys_from_seed(seed: &str) -> AuthorityKeysTuple {
         get_account_id_from_seed::<sr25519::Public>(&format!("{}//stash", seed)),
         get_from_seed::<BabeId>(seed),
         get_from_seed::<GrandpaId>(seed),
+        get_from_seed::<AuthorityDiscoveryId>(seed),
     )
 }
 
-fn session_keys(babe: BabeId, grandpa: GrandpaId) -> SessionKeys {
-    SessionKeys { babe, grandpa }
+fn session_keys(
+    babe: BabeId,
+    grandpa: GrandpaId,
+    authority_discovery: AuthorityDiscoveryId,
+) -> SessionKeys {
+    SessionKeys {
+        babe,
+        grandpa,
+        authority_discovery,
+    }
 }
 
 pub fn development_config() -> Result<ChainSpec, String> {
@@ -206,10 +217,17 @@ pub fn staging_testnet_config() -> Result<ChainSpec, String> {
     // 5G6VvSAqrqNLoqoRM4GUxrKQkfHuZ3ggnW8bbsQZbi187kfu
     let grandpa2: GrandpaId =
         hex!["b24f3f629e5cc692b50f08b9714c67be656b057293bb077beb44781a9a0e2992"].unchecked_into();
+    // authority_discovery same with babe
+    // 5EtZp8WCs4yRDvfLapwU8GrSoS9e7qpXVtYZVCNDFBXuVsiW
+    let ad1: AuthorityDiscoveryId =
+        hex!["7cf92b27e280cef89900a7d351e37cdc6a578104a71f918165f52fee77aef647"].unchecked_into();
+    // 5GRaVtCnSKjeXXXu6S5cVEcqn5yGbnCTGYYeKodxiRbnnZBd
+    let ad2: AuthorityDiscoveryId =
+        hex!["c0dc511c88d7ef3bc5b465de48aac4efc643283f179b93d413f97e4a7aac714b"].unchecked_into();
 
     let initial_authorities: Vec<AuthorityKeysTuple> = vec![
-        (controller1.clone(), stash1.clone(), babe1, grandpa1),
-        (controller2.clone(), stash2.clone(), babe2, grandpa2),
+        (controller1.clone(), stash1.clone(), babe1, grandpa1, ad1),
+        (controller2.clone(), stash2.clone(), babe2, grandpa2, ad2),
     ];
 
     Ok(ChainSpec::from_genesis(
@@ -290,6 +308,7 @@ fn testnet_genesis(
         pallet_grandpa: Some(GrandpaConfig {
             authorities: vec![],
         }),
+        pallet_authority_discovery: Some(AuthorityDiscoveryConfig { keys: vec![] }),
         pallet_session: Some(SessionConfig {
             keys: initial_authorities
                 .iter()
@@ -297,7 +316,7 @@ fn testnet_genesis(
                     (
                         x.0.clone(),
                         x.0.clone(),
-                        session_keys(x.2.clone(), x.3.clone()),
+                        session_keys(x.2.clone(), x.3.clone(), x.4.clone()),
                     )
                 })
                 .collect::<Vec<_>>(),

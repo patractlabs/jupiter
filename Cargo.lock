@@ -2308,6 +2308,7 @@ dependencies = [
  "jupiter-rpc",
  "jupiter-runtime",
  "log",
+ "pallet-authority-discovery",
  "pallet-contracts",
  "parking_lot 0.10.2",
  "sc-authority-discovery",
@@ -2322,6 +2323,7 @@ dependencies = [
  "sc-service",
  "sc-transaction-pool",
  "serde_json",
+ "sp-authority-discovery",
  "sp-consensus",
  "sp-consensus-babe",
  "sp-core",
@@ -2474,6 +2476,7 @@ dependencies = [
  "frame-system-rpc-runtime-api",
  "jupiter-primitives",
  "jupiter-runtime-common",
+ "pallet-authority-discovery",
  "pallet-authorship",
  "pallet-babe",
  "pallet-balances",
@@ -2496,6 +2499,7 @@ dependencies = [
  "parity-scale-codec",
  "serde",
  "sp-api",
+ "sp-authority-discovery",
  "sp-block-builder",
  "sp-consensus-babe",
  "sp-core",
@@ -3602,6 +3606,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6ff55baddef9e4ad00f88b6c743a2a8062d4c6ade126c2a528644b8e444d52ce"
 dependencies = [
  "stable_deref_trait",
+]
+
+[[package]]
+name = "pallet-authority-discovery"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cfa683f726db011795ae117683b956e98c061f35f322ad7c0cfe248b6b272ae3"
+dependencies = [
+ "frame-support",
+ "frame-system",
+ "pallet-session",
+ "parity-scale-codec",
+ "serde",
+ "sp-application-crypto",
+ "sp-authority-discovery",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]

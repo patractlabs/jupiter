@@ -21,6 +21,7 @@ use sp_std::prelude::*;
 use pallet_grandpa::fg_primitives;
 use pallet_grandpa::{AuthorityId as GrandpaId, AuthorityList as GrandpaAuthorityList};
 // use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
+use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 
 #[cfg(feature = "std")]
 use sp_version::NativeVersion;
@@ -60,6 +61,7 @@ impl_opaque_keys! {
         pub babe: Babe,
         pub grandpa: Grandpa,
         // pub im_online: ImOnline,
+        pub authority_discovery: AuthorityDiscovery,
     }
 }
 
@@ -200,16 +202,38 @@ impl pallet_babe::Trait for Runtime {
         pallet_babe::AuthorityId,
     )>>::IdentificationTuple;
 
-    type HandleEquivocation = ();
+    type HandleEquivocation =
+        pallet_babe::EquivocationHandler<Self::KeyOwnerIdentification, Offences>;
 
     type WeightInfo = ();
 }
+
+impl<C> frame_system::offchain::SendTransactionTypes<C> for Runtime
+where
+    Call: From<C>,
+{
+    type Extrinsic = UncheckedExtrinsic;
+    type OverarchingCall = Call;
+}
+
+parameter_types! {
+    pub OffencesWeightSoftLimit: Weight = Perbill::from_percent(60) * MaximumBlockWeight::get();
+}
+
+impl pallet_offences::Trait for Runtime {
+    type Event = Event;
+    type IdentificationTuple = pallet_session::historical::IdentificationTuple<Self>;
+    type OnOffenceHandler = ();
+    type WeightSoftLimit = OffencesWeightSoftLimit;
+}
+
+impl pallet_authority_discovery::Trait for Runtime {}
 
 impl pallet_grandpa::Trait for Runtime {
     type Event = Event;
     type Call = Call;
 
-    type KeyOwnerProofSystem = ();
+    type KeyOwnerProofSystem = Historical;
 
     type KeyOwnerProof =
         <Self::KeyOwnerProofSystem as KeyOwnerProofSystem<(KeyTypeId, GrandpaId)>>::Proof;
@@ -219,7 +243,8 @@ impl pallet_grandpa::Trait for Runtime {
         GrandpaId,
     )>>::IdentificationTuple;
 
-    type HandleEquivocation = ();
+    type HandleEquivocation =
+        pallet_grandpa::EquivocationHandler<Self::KeyOwnerIdentification, Offences>;
 
     type WeightInfo = ();
 }
@@ -243,6 +268,26 @@ impl pallet_session::SessionManager<AccountId> for SimpleSessionManager {
 
     fn start_session(_start_index: u32) {}
 }
+impl pallet_session::historical::SessionManager<AccountId, AccountId> for SimpleSessionManager {
+    fn new_session(new_index: u32) -> Option<Vec<(AccountId, AccountId)>> {
+        // session 0..1 validators add by extra_genesis
+        if new_index <= 1 {
+            None
+        } else {
+            let validators: Vec<AccountId> = <pallet_session::Module<Runtime>>::validators();
+            Some(
+                validators
+                    .iter()
+                    .map(|validator| (validator.clone(), validator.clone()))
+                    .collect(),
+            )
+        }
+    }
+
+    fn end_session(_end_index: u32) {}
+
+    fn start_session(_start_index: u32) {}
+}
 
 impl pallet_session::Trait for Runtime {
     type Event = Event;
@@ -250,7 +295,8 @@ impl pallet_session::Trait for Runtime {
     type ValidatorIdOf = SimpleValidatorIdConverter;
     type ShouldEndSession = Babe;
     type NextSessionRotation = Babe;
-    type SessionManager = SimpleSessionManager;
+    type SessionManager =
+        pallet_session::historical::NoteHistoricalRoot<Self, SimpleSessionManager>;
     type SessionHandler = <SessionKeys as OpaqueKeys>::KeyTypeIdProviders;
     type Keys = SessionKeys;
     type DisabledValidatorsThreshold = DisabledValidatorsThreshold;
@@ -259,7 +305,7 @@ impl pallet_session::Trait for Runtime {
 
 impl pallet_session_historical::Trait for Runtime {
     type FullIdentification = AccountId;
-    type FullIdentificationOf = ();
+    type FullIdentificationOf = SimpleValidatorIdConverter;
 }
 
 parameter_types! {
@@ -368,8 +414,10 @@ construct_runtime!(
         // Consensus support.
         Authorship: pallet_authorship::{Module, Call, Storage},
         Grandpa: pallet_grandpa::{Module, Call, Storage, Config, Event},
-        Historical: pallet_session_historical::{Module},
+        Historical: pallet_session_historical::{Module, Storage},
         Session: pallet_session::{Module, Call, Storage, Event, Config<T>},
+        AuthorityDiscovery: pallet_authority_discovery::{Module, Call, Config},
+        Offences: pallet_offences::{Module, Call, Storage, Event},
 
         Timestamp: pallet_timestamp::{Module, Call, Storage, Inherent},
         Balances: pallet_balances::{Module, Call, Storage, Config<T>, Event<T>},
@@ -519,6 +567,12 @@ impl_runtime_apis! {
                 equivocation_proof,
                 key_owner_proof,
             )
+        }
+    }
+
+    impl sp_authority_discovery::AuthorityDiscoveryApi<Block> for Runtime {
+        fn authorities() -> Vec<AuthorityDiscoveryId> {
+            AuthorityDiscovery::authorities()
         }
     }
 
