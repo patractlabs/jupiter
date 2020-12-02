@@ -110,8 +110,6 @@ runtime-benchmarks = [
     "frame-system-benchmarking",
     "pallet-contracts/runtime-benchmarks",
     "sp-runtime/runtime-benchmarks",
-    "codec/std",
-    "serde",
 
     "sp-runtime/runtime-benchmarks",
     "frame-support/runtime-benchmarks",
