@@ -2715,7 +2715,7 @@ dependencies = [
  "jupiter-runtime-common",
  "pallet-authorship",
  "pallet-balances",
- "pallet-contracts 2.0.0",
+ "pallet-contracts 2.0.0 (git+https://github.com/paritytech/substrate)",
  "pallet-contracts-primitives",
  "pallet-contracts-rpc-runtime-api",
  "pallet-indices",
@@ -4071,7 +4071,6 @@ dependencies = [
 name = "pallet-contracts"
 version = "2.0.0"
 dependencies = [
- "frame-benchmarking",
  "frame-support",
  "frame-system",
  "jupiter-io",
@@ -4080,8 +4079,6 @@ dependencies = [
  "parity-scale-codec",
  "parity-wasm 0.41.0",
  "pwasm-utils 0.16.0",
- "rand 0.7.3",
- "rand_pcg",
  "serde",
  "sp-core",
  "sp-io",
@@ -4096,6 +4093,7 @@ name = "pallet-contracts"
 version = "2.0.0"
 source = "git+https://github.com/paritytech/substrate?branch=master#b63b8643e00214f1cbe28b6ca4e804af656c9038"
 dependencies = [
+ "frame-benchmarking",
  "frame-support",
  "frame-system",
  "pallet-contracts-primitives",
@@ -4103,6 +4101,8 @@ dependencies = [
  "parity-scale-codec",
  "parity-wasm 0.41.0",
  "pwasm-utils 0.16.0",
+ "rand 0.7.3",
+ "rand_pcg",
  "serde",
  "sp-core",
  "sp-io",
@@ -4209,6 +4209,7 @@ name = "pallet-indices"
 version = "2.0.0"
 source = "git+https://github.com/paritytech/substrate?branch=master#b63b8643e00214f1cbe28b6ca4e804af656c9038"
 dependencies = [
+ "frame-benchmarking",
  "frame-support",
  "frame-system",
  "parity-scale-codec",
@@ -4225,6 +4226,7 @@ name = "pallet-multisig"
 version = "2.0.0"
 source = "git+https://github.com/paritytech/substrate?branch=master#b63b8643e00214f1cbe28b6ca4e804af656c9038"
 dependencies = [
+ "frame-benchmarking",
  "frame-support",
  "frame-system",
  "parity-scale-codec",
@@ -4309,6 +4311,7 @@ dependencies = [
  "parity-scale-codec",
  "serde",
  "sp-inherents",
+ "sp-io",
  "sp-runtime",
  "sp-std",
  "sp-timestamp",
@@ -4367,6 +4370,7 @@ name = "pallet-utility"
 version = "2.0.0"
 source = "git+https://github.com/paritytech/substrate?branch=master#b63b8643e00214f1cbe28b6ca4e804af656c9038"
 dependencies = [
+ "frame-benchmarking",
  "frame-support",
  "frame-system",
  "parity-scale-codec",

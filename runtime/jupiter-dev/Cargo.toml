@@ -51,7 +51,8 @@ pallet-contracts-primitives = { version = "2.0.0", git = "https://github.com/par
 pallet-contracts-rpc-runtime-api = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 
 # local runtime module
-pallet-contracts = { path = "../../vendor/substrate/frame/contracts", default-features = false }
+# pallet-contracts = { path = "../../vendor/substrate/frame/contracts", default-features = false }
+pallet-contracts = { git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 
 jupiter-primitives = { path = "../../primitives", default-features = false }
 jupiter-runtime-common = { path = "../common", default-features = false }
@@ -109,4 +110,20 @@ runtime-benchmarks = [
     "frame-system-benchmarking",
     "pallet-contracts/runtime-benchmarks",
     "sp-runtime/runtime-benchmarks",
+    "codec/std",
+    "serde",
+
+    "sp-runtime/runtime-benchmarks",
+    "frame-support/runtime-benchmarks",
+    "frame-system/runtime-benchmarks",
+    "pallet-offences/runtime-benchmarks",
+    "pallet-timestamp/runtime-benchmarks",
+    "pallet-indices/runtime-benchmarks",
+    "pallet-balances/runtime-benchmarks",
+    "pallet-utility/runtime-benchmarks",
+    "pallet-multisig/runtime-benchmarks",
+    "pallet-contracts/runtime-benchmarks",
+
+    "jupiter-primitives/runtime-benchmarks",
+    "jupiter-runtime-common/runtime-benchmarks",
 ]
