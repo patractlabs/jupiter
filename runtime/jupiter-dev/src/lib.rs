@@ -365,24 +365,6 @@ impl_runtime_apis! {
         }
     }
 
-    impl sp_offchain::OffchainWorkerApi<Block> for Runtime {
-        fn offchain_worker(header: &<Block as BlockT>::Header) {
-            Executive::offchain_worker(header)
-        }
-    }
-
-    impl sp_session::SessionKeys<Block> for Runtime {
-        fn generate_session_keys(_seed: Option<Vec<u8>>) -> Vec<u8> {
-            Vec::new()
-        }
-
-        fn decode_session_keys(
-            _encoded: Vec<u8>,
-        ) -> Option<Vec<(Vec<u8>, sp_core::crypto::KeyTypeId)>> {
-            None
-        }
-    }
-
     impl frame_system_rpc_runtime_api::AccountNonceApi<Block, AccountId, Index> for Runtime {
         fn account_nonce(account: AccountId) -> Index {
             System::account_nonce(account)
@@ -425,9 +407,8 @@ impl_runtime_apis! {
         }
     }
 
-
     #[cfg(feature = "runtime-benchmarks")]
-    impl frame_benchmarking::Benchmark<BlockT> for Runtime {
+    impl frame_benchmarking::Benchmark<Block> for Runtime {
         fn dispatch_benchmark(
             config: frame_benchmarking::BenchmarkConfig
         ) -> Result<Vec<frame_benchmarking::BenchmarkBatch>, sp_runtime::RuntimeString> {
@@ -435,12 +416,8 @@ impl_runtime_apis! {
             // Trying to add benchmarks directly to the Session Pallet caused cyclic dependency issues.
             // To get around that, we separated the Session benchmarks into its own crate, which is why
             // we need these two lines below.
-            use pallet_session_benchmarking::Module as SessionBench;
-            use pallet_offences_benchmarking::Module as OffencesBench;
             use frame_system_benchmarking::Module as SystemBench;
 
-            impl pallet_session_benchmarking::Config for Runtime {}
-            impl pallet_offences_benchmarking::Config for Runtime {}
             impl frame_system_benchmarking::Config for Runtime {}
 
             let whitelist: Vec<TrackedStorageKey> = vec![
@@ -459,29 +436,13 @@ impl_runtime_apis! {
             ];
 
             let mut batches = Vec::<BenchmarkBatch>::new();
-            let _params = (&config, &whitelist);
+            let params = (&config, &whitelist);
 
-            // add_benchmark!(params, batches, pallet_babe, Babe);
-            // add_benchmark!(params, batches, pallet_balances, Balances);
-            // add_benchmark!(params, batches, pallet_collective, Council);
-            // add_benchmark!(params, batches, pallet_contracts, Contracts);
-            // add_benchmark!(params, batches, pallet_democracy, Democracy);
-            // add_benchmark!(params, batches, pallet_elections_phragmen, Elections);
-            // add_benchmark!(params, batches, pallet_grandpa, Grandpa);
-            // add_benchmark!(params, batches, pallet_identity, Identity);
-            // add_benchmark!(params, batches, pallet_im_online, ImOnline);
-            // add_benchmark!(params, batches, pallet_indices, Indices);
-            // add_benchmark!(params, batches, pallet_multisig, Multisig);
-            // add_benchmark!(params, batches, pallet_offences, OffencesBench::<Runtime>);
-            // add_benchmark!(params, batches, pallet_proxy, Proxy);
-            // add_benchmark!(params, batches, pallet_scheduler, Scheduler);
-            // add_benchmark!(params, batches, pallet_session, SessionBench::<Runtime>);
-            // add_benchmark!(params, batches, pallet_staking, Staking);
-            // add_benchmark!(params, batches, frame_system, SystemBench::<Runtime>);
-            // add_benchmark!(params, batches, pallet_timestamp, Timestamp);
-            // add_benchmark!(params, batches, pallet_treasury, Treasury);
-            // add_benchmark!(params, batches, pallet_utility, Utility);
-            // add_benchmark!(params, batches, pallet_vesting, Vesting);
+            add_benchmark!(params, batches, frame_system, SystemBench::<Runtime>);
+            add_benchmark!(params, batches, pallet_balances, Balances);
+            add_benchmark!(params, batches, pallet_contracts, Contracts);
+            add_benchmark!(params, batches, pallet_indices, Indices);
+            add_benchmark!(params, batches, pallet_timestamp, Timestamp);
 
             if batches.is_empty() { return Err("Benchmark not found for this pallet.".into()) }
             Ok(batches)
