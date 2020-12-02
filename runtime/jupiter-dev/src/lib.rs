@@ -93,7 +93,7 @@ parameter_types! {
 parameter_types! {
     pub const Version: RuntimeVersion = VERSION;
 }
-impl frame_system::Trait for Runtime {
+impl frame_system::Config for Runtime {
     /// The basic call filter to use in dispatchable.
     type BaseCallFilter = ();
     /// The identifier used to distinguish between accounts.
@@ -156,7 +156,7 @@ parameter_types! {
     pub const UncleGenerations: u32 = 0;
 }
 
-impl pallet_authorship::Trait for Runtime {
+impl pallet_authorship::Config for Runtime {
     type FindAuthor = ();
     // would set Default::default() for author
     type UncleGenerations = UncleGenerations;
@@ -168,7 +168,7 @@ parameter_types! {
     pub const MinimumPeriod: u64 = 1;
 }
 
-impl pallet_timestamp::Trait for Runtime {
+impl pallet_timestamp::Config for Runtime {
     /// A timestamp: milliseconds since the unix epoch.
     type Moment = u64;
     type OnTimestampSet = ();
@@ -180,7 +180,7 @@ parameter_types! {
     pub const IndexDeposit: Balance = 10 * DOLLARS;
 }
 
-impl pallet_indices::Trait for Runtime {
+impl pallet_indices::Config for Runtime {
     type AccountIndex = AccountIndex;
     type Currency = Balances;
     type Deposit = IndexDeposit;
@@ -195,7 +195,7 @@ parameter_types! {
     pub const MaxLocks: u32 = 50;
 }
 
-impl pallet_balances::Trait for Runtime {
+impl pallet_balances::Config for Runtime {
     type MaxLocks = MaxLocks;
     /// The type for recording an account's balance.
     type Balance = Balance;
@@ -211,7 +211,7 @@ parameter_types! {
     pub const TransactionByteFee: Balance = 10 * MILLICENTS;
 }
 
-impl pallet_transaction_payment::Trait for Runtime {
+impl pallet_transaction_payment::Config for Runtime {
     type OnChargeTransaction = CurrencyAdapter<Balances, impls::ToAuthor<Self>>;
     type TransactionByteFee = TransactionByteFee;
     type WeightToFee = WeightToFee;
@@ -229,7 +229,7 @@ parameter_types! {
     pub const MaxValueSize: u32 = 16 * 1024;
 }
 
-impl pallet_contracts::Trait for Runtime {
+impl pallet_contracts::Config for Runtime {
     type Time = Timestamp;
     type Randomness = RandomnessCollectiveFlip;
     type Currency = Balances;
@@ -247,7 +247,7 @@ impl pallet_contracts::Trait for Runtime {
     type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
 }
 
-impl pallet_sudo::Trait for Runtime {
+impl pallet_sudo::Config for Runtime {
     type Event = Event;
     type Call = Call;
 }
@@ -439,9 +439,9 @@ impl_runtime_apis! {
             use pallet_offences_benchmarking::Module as OffencesBench;
             use frame_system_benchmarking::Module as SystemBench;
 
-            impl pallet_session_benchmarking::Trait for Runtime {}
-            impl pallet_offences_benchmarking::Trait for Runtime {}
-            impl frame_system_benchmarking::Trait for Runtime {}
+            impl pallet_session_benchmarking::Config for Runtime {}
+            impl pallet_offences_benchmarking::Config for Runtime {}
+            impl frame_system_benchmarking::Config for Runtime {}
 
             let whitelist: Vec<TrackedStorageKey> = vec![
                 // Block Number
