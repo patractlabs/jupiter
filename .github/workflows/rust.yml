@@ -31,8 +31,8 @@ jobs:
       - name: Init
         run: git submodule update --init --remote
       - name: Build
-        run: |
-          cargo build --all -vv
-          cargo build -p jupiter-dev --all-features
+        run: cargo build --all -vv
+      - name: Test Benchmark Feature
+        run: cargo build -p jupiter-dev --all-features
       - name: Run tests
         run: cargo test --all -vv
