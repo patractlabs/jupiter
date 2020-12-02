@@ -12,7 +12,7 @@ use sp_runtime::traits::{BlakeTwo256, Block as BlockT, IdentityLookup, Saturatin
 use sp_runtime::{
     create_runtime_str, generic,
     transaction_validity::{TransactionSource, TransactionValidity},
-    ApplyExtrinsicResult,
+    ApplyExtrinsicResult, KeyTypeId,
 };
 use sp_std::prelude::*;
 
@@ -365,6 +365,12 @@ impl_runtime_apis! {
         }
     }
 
+    impl sp_offchain::OffchainWorkerApi<Block> for Runtime {
+        fn offchain_worker(header: &<Block as BlockT>::Header) {
+            Executive::offchain_worker(header)
+        }
+    }
+
     impl frame_system_rpc_runtime_api::AccountNonceApi<Block, AccountId, Index> for Runtime {
         fn account_nonce(account: AccountId) -> Index {
             System::account_nonce(account)
@@ -404,6 +410,23 @@ impl_runtime_apis! {
             address: AccountId,
         ) -> pallet_contracts_primitives::RentProjectionResult<BlockNumber> {
             Contracts::rent_projection(address)
+        }
+    }
+
+    /// NOTE:
+    ///
+    /// Implement empty session for compiling the CLI currently
+    impl sp_session::SessionKeys<Block> for Runtime {
+        fn generate_session_keys(_seed: Option<Vec<u8>>) -> Vec<u8> {
+            // SessionKeys::generate(seed)
+            Vec::new()
+        }
+
+        fn decode_session_keys(
+            _encoded: Vec<u8>,
+        ) -> Option<Vec<(Vec<u8>, KeyTypeId)>> {
+            // SessionKeys::decode_into_raw_public_keys(&encoded)
+            None
         }
     }
 
