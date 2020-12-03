@@ -32,11 +32,20 @@ sc-basic-authorship = { version = "0.8.0", git = "https://github.com/paritytech/
 pallet-contracts = { package = "pallet-contracts", path = "../../../vendor/substrate/frame/contracts" }
 
 frame-benchmarking = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+frame-benchmarking-cli = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 
 jupiter-primitives = { path = "../../../primitives" }
 jupiter-dev-runtime = { path = "../../../runtime/jupiter-dev" }
+jupiter-dev-executor = { path = "../executor" }
 jupiter-rpc = { path = "../../../rpc" }
 jupiter-io = { path = "../../../primitives/io" }
 
+
 [build-dependencies]
 substrate-build-script-utils = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+
+
+[features]
+runtime-benchmarks = [
+	"jupiter-dev-runtime/runtime-benchmarks",
+]

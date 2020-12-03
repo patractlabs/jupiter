@@ -12,7 +12,7 @@ use sp_runtime::traits::{BlakeTwo256, Block as BlockT, IdentityLookup, Saturatin
 use sp_runtime::{
     create_runtime_str, generic,
     transaction_validity::{TransactionSource, TransactionValidity},
-    ApplyExtrinsicResult,
+    ApplyExtrinsicResult, KeyTypeId,
 };
 use sp_std::prelude::*;
 
@@ -93,7 +93,7 @@ parameter_types! {
 parameter_types! {
     pub const Version: RuntimeVersion = VERSION;
 }
-impl frame_system::Trait for Runtime {
+impl frame_system::Config for Runtime {
     /// The basic call filter to use in dispatchable.
     type BaseCallFilter = ();
     /// The identifier used to distinguish between accounts.
@@ -156,7 +156,7 @@ parameter_types! {
     pub const UncleGenerations: u32 = 0;
 }
 
-impl pallet_authorship::Trait for Runtime {
+impl pallet_authorship::Config for Runtime {
     type FindAuthor = ();
     // would set Default::default() for author
     type UncleGenerations = UncleGenerations;
@@ -168,7 +168,7 @@ parameter_types! {
     pub const MinimumPeriod: u64 = 1;
 }
 
-impl pallet_timestamp::Trait for Runtime {
+impl pallet_timestamp::Config for Runtime {
     /// A timestamp: milliseconds since the unix epoch.
     type Moment = u64;
     type OnTimestampSet = ();
@@ -180,7 +180,7 @@ parameter_types! {
     pub const IndexDeposit: Balance = 10 * DOLLARS;
 }
 
-impl pallet_indices::Trait for Runtime {
+impl pallet_indices::Config for Runtime {
     type AccountIndex = AccountIndex;
     type Currency = Balances;
     type Deposit = IndexDeposit;
@@ -195,7 +195,7 @@ parameter_types! {
     pub const MaxLocks: u32 = 50;
 }
 
-impl pallet_balances::Trait for Runtime {
+impl pallet_balances::Config for Runtime {
     type MaxLocks = MaxLocks;
     /// The type for recording an account's balance.
     type Balance = Balance;
@@ -211,7 +211,7 @@ parameter_types! {
     pub const TransactionByteFee: Balance = 10 * MILLICENTS;
 }
 
-impl pallet_transaction_payment::Trait for Runtime {
+impl pallet_transaction_payment::Config for Runtime {
     type OnChargeTransaction = CurrencyAdapter<Balances, impls::ToAuthor<Self>>;
     type TransactionByteFee = TransactionByteFee;
     type WeightToFee = WeightToFee;
@@ -229,7 +229,7 @@ parameter_types! {
     pub const MaxValueSize: u32 = 16 * 1024;
 }
 
-impl pallet_contracts::Trait for Runtime {
+impl pallet_contracts::Config for Runtime {
     type Time = Timestamp;
     type Randomness = RandomnessCollectiveFlip;
     type Currency = Balances;
@@ -247,7 +247,7 @@ impl pallet_contracts::Trait for Runtime {
     type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
 }
 
-impl pallet_sudo::Trait for Runtime {
+impl pallet_sudo::Config for Runtime {
     type Event = Event;
     type Call = Call;
 }
@@ -371,18 +371,6 @@ impl_runtime_apis! {
         }
     }
 
-    impl sp_session::SessionKeys<Block> for Runtime {
-        fn generate_session_keys(_seed: Option<Vec<u8>>) -> Vec<u8> {
-            Vec::new()
-        }
-
-        fn decode_session_keys(
-            _encoded: Vec<u8>,
-        ) -> Option<Vec<(Vec<u8>, sp_core::crypto::KeyTypeId)>> {
-            None
-        }
-    }
-
     impl frame_system_rpc_runtime_api::AccountNonceApi<Block, AccountId, Index> for Runtime {
         fn account_nonce(account: AccountId) -> Index {
             System::account_nonce(account)
@@ -422,6 +410,65 @@ impl_runtime_apis! {
             address: AccountId,
         ) -> pallet_contracts_primitives::RentProjectionResult<BlockNumber> {
             Contracts::rent_projection(address)
+        }
+    }
+
+    /// NOTE:
+    ///
+    /// Implement empty session for compiling the CLI currently
+    impl sp_session::SessionKeys<Block> for Runtime {
+        fn generate_session_keys(_seed: Option<Vec<u8>>) -> Vec<u8> {
+            // SessionKeys::generate(seed)
+            Vec::new()
+        }
+
+        fn decode_session_keys(
+            _encoded: Vec<u8>,
+        ) -> Option<Vec<(Vec<u8>, KeyTypeId)>> {
+            // SessionKeys::decode_into_raw_public_keys(&encoded)
+            None
+        }
+    }
+
+    #[cfg(feature = "runtime-benchmarks")]
+    impl frame_benchmarking::Benchmark<Block> for Runtime {
+        fn dispatch_benchmark(
+            config: frame_benchmarking::BenchmarkConfig
+        ) -> Result<Vec<frame_benchmarking::BenchmarkBatch>, sp_runtime::RuntimeString> {
+            use frame_benchmarking::{Benchmarking, BenchmarkBatch, add_benchmark, TrackedStorageKey};
+            // Trying to add benchmarks directly to the Session Pallet caused cyclic dependency issues.
+            // To get around that, we separated the Session benchmarks into its own crate, which is why
+            // we need these two lines below.
+            use frame_system_benchmarking::Module as SystemBench;
+
+            impl frame_system_benchmarking::Config for Runtime {}
+
+            let whitelist: Vec<TrackedStorageKey> = vec![
+                // Block Number
+                hex_literal::hex!("26aa394eea5630e07c48ae0c9558cef702a5c1b19ab7a04f536c519aca4983ac").to_vec().into(),
+                // Total Issuance
+                hex_literal::hex!("c2261276cc9d1f8598ea4b6a74b15c2f57c875e4cff74148e4628f264b974c80").to_vec().into(),
+                // Execution Phase
+                hex_literal::hex!("26aa394eea5630e07c48ae0c9558cef7ff553b5a9862a516939d82b3d3d8661a").to_vec().into(),
+                // Event Count
+                hex_literal::hex!("26aa394eea5630e07c48ae0c9558cef70a98fdbe9ce6c55837576c60c7af3850").to_vec().into(),
+                // System Events
+                hex_literal::hex!("26aa394eea5630e07c48ae0c9558cef780d41e5e16056765bc8461851072c9d7").to_vec().into(),
+                // Treasury Account
+                hex_literal::hex!("26aa394eea5630e07c48ae0c9558cef7b99d880ec681799c0cf30e8886371da95ecffd7b6c0f78751baa9d281e0bfa3a6d6f646c70792f74727372790000000000000000000000000000000000000000").to_vec().into(),
+            ];
+
+            let mut batches = Vec::<BenchmarkBatch>::new();
+            let params = (&config, &whitelist);
+
+            add_benchmark!(params, batches, frame_system, SystemBench::<Runtime>);
+            add_benchmark!(params, batches, pallet_balances, Balances);
+            add_benchmark!(params, batches, pallet_contracts, Contracts);
+            add_benchmark!(params, batches, pallet_indices, Indices);
+            add_benchmark!(params, batches, pallet_timestamp, Timestamp);
+
+            if batches.is_empty() { return Err("Benchmark not found for this pallet.".into()) }
+            Ok(batches)
         }
     }
 }
