@@ -70,8 +70,8 @@ impl_opaque_keys! {
 pub fn wasm_binary_unwrap() -> &'static [u8] {
     WASM_BINARY.expect(
         "Development wasm binary is not available. This means the client is \
-						built with `BUILD_DUMMY_WASM_BINARY` flag and it is only usable for \
-						production chains. Please rebuild with the flag disabled.",
+		 built with `BUILD_DUMMY_WASM_BINARY` flag and it is only usable for \
+		 production chains. Please rebuild with the flag disabled.",
     )
 }
 
@@ -110,7 +110,7 @@ parameter_types! {
 parameter_types! {
     pub const Version: RuntimeVersion = VERSION;
 }
-impl frame_system::Trait for Runtime {
+impl frame_system::Config for Runtime {
     /// The basic call filter to use in dispatchable.
     type BaseCallFilter = ();
     /// The identifier used to distinguish between accounts.
@@ -169,7 +169,7 @@ impl frame_system::Trait for Runtime {
     type SystemWeightInfo = weights::frame_system::WeightInfo;
 }
 
-impl pallet_aura::Trait for Runtime {
+impl pallet_aura::Config for Runtime {
     type AuthorityId = AuraId;
 }
 
@@ -177,14 +177,14 @@ parameter_types! {
     pub const UncleGenerations: u32 = 0;
 }
 
-impl pallet_authorship::Trait for Runtime {
+impl pallet_authorship::Config for Runtime {
     type FindAuthor = pallet_session::FindAccountFromAuthorIndex<Self, Aura>;
     type UncleGenerations = UncleGenerations;
     type FilterUncle = ();
     type EventHandler = ();
 }
 
-impl pallet_grandpa::Trait for Runtime {
+impl pallet_grandpa::Config for Runtime {
     type Event = Event;
     type Call = Call;
 
@@ -239,7 +239,7 @@ impl pallet_session::SessionManager<AccountId> for SimpleSessionManager {
     fn start_session(_start_index: u32) {}
 }
 
-impl pallet_session::Trait for Runtime {
+impl pallet_session::Config for Runtime {
     type Event = Event;
     type ValidatorId = AccountId;
     type ValidatorIdOf = SimpleValidatorIdConverter;
@@ -252,7 +252,7 @@ impl pallet_session::Trait for Runtime {
     type WeightInfo = weights::pallet_session::WeightInfo;
 }
 
-impl pallet_session_historical::Trait for Runtime {
+impl pallet_session_historical::Config for Runtime {
     type FullIdentification = AccountId;
     type FullIdentificationOf = ();
 }
@@ -261,7 +261,7 @@ parameter_types! {
     pub const MinimumPeriod: u64 = SLOT_DURATION / 2;
 }
 
-impl pallet_timestamp::Trait for Runtime {
+impl pallet_timestamp::Config for Runtime {
     /// A timestamp: milliseconds since the unix epoch.
     type Moment = u64;
     type OnTimestampSet = Aura;
@@ -273,7 +273,7 @@ parameter_types! {
     pub const IndexDeposit: Balance = 10 * DOLLARS;
 }
 
-impl pallet_indices::Trait for Runtime {
+impl pallet_indices::Config for Runtime {
     type AccountIndex = AccountIndex;
     type Currency = Balances;
     type Deposit = IndexDeposit;
@@ -288,7 +288,7 @@ parameter_types! {
     pub const MaxLocks: u32 = 50;
 }
 
-impl pallet_balances::Trait for Runtime {
+impl pallet_balances::Config for Runtime {
     type MaxLocks = MaxLocks;
     /// The type for recording an account's balance.
     type Balance = Balance;
@@ -304,7 +304,7 @@ parameter_types! {
     pub const TransactionByteFee: Balance = 10 * MILLICENTS;
 }
 
-impl pallet_transaction_payment::Trait for Runtime {
+impl pallet_transaction_payment::Config for Runtime {
     type OnChargeTransaction = CurrencyAdapter<Balances, impls::ToAuthor<Self>>;
     type TransactionByteFee = TransactionByteFee;
     type WeightToFee = WeightToFee;
@@ -322,7 +322,7 @@ parameter_types! {
     pub const MaxValueSize: u32 = 16 * 1024;
 }
 
-impl pallet_contracts::Trait for Runtime {
+impl pallet_contracts::Config for Runtime {
     type Time = Timestamp;
     type Randomness = RandomnessCollectiveFlip;
     type Currency = Balances;
@@ -340,7 +340,7 @@ impl pallet_contracts::Trait for Runtime {
     type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
 }
 
-impl pallet_sudo::Trait for Runtime {
+impl pallet_sudo::Config for Runtime {
     type Event = Event;
     type Call = Call;
 }
