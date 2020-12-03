@@ -4,15 +4,16 @@ use std::convert::TryInto;
 use hex_literal::hex;
 
 use sc_service::ChainType;
-use sp_consensus_aura::sr25519::AuthorityId as AuraId;
+use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
+use sp_consensus_babe::AuthorityId as BabeId;
 use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public};
 use sp_finality_grandpa::AuthorityId as GrandpaId;
 use sp_runtime::traits::{IdentifyAccount, Verify};
 
 use jupiter_runtime::{AccountId, SessionKeys, Signature};
 use jupiter_runtime::{
-    AuraConfig, BalancesConfig, ContractsConfig, GenesisConfig, GrandpaConfig, IndicesConfig,
-    SessionConfig, SudoConfig, SystemConfig, WASM_BINARY,
+    AuthorityDiscoveryConfig, BabeConfig, BalancesConfig, ContractsConfig, GenesisConfig,
+    GrandpaConfig, IndicesConfig, SessionConfig, SudoConfig, SystemConfig, WASM_BINARY,
 };
 
 // The URL for the telemetry server.
@@ -38,24 +39,35 @@ where
     AccountPublic::from(get_from_seed::<TPublic>(seed)).into_account()
 }
 
-/// Generate an Aura authority key.
+/// Generate an Babe authority key.
 type AuthorityKeysTuple = (
     AccountId, // ValidatorId
     AccountId, // (SessionKey)
-    AuraId,
+    BabeId,
     GrandpaId,
+    AuthorityDiscoveryId,
 );
 /// Helper function to generate stash, controller and session key from seed
 pub fn authority_keys_from_seed(seed: &str) -> AuthorityKeysTuple {
     (
         get_account_id_from_seed::<sr25519::Public>(seed),
         get_account_id_from_seed::<sr25519::Public>(&format!("{}//stash", seed)),
-        get_from_seed::<AuraId>(seed),
+        get_from_seed::<BabeId>(seed),
         get_from_seed::<GrandpaId>(seed),
+        get_from_seed::<AuthorityDiscoveryId>(seed),
     )
 }
-fn session_keys(aura: AuraId, grandpa: GrandpaId) -> SessionKeys {
-    SessionKeys { aura, grandpa }
+
+fn session_keys(
+    babe: BabeId,
+    grandpa: GrandpaId,
+    authority_discovery: AuthorityDiscoveryId,
+) -> SessionKeys {
+    SessionKeys {
+        babe,
+        grandpa,
+        authority_discovery,
+    }
 }
 
 pub fn development_config() -> Result<ChainSpec, String> {
@@ -168,14 +180,14 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
 pub fn staging_testnet_config() -> Result<ChainSpec, String> {
     let wasm_binary = WASM_BINARY.ok_or("Testnet wasm binary not available".to_string())?;
 
-    // subkey inspect-key --uri "$SECRET"
+    // subkey inspect "$SECRET"
     // 5FC7Y5AHZgsGsdPpkZzhNNMVEvwkV1JDBhFgoDRifbnfFQhp
     let root_key: AccountId =
         hex!["8a5b214c82362a8aba60af2a5fee63989f1ae4ce3ec802251c0b3ff9f4ad1826"].into();
     // bash:
-    // for i in 1 2; do for j in stash controller; do subkey inspect-key --uri "$SECRET//$i//$j"; done; done
-    // for i in 1 2; do for j in aura; do subkey inspect-key --scheme sr25519 --uri "$SECRET//$i//$j"; done; done
-    // for i in 1 2; do for j in grandpa; do subkey inspect-key --scheme ed25519 --uri "$SECRET//$i//$j"; done; done
+    // for i in 1 2; do for j in stash controller; do subkey inspect "$SECRET//$i//$j"; done; done
+    // for i in 1 2; do for j in babe; do subkey inspect --scheme Sr25519 "$SECRET//$i//$j"; done; done
+    // for i in 1 2; do for j in grandpa; do subkey inspect --scheme Ed25519 "$SECRET//$i//$j"; done; done
 
     // stash & controller
     let (stash1, controller1): (AccountId, AccountId) = (
@@ -190,12 +202,12 @@ pub fn staging_testnet_config() -> Result<ChainSpec, String> {
         // 5DMRmiSn4DTdo7HZM2frH88UZFapYGMCgEQukpD6yd5fc1Pm
         hex!["38fd41ccf5b2020e4f79ab9007e0496096ff5edd692c57cba1dbfce5eaa77c69"].into(),
     );
-    // aura
+    // babe
     // 5EtZp8WCs4yRDvfLapwU8GrSoS9e7qpXVtYZVCNDFBXuVsiW
-    let aura1: AuraId =
+    let babe1: BabeId =
         hex!["7cf92b27e280cef89900a7d351e37cdc6a578104a71f918165f52fee77aef647"].unchecked_into();
     // 5GRaVtCnSKjeXXXu6S5cVEcqn5yGbnCTGYYeKodxiRbnnZBd
-    let aura2: AuraId =
+    let babe2: BabeId =
         hex!["c0dc511c88d7ef3bc5b465de48aac4efc643283f179b93d413f97e4a7aac714b"].unchecked_into();
     // grandpa
     // 5CwDbbQZY7dWGhgPvGqbi2WnhcFw7WkpW2ZrmvSvhtM7qVKn
@@ -204,10 +216,17 @@ pub fn staging_testnet_config() -> Result<ChainSpec, String> {
     // 5G6VvSAqrqNLoqoRM4GUxrKQkfHuZ3ggnW8bbsQZbi187kfu
     let grandpa2: GrandpaId =
         hex!["b24f3f629e5cc692b50f08b9714c67be656b057293bb077beb44781a9a0e2992"].unchecked_into();
+    // authority_discovery same with babe
+    // 5EtZp8WCs4yRDvfLapwU8GrSoS9e7qpXVtYZVCNDFBXuVsiW
+    let audi1: AuthorityDiscoveryId =
+        hex!["7cf92b27e280cef89900a7d351e37cdc6a578104a71f918165f52fee77aef647"].unchecked_into();
+    // 5GRaVtCnSKjeXXXu6S5cVEcqn5yGbnCTGYYeKodxiRbnnZBd
+    let audi2: AuthorityDiscoveryId =
+        hex!["c0dc511c88d7ef3bc5b465de48aac4efc643283f179b93d413f97e4a7aac714b"].unchecked_into();
 
     let initial_authorities: Vec<AuthorityKeysTuple> = vec![
-        (controller1.clone(), stash1.clone(), aura1, grandpa1),
-        (controller2.clone(), stash2.clone(), aura2, grandpa2),
+        (controller1.clone(), stash1.clone(), babe1, grandpa1, audi1),
+        (controller2.clone(), stash2.clone(), babe2, grandpa2, audi2),
     ];
 
     Ok(ChainSpec::from_genesis(
@@ -282,12 +301,13 @@ fn testnet_genesis(
                 .collect(),
         }),
         pallet_indices: Some(IndicesConfig { indices: vec![] }),
-        pallet_aura: Some(AuraConfig {
+        pallet_babe: Some(BabeConfig {
             authorities: vec![],
         }),
         pallet_grandpa: Some(GrandpaConfig {
             authorities: vec![],
         }),
+        pallet_authority_discovery: Some(AuthorityDiscoveryConfig { keys: vec![] }),
         pallet_session: Some(SessionConfig {
             keys: initial_authorities
                 .iter()
@@ -295,7 +315,7 @@ fn testnet_genesis(
                     (
                         x.0.clone(),
                         x.0.clone(),
-                        session_keys(x.2.clone(), x.3.clone()),
+                        session_keys(x.2.clone(), x.3.clone(), x.4.clone()),
                     )
                 })
                 .collect::<Vec<_>>(),
