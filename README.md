@@ -17,14 +17,48 @@ This repo provide two type node:
     It's a local develop node for testing contract easily. This node could run in single, and **do not have time interval
     for producing block**, which would produce block only when receiving an extrinsic. This feature let developers do not 
     need to waste time for waiting producing blocks in develop and test.
-    
-**Note: current jupiter is dependent on substrate v2.0.0 version. `pallet-contracts` for v2.0.0 version is still in refactoring, 
-and newest ink! do not match for current `pallet-contracts`, some example contracts could not play well in current version.**
-    
+
+**Note: current `pallet-contracts` is in developing and upgrading quickly. Thus we prepare different branch to track this module.**
+For now, jupiter has two branch:
+* master
+* [substrate-v2.0.0](https://github.com/patractlabs/jupiter/tree/substrate-v2.0.0)
+
+In different branch, we would provide different `pallet-contracts` features.
+
+* for `master` branch, we provide newest substrate `pallet-contracts` module. 
+    * for Jupiter Testnet node:
+        
+        Currently we use substrate `pallet-contracts` version crate to provide contract features. The `pallet-contracts` 
+        version matches to the substrate commit version in `Cargo.lock`.
+        (you can lookup the keyword "git+https://github.com/paritytech/substrate?branch=master#<commit version>" in `Cargo.lock` 
+        and the "commit version" is the substrate commit version for current jupiter `pallet-contracts` crate). 
+    * for Jupiter local develop node:
+        
+        In develop node, we use our forked `pallet-contracts` to integrate our newest features like the cryptography about 
+        Zero-knowledge proof or something else. This forked `pallet-contracts` is a git submodule in `vendor/substrate` 
+        directory. 
+        
+        More information about this forked `pallet-contracts` refers to this link: [substrate](https://github.com/patractlabs/substrate/tree/patract-contracts/frame/contracts).
+        
+* for `substrate-v2.0.0` branch, we provide version 2.0.0 `pallet-contracts`.
+    * version 2.0.0 may not match for newest ink!. If you what to test contract in this branch, please peek a suitable ink!
+    version for v2.0.0 `palset-contracts`. 
+
 ## compile and run
 ### 1. clone this repo
 ```bash
+> git clone --recurse-submodules https://github.com/patractlabs/jupiter.git
+## or do following commands
 > git clone https://github.com/patractlabs/jupiter.git
+> cd jupiter/vendor
+> git submodule update --init --recursive
+```
+If you want to use `substrate-v2.0.0` branch, do following commands:
+```bash
+> git clone --branch substrate-v2.0.0 https://github.com/patractlabs/jupiter.git
+## or do following commands:
+> git clone https://github.com/patractlabs/jupiter.git
+> git checkout -t origin/substrate-v2.0.0
 ```
 
 ### 2. init building environment
