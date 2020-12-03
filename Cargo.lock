@@ -2737,7 +2737,7 @@ dependencies = [
  "jupiter-rpc",
  "jupiter-runtime",
  "log",
- "pallet-contracts 2.0.0 (git+https://github.com/paritytech/substrate)",
+ "pallet-contracts",
  "parking_lot 0.10.2",
  "sc-authority-discovery",
  "sc-basic-authorship",
@@ -2782,7 +2782,7 @@ dependencies = [
  "jupiter-primitives",
  "jupiter-rpc",
  "log",
- "pallet-contracts 2.0.0",
+ "pallet-contracts",
  "parking_lot 0.10.2",
  "sc-basic-authorship",
  "sc-cli",
@@ -2827,7 +2827,7 @@ dependencies = [
  "jupiter-runtime-common",
  "pallet-authorship",
  "pallet-balances",
- "pallet-contracts 2.0.0",
+ "pallet-contracts",
  "pallet-contracts-primitives",
  "pallet-contracts-rpc-runtime-api",
  "pallet-indices",
@@ -2857,6 +2857,7 @@ name = "jupiter-executor"
 version = "0.1.0"
 dependencies = [
  "frame-benchmarking",
+ "jupiter-io",
  "jupiter-runtime",
  "sc-executor",
 ]
@@ -2919,7 +2920,7 @@ dependencies = [
  "pallet-aura",
  "pallet-authorship",
  "pallet-balances",
- "pallet-contracts 2.0.0 (git+https://github.com/paritytech/substrate)",
+ "pallet-contracts",
  "pallet-contracts-primitives",
  "pallet-contracts-rpc-runtime-api",
  "pallet-grandpa",
@@ -4198,27 +4199,6 @@ dependencies = [
  "pwasm-utils 0.16.0",
  "rand 0.7.3",
  "rand_pcg",
- "serde",
- "sp-core",
- "sp-io",
- "sp-runtime",
- "sp-sandbox",
- "sp-std",
- "wasmi-validation",
-]
-
-[[package]]
-name = "pallet-contracts"
-version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate?branch=master#f884296f7436916909025f8b43c4bbf3e60e4c60"
-dependencies = [
- "frame-support",
- "frame-system",
- "pallet-contracts-primitives",
- "pallet-contracts-proc-macro",
- "parity-scale-codec",
- "parity-wasm 0.41.0",
- "pwasm-utils 0.16.0",
  "serde",
  "sp-core",
  "sp-io",
