@@ -349,8 +349,8 @@ impl pallet_sudo::Config for Runtime {
 construct_runtime!(
     pub enum Runtime where
         Block = Block,
-    NodeBlock = jupiter_primitives::Block,
-    UncheckedExtrinsic = UncheckedExtrinsic
+        NodeBlock = jupiter_primitives::Block,
+        UncheckedExtrinsic = UncheckedExtrinsic
     {
         // Basic stuff; balances is uncallable initially.
         System: frame_system::{Module, Call, Config, Storage, Event<T>},
@@ -497,9 +497,9 @@ impl_runtime_apis! {
 
         fn submit_report_equivocation_unsigned_extrinsic(
             _equivocation_proof: fg_primitives::EquivocationProof<
-                    <Block as BlockT>::Hash,
+                <Block as BlockT>::Hash,
                 NumberFor<Block>,
-                >,
+            >,
             _key_owner_proof: fg_primitives::OpaqueKeyOwnershipProof,
         ) -> Option<()> {
             None
@@ -523,9 +523,9 @@ impl_runtime_apis! {
     }
 
     impl pallet_transaction_payment_rpc_runtime_api::TransactionPaymentApi<
-            Block,
+        Block,
         Balance,
-        > for Runtime {
+    > for Runtime {
         fn query_info(uxt: <Block as BlockT>::Extrinsic, len: u32) -> RuntimeDispatchInfo<Balance> {
             TransactionPayment::query_info(uxt, len)
         }
