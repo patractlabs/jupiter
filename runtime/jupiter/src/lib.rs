@@ -21,7 +21,7 @@ use sp_std::prelude::*;
 use pallet_grandpa::fg_primitives;
 use pallet_grandpa::{AuthorityId as GrandpaId, AuthorityList as GrandpaAuthorityList};
 // use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
-use sp_consensus_aura::sr25519::AuthorityId as AuraId;
+use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 
 #[cfg(feature = "std")]
 use sp_version::NativeVersion;
@@ -58,9 +58,10 @@ use jupiter_runtime_common::{
 
 impl_opaque_keys! {
     pub struct SessionKeys {
-        pub aura: Aura,
+        pub babe: Babe,
         pub grandpa: Grandpa,
         // pub im_online: ImOnline,
+        pub authority_discovery: AuthorityDiscovery,
     }
 }
 
@@ -168,26 +169,71 @@ impl frame_system::Trait for Runtime {
     type SystemWeightInfo = weights::frame_system::WeightInfo;
 }
 
-impl pallet_aura::Trait for Runtime {
-    type AuthorityId = AuraId;
-}
-
 parameter_types! {
     pub const UncleGenerations: u32 = 0;
 }
 
 impl pallet_authorship::Trait for Runtime {
-    type FindAuthor = pallet_session::FindAccountFromAuthorIndex<Self, Aura>;
+    type FindAuthor = pallet_session::FindAccountFromAuthorIndex<Self, Babe>;
     type UncleGenerations = UncleGenerations;
     type FilterUncle = ();
     type EventHandler = ();
 }
 
+parameter_types! {
+    pub const EpochDuration: u64 = EPOCH_DURATION_IN_BLOCKS as u64;
+    pub const ExpectedBlockTime: Moment = MILLISECS_PER_BLOCK;
+}
+
+impl pallet_babe::Trait for Runtime {
+    type EpochDuration = EpochDuration;
+    type ExpectedBlockTime = ExpectedBlockTime;
+    type EpochChangeTrigger = pallet_babe::ExternalTrigger;
+
+    type KeyOwnerProofSystem = Historical;
+
+    type KeyOwnerProof = <Self::KeyOwnerProofSystem as KeyOwnerProofSystem<(
+        KeyTypeId,
+        pallet_babe::AuthorityId,
+    )>>::Proof;
+
+    type KeyOwnerIdentification = <Self::KeyOwnerProofSystem as KeyOwnerProofSystem<(
+        KeyTypeId,
+        pallet_babe::AuthorityId,
+    )>>::IdentificationTuple;
+
+    type HandleEquivocation =
+        pallet_babe::EquivocationHandler<Self::KeyOwnerIdentification, Offences>;
+
+    type WeightInfo = ();
+}
+
+impl<C> frame_system::offchain::SendTransactionTypes<C> for Runtime
+where
+    Call: From<C>,
+{
+    type Extrinsic = UncheckedExtrinsic;
+    type OverarchingCall = Call;
+}
+
+parameter_types! {
+    pub OffencesWeightSoftLimit: Weight = Perbill::from_percent(60) * MaximumBlockWeight::get();
+}
+
+impl pallet_offences::Trait for Runtime {
+    type Event = Event;
+    type IdentificationTuple = pallet_session::historical::IdentificationTuple<Self>;
+    type OnOffenceHandler = ();
+    type WeightSoftLimit = OffencesWeightSoftLimit;
+}
+
+impl pallet_authority_discovery::Trait for Runtime {}
+
 impl pallet_grandpa::Trait for Runtime {
     type Event = Event;
     type Call = Call;
 
-    type KeyOwnerProofSystem = ();
+    type KeyOwnerProofSystem = Historical;
 
     type KeyOwnerProof =
         <Self::KeyOwnerProofSystem as KeyOwnerProofSystem<(KeyTypeId, GrandpaId)>>::Proof;
@@ -197,7 +243,8 @@ impl pallet_grandpa::Trait for Runtime {
         GrandpaId,
     )>>::IdentificationTuple;
 
-    type HandleEquivocation = ();
+    type HandleEquivocation =
+        pallet_grandpa::EquivocationHandler<Self::KeyOwnerIdentification, Offences>;
 
     type WeightInfo = ();
 }
@@ -212,25 +259,29 @@ impl Convert<AccountId, Option<AccountId>> for SimpleValidatorIdConverter {
     }
 }
 pub struct SimpleSessionManager;
-impl<BlockNumber> pallet_session::ShouldEndSession<BlockNumber> for SimpleSessionManager {
-    fn should_end_session(_: BlockNumber) -> bool {
-        false
-    }
-}
-impl<BlockNumber> frame_support::traits::EstimateNextSessionRotation<BlockNumber>
-    for SimpleSessionManager
-{
-    fn estimate_next_session_rotation(_: BlockNumber) -> Option<BlockNumber> {
-        None
-    }
-
-    fn weight(_: BlockNumber) -> Weight {
-        0
-    }
-}
 impl pallet_session::SessionManager<AccountId> for SimpleSessionManager {
     fn new_session(_new_index: u32) -> Option<Vec<AccountId>> {
         None
+    }
+
+    fn end_session(_end_index: u32) {}
+
+    fn start_session(_start_index: u32) {}
+}
+impl pallet_session::historical::SessionManager<AccountId, AccountId> for SimpleSessionManager {
+    fn new_session(new_index: u32) -> Option<Vec<(AccountId, AccountId)>> {
+        // session 0..1 validators add by extra_genesis
+        if new_index <= 1 {
+            None
+        } else {
+            let validators: Vec<AccountId> = <pallet_session::Module<Runtime>>::validators();
+            Some(
+                validators
+                    .iter()
+                    .map(|validator| (validator.clone(), validator.clone()))
+                    .collect(),
+            )
+        }
     }
 
     fn end_session(_end_index: u32) {}
@@ -242,9 +293,10 @@ impl pallet_session::Trait for Runtime {
     type Event = Event;
     type ValidatorId = AccountId;
     type ValidatorIdOf = SimpleValidatorIdConverter;
-    type ShouldEndSession = SimpleSessionManager;
-    type NextSessionRotation = SimpleSessionManager;
-    type SessionManager = SimpleSessionManager;
+    type ShouldEndSession = Babe;
+    type NextSessionRotation = Babe;
+    type SessionManager =
+        pallet_session::historical::NoteHistoricalRoot<Self, SimpleSessionManager>;
     type SessionHandler = <SessionKeys as OpaqueKeys>::KeyTypeIdProviders;
     type Keys = SessionKeys;
     type DisabledValidatorsThreshold = DisabledValidatorsThreshold;
@@ -253,7 +305,7 @@ impl pallet_session::Trait for Runtime {
 
 impl pallet_session_historical::Trait for Runtime {
     type FullIdentification = AccountId;
-    type FullIdentificationOf = ();
+    type FullIdentificationOf = SimpleValidatorIdConverter;
 }
 
 parameter_types! {
@@ -263,7 +315,7 @@ parameter_types! {
 impl pallet_timestamp::Trait for Runtime {
     /// A timestamp: milliseconds since the unix epoch.
     type Moment = u64;
-    type OnTimestampSet = Aura;
+    type OnTimestampSet = Babe;
     type MinimumPeriod = MinimumPeriod;
     type WeightInfo = weights::pallet_timestamp::WeightInfo;
 }
@@ -358,12 +410,14 @@ construct_runtime!(
         System: frame_system::{Module, Call, Config, Storage, Event<T>},
         RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Module, Call, Storage},
 
-        Aura: pallet_aura::{Module, Config<T>, Inherent},
+        Babe: pallet_babe::{Module, Call, Storage, Config, Inherent, ValidateUnsigned},
         // Consensus support.
         Authorship: pallet_authorship::{Module, Call, Storage},
         Grandpa: pallet_grandpa::{Module, Call, Storage, Config, Event},
-        Historical: pallet_session_historical::{Module},
+        Historical: pallet_session_historical::{Module, Storage},
         Session: pallet_session::{Module, Call, Storage, Event, Config<T>},
+        AuthorityDiscovery: pallet_authority_discovery::{Module, Call, Config},
+        Offences: pallet_offences::{Module, Call, Storage, Event},
 
         Timestamp: pallet_timestamp::{Module, Call, Storage, Inherent},
         Balances: pallet_balances::{Module, Call, Storage, Config<T>, Event<T>},
@@ -471,13 +525,54 @@ impl_runtime_apis! {
         }
     }
 
-    impl sp_consensus_aura::AuraApi<Block, AuraId> for Runtime {
-        fn slot_duration() -> u64 {
-            Aura::slot_duration()
+    impl sp_consensus_babe::BabeApi<Block> for Runtime {
+        fn configuration() -> sp_consensus_babe::BabeGenesisConfiguration {
+            // The choice of `c` parameter (where `1 - c` represents the
+            // probability of a slot being empty), is done in accordance to the
+            // slot duration and expected target block time, for safely
+            // resisting network delays of maximum two seconds.
+            // <https://research.web3.foundation/en/latest/polkadot/BABE/Babe/#6-practical-results>
+            sp_consensus_babe::BabeGenesisConfiguration {
+                slot_duration: Babe::slot_duration(),
+                epoch_length: EpochDuration::get(),
+                c: PRIMARY_PROBABILITY,
+                genesis_authorities: Babe::authorities(),
+                randomness: Babe::randomness(),
+                allowed_slots: sp_consensus_babe::AllowedSlots::PrimaryAndSecondaryVRFSlots,
+            }
         }
 
-        fn authorities() -> Vec<AuraId> {
-            Aura::authorities()
+        fn current_epoch_start() -> sp_consensus_babe::SlotNumber {
+            Babe::current_epoch_start()
+        }
+
+        fn generate_key_ownership_proof(
+            _slot_number: sp_consensus_babe::SlotNumber,
+            authority_id: sp_consensus_babe::AuthorityId,
+        ) -> Option<sp_consensus_babe::OpaqueKeyOwnershipProof> {
+            use codec::Encode;
+
+            Historical::prove((sp_consensus_babe::KEY_TYPE, authority_id))
+                .map(|p| p.encode())
+                .map(sp_consensus_babe::OpaqueKeyOwnershipProof::new)
+        }
+
+        fn submit_report_equivocation_unsigned_extrinsic(
+            equivocation_proof: sp_consensus_babe::EquivocationProof<<Block as BlockT>::Header>,
+            key_owner_proof: sp_consensus_babe::OpaqueKeyOwnershipProof,
+        ) -> Option<()> {
+            let key_owner_proof = key_owner_proof.decode()?;
+
+            Babe::submit_unsigned_equivocation_report(
+                equivocation_proof,
+                key_owner_proof,
+            )
+        }
+    }
+
+    impl sp_authority_discovery::AuthorityDiscoveryApi<Block> for Runtime {
+        fn authorities() -> Vec<AuthorityDiscoveryId> {
+            AuthorityDiscovery::authorities()
         }
     }
 

@@ -143,14 +143,13 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
         let pool = transaction_pool.clone();
 
         Box::new(move |deny_unsafe, _| {
-            let deps = jupiter_rpc::FullDeps::<_, _, FullBackend> {
+            let deps = jupiter_rpc::BasicDeps {
                 client: client.clone(),
                 pool: pool.clone(),
                 deny_unsafe,
-                grandpa: None,
             };
 
-            jupiter_rpc::create_full(deps)
+            jupiter_rpc::create_basic(deps)
         })
     };
 
