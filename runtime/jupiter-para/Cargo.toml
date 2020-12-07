@@ -107,6 +107,7 @@ std = [
     "cumulus-parachain-upgrade/std",
     "cumulus-primitives/std",
     "cumulus-runtime/std",
+    "cumulus-message-broker/std",
     "parachain-info/std",
 #    "token-dealer/std",
 ]
