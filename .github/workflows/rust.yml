@@ -21,13 +21,13 @@ jobs:
           toolchain: nightly-2020-10-05
           target: wasm32-unknown-unknown
           override: true
-      - name: Cache substrate deps
-        uses: actions/cache@v1
-        env:
-          cache-name: substrate-cache
-        with:
-          path: ./target
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('./Cargo.lock') }}
+#      - name: Cache substrate deps
+#        uses: actions/cache@v1
+#        env:
+#          cache-name: substrate-cache
+#        with:
+#          path: ./target
+#          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('./Cargo.lock') }}
       - name: Init
         run: git submodule update --init --remote
       - name: Build
