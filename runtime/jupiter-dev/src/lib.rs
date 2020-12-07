@@ -43,7 +43,7 @@ pub use jupiter_primitives::{
     AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Signature,
 };
 use jupiter_runtime_common::{
-    constants::{currency::*, fee::WeightToFee},
+    constants::{currency::*, fee::WeightToFee, time::SLOT_DURATION},
     impls, weights,
 };
 use pallet_transaction_payment::CurrencyAdapter;
@@ -165,7 +165,7 @@ impl pallet_authorship::Config for Runtime {
 }
 
 parameter_types! {
-    pub const MinimumPeriod: u64 = 1;
+    pub const MinimumPeriod: u64 = SLOT_DURATION / 2;
 }
 
 impl pallet_timestamp::Config for Runtime {
@@ -292,7 +292,8 @@ pub type SignedExtra = (
     frame_system::CheckSpecVersion<Runtime>,
     frame_system::CheckTxVersion<Runtime>,
     frame_system::CheckGenesis<Runtime>,
-    frame_system::CheckEra<Runtime>,
+    // TODO: enable "CheckEra" after the package publish for issue: https://github.com/polkadot-js/api/issues/2909
+    // frame_system::CheckEra<Runtime>,
     frame_system::CheckNonce<Runtime>,
     frame_system::CheckWeight<Runtime>,
     pallet_transaction_payment::ChargeTransactionPayment<Runtime>,
