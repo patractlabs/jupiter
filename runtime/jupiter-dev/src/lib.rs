@@ -44,7 +44,7 @@ pub use jupiter_primitives::{
     AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Signature,
 };
 use jupiter_runtime_common::{
-    constants::{currency::*, fee::WeightToFee},
+    constants::{currency::*, fee::WeightToFee, time::SLOT_DURATION},
     impls, weights,
 };
 
@@ -164,7 +164,7 @@ impl pallet_authorship::Trait for Runtime {
 }
 
 parameter_types! {
-    pub const MinimumPeriod: u64 = 1;
+    pub const MinimumPeriod: u64 = SLOT_DURATION / 2;
 }
 
 impl pallet_timestamp::Trait for Runtime {
