@@ -39,6 +39,7 @@ sc-service = { version = "0.8.0", git = "https://github.com/paritytech/substrate
 
 pallet-contracts = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 pallet-authority-discovery = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+pallet-im-online = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 pallet-staking = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 
 jupiter-primitives = { path = "../../../primitives" }

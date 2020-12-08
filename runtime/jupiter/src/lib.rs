@@ -16,9 +16,7 @@ use sp_runtime::{
     create_runtime_str,
     curve::PiecewiseLinear,
     generic, impl_opaque_keys,
-    traits::{
-        BlakeTwo256, Block as BlockT, Convert, IdentityLookup, NumberFor, OpaqueKeys, Saturating,
-    },
+    traits::{BlakeTwo256, Block as BlockT, IdentityLookup, NumberFor, OpaqueKeys, Saturating},
     transaction_validity::{TransactionPriority, TransactionSource, TransactionValidity},
     ApplyExtrinsicResult, ModuleId, Perbill, Percent, Permill,
 };
@@ -27,7 +25,7 @@ use static_assertions::const_assert;
 
 use pallet_grandpa::fg_primitives;
 use pallet_grandpa::{AuthorityId as GrandpaId, AuthorityList as GrandpaAuthorityList};
-// use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
+use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 
 #[cfg(feature = "std")]
@@ -71,7 +69,7 @@ impl_opaque_keys! {
     pub struct SessionKeys {
         pub babe: Babe,
         pub grandpa: Grandpa,
-        // pub im_online: ImOnline,
+        pub im_online: ImOnline,
         pub authority_discovery: AuthorityDiscovery,
     }
 }
@@ -209,7 +207,7 @@ impl pallet_authorship::Config for Runtime {
     type FindAuthor = pallet_session::FindAccountFromAuthorIndex<Self, Babe>;
     type UncleGenerations = UncleGenerations;
     type FilterUncle = ();
-    type EventHandler = ();
+    type EventHandler = (Staking, ImOnline);
 }
 
 parameter_types! {
@@ -271,6 +269,15 @@ parameter_types! {
     pub const ImOnlineUnsignedPriority: TransactionPriority = TransactionPriority::max_value();
 }
 
+impl pallet_im_online::Config for Runtime {
+    type AuthorityId = ImOnlineId;
+    type Event = Event;
+    type ReportUnresponsiveness = Offences;
+    type SessionDuration = SessionDuration;
+    type UnsignedPriority = ImOnlineUnsignedPriority;
+    type WeightInfo = weights::pallet_im_online::WeightInfo<Runtime>;
+}
+
 impl pallet_grandpa::Config for Runtime {
     type Event = Event;
     type Call = Call;
@@ -293,42 +300,6 @@ impl pallet_grandpa::Config for Runtime {
 
 parameter_types! {
     pub const DisabledValidatorsThreshold: Perbill = Perbill::from_percent(17);
-}
-pub struct SimpleValidatorIdConverter;
-impl Convert<AccountId, Option<AccountId>> for SimpleValidatorIdConverter {
-    fn convert(controller: AccountId) -> Option<AccountId> {
-        Some(controller)
-    }
-}
-pub struct SimpleSessionManager;
-impl pallet_session::SessionManager<AccountId> for SimpleSessionManager {
-    fn new_session(_new_index: u32) -> Option<Vec<AccountId>> {
-        None
-    }
-
-    fn end_session(_end_index: u32) {}
-
-    fn start_session(_start_index: u32) {}
-}
-impl pallet_session::historical::SessionManager<AccountId, AccountId> for SimpleSessionManager {
-    fn new_session(new_index: u32) -> Option<Vec<(AccountId, AccountId)>> {
-        // session 0..1 validators add by extra_genesis
-        if new_index <= 1 {
-            None
-        } else {
-            let validators: Vec<AccountId> = <pallet_session::Module<Runtime>>::validators();
-            Some(
-                validators
-                    .iter()
-                    .map(|validator| (validator.clone(), validator.clone()))
-                    .collect(),
-            )
-        }
-    }
-
-    fn end_session(_end_index: u32) {}
-
-    fn start_session(_start_index: u32) {}
 }
 
 impl pallet_session::Config for Runtime {
@@ -709,21 +680,26 @@ construct_runtime!(
         UncheckedExtrinsic = UncheckedExtrinsic
     {
         // Basic stuff; balances is uncallable initially.
-        System: frame_system::{Module, Call, Config, Storage, Event<T>},
-        RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Module, Call, Storage},
+        System: frame_system::{Module, Call, Config, Storage, Event<T>} = 0,
+        RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Module, Storage} = 32,
 
-        Babe: pallet_babe::{Module, Call, Storage, Config, Inherent, ValidateUnsigned},
+        // Must be before session.
+        Babe: pallet_babe::{Module, Call, Storage, Config, Inherent, ValidateUnsigned} = 1,
+
+        Timestamp: pallet_timestamp::{Module, Call, Storage, Inherent} = 2,
+        Indices: pallet_indices::{Module, Call, Storage, Config<T>, Event<T>} = 3,
+        Balances: pallet_balances::{Module, Call, Storage, Config<T>, Event<T>} = 4,
+        TransactionPayment: pallet_transaction_payment::{Module, Storage} = 33,
 
         // Consensus support.
-        Authorship: pallet_authorship::{Module, Call, Storage},
+        Authorship: pallet_authorship::{Module, Call, Storage} = 5,
         Staking: pallet_staking::{Module, Call, Storage, Config<T>, Event<T>, ValidateUnsigned} = 6,
-        Grandpa: pallet_grandpa::{Module, Call, Storage, Config, Event},
-        Historical: pallet_session_historical::{Module, Storage},
-        Session: pallet_session::{Module, Call, Storage, Event, Config<T>},
-        // ImOnline: pallet_im_online::{Module, Call, Storage, Event<T>, ValidateUnsigned, Config<T>} = 11,
-        AuthorityDiscovery: pallet_authority_discovery::{Module, Call, Storage, Config},
-        Offences: pallet_offences::{Module, Call, Storage, Event},
-
+        Offences: pallet_offences::{Module, Call, Storage, Event} = 7,
+        Historical: pallet_session_historical::{Module} = 34,
+        Session: pallet_session::{Module, Call, Storage, Event, Config<T>} = 8,
+        Grandpa: pallet_grandpa::{Module, Call, Storage, Config, Event} = 10,
+        ImOnline: pallet_im_online::{Module, Call, Storage, Event<T>, ValidateUnsigned, Config<T>} = 11,
+        AuthorityDiscovery: pallet_authority_discovery::{Module, Call, Storage, Config} = 12,
 
         // Governance stuff; uncallable initially.
         Democracy: pallet_democracy::{Module, Call, Storage, Config, Event<T>} = 13,
@@ -732,11 +708,6 @@ construct_runtime!(
         ElectionsPhragmen: pallet_elections_phragmen::{Module, Call, Storage, Event<T>, Config<T>} = 16,
         TechnicalMembership: pallet_membership::<Instance1>::{Module, Call, Storage, Event<T>, Config<T>} = 17,
         Treasury: pallet_treasury::{Module, Call, Storage, Event<T>} = 18,
-
-        Timestamp: pallet_timestamp::{Module, Call, Storage, Inherent},
-        Balances: pallet_balances::{Module, Call, Storage, Config<T>, Event<T>},
-        Indices: pallet_indices::{Module, Call, Storage, Config<T>, Event<T>},
-        TransactionPayment: pallet_transaction_payment::{Module, Storage},
 
         Contracts: pallet_contracts::{Module, Call, Config<T>, Storage, Event<T>},
 

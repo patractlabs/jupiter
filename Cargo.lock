@@ -2526,6 +2526,7 @@ dependencies = [
  "log",
  "pallet-authority-discovery",
  "pallet-contracts 2.0.0 (git+https://github.com/paritytech/substrate)",
+ "pallet-im-online",
  "pallet-staking",
  "parking_lot 0.10.2",
  "sc-authority-discovery",
