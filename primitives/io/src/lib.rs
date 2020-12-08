@@ -7,8 +7,8 @@ use sp_runtime_interface::runtime_interface;
 #[runtime_interface]
 pub trait ZkSnarks {
     /// Vector Addition
-    fn add(fn_id: i32, input: &[u8], output: &mut [u8]) -> Option<()> {
-        let res = match fn_id {
+    fn add(fn_id: i32, input: &[u8]) -> Option<Vec<u8>> {
+        Some(match fn_id {
             0x2a => {
                 <megaclite::curves::Bls12_377 as megaclite::CurveBasicOperations>::add(input).ok()
             }
@@ -20,15 +20,12 @@ pub trait ZkSnarks {
                 <megaclite::curves::BW6_761 as megaclite::CurveBasicOperations>::add(input).ok()
             }
             _ => None,
-        }?;
-
-        output.copy_from_slice(&res);
-        Some(())
+        }?)
     }
 
     /// Scalar Multiplication
-    fn mul(fn_id: i32, input: &[u8], output: &mut [u8]) -> Option<()> {
-        let res = match fn_id {
+    fn mul(fn_id: i32, input: &[u8]) -> Option<Vec<u8>> {
+        Some(match fn_id {
             0x2a => {
                 <megaclite::curves::Bls12_377 as megaclite::CurveBasicOperations>::mul(input).ok()
             }
@@ -40,15 +37,12 @@ pub trait ZkSnarks {
                 <megaclite::curves::BW6_761 as megaclite::CurveBasicOperations>::mul(input).ok()
             }
             _ => None,
-        }?;
-
-        output.copy_from_slice(&res);
-        Some(())
+        }?)
     }
 
     /// Scalar Multiplication
     fn pairing(fn_id: i32, input: &[u8]) -> Option<bool> {
-        let res = match fn_id {
+        Some(match fn_id {
             0x2a => {
                 <megaclite::curves::Bls12_377 as megaclite::CurveBasicOperations>::pairing(input)
                     .ok()
@@ -64,8 +58,6 @@ pub trait ZkSnarks {
                 <megaclite::curves::BW6_761 as megaclite::CurveBasicOperations>::pairing(input).ok()
             }
             _ => None,
-        }?;
-
-        Some(res)
+        }?)
     }
 }
