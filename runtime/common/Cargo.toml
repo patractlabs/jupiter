@@ -20,11 +20,14 @@ pallet-democracy = { version = "2.0.0", git = "https://github.com/paritytech/sub
 pallet-elections-phragmen = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-im-online = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-indices = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-multisig = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-proxy = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-scheduler = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-session = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-staking = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-timestamp = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-treasury = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-utility = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 
 jupiter-primitives = { path = "../../primitives", default-features = false }
 
@@ -44,11 +47,14 @@ std = [
     "pallet-elections-phragmen/std",
     "pallet-im-online/std",
     "pallet-indices/std",
+    "pallet-multisig/std",
+    "pallet-proxy/std",
     "pallet-scheduler/std",
     "pallet-session/std",
     "pallet-staking/std",
     "pallet-timestamp/std",
     "pallet-treasury/std",
+    "pallet-utility/std",
 
     "jupiter-primitives/std",
 ]
