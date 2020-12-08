@@ -2696,6 +2696,8 @@ name = "jupiter-io"
 version = "0.2.0"
 dependencies = [
  "megaclite",
+ "num-bigint 0.3.1",
+ "num-traits",
  "sp-runtime-interface",
 ]
 
@@ -3486,16 +3488,17 @@ checksum = "60302e4db3a61da70c0cb7991976248362f30319e88850c487b9b95bbf059e00"
 [[package]]
 name = "megaclite"
 version = "0.1.0"
-source = "git+https://github.com/patractlabs/megaclite.git#6551bca2acc80ba292905e2323cd8d221a459542"
+source = "git+https://github.com/patractlabs/megaclite.git?rev=cd0a365#cd0a365a9a65aa2bbee56752b63dbae03a7c7116"
 dependencies = [
  "megaclite-arkworks",
  "num-bigint 0.3.1",
+ "num-traits",
 ]
 
 [[package]]
 name = "megaclite-arkworks"
 version = "0.1.0"
-source = "git+https://github.com/patractlabs/megaclite.git#6551bca2acc80ba292905e2323cd8d221a459542"
+source = "git+https://github.com/patractlabs/megaclite.git?rev=cd0a365#cd0a365a9a65aa2bbee56752b63dbae03a7c7116"
 dependencies = [
  "ark-bls12-377",
  "ark-bls12-381",

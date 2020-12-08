@@ -9,7 +9,9 @@ targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
 sp-runtime-interface = { git = "https://github.com/paritytech/substrate.git", branch = "master", default-features = false }
-megaclite = { git = "https://github.com/patractlabs/megaclite.git", default-features = false, optional = true, features = ["arkworks"] }
+megaclite = { git = "https://github.com/patractlabs/megaclite.git", default-features = false, optional = true, features = ["arkworks"], rev = "cd0a365" }
+num-bigint = "0.3.1"
+num-traits = "0.2.14"
 
 [features]
 default = ["std"]
