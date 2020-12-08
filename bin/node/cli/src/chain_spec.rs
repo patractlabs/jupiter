@@ -8,13 +8,19 @@ use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_consensus_babe::AuthorityId as BabeId;
 use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public};
 use sp_finality_grandpa::AuthorityId as GrandpaId;
-use sp_runtime::traits::{IdentifyAccount, Verify};
+use sp_runtime::{
+    traits::{IdentifyAccount, Verify},
+    Perbill,
+};
 
 use jupiter_runtime::{AccountId, SessionKeys, Signature};
 use jupiter_runtime::{
-    AuthorityDiscoveryConfig, BabeConfig, BalancesConfig, ContractsConfig, GenesisConfig,
-    GrandpaConfig, IndicesConfig, SessionConfig, SudoConfig, SystemConfig, WASM_BINARY,
+    AuthorityDiscoveryConfig, BalancesConfig, ContractsConfig, CouncilConfig, GenesisConfig,
+    IndicesConfig, SessionConfig, StakingConfig, SudoConfig, SystemConfig,
+    TechnicalCommitteeConfig, WASM_BINARY,
 };
+use jupiter_runtime_common::constants::currency::DOTS;
+use pallet_staking::{Forcing, StakerStatus};
 
 // The URL for the telemetry server.
 // const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
@@ -286,6 +292,9 @@ fn testnet_genesis(
     endowed_accounts: Vec<AccountId>,
     enable_println: bool,
 ) -> GenesisConfig {
+    const ENDOWMENT: u128 = 1_000_000 * DOTS;
+    const STASH: u128 = 100 * DOTS;
+
     GenesisConfig {
         frame_system: Some(SystemConfig {
             // Add Wasm runtime to storage.
@@ -293,20 +302,15 @@ fn testnet_genesis(
             changes_trie_config: Default::default(),
         }),
         pallet_balances: Some(BalancesConfig {
-            // Configure endowed accounts with initial balance of 1 << 60.
             balances: endowed_accounts
                 .iter()
-                .cloned()
-                .map(|k| (k, 1 << 60))
+                .map(|k: &AccountId| (k.clone(), ENDOWMENT))
+                .chain(initial_authorities.iter().map(|x| (x.0.clone(), STASH)))
                 .collect(),
         }),
         pallet_indices: Some(IndicesConfig { indices: vec![] }),
-        pallet_babe: Some(BabeConfig {
-            authorities: vec![],
-        }),
-        pallet_grandpa: Some(GrandpaConfig {
-            authorities: vec![],
-        }),
+        pallet_babe: Some(Default::default()),
+        pallet_grandpa: Some(Default::default()),
         pallet_authority_discovery: Some(AuthorityDiscoveryConfig { keys: vec![] }),
         pallet_session: Some(SessionConfig {
             keys: initial_authorities
@@ -326,6 +330,29 @@ fn testnet_genesis(
                 ..Default::default()
             },
         }),
+        pallet_staking: Some(StakingConfig {
+            validator_count: 50,
+            minimum_validator_count: initial_authorities.len() as u32,
+            stakers: initial_authorities
+                .iter()
+                .map(|x| (x.0.clone(), x.1.clone(), STASH, StakerStatus::Validator))
+                .collect(),
+            invulnerables: initial_authorities.iter().map(|x| x.0.clone()).collect(),
+            force_era: Forcing::ForceNone,
+            slash_reward_fraction: Perbill::from_percent(10),
+            ..Default::default()
+        }),
+        pallet_elections_phragmen: Some(Default::default()),
+        pallet_democracy: Some(Default::default()),
+        pallet_collective_Instance1: Some(CouncilConfig {
+            members: vec![],
+            phantom: Default::default(),
+        }),
+        pallet_collective_Instance2: Some(TechnicalCommitteeConfig {
+            members: vec![],
+            phantom: Default::default(),
+        }),
+        pallet_membership_Instance1: Some(Default::default()),
         pallet_sudo: Some(SudoConfig {
             // Assign network admin rights.
             key: root_key,

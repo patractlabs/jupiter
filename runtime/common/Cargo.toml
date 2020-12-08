@@ -15,9 +15,16 @@ frame-system = { version = "2.0.0", git = "https://github.com/paritytech/substra
 pallet-balances = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-transaction-payment = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-authorship = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
-pallet-timestamp = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-collective = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-democracy = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-elections-phragmen = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-im-online = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-indices = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-scheduler = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-session = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-staking = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-timestamp = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-treasury = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 
 jupiter-primitives = { path = "../../primitives", default-features = false }
 
@@ -32,9 +39,16 @@ std = [
     "pallet-balances/std",
     "pallet-transaction-payment/std",
     "pallet-authorship/std",
-    "pallet-timestamp/std",
+    "pallet-collective/std",
+    "pallet-democracy/std",
+    "pallet-elections-phragmen/std",
+    "pallet-im-online/std",
     "pallet-indices/std",
+    "pallet-scheduler/std",
     "pallet-session/std",
+    "pallet-staking/std",
+    "pallet-timestamp/std",
+    "pallet-treasury/std",
 
     "jupiter-primitives/std",
 ]

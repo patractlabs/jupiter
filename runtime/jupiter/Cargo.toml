@@ -23,6 +23,7 @@ sp-io = { version = "2.0.0", git = "https://github.com/paritytech/substrate", br
 sp-offchain = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 sp-runtime = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 sp-session = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+sp-staking = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 sp-std = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 sp-transaction-pool = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 sp-version = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
@@ -35,12 +36,20 @@ frame-system-rpc-runtime-api = { version = "2.0.0", git = "https://github.com/pa
 pallet-babe = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-authorship = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-authority-discovery = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-collective = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-democracy = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-elections-phragmen = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-grandpa = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-membership = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-im-online = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-randomness-collective-flip = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-sudo = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-offences = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-scheduler = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-session = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false, features = ["historical"] }
+pallet-staking = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-staking-reward-curve = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-treasury = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-timestamp = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-indices = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-balances = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
@@ -77,6 +86,7 @@ std = [
     "sp-offchain/std",
     "sp-runtime/std",
     "sp-session/std",
+    "sp-staking/std",
     "sp-std/std",
     "sp-transaction-pool/std",
     "sp-version/std",
@@ -89,13 +99,20 @@ std = [
     "pallet-authority-discovery/std",
     "pallet-babe/std",
     "pallet-authorship/std",
+    "pallet-collective/std",
+    "pallet-democracy/std",
+    "pallet-elections-phragmen/std",
     "pallet-grandpa/std",
     "pallet-im-online/std",
+    "pallet-membership/std",
     "pallet-randomness-collective-flip/std",
     "pallet-sudo/std",
+    "pallet-scheduler/std",
     "pallet-session/std",
+    "pallet-staking/std",
     "pallet-offences/std",
     "pallet-timestamp/std",
+    "pallet-treasury/std",
     "pallet-indices/std",
     "pallet-balances/std",
     "pallet-transaction-payment/std",
