@@ -47,7 +47,9 @@ pub use sp_runtime::BuildStorage;
 
 pub use frame_support::{
     construct_runtime, debug, parameter_types,
-    traits::{Filter, InstanceFilter, KeyOwnerProofSystem, LockIdentifier, Randomness},
+    traits::{
+        Filter, InstanceFilter, KeyOwnerProofSystem, LockIdentifier, Randomness, U128CurrencyToVote,
+    },
     weights::{
         constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_PER_SECOND},
         IdentityFee, Weight,
@@ -65,7 +67,7 @@ pub use jupiter_primitives::{
 };
 use jupiter_runtime_common::{
     constants::{currency::*, fee::WeightToFee, time::*},
-    impls, weights, CurrencyToVote,
+    impls, weights,
 };
 use pallet_transaction_payment::CurrencyAdapter;
 
@@ -427,7 +429,7 @@ type SlashCancelOrigin = EnsureOneOf<
 impl pallet_staking::Config for Runtime {
     type Currency = Balances;
     type UnixTime = Timestamp;
-    type CurrencyToVote = CurrencyToVote;
+    type CurrencyToVote = U128CurrencyToVote;
     type RewardRemainder = Treasury;
     type Event = Event;
     type Slash = Treasury;
@@ -555,7 +557,7 @@ impl pallet_elections_phragmen::Config for Runtime {
     type Currency = Balances;
     type ChangeMembers = Council;
     type InitializeMembers = Council;
-    type CurrencyToVote = frame_support::traits::U128CurrencyToVote;
+    type CurrencyToVote = U128CurrencyToVote;
     type CandidacyBond = CandidacyBond;
     type VotingBond = VotingBond;
     type LoserCandidate = Treasury;
@@ -807,19 +809,7 @@ impl InstanceFilter<Call> for ProxyType {
 				Call::ElectionsPhragmen(..) |
 				Call::TechnicalMembership(..) |
 				Call::Treasury(..) |
-				// Call::Claims(..) |
 				Call::Utility(..) |
-				// Call::Identity(..) |
-				// Call::Society(..) |
-				// Call::Recovery(pallet_recovery::Call::as_recovered(..)) |
-				// Call::Recovery(pallet_recovery::Call::vouch_recovery(..)) |
-				// Call::Recovery(pallet_recovery::Call::claim_recovery(..)) |
-				// Call::Recovery(pallet_recovery::Call::close_recovery(..)) |
-				// Call::Recovery(pallet_recovery::Call::remove_recovery(..)) |
-				// Call::Recovery(pallet_recovery::Call::cancel_recovered(..)) |
-				// Specifically omitting Recovery `create_recovery`, `initiate_recovery`
-				// Call::Vesting(pallet_vesting::Call::vest(..)) |
-				// Call::Vesting(pallet_vesting::Call::vest_other(..)) |
 				// Specifically omitting Vesting `vested_transfer`, and `force_vested_transfer`
 				Call::Scheduler(..) |
 				Call::Proxy(..) |
@@ -837,11 +827,7 @@ impl InstanceFilter<Call> for ProxyType {
             ProxyType::Staking => {
                 matches!(c, Call::Staking(..) | Call::Session(..) | Call::Utility(..))
             }
-            ProxyType::IdentityJudgement => matches!(
-                c,
-                // Call::Identity(pallet_identity::Call::provide_judgement(..)) |
-                Call::Utility(..)
-            ),
+            ProxyType::IdentityJudgement => matches!(c, Call::Utility(..)),
         }
     }
     fn is_superset(&self, o: &Self) -> bool {
