@@ -717,7 +717,7 @@ parameter_types! {
 
 impl pallet_contracts::Config for Runtime {
     type Time = Timestamp;
-    type Randomness = RandomnessCollectiveFlip;
+    type Randomness = Babe;
     type Currency = Balances;
     type Event = Event;
     type RentPayment = ();
@@ -870,7 +870,6 @@ construct_runtime!(
     {
         // Basic stuff; balances is uncallable initially.
         System: frame_system::{Module, Call, Config, Storage, Event<T>} = 0,
-        RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Module, Storage} = 32,
 
         // Must be before session.
         Babe: pallet_babe::{Module, Call, Storage, Config, Inherent, ValidateUnsigned} = 1,
@@ -994,7 +993,7 @@ impl_runtime_apis! {
         }
 
         fn random_seed() -> <Block as BlockT>::Hash {
-            RandomnessCollectiveFlip::random_seed()
+            Babe::randomness().into()
         }
     }
 
