@@ -3962,6 +3962,7 @@ name = "pallet-collective"
 version = "2.0.0"
 source = "git+https://github.com/paritytech/substrate?branch=master#ec55d650fea0b244e5481efd11b5ea2462766196"
 dependencies = [
+ "frame-benchmarking",
  "frame-support",
  "frame-system",
  "parity-scale-codec",
@@ -4089,6 +4090,7 @@ name = "pallet-elections-phragmen"
 version = "2.0.0"
 source = "git+https://github.com/paritytech/substrate?branch=master#ec55d650fea0b244e5481efd11b5ea2462766196"
 dependencies = [
+ "frame-benchmarking",
  "frame-support",
  "frame-system",
  "parity-scale-codec",
@@ -4124,6 +4126,7 @@ name = "pallet-im-online"
 version = "2.0.0"
 source = "git+https://github.com/paritytech/substrate?branch=master#ec55d650fea0b244e5481efd11b5ea2462766196"
 dependencies = [
+ "frame-benchmarking",
  "frame-support",
  "frame-system",
  "pallet-authorship",
@@ -4174,6 +4177,7 @@ name = "pallet-multisig"
 version = "2.0.0"
 source = "git+https://github.com/paritytech/substrate?branch=master#ec55d650fea0b244e5481efd11b5ea2462766196"
 dependencies = [
+ "frame-benchmarking",
  "frame-support",
  "frame-system",
  "parity-scale-codec",
@@ -4204,6 +4208,7 @@ name = "pallet-proxy"
 version = "2.0.1"
 source = "git+https://github.com/paritytech/substrate?branch=master#ec55d650fea0b244e5481efd11b5ea2462766196"
 dependencies = [
+ "frame-benchmarking",
  "frame-support",
  "frame-system",
  "parity-scale-codec",
@@ -4267,11 +4272,13 @@ name = "pallet-staking"
 version = "2.0.0"
 source = "git+https://github.com/paritytech/substrate?branch=master#ec55d650fea0b244e5481efd11b5ea2462766196"
 dependencies = [
+ "frame-benchmarking",
  "frame-support",
  "frame-system",
  "pallet-authorship",
  "pallet-session",
  "parity-scale-codec",
+ "rand_chacha",
  "serde",
  "sp-application-crypto",
  "sp-io",
@@ -4378,6 +4385,7 @@ name = "pallet-treasury"
 version = "2.0.0"
 source = "git+https://github.com/paritytech/substrate?branch=master#ec55d650fea0b244e5481efd11b5ea2462766196"
 dependencies = [
+ "frame-benchmarking",
  "frame-support",
  "frame-system",
  "pallet-balances",
@@ -4392,6 +4400,7 @@ name = "pallet-utility"
 version = "2.0.0"
 source = "git+https://github.com/paritytech/substrate?branch=master#ec55d650fea0b244e5481efd11b5ea2462766196"
 dependencies = [
+ "frame-benchmarking",
  "frame-support",
  "frame-system",
  "parity-scale-codec",
