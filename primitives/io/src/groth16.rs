@@ -1,5 +1,5 @@
 //! Groth16
-use megaclite::{CurveBasicOperations, Error, ErrorKind, SerializationError};
+use curve::{CurveBasicOperations, Error, ErrorKind, SerializationError};
 use num_bigint::BigUint;
 use num_traits::Num;
 
@@ -12,34 +12,26 @@ pub fn verify(
     public_inputs: &[&[u8]],
 ) -> Result<bool, SerializationError> {
     match curve_id {
-        0x2a => inner_verify::<megaclite::curves::Bls12_377>(
+        0x2a => inner_verify::<curve::curve::Bls12_377>(
             curve_id,
             vk_gamma_abc,
             vk,
             proof,
             public_inputs,
         ),
-        0x2b => inner_verify::<megaclite::curves::Bls12_381>(
+        0x2b => inner_verify::<curve::curve::Bls12_381>(
             curve_id,
             vk_gamma_abc,
             vk,
             proof,
             public_inputs,
         ),
-        0x2c => inner_verify::<megaclite::curves::Bn254>(
-            curve_id,
-            vk_gamma_abc,
-            vk,
-            proof,
-            public_inputs,
-        ),
-        0x2d => inner_verify::<megaclite::curves::BW6_761>(
-            curve_id,
-            vk_gamma_abc,
-            vk,
-            proof,
-            public_inputs,
-        ),
+        0x2c => {
+            inner_verify::<curve::curve::Bn254>(curve_id, vk_gamma_abc, vk, proof, public_inputs)
+        }
+        0x2d => {
+            inner_verify::<curve::curve::BW6_761>(curve_id, vk_gamma_abc, vk, proof, public_inputs)
+        }
         _ => Err(SerializationError::IoError(Error::new(
             ErrorKind::Other,
             "Unsupported curve",
