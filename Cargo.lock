@@ -755,16 +755,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "chain_extension"
-version = "0.1.0"
-dependencies = [
- "jupiter-io",
- "megaclite-arkworks",
- "pallet-contracts 2.0.0",
- "sp-runtime",
-]
-
-[[package]]
 name = "chrono"
 version = "0.4.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2565,6 +2555,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "jupiter-chain-extension"
+version = "0.1.0"
+dependencies = [
+ "jupiter-io",
+ "megaclite-arkworks",
+ "pallet-contracts 2.0.0",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
 name = "jupiter-cli"
 version = "0.1.0"
 dependencies = [
@@ -2663,6 +2664,7 @@ dependencies = [
  "frame-system-benchmarking",
  "frame-system-rpc-runtime-api",
  "hex-literal 0.3.1",
+ "jupiter-chain-extension",
  "jupiter-primitives",
  "jupiter-runtime-common",
  "pallet-authorship",

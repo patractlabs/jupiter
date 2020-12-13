@@ -1,4 +1,5 @@
 //! Jupiter Chain Extension
+#![cfg_attr(not(feature = "std"), no_std)]
 use pallet_contracts::{
     chain_extension::{
         ChainExtension, Environment, Ext, InitState, RetVal, SysConfig, UncheckedFrom,
@@ -6,6 +7,7 @@ use pallet_contracts::{
     Error,
 };
 use sp_runtime::DispatchError;
+use sp_std::vec::Vec;
 
 /// Convert bool to bytes, 0 for true, 1 for false
 fn b2b(b: bool) -> Vec<u8> {

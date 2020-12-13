@@ -21,7 +21,7 @@ native_executor_instance!(
     pub Executor,
     jupiter_dev_runtime::api::dispatch,
     jupiter_dev_runtime::native_version,
-    (frame_benchmarking::benchmarking::HostFunctions, jupiter_io::zk_snarks::HostFunctions),
+    (frame_benchmarking::benchmarking::HostFunctions, jupiter_io::pairing::HostFunctions),
 );
 
 /// Returns most parts of a service. Not enough to run a full chain,
