@@ -26,4 +26,6 @@ default-features = false
 
 [features]
 default = ["std"]
-std = [ "sp-runtime-interface/std" ]
+std = [
+  "sp-runtime-interface/std"
+]

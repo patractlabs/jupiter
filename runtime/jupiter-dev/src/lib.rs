@@ -37,6 +37,7 @@ pub use frame_support::{
     StorageValue,
 };
 pub use pallet_balances::Call as BalancesCall;
+pub use pallet_template::Call as TemplateCall;
 pub use pallet_timestamp::Call as TimestampCall;
 
 pub use jupiter_primitives::{
@@ -253,6 +254,10 @@ impl pallet_sudo::Config for Runtime {
     type Call = Call;
 }
 
+impl pallet_template::Config for Runtime {
+    type Event = Event;
+}
+
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
     pub enum Runtime where
@@ -275,6 +280,9 @@ construct_runtime!(
         Contracts: pallet_contracts::{Module, Call, Config<T>, Storage, Event<T>},
 
         Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>},
+
+        // Test
+        Template: pallet_template::{Module, Call, Storage, Event<T>},
     }
 );
 
@@ -468,6 +476,7 @@ impl_runtime_apis! {
             add_benchmark!(params, batches, pallet_contracts, Contracts);
             add_benchmark!(params, batches, pallet_indices, Indices);
             add_benchmark!(params, batches, pallet_timestamp, Timestamp);
+            add_benchmark!(params, batches, pallet_template, Template);
 
             if batches.is_empty() { return Err("Benchmark not found for this pallet.".into()) }
             Ok(batches)

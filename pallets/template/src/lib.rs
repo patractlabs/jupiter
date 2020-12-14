@@ -9,11 +9,11 @@ use frame_system::ensure_signed;
 #[cfg(feature = "runtime-benchmarks")]
 mod benchmarking;
 
-#[cfg(test)]
-mod mock;
-
-#[cfg(test)]
-mod tests;
+// #[cfg(test)]
+// mod mock;
+//
+// #[cfg(test)]
+// mod tests;
 
 /// Configure the pallet by specifying the parameters and types on which it depends.
 pub trait Config: frame_system::Config {
@@ -148,7 +148,6 @@ decl_module! {
         pub fn wasm_bls12_381_verify(origin) {
             curve::tests::verify(0x2b);
         }
-
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn native_bls12_381_add(origin) {
