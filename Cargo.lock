@@ -2711,7 +2711,6 @@ dependencies = [
  "frame-benchmarking",
  "frame-benchmarking-cli",
  "futures 0.3.8",
- "jupiter-dev-executor",
  "jupiter-dev-runtime",
  "jupiter-io",
  "jupiter-primitives",
@@ -2736,15 +2735,6 @@ dependencies = [
  "sp-timestamp",
  "structopt",
  "substrate-build-script-utils",
-]
-
-[[package]]
-name = "jupiter-dev-executor"
-version = "0.1.0"
-dependencies = [
- "frame-benchmarking",
- "jupiter-dev-runtime",
- "sc-executor",
 ]
 
 [[package]]

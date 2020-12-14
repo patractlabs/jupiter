@@ -21,31 +21,31 @@
 
 use super::*;
 
-use sp_std::prelude::*;
-use frame_system::RawOrigin;
 use frame_benchmarking::{benchmarks, whitelisted_caller};
+use frame_system::RawOrigin;
+use sp_std::prelude::*;
 
 benchmarks! {
-	_ { }
+    _ { }
     wasm_bls12_377_add {
         let caller: T::AccountId = whitelisted_caller();
-	}: wasm_bls12_377_add(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: wasm_bls12_377_add(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     wasm_bls12_377_mul {
         let caller: T::AccountId = whitelisted_caller();
-	}: wasm_bls12_377_mul(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: wasm_bls12_377_mul(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     wasm_bls12_377_pairing_two {
         let caller: T::AccountId = whitelisted_caller();
-	}: wasm_bls12_377_pairing_two(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: wasm_bls12_377_pairing_two(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     wasm_bls12_377_pairing_six {
         let caller: T::AccountId = whitelisted_caller();
-	}: wasm_bls12_377_pairing_six(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: wasm_bls12_377_pairing_six(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     wasm_bls12_377_verify {
         let caller: T::AccountId = whitelisted_caller();
@@ -54,23 +54,23 @@ benchmarks! {
 
     native_bls12_377_add {
         let caller: T::AccountId = whitelisted_caller();
-	}: native_bls12_377_add(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: native_bls12_377_add(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     native_bls12_377_mul {
         let caller: T::AccountId = whitelisted_caller();
-	}: native_bls12_377_mul(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: native_bls12_377_mul(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     native_bls12_377_pairing_two {
         let caller: T::AccountId = whitelisted_caller();
-	}: native_bls12_377_pairing_two(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: native_bls12_377_pairing_two(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     native_bls12_377_pairing_six {
         let caller: T::AccountId = whitelisted_caller();
-	}: native_bls12_377_pairing_six(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: native_bls12_377_pairing_six(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     native_bls12_377_verify {
         let caller: T::AccountId = whitelisted_caller();
@@ -81,155 +81,155 @@ benchmarks! {
 
     wasm_bls12_381_add {
         let caller: T::AccountId = whitelisted_caller();
-	}: wasm_bls12_381_add(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: wasm_bls12_381_add(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     wasm_bls12_381_mul {
         let caller: T::AccountId = whitelisted_caller();
-	}: wasm_bls12_381_mul(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: wasm_bls12_381_mul(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     wasm_bls12_381_pairing_two {
         let caller: T::AccountId = whitelisted_caller();
-	}: wasm_bls12_381_pairing_two(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: wasm_bls12_381_pairing_two(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     wasm_bls12_381_pairing_six {
         let caller: T::AccountId = whitelisted_caller();
-	}: wasm_bls12_381_pairing_six(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: wasm_bls12_381_pairing_six(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     wasm_bls12_381_verify {
         let caller: T::AccountId = whitelisted_caller();
-	}: wasm_bls12_381_verify(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: wasm_bls12_381_verify(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     native_bls12_381_add {
         let caller: T::AccountId = whitelisted_caller();
-	}: native_bls12_381_add(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: native_bls12_381_add(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     native_bls12_381_mul {
         let caller: T::AccountId = whitelisted_caller();
-	}: native_bls12_381_mul(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: native_bls12_381_mul(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     native_bls12_381_pairing_two {
         let caller: T::AccountId = whitelisted_caller();
-	}: native_bls12_381_pairing_two(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: native_bls12_381_pairing_two(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     native_bls12_381_pairing_six {
         let caller: T::AccountId = whitelisted_caller();
-	}: native_bls12_381_pairing_six(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: native_bls12_381_pairing_six(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     native_bls12_381_verify {
         let caller: T::AccountId = whitelisted_caller();
-	}: native_bls12_381_verify(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: native_bls12_381_verify(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     // bn254
 
     wasm_bn254_add {
         let caller: T::AccountId = whitelisted_caller();
-	}: wasm_bn254_add(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: wasm_bn254_add(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     wasm_bn254_mul {
         let caller: T::AccountId = whitelisted_caller();
-	}: wasm_bn254_mul(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: wasm_bn254_mul(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     wasm_bn254_pairing_two {
         let caller: T::AccountId = whitelisted_caller();
-	}: wasm_bn254_pairing_two(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: wasm_bn254_pairing_two(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     wasm_bn254_pairing_six {
         let caller: T::AccountId = whitelisted_caller();
-	}: wasm_bn254_pairing_six(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: wasm_bn254_pairing_six(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     wasm_bn254_verify {
         let caller: T::AccountId = whitelisted_caller();
-	}: wasm_bn254_verify(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: wasm_bn254_verify(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     native_bn254_add {
         let caller: T::AccountId = whitelisted_caller();
-	}: native_bn254_add(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: native_bn254_add(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     native_bn254_mul {
         let caller: T::AccountId = whitelisted_caller();
-	}: native_bn254_mul(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: native_bn254_mul(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     native_bn254_pairing_two {
         let caller: T::AccountId = whitelisted_caller();
-	}: native_bn254_pairing_two(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: native_bn254_pairing_two(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     native_bn254_pairing_six {
         let caller: T::AccountId = whitelisted_caller();
-	}: native_bn254_pairing_six(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: native_bn254_pairing_six(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     native_bn254_verify {
         let caller: T::AccountId = whitelisted_caller();
-	}: native_bn254_verify(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: native_bn254_verify(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     // bw6_761
 
     wasm_bw6_761_add {
         let caller: T::AccountId = whitelisted_caller();
-	}: wasm_bw6_761_add(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: wasm_bw6_761_add(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     wasm_bw6_761_mul {
         let caller: T::AccountId = whitelisted_caller();
-	}: wasm_bw6_761_mul(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: wasm_bw6_761_mul(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     wasm_bw6_761_pairing_two {
         let caller: T::AccountId = whitelisted_caller();
-	}: wasm_bw6_761_pairing_two(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: wasm_bw6_761_pairing_two(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     wasm_bw6_761_pairing_six {
         let caller: T::AccountId = whitelisted_caller();
-	}: wasm_bw6_761_pairing_six(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: wasm_bw6_761_pairing_six(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     wasm_bw6_761_verify {
         let caller: T::AccountId = whitelisted_caller();
-	}: wasm_bw6_761_verify(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: wasm_bw6_761_verify(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     native_bw6_761_add {
         let caller: T::AccountId = whitelisted_caller();
-	}: native_bw6_761_add(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: native_bw6_761_add(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     native_bw6_761_mul {
         let caller: T::AccountId = whitelisted_caller();
-	}: native_bw6_761_mul(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: native_bw6_761_mul(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     native_bw6_761_pairing_two {
         let caller: T::AccountId = whitelisted_caller();
-	}: native_bw6_761_pairing_two(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: native_bw6_761_pairing_two(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     native_bw6_761_pairing_six {
         let caller: T::AccountId = whitelisted_caller();
-	}: native_bw6_761_pairing_six(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: native_bw6_761_pairing_six(RawOrigin::Signed(caller.clone()))
+        verify {}
 
     native_bw6_761_verify {
         let caller: T::AccountId = whitelisted_caller();
-	}: native_bw6_761_verify(RawOrigin::Signed(caller.clone()))
-	    verify {}
+    }: native_bw6_761_verify(RawOrigin::Signed(caller.clone()))
+        verify {}
 }

@@ -1,4 +1,3 @@
-use jupiter_dev_executor::Executor;
 use jupiter_dev_runtime::Block;
 use sc_cli::{ChainSpec, Role, RuntimeVersion, SubstrateCli};
 use sc_service::PartialComponents;
@@ -6,7 +5,7 @@ use sc_service::PartialComponents;
 use crate::chain_spec;
 use crate::cli::{Cli, Subcommand};
 use crate::service;
-use crate::service::new_partial;
+use crate::service::{new_partial, Executor};
 
 impl SubstrateCli for Cli {
     fn impl_name() -> String {
