@@ -69,7 +69,7 @@ pub fn development_config() -> Result<ChainSpec, String> {
             json!({
                 "ss58Format": 42,
                 "tokenDecimals": 10,
-                "tokenSymbol": "DOT (new)"
+                "tokenSymbol": "JPT"
             })
             .as_object()
             .expect("network properties generation can not fail; qed")

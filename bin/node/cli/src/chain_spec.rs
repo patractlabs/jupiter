@@ -8,13 +8,20 @@ use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_consensus_babe::AuthorityId as BabeId;
 use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public};
 use sp_finality_grandpa::AuthorityId as GrandpaId;
-use sp_runtime::traits::{IdentifyAccount, Verify};
+use sp_runtime::{
+    traits::{IdentifyAccount, Verify},
+    Perbill,
+};
 
 use jupiter_runtime::{AccountId, SessionKeys, Signature};
 use jupiter_runtime::{
-    AuthorityDiscoveryConfig, BabeConfig, BalancesConfig, ContractsConfig, GenesisConfig,
-    GrandpaConfig, IndicesConfig, SessionConfig, SudoConfig, SystemConfig, WASM_BINARY,
+    AuthorityDiscoveryConfig, BalancesConfig, ContractsConfig, CouncilConfig, GenesisConfig,
+    IndicesConfig, SessionConfig, StakingConfig, SudoConfig, SystemConfig,
+    TechnicalCommitteeConfig, WASM_BINARY,
 };
+use jupiter_runtime_common::constants::currency::DOTS;
+use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
+use pallet_staking::{Forcing, StakerStatus};
 
 // The URL for the telemetry server.
 // const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
@@ -45,6 +52,7 @@ type AuthorityKeysTuple = (
     AccountId, // (SessionKey)
     BabeId,
     GrandpaId,
+    ImOnlineId,
     AuthorityDiscoveryId,
 );
 /// Helper function to generate stash, controller and session key from seed
@@ -54,6 +62,7 @@ pub fn authority_keys_from_seed(seed: &str) -> AuthorityKeysTuple {
         get_account_id_from_seed::<sr25519::Public>(&format!("{}//stash", seed)),
         get_from_seed::<BabeId>(seed),
         get_from_seed::<GrandpaId>(seed),
+        get_from_seed::<ImOnlineId>(seed),
         get_from_seed::<AuthorityDiscoveryId>(seed),
     )
 }
@@ -61,11 +70,13 @@ pub fn authority_keys_from_seed(seed: &str) -> AuthorityKeysTuple {
 fn session_keys(
     babe: BabeId,
     grandpa: GrandpaId,
+    im_online: ImOnlineId,
     authority_discovery: AuthorityDiscoveryId,
 ) -> SessionKeys {
     SessionKeys {
         babe,
         grandpa,
+        im_online,
         authority_discovery,
     }
 }
@@ -107,7 +118,7 @@ pub fn development_config() -> Result<ChainSpec, String> {
             json!({
                 "ss58Format": 42,
                 "tokenDecimals": 10,
-                "tokenSymbol": "DOT (new)"
+                "tokenSymbol": "JPT"
             })
             .as_object()
             .expect("network properties generation can not fail; qed")
@@ -166,7 +177,7 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
             json!({
                 "ss58Format": 42,
                 "tokenDecimals": 10,
-                "tokenSymbol": "DOT (new)"
+                "tokenSymbol": "JPT"
             })
             .as_object()
             .expect("network properties generation can not fail; qed")
@@ -188,6 +199,7 @@ pub fn staging_testnet_config() -> Result<ChainSpec, String> {
     // for i in 1 2; do for j in stash controller; do subkey inspect "$SECRET//$i//$j"; done; done
     // for i in 1 2; do for j in babe; do subkey inspect --scheme Sr25519 "$SECRET//$i//$j"; done; done
     // for i in 1 2; do for j in grandpa; do subkey inspect --scheme Ed25519 "$SECRET//$i//$j"; done; done
+    // for i in 1 2; do for j in im_online; do subkey inspect --scheme Sr25519 "$SECRET//$i//$j"; done; done
 
     // stash & controller
     let (stash1, controller1): (AccountId, AccountId) = (
@@ -216,7 +228,14 @@ pub fn staging_testnet_config() -> Result<ChainSpec, String> {
     // 5G6VvSAqrqNLoqoRM4GUxrKQkfHuZ3ggnW8bbsQZbi187kfu
     let grandpa2: GrandpaId =
         hex!["b24f3f629e5cc692b50f08b9714c67be656b057293bb077beb44781a9a0e2992"].unchecked_into();
-    // authority_discovery same with babe
+    // im_online
+    // 5EtZp8WCs4yRDvfLapwU8GrSoS9e7qpXVtYZVCNDFBXuVsiW
+    let imonline1: ImOnlineId =
+        hex!["7cf92b27e280cef89900a7d351e37cdc6a578104a71f918165f52fee77aef647"].unchecked_into();
+    // 5GRaVtCnSKjeXXXu6S5cVEcqn5yGbnCTGYYeKodxiRbnnZBd
+    let imonline2: ImOnlineId =
+        hex!["c0dc511c88d7ef3bc5b465de48aac4efc643283f179b93d413f97e4a7aac714b"].unchecked_into();
+    // authority_discovery
     // 5EtZp8WCs4yRDvfLapwU8GrSoS9e7qpXVtYZVCNDFBXuVsiW
     let audi1: AuthorityDiscoveryId =
         hex!["7cf92b27e280cef89900a7d351e37cdc6a578104a71f918165f52fee77aef647"].unchecked_into();
@@ -225,8 +244,22 @@ pub fn staging_testnet_config() -> Result<ChainSpec, String> {
         hex!["c0dc511c88d7ef3bc5b465de48aac4efc643283f179b93d413f97e4a7aac714b"].unchecked_into();
 
     let initial_authorities: Vec<AuthorityKeysTuple> = vec![
-        (controller1.clone(), stash1.clone(), babe1, grandpa1, audi1),
-        (controller2.clone(), stash2.clone(), babe2, grandpa2, audi2),
+        (
+            controller1.clone(),
+            stash1.clone(),
+            babe1,
+            grandpa1,
+            imonline1,
+            audi1,
+        ),
+        (
+            controller2.clone(),
+            stash2.clone(),
+            babe2,
+            grandpa2,
+            imonline2,
+            audi2,
+        ),
     ];
 
     Ok(ChainSpec::from_genesis(
@@ -267,7 +300,7 @@ pub fn staging_testnet_config() -> Result<ChainSpec, String> {
             json!({
                 "ss58Format": 42,
                 "tokenDecimals": 10,
-                "tokenSymbol": "DOT (new)"
+                "tokenSymbol": "JPT"
             })
             .as_object()
             .expect("network properties generation can not fail; qed")
@@ -286,6 +319,9 @@ fn testnet_genesis(
     endowed_accounts: Vec<AccountId>,
     enable_println: bool,
 ) -> GenesisConfig {
+    const ENDOWMENT: u128 = 1_000_000 * DOTS;
+    const STASH: u128 = 100 * DOTS;
+
     GenesisConfig {
         frame_system: Some(SystemConfig {
             // Add Wasm runtime to storage.
@@ -293,20 +329,16 @@ fn testnet_genesis(
             changes_trie_config: Default::default(),
         }),
         pallet_balances: Some(BalancesConfig {
-            // Configure endowed accounts with initial balance of 1 << 60.
             balances: endowed_accounts
                 .iter()
-                .cloned()
-                .map(|k| (k, 1 << 60))
+                .map(|k: &AccountId| (k.clone(), ENDOWMENT))
+                .chain(initial_authorities.iter().map(|x| (x.0.clone(), STASH)))
                 .collect(),
         }),
         pallet_indices: Some(IndicesConfig { indices: vec![] }),
-        pallet_babe: Some(BabeConfig {
-            authorities: vec![],
-        }),
-        pallet_grandpa: Some(GrandpaConfig {
-            authorities: vec![],
-        }),
+        pallet_babe: Some(Default::default()),
+        pallet_grandpa: Some(Default::default()),
+        pallet_im_online: Some(Default::default()),
         pallet_authority_discovery: Some(AuthorityDiscoveryConfig { keys: vec![] }),
         pallet_session: Some(SessionConfig {
             keys: initial_authorities
@@ -315,7 +347,7 @@ fn testnet_genesis(
                     (
                         x.0.clone(),
                         x.0.clone(),
-                        session_keys(x.2.clone(), x.3.clone(), x.4.clone()),
+                        session_keys(x.2.clone(), x.3.clone(), x.4.clone(), x.5.clone()),
                     )
                 })
                 .collect::<Vec<_>>(),
@@ -326,6 +358,29 @@ fn testnet_genesis(
                 ..Default::default()
             },
         }),
+        pallet_staking: Some(StakingConfig {
+            validator_count: initial_authorities.len() as u32 * 2,
+            minimum_validator_count: initial_authorities.len() as u32,
+            stakers: initial_authorities
+                .iter()
+                .map(|x| (x.0.clone(), x.1.clone(), STASH, StakerStatus::Validator))
+                .collect(),
+            invulnerables: initial_authorities.iter().map(|x| x.0.clone()).collect(),
+            force_era: Forcing::ForceNone,
+            slash_reward_fraction: Perbill::from_percent(10),
+            ..Default::default()
+        }),
+        pallet_elections_phragmen: Some(Default::default()),
+        pallet_democracy: Some(Default::default()),
+        pallet_collective_Instance1: Some(CouncilConfig {
+            members: vec![],
+            phantom: Default::default(),
+        }),
+        pallet_collective_Instance2: Some(TechnicalCommitteeConfig {
+            members: vec![],
+            phantom: Default::default(),
+        }),
+        pallet_membership_Instance1: Some(Default::default()),
         pallet_sudo: Some(SudoConfig {
             // Assign network admin rights.
             key: root_key,
