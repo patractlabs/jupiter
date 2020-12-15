@@ -358,7 +358,7 @@ impl pallet_session::Config for Runtime {
     type SessionHandler = <SessionKeys as OpaqueKeys>::KeyTypeIdProviders;
     type Keys = SessionKeys;
     type DisabledValidatorsThreshold = DisabledValidatorsThreshold;
-    type WeightInfo = weights::pallet_session::WeightInfo;
+    type WeightInfo = weights::pallet_session::WeightInfo<Runtime>;
 }
 
 impl pallet_session::historical::Config for Runtime {
@@ -682,6 +682,31 @@ impl pallet_transaction_payment::Config for Runtime {
 }
 
 parameter_types! {
+    // Minimum 100 bytes/KSM deposited (1 CENT/byte)
+    pub const BasicDeposit: Balance = 10 * DOLLARS;       // 258 bytes on-chain
+    pub const FieldDeposit: Balance = 250 * CENTS;        // 66 bytes on-chain
+    pub const SubAccountDeposit: Balance = 2 * DOLLARS;   // 53 bytes on-chain
+    pub const MaxSubAccounts: u32 = 100;
+    pub const MaxAdditionalFields: u32 = 100;
+    pub const MaxRegistrars: u32 = 20;
+}
+
+impl pallet_identity::Config for Runtime {
+    type Event = Event;
+    type Currency = Balances;
+    type Slashed = Treasury;
+    type BasicDeposit = BasicDeposit;
+    type FieldDeposit = FieldDeposit;
+    type SubAccountDeposit = SubAccountDeposit;
+    type MaxSubAccounts = MaxSubAccounts;
+    type MaxAdditionalFields = MaxAdditionalFields;
+    type MaxRegistrars = MaxRegistrars;
+    type RegistrarOrigin = MoreThanHalfCouncil;
+    type ForceOrigin = MoreThanHalfCouncil;
+    type WeightInfo = weights::pallet_identity::WeightInfo<Runtime>;
+}
+
+parameter_types! {
     pub const TombstoneDeposit: Balance = 16 * MILLICENTS;
     pub const RentByteFee: Balance = 4 * MILLICENTS;
     pub const RentDepositOffset: Balance = 1000 * MILLICENTS;
@@ -880,6 +905,9 @@ construct_runtime!(
         // Utility module.
         Utility: pallet_utility::{Module, Call, Event} = 24,
 
+        // Less simple identity module.
+        Identity: pallet_identity::{Module, Call, Storage, Event<T>} = 25,
+
         // System scheduler.
         Scheduler: pallet_scheduler::{Module, Call, Storage, Event<T>} = 29,
 
@@ -889,7 +917,7 @@ construct_runtime!(
         // Multisig module. Late addition.
         Multisig: pallet_multisig::{Module, Call, Storage, Event<T>} = 31,
 
-        Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>} = 35,
+        Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>} = 19, // replace claims in ksm
     }
 );
 
