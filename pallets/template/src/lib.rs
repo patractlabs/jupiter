@@ -1,11 +1,12 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use contract::Module as Contracts;
+use contract::{CodeHash, Module as Contracts};
 /// Edit this file to define custom logic or remove it if it is not needed.
 /// Learn more about FRAME and the core library of Substrate FRAME pallets:
 /// https://substrate.dev/docs/en/knowledgebase/runtime/frame
 use frame_support::{decl_error, decl_event, decl_module, decl_storage, dispatch, traits::Get};
 use sp_core::crypto::UncheckedFrom;
+use sp_runtime::traits::StaticLookup;
 use sp_std::vec::Vec;
 
 #[cfg(feature = "runtime-benchmarks")]
@@ -29,9 +30,8 @@ decl_storage! {
         T::AccountId: AsRef<[u8]>,
         T::AccountId: UncheckedFrom<T::Hash>,
     {
-        // Learn more about declaring storage items:
-        // https://substrate.dev/docs/en/knowledgebase/runtime/storage#declaring-storage-items
-        Something get(fn something): Option<u32>;
+        // The Contract
+        pub Contract: CodeHash<T>;
     }
 }
 
@@ -57,8 +57,10 @@ decl_error! {
     {
         /// Error names should be descriptive.
         NoneValue,
-        /// Errors should have helpful documentation associated with them.
-        StorageOverflow,
+        /// The contract we just put disappeared
+        ContractDisappeared,
+        /// Failed
+        InstantiateContractFailed
     }
 }
 
@@ -78,9 +80,53 @@ decl_module! {
         // Events must be initialized if they are used by the pallet.
         fn deposit_event() = default;
 
+        /// Put and instantiate code
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
-        pub fn put_code(origin, code: Vec<u8>) -> dispatch::DispatchResult {
-            <Contracts<T>>::put_code(origin, code)
+        pub fn put_code(origin, code: Vec<u8>) -> Result<(), dispatch::DispatchError> {
+            <Contracts<T>>::put_code(origin.clone(), code)?;
+            if let Some((code_hash, _)) = <contract::PristineCode<T>>::iter().last() {
+                <Contract<T>>::set(code_hash.clone());
+                Ok(())
+            } else {
+                Err(<Error<T>>::ContractDisappeared.into())
+            }
+        }
+
+        /// Instantiate the code
+        #[weight = 10_000 + T::DbWeight::get().writes(1)]
+        pub fn instantiate(origin) -> Result<(), dispatch::DispatchError> {
+            if <Contracts<T>>::instantiate(
+                origin,
+                0.into(),
+                0,
+                <Contract<T>>::get(),
+                b"".to_vec(),
+                b"".to_vec(),
+            ).is_err() {
+                Err(<Error<T>>::InstantiateContractFailed.into())
+            } else {
+                Ok(())
+            }
+        }
+
+        /// Call the contract
+        #[weight = 10_000 + T::DbWeight::get().writes(1)]
+        pub fn call(
+            origin,
+            caller: T::AccountId,
+            data: Vec<u8>,
+        ) -> dispatch::DispatchResultWithPostInfo {
+            <Contracts<T>>::call(
+                origin,
+                T::Lookup::unlookup(<Contracts<T>>::contract_address(
+                    &caller,
+                    &<Contract<T>>::get(),
+                    &b"".to_vec(),
+                )),
+                0.into(),
+                0,
+                data
+            )
         }
 
         // bls12_377

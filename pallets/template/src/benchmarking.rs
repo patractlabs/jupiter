@@ -21,9 +21,9 @@
 
 use super::*;
 
+// use contract::{Module as Contracts, *};
 use frame_benchmarking::{benchmarks, whitelisted_caller};
 use frame_system::RawOrigin;
-use pallet_contracts::{Module as Contracts, *};
 use sp_std::prelude::*;
 
 benchmarks! {
