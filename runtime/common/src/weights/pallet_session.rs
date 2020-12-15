@@ -20,18 +20,20 @@
 #![allow(unused_parens)]
 #![allow(unused_imports)]
 
-use frame_support::weights::{constants::RocksDbWeight as DbWeight, Weight};
+use frame_support::{traits::Get, weights::Weight};
+use sp_std::marker::PhantomData;
 
-pub struct WeightInfo;
-impl pallet_session::WeightInfo for WeightInfo {
+/// Weight functions for pallet_session.
+pub struct WeightInfo<T>(PhantomData<T>);
+impl<T: frame_system::Config> pallet_session::WeightInfo for WeightInfo<T> {
     fn set_keys() -> Weight {
-        (88_411_000 as Weight)
-            .saturating_add(DbWeight::get().reads(6 as Weight))
-            .saturating_add(DbWeight::get().writes(5 as Weight))
+        (91_470_000 as Weight)
+            .saturating_add(T::DbWeight::get().reads(7 as Weight))
+            .saturating_add(T::DbWeight::get().writes(6 as Weight))
     }
     fn purge_keys() -> Weight {
-        (51_843_000 as Weight)
-            .saturating_add(DbWeight::get().reads(2 as Weight))
-            .saturating_add(DbWeight::get().writes(5 as Weight))
+        (53_966_000 as Weight)
+            .saturating_add(T::DbWeight::get().reads(2 as Weight))
+            .saturating_add(T::DbWeight::get().writes(6 as Weight))
     }
 }
