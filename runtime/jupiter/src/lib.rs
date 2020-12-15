@@ -19,7 +19,7 @@ use sp_runtime::{
     generic, impl_opaque_keys,
     traits::{
         AccountIdLookup, BlakeTwo256, Block as BlockT, Extrinsic as ExtrinsicT, OpaqueKeys,
-        SaturatedConversion, Saturating, StaticLookup, Verify,
+        SaturatedConversion, StaticLookup, Verify,
     },
     transaction_validity::{TransactionPriority, TransactionSource, TransactionValidity},
     ApplyExtrinsicResult, ModuleId, Perbill, Percent, Permill,
@@ -56,7 +56,7 @@ pub use frame_support::{
     },
     weights::{
         constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_PER_SECOND},
-        IdentityFee, Weight,
+        DispatchClass, IdentityFee, Weight,
     },
     RuntimeDebug, StorageValue,
 };
@@ -70,7 +70,7 @@ pub use jupiter_primitives::{
 };
 use jupiter_runtime_common::{
     constants::{currency::*, fee::WeightToFee, time::*},
-    impls, weights,
+    impls, weights, BlockHashCount, BlockLength, BlockWeights, OffchainSolutionWeightLimit,
 };
 
 impl_opaque_keys! {
@@ -111,24 +111,6 @@ pub fn native_version() -> NativeVersion {
         can_author_with: Default::default(),
     }
 }
-
-type MoreThanHalfCouncil = EnsureOneOf<
-    AccountId,
-    EnsureRoot<AccountId>,
-    pallet_collective::EnsureProportionMoreThan<_1, _2, AccountId, CouncilCollective>,
->;
-
-parameter_types! {
-    pub const BlockHashCount: BlockNumber = 2400;
-    /// We allow for 2 seconds of compute with a 6 second average block time.
-    pub const MaximumBlockWeight: Weight = 2 * WEIGHT_PER_SECOND;
-    pub const AvailableBlockRatio: Perbill = Perbill::from_percent(75);
-    /// Assume 10% of weight for average on_initialize calls.
-    pub MaximumExtrinsicWeight: Weight = AvailableBlockRatio::get()
-        .saturating_sub(Perbill::from_percent(10)) * MaximumBlockWeight::get();
-    pub const MaximumBlockLength: u32 = 5 * 1024 * 1024;
-}
-
 /// Avoid processing transactions from slots and parachain registrar.
 pub struct BaseFilter;
 impl Filter<Call> for BaseFilter {
@@ -137,19 +119,26 @@ impl Filter<Call> for BaseFilter {
     }
 }
 
-// Configure FRAME pallets to include in runtime.
+type MoreThanHalfCouncil = EnsureOneOf<
+    AccountId,
+    EnsureRoot<AccountId>,
+    pallet_collective::EnsureProportionMoreThan<_1, _2, AccountId, CouncilCollective>,
+>;
+
 parameter_types! {
     pub const Version: RuntimeVersion = VERSION;
 }
 impl frame_system::Config for Runtime {
     /// The basic call filter to use in dispatchable.
     type BaseCallFilter = BaseFilter;
-    /// The identifier used to distinguish between accounts.
-    type AccountId = AccountId;
+    /// Block & extrinsics weights: base values and limits.
+    type BlockWeights = BlockWeights;
+    /// The maximum length of a block (in bytes).
+    type BlockLength = BlockLength;
+    /// The ubiquitous origin type.
+    type Origin = Origin;
     /// The aggregated dispatch type that is available for extrinsics.
     type Call = Call;
-    /// The lookup mechanism to get account ID from whatever is passed in dispatchers.
-    type Lookup = AccountIdLookup<AccountId, ()>;
     /// The index type for storing how many extrinsics an account has signed.
     type Index = Index;
     /// The index type for blocks.
@@ -158,51 +147,37 @@ impl frame_system::Config for Runtime {
     type Hash = Hash;
     /// The hashing algorithm used.
     type Hashing = BlakeTwo256;
+    /// The identifier used to distinguish between accounts.
+    type AccountId = AccountId;
+    /// The lookup mechanism to get account ID from whatever is passed in dispatchers.
+    type Lookup = AccountIdLookup<AccountId, ()>;
     /// The header type.
     type Header = generic::Header<BlockNumber, BlakeTwo256>;
     /// The ubiquitous event type.
     type Event = Event;
-    /// The ubiquitous origin type.
-    type Origin = Origin;
     /// Maximum number of block number to block hash mappings to keep (oldest pruned first).
     type BlockHashCount = BlockHashCount;
-    /// Maximum weight of each block.
-    type MaximumBlockWeight = MaximumBlockWeight;
     /// The weight of database operations that the runtime can invoke.
     type DbWeight = RocksDbWeight;
-    /// The weight of the overhead invoked on the block import process, independent of the
-    /// extrinsics included in that block.
-    type BlockExecutionWeight = BlockExecutionWeight;
-    /// The base weight of any extrinsic processed by the runtime, independent of the
-    /// logic of that extrinsic. (Signature verification, nonce increment, fee, etc...)
-    type ExtrinsicBaseWeight = ExtrinsicBaseWeight;
-    /// The maximum weight that a single extrinsic of `Normal` dispatch class can have,
-    /// idependent of the logic of that extrinsics. (Roughly max block weight - average on
-    /// initialize cost).
-    type MaximumExtrinsicWeight = MaximumExtrinsicWeight;
-    /// Maximum size of all encoded transactions (in bytes) that are allowed in one block.
-    type MaximumBlockLength = MaximumBlockLength;
-    /// Portion of the block weight that is available to all normal transactions.
-    type AvailableBlockRatio = AvailableBlockRatio;
     /// Version of the runtime.
     type Version = Version;
     /// Converts a module to the index of the module in `construct_runtime!`.
     ///
     /// This type is being generated by `construct_runtime!`.
     type PalletInfo = PalletInfo;
+    /// The data to be stored in an account.
+    type AccountData = pallet_balances::AccountData<Balance>;
     /// What to do if a new account is created.
     type OnNewAccount = ();
     /// What to do if an account is fully reaped from the system.
     type OnKilledAccount = ();
-    /// The data to be stored in an account.
-    type AccountData = pallet_balances::AccountData<Balance>;
     /// Weight information for the extrinsics of this pallet.
     type SystemWeightInfo = weights::frame_system::WeightInfo;
 }
 
 parameter_types! {
-    // pub MaximumSchedulerWeight: Weight = Perbill::from_percent(80) *
-    //     BlockWeights::get().max_block;
+    pub MaximumSchedulerWeight: Weight = Perbill::from_percent(80) *
+        BlockWeights::get().max_block;
     pub const MaxScheduledPerBlock: u32 = 50;
 }
 
@@ -211,7 +186,7 @@ impl pallet_scheduler::Config for Runtime {
     type Origin = Origin;
     type PalletsOrigin = OriginCaller;
     type Call = Call;
-    type MaximumWeight = MaximumBlockWeight; // TODO replace to MaximumSchedulerWeight later
+    type MaximumWeight = MaximumSchedulerWeight;
     type ScheduleOrigin = EnsureRoot<AccountId>;
     type MaxScheduledPerBlock = MaxScheduledPerBlock;
     type WeightInfo = weights::pallet_scheduler::WeightInfo<Runtime>;
@@ -318,7 +293,7 @@ where
 }
 
 parameter_types! {
-    pub OffencesWeightSoftLimit: Weight = Perbill::from_percent(60) * MaximumBlockWeight::get();
+    pub OffencesWeightSoftLimit: Weight = Perbill::from_percent(60) * BlockWeights::get().max_block;
 }
 
 impl pallet_offences::Config for Runtime {
@@ -420,9 +395,6 @@ parameter_types! {
     pub const ElectionLookahead: BlockNumber = EPOCH_DURATION_IN_BLOCKS / 4;
     pub const MaxIterations: u32 = 10;
     pub MinSolutionScoreBump: Perbill = Perbill::from_rational_approximation(5u32, 10_000);
-    pub OffchainSolutionWeightLimit: Weight = MaximumExtrinsicWeight::get()
-        .saturating_sub(BlockExecutionWeight::get())
-        .saturating_sub(ExtrinsicBaseWeight::get());
 }
 
 type SlashCancelOrigin = EnsureOneOf<
