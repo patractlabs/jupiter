@@ -42,6 +42,7 @@ pallet-democracy = { version = "2.0.0", git = "https://github.com/paritytech/sub
 pallet-elections-phragmen = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-grandpa = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-im-online = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-identity = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-indices = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-membership = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-multisig = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
@@ -108,6 +109,7 @@ std = [
     "pallet-elections-phragmen/std",
     "pallet-grandpa/std",
     "pallet-im-online/std",
+    "pallet-identity/std",
     "pallet-indices/std",
     "pallet-membership/std",
     "pallet-multisig/std",
