@@ -97,7 +97,7 @@ decl_module! {
         pub fn instantiate(origin) -> Result<(), dispatch::DispatchError> {
             if <Contracts<T>>::instantiate(
                 origin,
-                0.into(),
+                0u32.into(),
                 0,
                 <Contract<T>>::get(),
                 b"".to_vec(),
@@ -123,7 +123,7 @@ decl_module! {
                     &<Contract<T>>::get(),
                     &b"".to_vec(),
                 )),
-                0.into(),
+                0u32.into(),
                 0,
                 data
             )

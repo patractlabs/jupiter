@@ -27,44 +27,11 @@ use frame_system::RawOrigin;
 use sp_std::prelude::*;
 
 benchmarks! {
-    _ { }
-    // ink_groth16_verify {
-    //     // let caller: T::AccountId = whitelisted_caller();
-    //     let salt = vec![0xff];
-    //     Contracts<T>::put_code_raw(&[]);
-    //     Contracts::<T>::instantiate(
-    //         RawOrigin::Signed(caller.clone()).into(),
-    //         endowment,
-    //         Weight::max_value(),
-    //         module.hash,
-    //         data,
-    //         salt,
-    //     )?;
-    // } // : bare_call(caller, )
-    // call {
-    //     let data = vec![42u8; 1024];
-    //     let instance = Contract::<T>::with_caller(
-    //         whitelisted_caller(), WasmModule::dummy_with_mem(), vec![], Endow::CollectRent
-    //     )?;
-    //     let value = T::Currency::minimum_balance() * 100u32.into();
-    //     let origin = RawOrigin::Signed(instance.caller.clone());
-    //     let callee = instance.addr.clone();
-    //
-    //     // trigger rent collection for worst case performance of call
-    //     System::<T>::set_block_number(instance.eviction_at()? - 5u32.into());
-    //     let before = T::Currency::free_balance(&instance.account_id);
-    // }: _(origin, callee, value, Weight::max_value(), data)
-    // verify {
-    //     // endowment and value transfered via call should be removed from the caller
-    //     assert_eq!(
-    //         T::Currency::free_balance(&instance.caller),
-    //         caller_funding::<T>() - instance.endowment - value,
-    //     );
-    //     // rent should have lowered the amount of balance of the contract
-    //     assert!(T::Currency::free_balance(&instance.account_id) < before + value);
-    //     // but it should not have been evicted by the rent collection
-    //     instance.alive_info()?;
-    // }
+    where_clause { where
+        T::AccountId: UncheckedFrom<T::Hash>,
+	    T::AccountId: AsRef<[u8]>,
+    }
+	_ {}
 
     wasm_bls12_377_add {
         let caller: T::AccountId = whitelisted_caller();
