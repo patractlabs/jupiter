@@ -4478,6 +4478,7 @@ dependencies = [
  "frame-system",
  "jupiter-io",
  "megaclite-arkworks",
+ "pallet-contracts 2.0.0",
  "parity-scale-codec",
  "sp-core",
  "sp-io",

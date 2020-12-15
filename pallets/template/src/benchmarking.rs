@@ -23,38 +23,77 @@ use super::*;
 
 use frame_benchmarking::{benchmarks, whitelisted_caller};
 use frame_system::RawOrigin;
+use pallet_contracts::{Module as Contracts, *};
 use sp_std::prelude::*;
 
 benchmarks! {
     _ { }
+    // ink_groth16_verify {
+    //     // let caller: T::AccountId = whitelisted_caller();
+    //     let salt = vec![0xff];
+    //     Contracts<T>::put_code_raw(&[]);
+    //     Contracts::<T>::instantiate(
+    //         RawOrigin::Signed(caller.clone()).into(),
+    //         endowment,
+    //         Weight::max_value(),
+    //         module.hash,
+    //         data,
+    //         salt,
+    //     )?;
+    // } // : bare_call(caller, )
+    // call {
+    //     let data = vec![42u8; 1024];
+    //     let instance = Contract::<T>::with_caller(
+    //         whitelisted_caller(), WasmModule::dummy_with_mem(), vec![], Endow::CollectRent
+    //     )?;
+    //     let value = T::Currency::minimum_balance() * 100u32.into();
+    //     let origin = RawOrigin::Signed(instance.caller.clone());
+    //     let callee = instance.addr.clone();
+    //
+    //     // trigger rent collection for worst case performance of call
+    //     System::<T>::set_block_number(instance.eviction_at()? - 5u32.into());
+    //     let before = T::Currency::free_balance(&instance.account_id);
+    // }: _(origin, callee, value, Weight::max_value(), data)
+    // verify {
+    //     // endowment and value transfered via call should be removed from the caller
+    //     assert_eq!(
+    //         T::Currency::free_balance(&instance.caller),
+    //         caller_funding::<T>() - instance.endowment - value,
+    //     );
+    //     // rent should have lowered the amount of balance of the contract
+    //     assert!(T::Currency::free_balance(&instance.account_id) < before + value);
+    //     // but it should not have been evicted by the rent collection
+    //     instance.alive_info()?;
+    // }
+
     wasm_bls12_377_add {
         let caller: T::AccountId = whitelisted_caller();
-    }: wasm_bls12_377_add(RawOrigin::Signed(caller.clone()))
+    }: _(RawOrigin::Signed(caller.clone()))
         verify {}
 
     wasm_bls12_377_mul {
         let caller: T::AccountId = whitelisted_caller();
-    }: wasm_bls12_377_mul(RawOrigin::Signed(caller.clone()))
+    }: _(RawOrigin::Signed(caller.clone()))
         verify {}
 
     wasm_bls12_377_pairing_two {
         let caller: T::AccountId = whitelisted_caller();
-    }: wasm_bls12_377_pairing_two(RawOrigin::Signed(caller.clone()))
+    }: _(RawOrigin::Signed(caller.clone()))
         verify {}
 
     wasm_bls12_377_pairing_six {
         let caller: T::AccountId = whitelisted_caller();
-    }: wasm_bls12_377_pairing_six(RawOrigin::Signed(caller.clone()))
+    }: _(RawOrigin::Signed(caller.clone()))
         verify {}
 
     wasm_bls12_377_verify {
         let caller: T::AccountId = whitelisted_caller();
-    }: wasm_bls12_377_verify(RawOrigin::Signed(caller.clone()))
+    }: _(RawOrigin::Signed(caller.clone()))
         verify {}
 
     native_bls12_377_add {
         let caller: T::AccountId = whitelisted_caller();
-    }: native_bls12_377_add(RawOrigin::Signed(caller.clone()))
+    }: _(RawOrigin::Signed(caller.clone()))
         verify {}
 
     native_bls12_377_mul {
