@@ -18,8 +18,8 @@ use sp_runtime::{
     curve::PiecewiseLinear,
     generic, impl_opaque_keys,
     traits::{
-        BlakeTwo256, Block as BlockT, Extrinsic as ExtrinsicT, IdentityLookup, NumberFor,
-        OpaqueKeys, SaturatedConversion, Saturating, Verify,
+        AccountIdLookup, BlakeTwo256, Block as BlockT, Extrinsic as ExtrinsicT, OpaqueKeys,
+        SaturatedConversion, Saturating, StaticLookup, Verify,
     },
     transaction_validity::{TransactionPriority, TransactionSource, TransactionValidity},
     ApplyExtrinsicResult, ModuleId, Perbill, Percent, Permill,
@@ -27,18 +27,22 @@ use sp_runtime::{
 use sp_std::prelude::*;
 use static_assertions::const_assert;
 
-use pallet_grandpa::fg_primitives;
-use pallet_grandpa::{AuthorityId as GrandpaId, AuthorityList as GrandpaAuthorityList};
+use pallet_grandpa::{
+    fg_primitives, AuthorityId as GrandpaId, AuthorityList as GrandpaAuthorityList,
+};
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 
 #[cfg(feature = "std")]
 pub use pallet_staking::StakerStatus;
+use sp_staking::SessionIndex;
 #[cfg(feature = "std")]
 use sp_version::NativeVersion;
 use sp_version::RuntimeVersion;
 
+use frame_system::{EnsureOneOf, EnsureRoot};
 use pallet_contracts_primitives::ContractExecResult;
+use pallet_transaction_payment::CurrencyAdapter;
 use pallet_transaction_payment_rpc_runtime_api::RuntimeDispatchInfo;
 
 // A few exports that help ease life for downstream crates.
@@ -56,11 +60,10 @@ pub use frame_support::{
     },
     RuntimeDebug, StorageValue,
 };
-use frame_system::{EnsureOneOf, EnsureRoot};
+
 pub use pallet_balances::Call as BalancesCall;
 pub use pallet_session::historical as pallet_session_historical;
 pub use pallet_timestamp::Call as TimestampCall;
-use sp_staking::SessionIndex;
 
 pub use jupiter_primitives::{
     AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Signature,
@@ -69,7 +72,6 @@ use jupiter_runtime_common::{
     constants::{currency::*, fee::WeightToFee, time::*},
     impls, weights,
 };
-use pallet_transaction_payment::CurrencyAdapter;
 
 impl_opaque_keys! {
     pub struct SessionKeys {
@@ -93,7 +95,7 @@ pub fn wasm_binary_unwrap() -> &'static [u8] {
 /// Runtime version.
 pub const VERSION: RuntimeVersion = RuntimeVersion {
     spec_name: create_runtime_str!("jupiter"),
-    impl_name: create_runtime_str!("jupiter"),
+    impl_name: create_runtime_str!("patract-jupiter"),
     authoring_version: 1,
     spec_version: 1,
     impl_version: 1,
@@ -147,7 +149,7 @@ impl frame_system::Config for Runtime {
     /// The aggregated dispatch type that is available for extrinsics.
     type Call = Call;
     /// The lookup mechanism to get account ID from whatever is passed in dispatchers.
-    type Lookup = IdentityLookup<AccountId>;
+    type Lookup = AccountIdLookup<AccountId, ()>;
     /// The index type for storing how many extrinsics an account has signed.
     type Index = Index;
     /// The index type for blocks.
@@ -199,6 +201,8 @@ impl frame_system::Config for Runtime {
 }
 
 parameter_types! {
+    // pub MaximumSchedulerWeight: Weight = Perbill::from_percent(80) *
+    //     BlockWeights::get().max_block;
     pub const MaxScheduledPerBlock: u32 = 50;
 }
 
@@ -207,7 +211,7 @@ impl pallet_scheduler::Config for Runtime {
     type Origin = Origin;
     type PalletsOrigin = OriginCaller;
     type Call = Call;
-    type MaximumWeight = MaximumBlockWeight;
+    type MaximumWeight = MaximumBlockWeight; // TODO replace to MaximumSchedulerWeight later
     type ScheduleOrigin = EnsureRoot<AccountId>;
     type MaxScheduledPerBlock = MaxScheduledPerBlock;
     type WeightInfo = weights::pallet_scheduler::WeightInfo<Runtime>;
@@ -294,8 +298,9 @@ where
             })
             .ok()?;
         let signature = raw_payload.using_encoded(|payload| C::sign(payload, public))?;
+        let address = AccountIdLookup::<AccountId, ()>::unlookup(account);
         let (call, extra, _) = raw_payload.deconstruct();
-        Some((call, (account, signature, extra)))
+        Some((call, (address, signature, extra)))
     }
 }
 
@@ -885,7 +890,7 @@ construct_runtime!(
         Offences: pallet_offences::{Module, Call, Storage, Event} = 7,
         Historical: pallet_session_historical::{Module} = 34,
         Session: pallet_session::{Module, Call, Storage, Event, Config<T>} = 8,
-        Grandpa: pallet_grandpa::{Module, Call, Storage, Config, Event} = 10,
+        Grandpa: pallet_grandpa::{Module, Call, Storage, Config, Event, ValidateUnsigned} = 10,
         ImOnline: pallet_im_online::{Module, Call, Storage, Event<T>, ValidateUnsigned, Config<T>} = 11,
         AuthorityDiscovery: pallet_authority_discovery::{Module, Call, Storage, Config} = 12,
 
@@ -917,7 +922,7 @@ construct_runtime!(
 );
 
 /// The address format for describing accounts.
-pub type Address = AccountId;
+pub type Address = sp_runtime::MultiAddress<AccountId, ()>;
 /// Block header type as expected by this runtime.
 pub type Header = generic::Header<BlockNumber, BlakeTwo256>;
 /// Block type as expected by this runtime.
@@ -931,7 +936,7 @@ pub type SignedExtra = (
     frame_system::CheckSpecVersion<Runtime>,
     frame_system::CheckTxVersion<Runtime>,
     frame_system::CheckGenesis<Runtime>,
-    frame_system::CheckEra<Runtime>,
+    frame_system::CheckMortality<Runtime>,
     frame_system::CheckNonce<Runtime>,
     frame_system::CheckWeight<Runtime>,
     pallet_transaction_payment::ChargeTransactionPayment<Runtime>,
@@ -1081,23 +1086,29 @@ impl_runtime_apis! {
         }
 
         fn submit_report_equivocation_unsigned_extrinsic(
-            _equivocation_proof: fg_primitives::EquivocationProof<
+            equivocation_proof: fg_primitives::EquivocationProof<
                 <Block as BlockT>::Hash,
-                NumberFor<Block>,
+                sp_runtime::traits::NumberFor<Block>,
             >,
-            _key_owner_proof: fg_primitives::OpaqueKeyOwnershipProof,
+            key_owner_proof: fg_primitives::OpaqueKeyOwnershipProof,
         ) -> Option<()> {
-            None
+            let key_owner_proof = key_owner_proof.decode()?;
+
+            Grandpa::submit_unsigned_equivocation_report(
+                equivocation_proof,
+                key_owner_proof,
+            )
         }
 
         fn generate_key_ownership_proof(
             _set_id: fg_primitives::SetId,
-            _authority_id: GrandpaId,
+            authority_id: fg_primitives::AuthorityId,
         ) -> Option<fg_primitives::OpaqueKeyOwnershipProof> {
-            // NOTE: this is the only implementation possible since we've
-            // defined our key owner proof type as a bottom type (i.e. a type
-            // with no values).
-            None
+            use codec::Encode;
+
+            Historical::prove((fg_primitives::KEY_TYPE, authority_id))
+                .map(|p| p.encode())
+                .map(fg_primitives::OpaqueKeyOwnershipProof::new)
         }
     }
 
