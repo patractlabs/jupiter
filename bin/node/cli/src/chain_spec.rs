@@ -417,8 +417,12 @@ fn testnet_genesis(
             },
         }),
         pallet_staking: Some(StakingConfig {
-            validator_count: 50,
-            minimum_validator_count: 4,
+            validator_count: if initial_authorities.len() < 4 {
+                initial_authorities.len() as u32 * 2
+            } else {
+                50
+            },
+            minimum_validator_count: initial_authorities.len() as u32,
             stakers: initial_authorities
                 .iter()
                 .map(|x| (x.0.clone(), x.1.clone(), STASH, StakerStatus::Validator))
