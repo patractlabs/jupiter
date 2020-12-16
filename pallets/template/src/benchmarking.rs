@@ -21,17 +21,54 @@
 
 use super::*;
 
-// use contract::{Module as Contracts, *};
+use contract::{BalanceOf, ConfigCache, Module as Contracts};
 use frame_benchmarking::{benchmarks, whitelisted_caller};
+use frame_support::{traits::Currency, weights::Weight};
 use frame_system::RawOrigin;
+use sp_runtime::traits::{Bounded, CheckedDiv, Hash, Saturating, Zero};
 use sp_std::prelude::*;
 
 benchmarks! {
     where_clause { where
         T::AccountId: UncheckedFrom<T::Hash>,
-	    T::AccountId: AsRef<[u8]>,
+        T::AccountId: AsRef<[u8]>,
     }
-	_ {}
+    _ {}
+
+    test_contract {
+        let caller: T::AccountId = whitelisted_caller();
+        let origin = RawOrigin::Signed(caller.clone());
+        T::Currency::make_free_balance_be(&caller, BalanceOf::<T>::max_value());
+
+        // Put WASM module
+        let module = include_bytes!(concat!(env!("OUT_DIR"), "/flip.wasm")).to_vec();
+        let hash = T::Hashing::hash(&module);
+        <Contracts<T>>::put_code(origin.clone().into(), module)?;
+
+        // storage_size cannot be zero because otherwise a contract that is just above
+        // the subsistence threshold does not pay rent given a large enough subsistence
+        // threshold. But we need rent payments to occur in order to benchmark for worst cases.
+        let storage_size = ConfigCache::<T>::subsistence_threshold_uncached()
+            .checked_div(&T::RentDepositOffset::get())
+            .unwrap_or_else(Zero::zero);
+
+        // Endowment should be large but not as large to inhibit rent payments.
+        let endowment = T::RentDepositOffset::get()
+            .saturating_mul(storage_size + T::StorageSizeOffset::get().into())
+            .saturating_sub(1u32.into());
+
+        <Contracts<T>>::instantiate(
+            origin.clone().into(),
+            endowment, // endowment
+            Weight::max_value(), // gas_limit
+            hash.clone(), // code_hash
+            [106, 55, 18, 226].to_vec(), // flip
+            b"".to_vec(), // salt
+        ).map_err(|_|<Error<T>>::InstantiateContractFailed)?;
+
+        // Calculate addr
+        let addr = Contracts::<T>::contract_address(&caller, &hash, &b"".to_vec());
+    }: call(origin, addr, vec![192, 150, 165, 243])
 
     wasm_bls12_377_add {
         let caller: T::AccountId = whitelisted_caller();

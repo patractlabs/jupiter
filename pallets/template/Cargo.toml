@@ -38,6 +38,8 @@ package = "pallet-contracts"
 path = "../../vendor/substrate/frame/contracts"
 default-features = false
 
+[dev-dependencies]
+wat = "1.0"
 
 [features]
 default = ['std']

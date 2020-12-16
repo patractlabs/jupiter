@@ -4,7 +4,9 @@ use contract::{CodeHash, Module as Contracts};
 /// Edit this file to define custom logic or remove it if it is not needed.
 /// Learn more about FRAME and the core library of Substrate FRAME pallets:
 /// https://substrate.dev/docs/en/knowledgebase/runtime/frame
-use frame_support::{decl_error, decl_event, decl_module, decl_storage, dispatch, traits::Get};
+use frame_support::{
+    decl_error, decl_event, decl_module, decl_storage, dispatch, traits::Get, weights::Weight,
+};
 use sp_core::crypto::UncheckedFrom;
 use sp_runtime::traits::StaticLookup;
 use sp_std::vec::Vec;
@@ -80,52 +82,19 @@ decl_module! {
         // Events must be initialized if they are used by the pallet.
         fn deposit_event() = default;
 
-        /// Put and instantiate code
-        #[weight = 10_000 + T::DbWeight::get().writes(1)]
-        pub fn put_code(origin, code: Vec<u8>) -> Result<(), dispatch::DispatchError> {
-            <Contracts<T>>::put_code(origin.clone(), code)?;
-            if let Some((code_hash, _)) = <contract::PristineCode<T>>::iter().last() {
-                <Contract<T>>::set(code_hash.clone());
-                Ok(())
-            } else {
-                Err(<Error<T>>::ContractDisappeared.into())
-            }
-        }
-
-        /// Instantiate the code
-        #[weight = 10_000 + T::DbWeight::get().writes(1)]
-        pub fn instantiate(origin) -> Result<(), dispatch::DispatchError> {
-            if <Contracts<T>>::instantiate(
-                origin,
-                0u32.into(),
-                0,
-                <Contract<T>>::get(),
-                b"".to_vec(),
-                b"".to_vec(),
-            ).is_err() {
-                Err(<Error<T>>::InstantiateContractFailed.into())
-            } else {
-                Ok(())
-            }
-        }
-
         /// Call the contract
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn call(
             origin,
-            caller: T::AccountId,
+            addr: T::AccountId,
             data: Vec<u8>,
         ) -> dispatch::DispatchResultWithPostInfo {
             <Contracts<T>>::call(
                 origin,
-                T::Lookup::unlookup(<Contracts<T>>::contract_address(
-                    &caller,
-                    &<Contract<T>>::get(),
-                    &b"".to_vec(),
-                )),
-                0u32.into(),
-                0,
-                data
+                T::Lookup::unlookup(addr), // contract address
+                0u32.into(), // T::Currency::minimum_balance() * 100u32.into(), // value
+                Weight::max_value(), // gas_limit
+                data // fn
             )
         }
 
