@@ -380,6 +380,13 @@ fn testnet_genesis(
     const ENDOWMENT: u128 = 1_000_000 * DOTS;
     const STASH: u128 = 100 * DOTS;
 
+    let mut endowed_accounts: Vec<AccountId> = endowed_accounts;
+    initial_authorities.iter().for_each(|x| {
+        if !endowed_accounts.contains(&x.0) {
+            endowed_accounts.push(x.0.clone())
+        }
+    });
+
     GenesisConfig {
         frame_system: Some(SystemConfig {
             // Add Wasm runtime to storage.
@@ -390,7 +397,6 @@ fn testnet_genesis(
             balances: endowed_accounts
                 .iter()
                 .map(|k: &AccountId| (k.clone(), ENDOWMENT))
-                .chain(initial_authorities.iter().map(|x| (x.0.clone(), STASH)))
                 .collect(),
         }),
         pallet_indices: Some(IndicesConfig { indices: vec![] }),
