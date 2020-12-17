@@ -4,13 +4,13 @@ version = "0.1.0"
 authors = ["clearloop <udtrokia@gmail.com>"]
 edition = "2018"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
-jupiter-io = { path = "../io", default-features = false }
-pallet-contracts = { path = "../../vendor/substrate/frame/contracts", default-features = false }
 sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 sp-std = { git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+
+pallet-contracts = { path = "../../vendor/substrate/frame/contracts", default-features = false }
+
+jupiter-io = { path = "../io", default-features = false, optional = true }
 
 [dependencies.curve]
 git = "https://github.com/patractlabs/megaclite.git"
@@ -22,4 +22,7 @@ std = [
   "jupiter-io/std",
   "pallet-contracts/std",
   "sp-runtime/std",
+]
+native-support = [
+  "jupiter-io"
 ]

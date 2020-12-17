@@ -69,7 +69,7 @@ pallet-contracts-rpc-runtime-api = { version = "0.8.0", git = "https://github.co
 
 # local runtime module
 jupiter-primitives = { path = "../../primitives", default-features = false }
-jupiter-chain-extension = { path = "../../primitives/chain-extension", default-features = false }
+jupiter-chain-extension = { path = "../../primitives/chain-extension", default-features = false, features = [ "native-support" ] }
 jupiter-runtime-common = { path = "../common", default-features = false }
 
 [build-dependencies]
