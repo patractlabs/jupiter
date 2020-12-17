@@ -13,24 +13,22 @@ pub fn verify(
     public_inputs: &[&[u8]],
 ) -> Result<bool, SerializationError> {
     match curve_id {
-        0x2a => inner_verify::<curve::curve::Bls12_377>(
+        0 => inner_verify::<curve::curve::Bls12_377>(
             curve_id,
             vk_gamma_abc,
             vk,
             proof,
             public_inputs,
         ),
-        0x2b => inner_verify::<curve::curve::Bls12_381>(
+        1 => inner_verify::<curve::curve::Bls12_381>(
             curve_id,
             vk_gamma_abc,
             vk,
             proof,
             public_inputs,
         ),
-        0x2c => {
-            inner_verify::<curve::curve::Bn254>(curve_id, vk_gamma_abc, vk, proof, public_inputs)
-        }
-        0x2d => {
+        2 => inner_verify::<curve::curve::Bn254>(curve_id, vk_gamma_abc, vk, proof, public_inputs),
+        3 => {
             inner_verify::<curve::curve::BW6_761>(curve_id, vk_gamma_abc, vk, proof, public_inputs)
         }
         _ => Err(SerializationError::IoError(Error::new(
