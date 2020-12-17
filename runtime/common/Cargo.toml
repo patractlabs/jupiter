@@ -19,6 +19,7 @@ pallet-collective = { version = "2.0.0", git = "https://github.com/paritytech/su
 pallet-democracy = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-elections-phragmen = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-im-online = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-identity = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-indices = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-multisig = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-proxy = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
@@ -27,6 +28,8 @@ pallet-session = { version = "2.0.0", git = "https://github.com/paritytech/subst
 pallet-staking = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-timestamp = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-treasury = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-bounties = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-tips = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-utility = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 
 jupiter-primitives = { path = "../../primitives", default-features = false }
@@ -46,6 +49,7 @@ std = [
     "pallet-democracy/std",
     "pallet-elections-phragmen/std",
     "pallet-im-online/std",
+    "pallet-identity/std",
     "pallet-indices/std",
     "pallet-multisig/std",
     "pallet-proxy/std",
@@ -54,6 +58,8 @@ std = [
     "pallet-staking/std",
     "pallet-timestamp/std",
     "pallet-treasury/std",
+    "pallet-bounties/std",
+    "pallet-tips/std",
     "pallet-utility/std",
 
     "jupiter-primitives/std",
@@ -70,6 +76,7 @@ runtime-benchmarks = [
     "pallet-democracy/runtime-benchmarks",
     "pallet-elections-phragmen/runtime-benchmarks",
     "pallet-im-online/runtime-benchmarks",
+    "pallet-identity/runtime-benchmarks",
     "pallet-indices/runtime-benchmarks",
     "pallet-multisig/runtime-benchmarks",
     "pallet-proxy/runtime-benchmarks",
@@ -77,5 +84,7 @@ runtime-benchmarks = [
     "pallet-staking/runtime-benchmarks",
     "pallet-timestamp/runtime-benchmarks",
     "pallet-treasury/runtime-benchmarks",
+    "pallet-bounties/runtime-benchmarks",
+    "pallet-tips/runtime-benchmarks",
     "pallet-utility/runtime-benchmarks",
 ]
