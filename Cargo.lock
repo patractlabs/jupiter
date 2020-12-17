@@ -2691,7 +2691,7 @@ version = "0.1.0"
 dependencies = [
  "jupiter-io",
  "megaclite-arkworks",
- "pallet-contracts 2.0.0",
+ "pallet-contracts",
  "sp-runtime",
  "sp-std",
 ]
@@ -2709,7 +2709,7 @@ dependencies = [
  "jupiter-runtime-common",
  "log",
  "pallet-authority-discovery",
- "pallet-contracts 2.0.0 (git+https://github.com/paritytech/substrate)",
+ "pallet-contracts",
  "pallet-im-online",
  "pallet-staking",
  "parking_lot 0.10.2",
@@ -2756,7 +2756,7 @@ dependencies = [
  "jupiter-primitives",
  "jupiter-rpc",
  "log",
- "pallet-contracts 2.0.0",
+ "pallet-contracts",
  "parking_lot 0.10.2",
  "sc-basic-authorship",
  "sc-cli",
@@ -2793,7 +2793,7 @@ dependencies = [
  "jupiter-runtime-common",
  "pallet-authorship",
  "pallet-balances",
- "pallet-contracts 2.0.0",
+ "pallet-contracts",
  "pallet-contracts-primitives",
  "pallet-contracts-rpc-runtime-api",
  "pallet-indices",
@@ -2887,6 +2887,7 @@ dependencies = [
  "frame-support",
  "frame-system",
  "frame-system-rpc-runtime-api",
+ "jupiter-chain-extension",
  "jupiter-primitives",
  "jupiter-runtime-common",
  "pallet-authority-discovery",
@@ -2895,7 +2896,7 @@ dependencies = [
  "pallet-balances",
  "pallet-bounties",
  "pallet-collective",
- "pallet-contracts 2.0.0 (git+https://github.com/paritytech/substrate)",
+ "pallet-contracts",
  "pallet-contracts-primitives",
  "pallet-contracts-rpc-runtime-api",
  "pallet-democracy",
@@ -4210,27 +4211,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pallet-contracts"
-version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate?branch=master#987a9723920217917f2708388d150add5ef52ef7"
-dependencies = [
- "frame-support",
- "frame-system",
- "pallet-contracts-primitives",
- "pallet-contracts-proc-macro",
- "parity-scale-codec",
- "parity-wasm 0.41.0",
- "pwasm-utils 0.16.0",
- "serde",
- "sp-core",
- "sp-io",
- "sp-runtime",
- "sp-sandbox",
- "sp-std",
- "wasmi-validation",
-]
-
-[[package]]
 name = "pallet-contracts-primitives"
 version = "2.0.0"
 source = "git+https://github.com/paritytech/substrate?branch=master#987a9723920217917f2708388d150add5ef52ef7"
@@ -4551,7 +4531,7 @@ dependencies = [
  "frame-system",
  "jupiter-io",
  "megaclite-arkworks",
- "pallet-contracts 2.0.0",
+ "pallet-contracts",
  "parity-scale-codec",
  "sp-core",
  "sp-io",
