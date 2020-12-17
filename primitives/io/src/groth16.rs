@@ -6,7 +6,7 @@ use sp_std::vec::Vec;
 
 /// Groth16 verification
 pub fn verify(
-    curve_id: i32,
+    curve_id: u32,
     vk_gamma_abc: &[&[u8]],
     vk: &[u8],
     proof: &[u8],
@@ -42,7 +42,7 @@ pub fn verify(
 
 /// Groth16 verification inner
 fn inner_verify<C: CurveBasicOperations>(
-    curve_id: i32,
+    curve_id: u32,
     vk_gamma_abc: &[&[u8]],
     vk: &[u8],
     proof: &[u8],
@@ -70,14 +70,14 @@ fn inner_verify<C: CurveBasicOperations>(
         mul_input[0..g1_len].copy_from_slice(b);
         mul_input[g1_len..g1_len + scalar_len].copy_from_slice(i);
 
-        let mul_ic = super::pairing::mul(curve_id, &mul_input)
+        let mul_ic = super::pairing::call(0x3a + curve_id, &mul_input)
             .ok_or_else(|| Error::new(ErrorKind::Other, "Mul Failed"))?;
 
         let mut acc_mul_ic = Vec::with_capacity(g1_len * 2);
         acc_mul_ic[0..g1_len].copy_from_slice(acc.as_ref());
         acc_mul_ic[g1_len..g1_len * 2].copy_from_slice(mul_ic.as_ref());
 
-        acc = super::pairing::add(curve_id, &*acc_mul_ic)
+        acc = super::pairing::call(0x2a + curve_id, &*acc_mul_ic)
             .ok_or_else(|| Error::new(ErrorKind::Other, "Add Failed"))?;
     }
 
@@ -128,8 +128,9 @@ fn inner_verify<C: CurveBasicOperations>(
     // Return the result of computing the pairing check
     // e(p1[0], p2[0]) *  .... * e(p1[n], p2[n]) == 1.
     // For example pairing([P1(), P1().negate()], [P2(), P2()]) should return true.
-    Ok(super::pairing::pairing(curve_id, &input[..])
-        .ok_or_else(|| Error::new(ErrorKind::Other, "Add Failed"))?)
+    Ok(super::pairing::call(0x4a + curve_id, &input[..])
+        .ok_or_else(|| Error::new(ErrorKind::Other, "Add Failed"))?[0]
+        == 0)
 }
 
 fn negate_y_based_curve(y: BigUint, prime_field: &'static str) -> Result<BigUint, &'static str> {

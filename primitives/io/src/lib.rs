@@ -9,19 +9,28 @@ pub mod groth16;
 /// Pairing runtime interface
 #[runtime_interface]
 pub trait Pairing {
-    /// Vector Addition
-    fn add(curve_id: i32, input: &[u8]) -> Option<Vec<u8>> {
-        curve::add(curve_id, input).ok()
+    fn wasm() -> bool {
+        if let Ok(mode) = ::std::env::var("JIO_MODE") {
+            if mode.to_uppercase() == "WASM" {
+                return true;
+            }
+        }
+
+        false
     }
 
-    /// Scalar Multiplication
-    fn mul(curve_id: i32, input: &[u8]) -> Option<Vec<u8>> {
-        curve::mul(curve_id, input).ok()
-    }
-
-    /// Pairing
-    fn pairing(curve_id: i32, input: &[u8]) -> Option<bool> {
-        curve::pairing(curve_id, input).ok()
+    /// Curve calls
+    ///
+    /// add     0x2a
+    /// mul     0x3a
+    /// pairing 0x4a
+    ///
+    /// bls12_377 0
+    /// bls12_181 1
+    /// bn254     2
+    /// bw6_761   3
+    fn call(func_id: u32, input: &[u8]) -> Option<Vec<u8>> {
+        curve::call(func_id, input).ok()
     }
 
     fn bls12_377_add() {

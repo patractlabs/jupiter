@@ -3646,7 +3646,7 @@ checksum = "60302e4db3a61da70c0cb7991976248362f30319e88850c487b9b95bbf059e00"
 [[package]]
 name = "megaclite-arkworks"
 version = "0.1.0"
-source = "git+https://github.com/patractlabs/megaclite.git#aa83b083d2d3fbac358edb4a1d048d094f3dfe30"
+source = "git+https://github.com/patractlabs/megaclite.git#cb5277ac81b36951e79cb4e1c6e29f0ccdd695fa"
 dependencies = [
  "ark-bls12-377",
  "ark-bls12-381",
