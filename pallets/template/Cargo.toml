@@ -40,6 +40,9 @@ package = "pallet-contracts"
 path = "../../vendor/substrate/frame/contracts"
 default-features = false
 
+[dev-dependencies]
+hex = "0.4.2"
+
 [build-dependencies]
 wat = "1.0"
 
@@ -55,7 +58,7 @@ std = [
     'sp-std/std',
 ]
 runtime-benchmarks = [
-     "hex",                   
+    "hex",                   
     "frame-benchmarking",
     'frame-system/runtime-benchmarks',
     'frame-support/runtime-benchmarks',

@@ -21,11 +21,18 @@ impl ChainExtension for JupiterExt {
         let mut input = dimmy.as_mut_slice();
         let mut env = env.buf_in_buf_out();
         env.read_into(&mut &mut input)?;
-        if let Some(output) = if jupiter_io::pairing::wasm() {
-            curve::call(func_id, input).ok()
-        } else {
-            jupiter_io::pairing::call(func_id, input)
-        } {
+        // if let Some(output) = if jupiter_io::pairing::wasm() {
+        //     curve::call(func_id, input)
+        // } else {
+        //     jupiter_io::pairing::call(func_id, input)
+        // } {
+        //     env.write(&output, false, None)?;
+        //     Ok(RetVal::Converging(0))
+        // } else {
+        //     Err(Error::<E::T>::InvalidFunctionId.into())
+        // }
+
+        if let Some(output) = curve::call(func_id, input) {
             env.write(&output, false, None)?;
             Ok(RetVal::Converging(0))
         } else {
