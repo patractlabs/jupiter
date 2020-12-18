@@ -1,124 +1,152 @@
-// This file is part of Substrate.
-
-// Copyright (C) 2018-2020 Parity Technologies (UK) Ltd.
-// SPDX-License-Identifier: Apache-2.0
-
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// 	http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-//! Test utilities
-
-#![cfg(test)]
-
-use crate::{decl_tests, tests::CallWithDispatchInfo, Config, GenesisConfig, Module};
-use frame_support::weights::{DispatchInfo, IdentityFee, Weight};
-use frame_support::{impl_outer_event, impl_outer_origin, parameter_types};
-use pallet_transaction_payment::CurrencyAdapter;
-use sp_core::H256;
-use sp_io;
-use sp_runtime::{testing::Header, traits::IdentityLookup, Perbill};
-
+use crate::{Config, Module};
+use frame_support::{impl_outer_event, impl_outer_origin, parameter_types, weights::Weight};
 use frame_system as system;
+use sp_runtime::{
+    testing::{Header, H256},
+    traits::{BlakeTwo256, Convert, IdentityLookup},
+    AccountId32, Perbill,
+};
+
 impl_outer_origin! {
     pub enum Origin for Test {}
 }
 
-mod balances {
-    pub use crate::Event;
-}
+// Configure a mock runtime to test the pallet.
 
-impl_outer_event! {
-    pub enum Event for Test {
-        system<T>,
-        balances<T>,
+#[derive(Clone, Eq, PartialEq, Debug)]
+pub struct Test;
+
+impl Convert<Weight, contract::BalanceOf<Self>> for Test {
+    fn convert(w: Weight) -> contract::BalanceOf<Self> {
+        w
     }
 }
 
-// Workaround for https://github.com/rust-lang/rust/issues/26925 . Remove when sorted.
-#[derive(Clone, PartialEq, Eq, Debug)]
-pub struct Test;
 parameter_types! {
     pub const BlockHashCount: u64 = 250;
     pub const MaximumBlockWeight: Weight = 1024;
     pub const MaximumBlockLength: u32 = 2 * 1024;
-    pub const AvailableBlockRatio: Perbill = Perbill::one();
-    pub static ExistentialDeposit: u64 = 0;
+    pub const AvailableBlockRatio: Perbill = Perbill::from_percent(75);
 }
-impl frame_system::Config for Test {
+
+impl system::Config for Test {
     type BaseCallFilter = ();
     type Origin = Origin;
+    type Call = ();
     type Index = u64;
     type BlockNumber = u64;
-    type Call = CallWithDispatchInfo;
     type Hash = H256;
-    type Hashing = ::sp_runtime::traits::BlakeTwo256;
-    type AccountId = u64;
+    type Hashing = BlakeTwo256;
+    type AccountId = AccountId32;
     type Lookup = IdentityLookup<Self::AccountId>;
     type Header = Header;
-    type Event = Event;
+    type Event = ();
     type BlockHashCount = BlockHashCount;
-    type MaximumBlockWeight = MaximumBlockWeight;
     type DbWeight = ();
-    type BlockExecutionWeight = ();
-    type ExtrinsicBaseWeight = ();
-    type MaximumExtrinsicWeight = MaximumBlockWeight;
-    type MaximumBlockLength = MaximumBlockLength;
-    type AvailableBlockRatio = AvailableBlockRatio;
     type Version = ();
     type PalletInfo = ();
-    // type AccountData = super::AccountData<u64>;
+    type AccountData = pallet_balances::AccountData<u64>;
     type OnNewAccount = ();
     type OnKilledAccount = ();
     type SystemWeightInfo = ();
-}
-parameter_types! {
-    pub const TransactionByteFee: u64 = 1;
-}
-impl pallet_transaction_payment::Config for Test {
-    type OnChargeTransaction = CurrencyAdapter<Module<Test>, ()>;
-    type TransactionByteFee = TransactionByteFee;
-    type WeightToFee = IdentityFee<u64>;
-    type FeeMultiplierUpdate = ();
+    type BlockWeights = ();
+    type BlockLength = ();
 }
 
-impl Config for Test {
-    type Balance = u64;
-    type DustRemoval = ();
-    type Event = Event;
-    type ExistentialDeposit = ExistentialDeposit;
-    type AccountStore = system::Module<Test>;
-    type MaxLocks = ();
+parameter_types! {
+    pub const MinimumPeriod: u64 = 1;
+    pub static ExistentialDeposit: u64 = 0;
+}
+
+impl pallet_timestamp::Config for Test {
+    type Moment = u64;
+    type OnTimestampSet = ();
+    type MinimumPeriod = MinimumPeriod;
     type WeightInfo = ();
 }
 
+impl_outer_event! {
+    pub enum MetaEvent for Test {
+        frame_system<T>,
+        pallet_balances<T>,
+        contract<T>,
+    }
+}
+
+impl Config for Test {
+    type Event = ();
+}
+
+type System = system::Module<Test>;
+
+impl pallet_balances::Config for Test {
+    type MaxLocks = ();
+    type Balance = u64;
+    type Event = ();
+    type DustRemoval = ();
+    type ExistentialDeposit = ExistentialDeposit;
+    type AccountStore = System;
+    type WeightInfo = ();
+}
+
+pub type Balances = pallet_balances::Module<Test>;
+type Timestamp = pallet_timestamp::Module<Test>;
+type Randomness = pallet_randomness_collective_flip::Module<Test>;
+
+parameter_types! {
+    pub const SignedClaimHandicap: u64 = 2;
+    pub const TombstoneDeposit: u64 = 16;
+    pub const StorageSizeOffset: u32 = 8;
+    pub const RentByteFee: u64 = 4;
+    pub const RentDepositOffset: u64 = 10_000;
+    pub const SurchargeReward: u64 = 150;
+    pub const MaxDepth: u32 = 100;
+    pub const MaxValueSize: u32 = 16_384;
+}
+
+impl contract::Config for Test {
+    type Time = Timestamp;
+    type Randomness = Randomness;
+    type Currency = Balances;
+    type Event = ();
+    type RentPayment = ();
+    type SignedClaimHandicap = SignedClaimHandicap;
+    type TombstoneDeposit = TombstoneDeposit;
+    type StorageSizeOffset = StorageSizeOffset;
+    type RentByteFee = RentByteFee;
+    type RentDepositOffset = RentDepositOffset;
+    type SurchargeReward = SurchargeReward;
+    type MaxDepth = MaxDepth;
+    type MaxValueSize = MaxValueSize;
+    type WeightPrice = Self;
+    type WeightInfo = ();
+    type ChainExtension = jupiter_chain_extension::JupiterExt;
+}
+
+pub type Template = Module<Test>;
+pub type Contracts = contract::Module<Test>;
+
+pub const ALICE: AccountId32 = AccountId32::new([1u8; 32]);
+pub const BOB: AccountId32 = AccountId32::new([2u8; 32]);
+pub const CHARLIE: AccountId32 = AccountId32::new([3u8; 32]);
+pub const DJANGO: AccountId32 = AccountId32::new([4u8; 32]);
+
+pub const GAS_LIMIT: contract::Gas = 10_000_000_000;
+
 pub struct ExtBuilder {
     existential_deposit: u64,
-    monied: bool,
 }
 impl Default for ExtBuilder {
     fn default() -> Self {
         Self {
             existential_deposit: 1,
-            monied: false,
         }
     }
 }
+
 impl ExtBuilder {
     pub fn existential_deposit(mut self, existential_deposit: u64) -> Self {
         self.existential_deposit = existential_deposit;
-        self
-    }
-    pub fn monied(mut self, monied: bool) -> Self {
-        self.monied = monied;
         self
     }
     pub fn set_associated_consts(&self) {
@@ -129,26 +157,16 @@ impl ExtBuilder {
         let mut t = frame_system::GenesisConfig::default()
             .build_storage::<Test>()
             .unwrap();
-        GenesisConfig::<Test> {
-            balances: if self.monied {
-                vec![
-                    (1, 10 * self.existential_deposit),
-                    (2, 20 * self.existential_deposit),
-                    (3, 30 * self.existential_deposit),
-                    (4, 40 * self.existential_deposit),
-                    (12, 10 * self.existential_deposit),
-                ]
-            } else {
-                vec![]
-            },
+        pallet_balances::GenesisConfig::<Test> { balances: vec![] }
+            .assimilate_storage(&mut t)
+            .unwrap();
+        contract::GenesisConfig::<Test> {
+            current_schedule: contract::Schedule::<Test>::default(),
         }
         .assimilate_storage(&mut t)
         .unwrap();
-
         let mut ext = sp_io::TestExternalities::new(t);
         ext.execute_with(|| System::set_block_number(1));
         ext
     }
 }
-
-decl_tests! { Test, ExtBuilder, EXISTENTIAL_DEPOSIT }

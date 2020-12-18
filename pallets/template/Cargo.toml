@@ -42,6 +42,12 @@ default-features = false
 
 [dev-dependencies]
 hex = "0.4.2"
+pallet-timestamp = { git = "https://github.com/paritytech/substrate", branch = "master" }
+pallet-balances = { git = "https://github.com/paritytech/substrate", branch = "master" }
+pallet-randomness-collective-flip = { git = "https://github.com/paritytech/substrate", branch = "master" }
+pallet-transaction-payment = { git = "https://github.com/paritytech/substrate", branch = "master" }
+jupiter-runtime-common = { path = "../../runtime/common" }
+jupiter-chain-extension = { path = "../../primitives/chain-extension" }
 
 [build-dependencies]
 wat = "1.0"

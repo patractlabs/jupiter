@@ -13,6 +13,9 @@ use sp_std::vec::Vec;
 
 #[cfg(feature = "runtime-benchmarks")]
 mod benchmarking;
+#[cfg(test)]
+mod mock;
+#[cfg(test)]
 mod tests;
 
 /// Configure the pallet by specifying the parameters and types on which it depends.

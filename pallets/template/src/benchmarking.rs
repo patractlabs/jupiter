@@ -41,7 +41,7 @@ benchmarks! {
         T::Currency::make_free_balance_be(&caller, BalanceOf::<T>::max_value());
 
         // Put WASM module
-        let module = include_bytes!(concat!(env!("OUT_DIR"), "/flip.wasm")).to_vec();
+        let module = include_bytes!(concat!(env!("OUT_DIR"), "/groth16o.wasm")).to_vec();
         let hash = T::Hashing::hash(&module);
         <Contracts<T>>::put_code(origin.clone().into(), module)?;
 
