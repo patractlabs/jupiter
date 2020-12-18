@@ -211,7 +211,7 @@ dependencies = [
 [[package]]
 name = "ark-ec"
 version = "0.1.0"
-source = "git+https://github.com/arkworks-rs/algebra#638b6d4453f6caf3f804d7870d6b1ea279d5b31b"
+source = "git+https://github.com/arkworks-rs/algebra#861b116f06194ceef75b91879a9d2a7582a9ff10"
 dependencies = [
  "ark-ff",
  "ark-serialize",
@@ -225,7 +225,7 @@ dependencies = [
 [[package]]
 name = "ark-ff"
 version = "0.1.0"
-source = "git+https://github.com/arkworks-rs/algebra#638b6d4453f6caf3f804d7870d6b1ea279d5b31b"
+source = "git+https://github.com/arkworks-rs/algebra#861b116f06194ceef75b91879a9d2a7582a9ff10"
 dependencies = [
  "ark-ff-asm",
  "ark-ff-macros",
@@ -241,7 +241,7 @@ dependencies = [
 [[package]]
 name = "ark-ff-asm"
 version = "0.1.0"
-source = "git+https://github.com/arkworks-rs/algebra#638b6d4453f6caf3f804d7870d6b1ea279d5b31b"
+source = "git+https://github.com/arkworks-rs/algebra#861b116f06194ceef75b91879a9d2a7582a9ff10"
 dependencies = [
  "quote",
  "syn",
@@ -250,7 +250,7 @@ dependencies = [
 [[package]]
 name = "ark-ff-macros"
 version = "0.1.0"
-source = "git+https://github.com/arkworks-rs/algebra#638b6d4453f6caf3f804d7870d6b1ea279d5b31b"
+source = "git+https://github.com/arkworks-rs/algebra#861b116f06194ceef75b91879a9d2a7582a9ff10"
 dependencies = [
  "num-bigint 0.3.1",
  "num-traits",
@@ -277,7 +277,7 @@ dependencies = [
 [[package]]
 name = "ark-poly"
 version = "0.1.0"
-source = "git+https://github.com/arkworks-rs/algebra#638b6d4453f6caf3f804d7870d6b1ea279d5b31b"
+source = "git+https://github.com/arkworks-rs/algebra#861b116f06194ceef75b91879a9d2a7582a9ff10"
 dependencies = [
  "ark-ff",
  "ark-serialize",
@@ -299,7 +299,7 @@ dependencies = [
 [[package]]
 name = "ark-serialize"
 version = "0.1.0"
-source = "git+https://github.com/arkworks-rs/algebra#638b6d4453f6caf3f804d7870d6b1ea279d5b31b"
+source = "git+https://github.com/arkworks-rs/algebra#861b116f06194ceef75b91879a9d2a7582a9ff10"
 dependencies = [
  "ark-serialize-derive",
  "ark-std",
@@ -308,7 +308,7 @@ dependencies = [
 [[package]]
 name = "ark-serialize-derive"
 version = "0.1.1-alpha.0"
-source = "git+https://github.com/arkworks-rs/algebra#638b6d4453f6caf3f804d7870d6b1ea279d5b31b"
+source = "git+https://github.com/arkworks-rs/algebra#861b116f06194ceef75b91879a9d2a7582a9ff10"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3667,7 +3667,7 @@ checksum = "60302e4db3a61da70c0cb7991976248362f30319e88850c487b9b95bbf059e00"
 [[package]]
 name = "megaclite-arkworks"
 version = "0.1.0"
-source = "git+https://github.com/patractlabs/megaclite.git#1acb4c87d7efba33b32063dd0f2eb7d237d5170b"
+source = "git+https://github.com/patractlabs/megaclite.git#b40b9b1e795dccec06bfa04771e2e8bc7b2f41a3"
 dependencies = [
  "ark-bls12-377",
  "ark-bls12-381",
