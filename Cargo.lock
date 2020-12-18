@@ -2690,7 +2690,7 @@ name = "jupiter-chain-extension"
 version = "0.1.0"
 dependencies = [
  "jupiter-io",
- "megaclite-arkworks",
+ "megaclite-arkworks 0.1.0 (git+https://github.com/patractlabs/megaclite.git)",
  "pallet-contracts 2.0.0",
  "sp-runtime",
  "sp-std",
@@ -2832,7 +2832,7 @@ dependencies = [
 name = "jupiter-io"
 version = "0.2.0"
 dependencies = [
- "megaclite-arkworks",
+ "megaclite-arkworks 0.1.0",
  "num-bigint 0.3.1",
  "num-traits",
  "sp-runtime-interface",
@@ -3646,7 +3646,6 @@ checksum = "60302e4db3a61da70c0cb7991976248362f30319e88850c487b9b95bbf059e00"
 [[package]]
 name = "megaclite-arkworks"
 version = "0.1.0"
-source = "git+https://github.com/patractlabs/megaclite.git#cb5277ac81b36951e79cb4e1c6e29f0ccdd695fa"
 dependencies = [
  "ark-bls12-377",
  "ark-bls12-381",
@@ -3657,6 +3656,25 @@ dependencies = [
  "ark-ff",
  "ark-groth16",
  "ark-relations",
+ "ark-serialize",
+ "ark-std",
+ "num-bigint 0.3.1",
+ "rand 0.7.3",
+ "rustc-hex",
+]
+
+[[package]]
+name = "megaclite-arkworks"
+version = "0.1.0"
+source = "git+https://github.com/patractlabs/megaclite.git#cb5277ac81b36951e79cb4e1c6e29f0ccdd695fa"
+dependencies = [
+ "ark-bls12-377",
+ "ark-bls12-381",
+ "ark-bn254",
+ "ark-bw6-761",
+ "ark-cp6-782",
+ "ark-ec",
+ "ark-ff",
  "ark-serialize",
  "ark-std",
  "num-bigint 0.3.1",
@@ -4530,8 +4548,9 @@ dependencies = [
  "frame-benchmarking",
  "frame-support",
  "frame-system",
+ "hex",
  "jupiter-io",
- "megaclite-arkworks",
+ "megaclite-arkworks 0.1.0",
  "pallet-contracts 2.0.0",
  "parity-scale-codec",
  "sp-core",

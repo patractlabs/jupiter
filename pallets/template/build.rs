@@ -6,6 +6,7 @@ use std::{
 };
 
 fn main() -> Result<()> {
+    println!("cargo:rerun-if-changed=groth16.wat");
     let out_dir = env::var_os("OUT_DIR").unwrap();
     let dest_path = Path::new(&out_dir).join("flip.wasm");
     fs::write(

@@ -12,7 +12,8 @@ sp-runtime-interface = { git = "https://github.com/paritytech/substrate.git", br
 sp-std = { git = "https://github.com/paritytech/substrate.git", branch = "master", default-features = false }
 
 [dependencies.curve]
-git = "https://github.com/patractlabs/megaclite.git"
+# git = "https://github.com/patractlabs/megaclite.git"
+path = "/Users/mercury/code/megaclite/crates/curve/arkworks"
 package = "megaclite-arkworks"
 default-features = false
 features = [ "tests" ]
