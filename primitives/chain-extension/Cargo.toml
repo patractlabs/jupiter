@@ -1,0 +1,28 @@
+[package]
+name = "jupiter-chain-extension"
+version = "0.1.0"
+authors = ["clearloop <udtrokia@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+sp-std = { git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+
+pallet-contracts = { path = "../../vendor/substrate/frame/contracts", default-features = false }
+
+jupiter-io = { path = "../io", default-features = false, optional = true }
+
+[dependencies.curve]
+git = "https://github.com/patractlabs/megaclite.git"
+package = "megaclite-arkworks"
+
+[features]
+default = ["std"]
+std = [
+  "jupiter-io/std",
+  "pallet-contracts/std",
+  "sp-runtime/std",
+]
+native-support = [
+  "jupiter-io"
+]

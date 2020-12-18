@@ -140,6 +140,201 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4d25d88fd6b8041580a654f9d0c581a047baee2b3efee13275f2fc392fc75034"
 
 [[package]]
+name = "ark-bls12-377"
+version = "0.1.0"
+source = "git+https://github.com/arkworks-rs/curves#e7d7d01a027ce6445a8865a881f78ef6910815d8"
+dependencies = [
+ "ark-ec",
+ "ark-ff",
+ "ark-std",
+]
+
+[[package]]
+name = "ark-bls12-381"
+version = "0.1.0"
+source = "git+https://github.com/arkworks-rs/curves#e7d7d01a027ce6445a8865a881f78ef6910815d8"
+dependencies = [
+ "ark-ec",
+ "ark-ff",
+ "ark-std",
+]
+
+[[package]]
+name = "ark-bn254"
+version = "0.1.0"
+source = "git+https://github.com/arkworks-rs/curves#e7d7d01a027ce6445a8865a881f78ef6910815d8"
+dependencies = [
+ "ark-ec",
+ "ark-ff",
+ "ark-std",
+]
+
+[[package]]
+name = "ark-bw6-761"
+version = "0.1.0"
+source = "git+https://github.com/arkworks-rs/curves#e7d7d01a027ce6445a8865a881f78ef6910815d8"
+dependencies = [
+ "ark-bls12-377",
+ "ark-ec",
+ "ark-ff",
+ "ark-std",
+]
+
+[[package]]
+name = "ark-cp6-782"
+version = "0.1.0"
+source = "git+https://github.com/arkworks-rs/curves#e7d7d01a027ce6445a8865a881f78ef6910815d8"
+dependencies = [
+ "ark-bls12-377",
+ "ark-ec",
+ "ark-ff",
+ "ark-std",
+]
+
+[[package]]
+name = "ark-crypto-primitives"
+version = "0.1.0"
+source = "git+https://github.com/arkworks-rs/crypto-primitives.git?branch=main#ce5cc89011b394eb006987a24088947d5099d641"
+dependencies = [
+ "ark-ec",
+ "ark-ff",
+ "ark-relations",
+ "ark-snark",
+ "ark-std",
+ "bench-utils",
+ "blake2 0.8.1",
+ "derivative",
+ "digest 0.8.1",
+ "rand 0.7.3",
+]
+
+[[package]]
+name = "ark-ec"
+version = "0.1.0"
+source = "git+https://github.com/arkworks-rs/algebra#861b116f06194ceef75b91879a9d2a7582a9ff10"
+dependencies = [
+ "ark-ff",
+ "ark-serialize",
+ "ark-std",
+ "derivative",
+ "num-traits",
+ "rand 0.7.3",
+ "zeroize",
+]
+
+[[package]]
+name = "ark-ff"
+version = "0.1.0"
+source = "git+https://github.com/arkworks-rs/algebra#861b116f06194ceef75b91879a9d2a7582a9ff10"
+dependencies = [
+ "ark-ff-asm",
+ "ark-ff-macros",
+ "ark-serialize",
+ "ark-std",
+ "derivative",
+ "num-traits",
+ "rand 0.7.3",
+ "rustc_version 0.3.0",
+ "zeroize",
+]
+
+[[package]]
+name = "ark-ff-asm"
+version = "0.1.0"
+source = "git+https://github.com/arkworks-rs/algebra#861b116f06194ceef75b91879a9d2a7582a9ff10"
+dependencies = [
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "ark-ff-macros"
+version = "0.1.0"
+source = "git+https://github.com/arkworks-rs/algebra#861b116f06194ceef75b91879a9d2a7582a9ff10"
+dependencies = [
+ "num-bigint 0.3.1",
+ "num-traits",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "ark-groth16"
+version = "0.1.0"
+source = "git+https://github.com/arkworks-rs/groth16#772f43bc1fec7f108ab2d60059654c5c63fe4126"
+dependencies = [
+ "ark-crypto-primitives",
+ "ark-ec",
+ "ark-ff",
+ "ark-poly",
+ "ark-relations",
+ "ark-serialize",
+ "ark-std",
+ "bench-utils",
+ "rand 0.7.3",
+]
+
+[[package]]
+name = "ark-poly"
+version = "0.1.0"
+source = "git+https://github.com/arkworks-rs/algebra#861b116f06194ceef75b91879a9d2a7582a9ff10"
+dependencies = [
+ "ark-ff",
+ "ark-serialize",
+ "ark-std",
+ "derivative",
+ "rand 0.7.3",
+]
+
+[[package]]
+name = "ark-relations"
+version = "0.1.0"
+source = "git+https://github.com/arkworks-rs/snark#b4477552cf7ac41d6da48fb5bafc300864dc3669"
+dependencies = [
+ "ark-ff",
+ "ark-std",
+ "tracing",
+]
+
+[[package]]
+name = "ark-serialize"
+version = "0.1.0"
+source = "git+https://github.com/arkworks-rs/algebra#861b116f06194ceef75b91879a9d2a7582a9ff10"
+dependencies = [
+ "ark-serialize-derive",
+ "ark-std",
+]
+
+[[package]]
+name = "ark-serialize-derive"
+version = "0.1.1-alpha.0"
+source = "git+https://github.com/arkworks-rs/algebra#861b116f06194ceef75b91879a9d2a7582a9ff10"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "ark-snark"
+version = "0.1.0"
+source = "git+https://github.com/arkworks-rs/snark#b4477552cf7ac41d6da48fb5bafc300864dc3669"
+dependencies = [
+ "ark-ff",
+ "ark-relations",
+ "ark-std",
+ "rand 0.7.3",
+]
+
+[[package]]
+name = "ark-std"
+version = "0.1.0"
+source = "git+https://github.com/arkworks-rs/utils#5cac2c78e8ddeea95c4eeea6832dd92f2dea36b9"
+dependencies = [
+ "rand 0.7.3",
+]
+
+[[package]]
 name = "arrayref"
 version = "0.3.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -374,20 +569,9 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "904dfeac50f3cdaba28fc6f57fdcddb75f49ed61346676a78c4ffe55877802fd"
 
 [[package]]
-name = "bellman_ce"
-version = "0.3.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a5ca1343d8690bb4d62e0665116bd4f109e33a642f86908ed107d226a402b0ef"
-dependencies = [
- "bit-vec",
- "byteorder",
- "cfg-if 0.1.10",
- "crossbeam",
- "futures 0.3.8",
- "num_cpus",
- "pairing_ce",
- "rand 0.4.6",
-]
+name = "bench-utils"
+version = "0.1.0"
+source = "git+https://github.com/arkworks-rs/utils#5cac2c78e8ddeea95c4eeea6832dd92f2dea36b9"
 
 [[package]]
 name = "bincode"
@@ -424,12 +608,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bit-vec"
-version = "0.6.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5f0dc55f2d8a1a85650ac47858bb001b4c0dd73d79e3c455a842925e68d29cd3"
-
-[[package]]
 name = "bitflags"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -443,6 +621,18 @@ checksum = "41262f11d771fd4a61aa3ce019fca363b4b6c282fca9da2a31186d3965a47a5c"
 dependencies = [
  "either",
  "radium",
+]
+
+[[package]]
+name = "blake2"
+version = "0.8.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "94cb07b0da6a73955f8fb85d24c466778e70cda767a568229b104f0264089330"
+dependencies = [
+ "byte-tools",
+ "crypto-mac 0.7.0",
+ "digest 0.8.1",
+ "opaque-debug 0.2.3",
 ]
 
 [[package]]
@@ -875,30 +1065,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "crossbeam"
-version = "0.7.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "69323bff1fb41c635347b8ead484a5ca6c3f11914d784170b158d8449ab07f8e"
-dependencies = [
- "cfg-if 0.1.10",
- "crossbeam-channel 0.4.4",
- "crossbeam-deque 0.7.3",
- "crossbeam-epoch 0.8.2",
- "crossbeam-queue",
- "crossbeam-utils 0.7.2",
-]
-
-[[package]]
-name = "crossbeam-channel"
-version = "0.4.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b153fe7cbef478c567df0f972e02e6d736db11affe43dfc9c56a9374d1adfb87"
-dependencies = [
- "crossbeam-utils 0.7.2",
- "maybe-uninit",
-]
-
-[[package]]
 name = "crossbeam-channel"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1070,6 +1236,17 @@ name = "data-encoding"
 version = "2.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "993a608597367c6377b258c25d7120740f00ed23a2252b729b1932dd7866f908"
+
+[[package]]
+name = "derivative"
+version = "2.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cb582b60359da160a9477ee80f15c8d784c477e69c217ef2cdd4169c24ea380f"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
 
 [[package]]
 name = "derive_more"
@@ -1330,32 +1507,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2c4c9e43643f5a3be4ca5b67d26b98031ff9db6806c3440ae32e02e3ceac3f1b"
 dependencies = [
  "libc",
-]
-
-[[package]]
-name = "ff_ce"
-version = "0.10.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4592897f75fd1bd178e5ec12d9d7df3d1943464feda2cbce1e708a484e82c8f6"
-dependencies = [
- "byteorder",
- "ff_derive_ce",
- "hex",
- "rand 0.4.6",
-]
-
-[[package]]
-name = "ff_derive_ce"
-version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "50c052fa6d4c2f12305ec364bfb8ef884836f3f61ea015b202372ff996d1ac4b"
-dependencies = [
- "num-bigint",
- "num-integer",
- "num-traits",
- "proc-macro2",
- "quote",
- "syn",
 ]
 
 [[package]]
@@ -1820,7 +1971,7 @@ dependencies = [
  "cc",
  "libc",
  "log",
- "rustc_version",
+ "rustc_version 0.2.3",
  "winapi 0.3.9",
 ]
 
@@ -2175,7 +2326,7 @@ dependencies = [
  "itoa",
  "log",
  "net2",
- "rustc_version",
+ "rustc_version 0.2.3",
  "time",
  "tokio 0.1.22",
  "tokio-buf",
@@ -2550,6 +2701,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "jupiter-chain-extension"
+version = "0.1.0"
+dependencies = [
+ "jupiter-io",
+ "megaclite-arkworks",
+ "pallet-contracts",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
 name = "jupiter-cli"
 version = "0.1.0"
 dependencies = [
@@ -2562,7 +2724,7 @@ dependencies = [
  "jupiter-runtime-common",
  "log",
  "pallet-authority-discovery",
- "pallet-contracts 2.0.0 (git+https://github.com/paritytech/substrate)",
+ "pallet-contracts",
  "pallet-im-online",
  "pallet-staking",
  "parking_lot 0.10.2",
@@ -2604,13 +2766,12 @@ dependencies = [
  "frame-benchmarking",
  "frame-benchmarking-cli",
  "futures 0.3.8",
- "jupiter-dev-executor",
  "jupiter-dev-runtime",
  "jupiter-io",
  "jupiter-primitives",
  "jupiter-rpc",
  "log",
- "pallet-contracts 2.0.0",
+ "pallet-contracts",
  "parking_lot 0.10.2",
  "sc-basic-authorship",
  "sc-cli",
@@ -2632,15 +2793,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "jupiter-dev-executor"
-version = "0.1.0"
-dependencies = [
- "frame-benchmarking",
- "jupiter-dev-runtime",
- "sc-executor",
-]
-
-[[package]]
 name = "jupiter-dev-runtime"
 version = "0.1.0"
 dependencies = [
@@ -2651,16 +2803,18 @@ dependencies = [
  "frame-system-benchmarking",
  "frame-system-rpc-runtime-api",
  "hex-literal 0.3.1",
+ "jupiter-chain-extension",
  "jupiter-primitives",
  "jupiter-runtime-common",
  "pallet-authorship",
  "pallet-balances",
- "pallet-contracts 2.0.0",
+ "pallet-contracts",
  "pallet-contracts-primitives",
  "pallet-contracts-rpc-runtime-api",
  "pallet-indices",
  "pallet-randomness-collective-flip",
  "pallet-sudo",
+ "pallet-template",
  "pallet-timestamp",
  "pallet-transaction-payment",
  "pallet-transaction-payment-rpc-runtime-api",
@@ -2685,6 +2839,7 @@ name = "jupiter-executor"
 version = "0.1.0"
 dependencies = [
  "frame-benchmarking",
+ "jupiter-io",
  "jupiter-runtime",
  "sc-executor",
 ]
@@ -2693,8 +2848,11 @@ dependencies = [
 name = "jupiter-io"
 version = "0.2.0"
 dependencies = [
- "megaclite",
+ "megaclite-arkworks",
+ "num-bigint 0.3.1",
+ "num-traits",
  "sp-runtime-interface",
+ "sp-std",
 ]
 
 [[package]]
@@ -2745,6 +2903,7 @@ dependencies = [
  "frame-support",
  "frame-system",
  "frame-system-rpc-runtime-api",
+ "jupiter-chain-extension",
  "jupiter-primitives",
  "jupiter-runtime-common",
  "pallet-authority-discovery",
@@ -2753,7 +2912,7 @@ dependencies = [
  "pallet-balances",
  "pallet-bounties",
  "pallet-collective",
- "pallet-contracts 2.0.0 (git+https://github.com/paritytech/substrate)",
+ "pallet-contracts",
  "pallet-contracts-primitives",
  "pallet-contracts-rpc-runtime-api",
  "pallet-democracy",
@@ -3506,11 +3665,25 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "60302e4db3a61da70c0cb7991976248362f30319e88850c487b9b95bbf059e00"
 
 [[package]]
-name = "megaclite"
+name = "megaclite-arkworks"
 version = "0.1.0"
-source = "git+https://github.com/patractlabs/megaclite.git#83484f7c6329fbfc74856c87d6fddf1ef033e43d"
+source = "git+https://github.com/patractlabs/megaclite.git#b40b9b1e795dccec06bfa04771e2e8bc7b2f41a3"
 dependencies = [
- "bellman_ce",
+ "ark-bls12-377",
+ "ark-bls12-381",
+ "ark-bn254",
+ "ark-bw6-761",
+ "ark-cp6-782",
+ "ark-ec",
+ "ark-ff",
+ "ark-groth16",
+ "ark-relations",
+ "ark-serialize",
+ "ark-std",
+ "num-bigint 0.3.1",
+ "num-traits",
+ "rand 0.7.3",
+ "rustc-hex",
 ]
 
 [[package]]
@@ -3808,6 +3981,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "num-bigint"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5e9a41747ae4633fce5adffb4d2e81ffc5e89593cb19917f8fb2cc5ff76507bf"
+dependencies = [
+ "autocfg",
+ "num-integer",
+ "num-traits",
+]
+
+[[package]]
 name = "num-complex"
 version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3834,7 +4018,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5c000134b5dbf44adc5cb772486d335293351644b801551abe8f75c84cfa4aef"
 dependencies = [
  "autocfg",
- "num-bigint",
+ "num-bigint 0.2.6",
  "num-integer",
  "num-traits",
 ]
@@ -3916,17 +4100,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6ff55baddef9e4ad00f88b6c743a2a8062d4c6ade126c2a528644b8e444d52ce"
 dependencies = [
  "stable_deref_trait",
-]
-
-[[package]]
-name = "pairing_ce"
-version = "0.21.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bfc00d65b1d29e0a067a967fcea83d8db261c149f76a557ba73f0304f01cdfde"
-dependencies = [
- "byteorder",
- "ff_ce",
- "rand 0.4.6",
 ]
 
 [[package]]
@@ -4037,7 +4210,6 @@ dependencies = [
  "frame-benchmarking",
  "frame-support",
  "frame-system",
- "jupiter-io",
  "pallet-contracts-primitives",
  "pallet-contracts-proc-macro",
  "parity-scale-codec",
@@ -4045,27 +4217,6 @@ dependencies = [
  "pwasm-utils 0.16.0",
  "rand 0.7.3",
  "rand_pcg",
- "serde",
- "sp-core",
- "sp-io",
- "sp-runtime",
- "sp-sandbox",
- "sp-std",
- "wasmi-validation",
-]
-
-[[package]]
-name = "pallet-contracts"
-version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate?branch=master#987a9723920217917f2708388d150add5ef52ef7"
-dependencies = [
- "frame-support",
- "frame-system",
- "pallet-contracts-primitives",
- "pallet-contracts-proc-macro",
- "parity-scale-codec",
- "parity-wasm 0.41.0",
- "pwasm-utils 0.16.0",
  "serde",
  "sp-core",
  "sp-io",
@@ -4388,6 +4539,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "pallet-template"
+version = "2.0.0"
+dependencies = [
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "jupiter-io",
+ "megaclite-arkworks",
+ "pallet-contracts",
+ "parity-scale-codec",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
+ "wat",
+]
+
+[[package]]
 name = "pallet-timestamp"
 version = "2.0.0"
 source = "git+https://github.com/paritytech/substrate?branch=master#987a9723920217917f2708388d150add5ef52ef7"
@@ -4656,7 +4825,7 @@ checksum = "f842b1982eb6c2fe34036a4fbfb06dd185a3f5c8edfaacdf7d1ea10b07de6252"
 dependencies = [
  "lock_api 0.3.4",
  "parking_lot_core 0.6.2",
- "rustc_version",
+ "rustc_version 0.2.3",
 ]
 
 [[package]]
@@ -4690,7 +4859,7 @@ dependencies = [
  "cloudabi 0.0.3",
  "libc",
  "redox_syscall",
- "rustc_version",
+ "rustc_version 0.2.3",
  "smallvec 0.6.13",
  "winapi 0.3.9",
 ]
@@ -5244,7 +5413,7 @@ checksum = "b4a349ca83373cfa5d6dbb66fd76e58b2cca08da71a5f6400de0a0a6a9bceeaf"
 dependencies = [
  "bitflags",
  "cc",
- "rustc_version",
+ "rustc_version 0.2.3",
 ]
 
 [[package]]
@@ -5271,7 +5440,7 @@ version = "1.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9ab346ac5921dc62ffa9f89b7a773907511cdfa5490c572ae9be1be33e8afa4a"
 dependencies = [
- "crossbeam-channel 0.5.0",
+ "crossbeam-channel",
  "crossbeam-deque 0.8.0",
  "crossbeam-utils 0.8.0",
  "lazy_static",
@@ -5465,6 +5634,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "rustc_version"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "65c94201b44764d6d1f7e37c15a8289ed55e546c1762c7f1d57f616966e0c181"
+dependencies = [
+ "semver 0.11.0",
+]
+
+[[package]]
 name = "rustls"
 version = "0.18.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5525,7 +5703,7 @@ version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6d3d055a2582e6b00ed7a31c1524040aa391092bf636328350813f3a0605215c"
 dependencies = [
- "rustc_version",
+ "rustc_version 0.2.3",
 ]
 
 [[package]]
@@ -5786,7 +5964,7 @@ dependencies = [
  "futures-timer 3.0.2",
  "log",
  "merlin",
- "num-bigint",
+ "num-bigint 0.2.6",
  "num-rational",
  "num-traits",
  "parity-scale-codec",
@@ -6847,12 +7025,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "795dd7aeeee24468e5a32661f6d27f7b5cbed802031b2d7640c7b10f8fb2dd50"
 dependencies = [
  "aes-gcm",
- "blake2",
+ "blake2 0.9.1",
  "chacha20poly1305",
  "rand 0.7.3",
  "rand_core 0.5.1",
  "ring",
- "rustc_version",
+ "rustc_version 0.2.3",
  "sha2 0.9.2",
  "subtle 2.3.0",
  "x25519-dalek",
@@ -8264,7 +8442,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "04f8ab788026715fa63b31960869617cba39117e520eb415b0139543e325ab59"
 dependencies = [
  "cfg-if 0.1.10",
- "rand 0.7.3",
+ "rand 0.3.23",
  "static_assertions",
 ]
 

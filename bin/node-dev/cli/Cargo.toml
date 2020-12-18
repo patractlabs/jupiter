@@ -36,7 +36,7 @@ frame-benchmarking-cli = { version = "2.0.0", git = "https://github.com/parityte
 
 jupiter-primitives = { path = "../../../primitives" }
 jupiter-dev-runtime = { path = "../../../runtime/jupiter-dev" }
-jupiter-dev-executor = { path = "../executor" }
+# jupiter-dev-executor = { path = "../executor" }
 jupiter-rpc = { path = "../../../rpc" }
 jupiter-io = { path = "../../../primitives/io" }
 

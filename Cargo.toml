@@ -9,6 +9,8 @@ members = [
 #    "runtime/jupiter-para",
     "primitives",
     "primitives/io",
+    "primitives/chain-extension",
+    "pallets/template",
     "rpc",
 ]
 exclude = ["vendor/substrate"]
