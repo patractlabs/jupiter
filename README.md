@@ -15,8 +15,8 @@ to deploy and run contracts on Jupiter blockchain.
 
 Jupiter `FRAME contracts pallet` contains our `ChainExtension` to provide many particular features for contracts, and contains some compatible modifications.
 * ChainExtension
-    * Contract Logger support
-    * Zero-Knowledge support
+    - [ ] Contract Logger support
+    - [x] Zero-Knowledge support, refer to this link [PIP-101](https://github.com/patractlabs/PIPs/blob/main/PIPs/pip-101.md)
 * Jupiter modifications
     * // No features for now.
     
@@ -37,6 +37,15 @@ This repo provide three type node:
     and **provide Babe VRF random number for contract module.**
   
     This node uses `modified pallet-contract` now.
+
+    **Jupiter testnet is in PoA now**, we would change to PoS Later.
+
+    **Jupiter open provider link is:**
+  
+    - `wss://jupiter.elara.patract.io/` (not yet)
+    - `wss://ws.jupiter.patract.cn/`
+    
+    Jupiter open telemetry link is [https://telemetry.polkadot.io/](https://telemetry.polkadot.io/)
   
 * Jupiter parachain node: (This node is not merged into `master` branch now.)
 
@@ -69,7 +78,7 @@ Note: Substrate newest master is very different with Substrate v2.0.0 version. I
 master as dependencies, and in Jupiter `substrate-v2.0.0` branch, we use Substrate v2.0.0 from "crates.io" as dependencies.
 
 Thus, jupiter has two main branch. In different branch, we provide different `pallet-contracts` features:
-* master: we track newest master, currently we use substrate commit:[`c88b104028b4fdda35311adb12eabf7aa5aa4316`](https://github.com/paritytech/substrate/commit/c88b104028b4fdda35311adb12eabf7aa5aa4316).
+* master: we track newest master, currently we use substrate commit:[`987a9723920217917f2708388d150add5ef52ef7`](https://github.com/paritytech/substrate/commit/987a9723920217917f2708388d150add5ef52ef7).
     * In master, we use `src pallet-contract` or `modified pallet-contract`
     * `src pallet-contract` is belong to substrate commit version.
     * `modified pallet-contract` is belong to the forked substrate in vendor directory. We usually track the newest substrate version.
@@ -155,16 +164,17 @@ More parameters please lookup from `--help` or Substrate Developer Hub [https://
 The blockchain produce blocks in `babe` algorithm for every **6 second**, and do finality by `grandpa` algorithm. 
 All people could join this testnet, either a sync node or a validator node. 
 
-**Welcome use this link (TODO) to claim some JPT from our faucet**
+**Welcome use this link [https://patrastore.io/](https://patrastore.io/) to claim some JPT from our faucet**
 
 ##### 4.1.1 join jupiter testnet
-// TODO. not support yet 
-
 Moving the execution file `jupiter` to other place and launch the node by following steps:
 ```bash
-jupiter --chain=testnet --name=<set you custom name> --pruning=archive --execution=NativeElseWasm
+./jupiter --chain=testnet --name=<set you custom name> --pruning=archive --execution=NativeElseWasm
 ```
-Those steps is same to any other substrate node, just should notice this parameter `--chain` should use `testnet`
+Those steps is same to any other substrate node, just should notice this parameter `--chain` should use `testnet`. If you 
+want to start a validator node, please wait until we announce starting PoS.
+
+You could lookup your node in [https://telemetry.polkadot.io/](https://telemetry.polkadot.io/).
 
 ##### 4.1.2 start local dev mode jupiter blockchain
 Notice this dev mode just means jupiter start with `--dev`, which is using dev config to start `jupiter`, not the 
@@ -209,9 +219,11 @@ For apps, developer or user could do following things:
     1. if you run you node on your machine, you just choose `Local Node`, which is `127.0.0.1:9944` for you websocket 
     address for your node (or other ip:port for you node).
     2. if you want to connect "jupiter testnet", you should choose "custom endpoint" and put the following address
-        ````
+        ```
         wss://jupiter.elara.patract.io/
-        ````
+        or
+        wss://ws.jupiter.patract.cn/
+        ```
         All developer could connect to public test network directly.
     
 2. Click `Settings` tab and click `Developer` in this tab view, parse the above json into it, and click `Save`.
