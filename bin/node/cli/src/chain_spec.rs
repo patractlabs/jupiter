@@ -3,7 +3,7 @@ use std::convert::TryInto;
 
 use hex_literal::hex;
 
-use sc_service::ChainType;
+use sc_service::{config::TelemetryEndpoints, ChainType};
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_consensus_babe::AuthorityId as BabeId;
 use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public};
@@ -24,7 +24,7 @@ use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use pallet_staking::{Forcing, StakerStatus};
 
 // The URL for the telemetry server.
-// const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
+const PATRACT_TELEMETRY_URL: &str = "wss://telemetry.patract.io/submit";
 
 /// Specialized `ChainSpec`. This is a specialization of the general Substrate ChainSpec type.
 pub type ChainSpec = sc_service::GenericChainSpec<GenesisConfig>;
@@ -350,7 +350,12 @@ pub fn staging_testnet_config() -> Result<ChainSpec, String> {
             "/dns/staging-4.jupiter.p2p.patract.io/tcp/30336/p2p/12D3KooWMx9TH6AtZf8y7DnVxDfYJmLPrL43uVbrhsnH8JtsvH2r".to_string().try_into().expect("must be valid bootnode"),
         ],
         // Telemetry
-        None,
+        Some(TelemetryEndpoints::new(
+            vec![
+                (PATRACT_TELEMETRY_URL.to_string(), 0)
+            ])
+                 .expect("Polkadot Staging telemetry url is valid; qed"),
+        ),
         // Protocol ID
         Some("jupiter_staging_testnet"),
         // Properties
