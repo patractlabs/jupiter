@@ -2690,8 +2690,8 @@ name = "jupiter-chain-extension"
 version = "0.1.0"
 dependencies = [
  "jupiter-io",
- "megaclite-arkworks 0.1.0 (git+https://github.com/patractlabs/megaclite.git)",
- "pallet-contracts 2.0.0",
+ "megaclite-arkworks",
+ "pallet-contracts",
  "sp-runtime",
  "sp-std",
 ]
@@ -2709,7 +2709,7 @@ dependencies = [
  "jupiter-runtime-common",
  "log",
  "pallet-authority-discovery",
- "pallet-contracts 2.0.0 (git+https://github.com/paritytech/substrate)",
+ "pallet-contracts",
  "pallet-im-online",
  "pallet-staking",
  "parking_lot 0.10.2",
@@ -2756,7 +2756,7 @@ dependencies = [
  "jupiter-primitives",
  "jupiter-rpc",
  "log",
- "pallet-contracts 2.0.0",
+ "pallet-contracts",
  "parking_lot 0.10.2",
  "sc-basic-authorship",
  "sc-cli",
@@ -2793,7 +2793,7 @@ dependencies = [
  "jupiter-runtime-common",
  "pallet-authorship",
  "pallet-balances",
- "pallet-contracts 2.0.0",
+ "pallet-contracts",
  "pallet-contracts-primitives",
  "pallet-contracts-rpc-runtime-api",
  "pallet-indices",
@@ -2832,7 +2832,7 @@ dependencies = [
 name = "jupiter-io"
 version = "0.2.0"
 dependencies = [
- "megaclite-arkworks 0.1.0",
+ "megaclite-arkworks",
  "num-bigint 0.3.1",
  "num-traits",
  "sp-runtime-interface",
@@ -2887,6 +2887,7 @@ dependencies = [
  "frame-support",
  "frame-system",
  "frame-system-rpc-runtime-api",
+ "jupiter-chain-extension",
  "jupiter-primitives",
  "jupiter-runtime-common",
  "pallet-authority-discovery",
@@ -2894,7 +2895,7 @@ dependencies = [
  "pallet-babe",
  "pallet-balances",
  "pallet-collective",
- "pallet-contracts 2.0.0 (git+https://github.com/paritytech/substrate)",
+ "pallet-contracts",
  "pallet-contracts-primitives",
  "pallet-contracts-rpc-runtime-api",
  "pallet-democracy",
@@ -3664,26 +3665,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "megaclite-arkworks"
-version = "0.1.0"
-source = "git+https://github.com/patractlabs/megaclite.git#cb5277ac81b36951e79cb4e1c6e29f0ccdd695fa"
-dependencies = [
- "ark-bls12-377",
- "ark-bls12-381",
- "ark-bn254",
- "ark-bw6-761",
- "ark-cp6-782",
- "ark-ec",
- "ark-ff",
- "ark-serialize",
- "ark-std",
- "num-bigint 0.3.1",
- "num-traits",
- "rand 0.7.3",
- "rustc-hex",
-]
-
-[[package]]
 name = "memchr"
 version = "2.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4209,27 +4190,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pallet-contracts"
-version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate?branch=master#c88b104028b4fdda35311adb12eabf7aa5aa4316"
-dependencies = [
- "frame-support",
- "frame-system",
- "pallet-contracts-primitives",
- "pallet-contracts-proc-macro",
- "parity-scale-codec",
- "parity-wasm 0.41.0",
- "pwasm-utils 0.16.0",
- "serde",
- "sp-core",
- "sp-io",
- "sp-runtime",
- "sp-sandbox",
- "sp-std",
- "wasmi-validation",
-]
-
-[[package]]
 name = "pallet-contracts-primitives"
 version = "2.0.0"
 source = "git+https://github.com/paritytech/substrate?branch=master#c88b104028b4fdda35311adb12eabf7aa5aa4316"
@@ -4545,6 +4505,7 @@ dependencies = [
 name = "pallet-template"
 version = "2.0.0"
 dependencies = [
+ "assert_matches",
  "frame-benchmarking",
  "frame-support",
  "frame-system",
@@ -4552,9 +4513,9 @@ dependencies = [
  "jupiter-chain-extension",
  "jupiter-io",
  "jupiter-runtime-common",
- "megaclite-arkworks 0.1.0",
+ "megaclite-arkworks",
  "pallet-balances",
- "pallet-contracts 2.0.0",
+ "pallet-contracts",
  "pallet-randomness-collective-flip",
  "pallet-timestamp",
  "pallet-transaction-payment",

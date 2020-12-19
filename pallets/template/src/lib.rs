@@ -1,12 +1,10 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use contract::{CodeHash, Module as Contracts};
+use contract::{BalanceOf, CodeHash, Gas, Module as Contracts};
 /// Edit this file to define custom logic or remove it if it is not needed.
 /// Learn more about FRAME and the core library of Substrate FRAME pallets:
 /// https://substrate.dev/docs/en/knowledgebase/runtime/frame
-use frame_support::{
-    decl_error, decl_event, decl_module, decl_storage, dispatch, traits::Get, weights::Weight,
-};
+use frame_support::{decl_error, decl_event, decl_module, decl_storage, dispatch, traits::Get};
 use sp_core::crypto::UncheckedFrom;
 use sp_runtime::traits::StaticLookup;
 use sp_std::vec::Vec;
@@ -90,14 +88,16 @@ decl_module! {
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn call(
             origin,
-            addr: T::AccountId,
+            dest: <T::Lookup as StaticLookup>::Source,
+            value: BalanceOf<T>,
+            gas: Gas,
             data: Vec<u8>,
         ) -> dispatch::DispatchResultWithPostInfo {
             <Contracts<T>>::call(
                 origin,
-                T::Lookup::unlookup(addr), // contract address
-                0u32.into(), // T::Currency::minimum_balance() * 100u32.into(), // value
-                Weight::max_value(), // gas_limit
+                dest, // contract address
+                value, // T::Currency::minimum_balance() * 100u32.into(), // value
+                gas, // gas_limit
                 data // fn
             )
         }

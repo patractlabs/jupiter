@@ -1,4 +1,4 @@
-use crate::{Config, Module};
+use crate::Config;
 use frame_support::{impl_outer_event, impl_outer_origin, parameter_types, weights::Weight};
 use frame_system as system;
 use sp_runtime::{
@@ -123,15 +123,9 @@ impl contract::Config for Test {
     type ChainExtension = jupiter_chain_extension::JupiterExt;
 }
 
-pub type Template = Module<Test>;
 pub type Contracts = contract::Module<Test>;
 
 pub const ALICE: AccountId32 = AccountId32::new([1u8; 32]);
-pub const BOB: AccountId32 = AccountId32::new([2u8; 32]);
-pub const CHARLIE: AccountId32 = AccountId32::new([3u8; 32]);
-pub const DJANGO: AccountId32 = AccountId32::new([4u8; 32]);
-
-pub const GAS_LIMIT: contract::Gas = 10_000_000_000;
 
 pub struct ExtBuilder {
     existential_deposit: u64,
@@ -145,13 +139,15 @@ impl Default for ExtBuilder {
 }
 
 impl ExtBuilder {
+    pub fn set_associated_consts(&self) {
+        EXISTENTIAL_DEPOSIT.with(|v| *v.borrow_mut() = self.existential_deposit);
+    }
+
     pub fn existential_deposit(mut self, existential_deposit: u64) -> Self {
         self.existential_deposit = existential_deposit;
         self
     }
-    pub fn set_associated_consts(&self) {
-        EXISTENTIAL_DEPOSIT.with(|v| *v.borrow_mut() = self.existential_deposit);
-    }
+
     pub fn build(self) -> sp_io::TestExternalities {
         self.set_associated_consts();
         let mut t = frame_system::GenesisConfig::default()

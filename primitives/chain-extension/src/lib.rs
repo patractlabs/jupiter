@@ -17,13 +17,21 @@ impl ChainExtension for JupiterExt {
     where
         <E::T as SysConfig>::AccountId: UncheckedFrom<<E::T as SysConfig>::Hash> + AsRef<[u8]>,
     {
-        env.charge_weight(1_000_000_000_u64)?;
+        sp_std::if_std! {}
+        // env.charge_weight(1_000_000_000_u64)?;
         let mut env = env.buf_in_buf_out();
         let input: Vec<u8> = env.read_as()?;
-        let output = curve::call(func_id, &input)
-            .map_err(|_| DispatchError::Other("Call chain extension failed"))?;
+        sp_std::if_std! {
+            println!("fn_id: {}, input_len: {:?}", func_id, input.len());
+        }
+        let output = curve::call(func_id, &input).map_err(|e| {
+            sp_std::if_std! {
+                println!("{:?}", e);
+            }
+            DispatchError::Other("Call chain extension failed")
+        })?;
         env.write(&output, false, None)?;
-        Ok(RetVal::Converging(0))
+        Ok(RetVal::Converging(func_id))
     }
 
     fn enabled() -> bool {

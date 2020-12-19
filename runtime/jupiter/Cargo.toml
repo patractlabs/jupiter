@@ -60,13 +60,15 @@ pallet-timestamp = { version = "2.0.0", git = "https://github.com/paritytech/sub
 pallet-utility = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 
 # vendor modules
-pallet-contracts = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+# pallet-contracts = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-contracts = { path = "../../vendor/substrate/frame/contracts", default-features = false }
 pallet-contracts-primitives = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-contracts-rpc-runtime-api = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 
 # local runtime module
 jupiter-primitives = { path = "../../primitives", default-features = false }
 jupiter-runtime-common = { path = "../common", default-features = false }
+jupiter-chain-extension = { path = "../../primitives/chain-extension", default-features = false }
 
 [build-dependencies]
 substrate-wasm-builder = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
@@ -127,4 +129,5 @@ std = [
 
     "jupiter-primitives/std",
     "jupiter-runtime-common/std",
+    "jupiter-chain-extension/std",
 ]
