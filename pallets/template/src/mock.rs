@@ -20,7 +20,7 @@ pub struct Test;
 
 impl Convert<Weight, contract::BalanceOf<Self>> for Test {
     fn convert(w: Weight) -> contract::BalanceOf<Self> {
-        w
+        w as u128
     }
 }
 
@@ -47,7 +47,7 @@ impl system::Config for Test {
     type DbWeight = ();
     type Version = ();
     type PalletInfo = ();
-    type AccountData = pallet_balances::AccountData<u64>;
+    type AccountData = pallet_balances::AccountData<u128>;
     type OnNewAccount = ();
     type OnKilledAccount = ();
     type SystemWeightInfo = ();
@@ -57,7 +57,7 @@ impl system::Config for Test {
 
 parameter_types! {
     pub const MinimumPeriod: u64 = 1;
-    pub static ExistentialDeposit: u64 = 0;
+    pub static ExistentialDeposit: u128 = 0;
 }
 
 impl pallet_timestamp::Config for Test {
@@ -83,7 +83,7 @@ type System = system::Module<Test>;
 
 impl pallet_balances::Config for Test {
     type MaxLocks = ();
-    type Balance = u64;
+    type Balance = u128;
     type Event = ();
     type DustRemoval = ();
     type ExistentialDeposit = ExistentialDeposit;
@@ -97,11 +97,11 @@ type Randomness = pallet_randomness_collective_flip::Module<Test>;
 
 parameter_types! {
     pub const SignedClaimHandicap: u64 = 2;
-    pub const TombstoneDeposit: u64 = 16;
+    pub const TombstoneDeposit: u128 = 16;
     pub const StorageSizeOffset: u32 = 8;
-    pub const RentByteFee: u64 = 4;
-    pub const RentDepositOffset: u64 = 10_000;
-    pub const SurchargeReward: u64 = 150;
+    pub const RentByteFee: u128 = 4;
+    pub const RentDepositOffset: u128 = 10_000;
+    pub const SurchargeReward: u128 = 150;
     pub const MaxDepth: u32 = 100;
     pub const MaxValueSize: u32 = 16_384;
 }
@@ -130,7 +130,7 @@ pub type Contracts = contract::Module<Test>;
 pub const ALICE: AccountId32 = AccountId32::new([1u8; 32]);
 
 pub struct ExtBuilder {
-    existential_deposit: u64,
+    existential_deposit: u128,
 }
 impl Default for ExtBuilder {
     fn default() -> Self {
@@ -145,7 +145,7 @@ impl ExtBuilder {
         EXISTENTIAL_DEPOSIT.with(|v| *v.borrow_mut() = self.existential_deposit);
     }
 
-    pub fn existential_deposit(mut self, existential_deposit: u64) -> Self {
+    pub fn existential_deposit(mut self, existential_deposit: u128) -> Self {
         self.existential_deposit = existential_deposit;
         self
     }
@@ -158,11 +158,12 @@ impl ExtBuilder {
         pallet_balances::GenesisConfig::<Test> { balances: vec![] }
             .assimilate_storage(&mut t)
             .unwrap();
-        contract::GenesisConfig::<Test> {
-            current_schedule: contract::Schedule::<Test>::default(),
-        }
-        .assimilate_storage(&mut t)
-        .unwrap();
+
+        let mut current_schedule = contract::Schedule::<Test>::default();
+        current_schedule.enable_println = true;
+        contract::GenesisConfig::<Test> { current_schedule }
+            .assimilate_storage(&mut t)
+            .unwrap();
         let mut ext = sp_io::TestExternalities::new(t);
         ext.execute_with(|| System::set_block_number(1));
         ext
@@ -171,7 +172,7 @@ impl ExtBuilder {
 
 /// Compile groth16 with test data
 pub fn groth16_addr(caller: AccountId32) -> AccountId32 {
-    let module = include_bytes!(concat!(env!("OUT_DIR"), "/groth16.wasm")).to_vec();
+    let module = include_bytes!("../res/groth16.wasm").to_vec();
     let hash = <Test as frame_system::Config>::Hashing::hash(&module);
     let _ = crate::mock::Balances::deposit_creating(&caller, 100_000_000_000_000);
     Contracts::put_code(Origin::signed(caller.clone()), module).unwrap();
