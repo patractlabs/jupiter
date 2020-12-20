@@ -49,9 +49,6 @@ pallet-transaction-payment = { git = "https://github.com/paritytech/substrate", 
 jupiter-runtime-common = { path = "../../runtime/common" }
 jupiter-chain-extension = { path = "../../primitives/chain-extension" }
 
-[build-dependencies]
-wat = "1.0"
-
 [features]
 default = ['std']
 std = [

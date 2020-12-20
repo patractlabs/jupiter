@@ -4528,7 +4528,6 @@ dependencies = [
  "sp-io",
  "sp-runtime",
  "sp-std",
- "wat",
 ]
 
 [[package]]
