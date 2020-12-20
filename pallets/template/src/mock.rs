@@ -185,6 +185,6 @@ pub fn groth16_addr(caller: AccountId32) -> AccountId32 {
         b"".to_vec(),                // salt
     )
     .unwrap();
-    let addr = Contracts::contract_address(&ALICE, &hash, &b"".to_vec());
+    let addr = Contracts::contract_address(&caller, &hash, &b"".to_vec());
     addr
 }
