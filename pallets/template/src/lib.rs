@@ -95,10 +95,10 @@ decl_module! {
         ) -> dispatch::DispatchResultWithPostInfo {
             <Contracts<T>>::call(
                 origin,
-                dest, // contract address
+                dest,  // contract address
                 value, // T::Currency::minimum_balance() * 100u32.into(), // value
-                gas, // gas_limit
-                data // fn
+                gas,   // gas_limit
+                data   // fn
             )
         }
 

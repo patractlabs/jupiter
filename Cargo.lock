@@ -2692,6 +2692,7 @@ dependencies = [
  "jupiter-io",
  "megaclite-arkworks",
  "pallet-contracts",
+ "parity-scale-codec",
  "sp-runtime",
  "sp-std",
 ]
@@ -3647,6 +3648,7 @@ checksum = "60302e4db3a61da70c0cb7991976248362f30319e88850c487b9b95bbf059e00"
 [[package]]
 name = "megaclite-arkworks"
 version = "0.1.0"
+source = "git+https://github.com/patractlabs/megaclite.git#40b05c1dee61e1dc77b785e8d12914a9eb7db272"
 dependencies = [
  "ark-bls12-377",
  "ark-bls12-381",
@@ -3659,7 +3661,9 @@ dependencies = [
  "ark-relations",
  "ark-serialize",
  "ark-std",
+ "cfg-if 1.0.0",
  "num-bigint 0.3.1",
+ "parity-scale-codec",
  "rand 0.7.3",
  "rustc-hex",
 ]
