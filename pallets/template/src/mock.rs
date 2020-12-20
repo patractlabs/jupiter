@@ -1,9 +1,11 @@
 use crate::Config;
-use frame_support::{impl_outer_event, impl_outer_origin, parameter_types, weights::Weight};
+use frame_support::{
+    impl_outer_event, impl_outer_origin, parameter_types, traits::Currency, weights::Weight,
+};
 use frame_system as system;
 use sp_runtime::{
     testing::{Header, H256},
-    traits::{BlakeTwo256, Convert, IdentityLookup},
+    traits::{BlakeTwo256, Convert, Hash, IdentityLookup},
     AccountId32, Perbill,
 };
 
@@ -165,4 +167,23 @@ impl ExtBuilder {
         ext.execute_with(|| System::set_block_number(1));
         ext
     }
+}
+
+/// Compile groth16 with test data
+pub fn groth16_addr(caller: AccountId32) -> AccountId32 {
+    let module = include_bytes!(concat!(env!("OUT_DIR"), "/groth16.wasm")).to_vec();
+    let hash = <Test as frame_system::Config>::Hashing::hash(&module);
+    let _ = crate::mock::Balances::deposit_creating(&caller, 100_000_000_000_000);
+    Contracts::put_code(Origin::signed(caller.clone()), module).unwrap();
+    Contracts::instantiate(
+        Origin::signed(ALICE.clone()),
+        1_000_000,                   // endowment
+        Weight::max_value(),         // gas_limit
+        hash.clone(),                // code_hash
+        [106, 55, 18, 226].to_vec(), // flip
+        b"".to_vec(),                // salt
+    )
+    .unwrap();
+    let addr = Contracts::contract_address(&ALICE, &hash, &b"".to_vec());
+    addr
 }

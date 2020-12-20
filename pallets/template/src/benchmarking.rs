@@ -68,6 +68,7 @@ benchmarks! {
 
         // Calculate addr
         let addr = Contracts::<T>::contract_address(&caller, &hash, &b"".to_vec());
+        let data = hex::decode().expect("Decode failed");
     }: call(origin, addr, endowment, Weight::max_value(), vec![192, 150, 165, 243])
 
     wasm_bls12_377_add {
