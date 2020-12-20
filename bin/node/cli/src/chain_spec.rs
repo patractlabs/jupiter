@@ -3,21 +3,28 @@ use std::convert::TryInto;
 
 use hex_literal::hex;
 
-use sc_service::ChainType;
+use sc_service::{config::TelemetryEndpoints, ChainType};
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_consensus_babe::AuthorityId as BabeId;
 use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public};
 use sp_finality_grandpa::AuthorityId as GrandpaId;
-use sp_runtime::traits::{IdentifyAccount, Verify};
+use sp_runtime::{
+    traits::{IdentifyAccount, Verify},
+    Perbill,
+};
 
 use jupiter_runtime::{AccountId, SessionKeys, Signature};
 use jupiter_runtime::{
-    AuthorityDiscoveryConfig, BabeConfig, BalancesConfig, ContractsConfig, GenesisConfig,
-    GrandpaConfig, IndicesConfig, SessionConfig, SudoConfig, SystemConfig, WASM_BINARY,
+    AuthorityDiscoveryConfig, BalancesConfig, ContractsConfig, CouncilConfig, GenesisConfig,
+    IndicesConfig, SessionConfig, StakingConfig, SudoConfig, SystemConfig,
+    TechnicalCommitteeConfig, WASM_BINARY,
 };
+use jupiter_runtime_common::constants::currency::DOTS;
+use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
+use pallet_staking::{Forcing, StakerStatus};
 
 // The URL for the telemetry server.
-// const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
+const PATRACT_TELEMETRY_URL: &str = "wss://telemetry.patract.io/submit";
 
 /// Specialized `ChainSpec`. This is a specialization of the general Substrate ChainSpec type.
 pub type ChainSpec = sc_service::GenericChainSpec<GenesisConfig>;
@@ -45,6 +52,7 @@ type AuthorityKeysTuple = (
     AccountId, // (SessionKey)
     BabeId,
     GrandpaId,
+    ImOnlineId,
     AuthorityDiscoveryId,
 );
 /// Helper function to generate stash, controller and session key from seed
@@ -54,6 +62,7 @@ pub fn authority_keys_from_seed(seed: &str) -> AuthorityKeysTuple {
         get_account_id_from_seed::<sr25519::Public>(&format!("{}//stash", seed)),
         get_from_seed::<BabeId>(seed),
         get_from_seed::<GrandpaId>(seed),
+        get_from_seed::<ImOnlineId>(seed),
         get_from_seed::<AuthorityDiscoveryId>(seed),
     )
 }
@@ -61,11 +70,13 @@ pub fn authority_keys_from_seed(seed: &str) -> AuthorityKeysTuple {
 fn session_keys(
     babe: BabeId,
     grandpa: GrandpaId,
+    im_online: ImOnlineId,
     authority_discovery: AuthorityDiscoveryId,
 ) -> SessionKeys {
     SessionKeys {
         babe,
         grandpa,
+        im_online,
         authority_discovery,
     }
 }
@@ -107,7 +118,7 @@ pub fn development_config() -> Result<ChainSpec, String> {
             json!({
                 "ss58Format": 42,
                 "tokenDecimals": 10,
-                "tokenSymbol": "DOT (new)"
+                "tokenSymbol": "JPT"
             })
             .as_object()
             .expect("network properties generation can not fail; qed")
@@ -166,7 +177,7 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
             json!({
                 "ss58Format": 42,
                 "tokenDecimals": 10,
-                "tokenSymbol": "DOT (new)"
+                "tokenSymbol": "JPT"
             })
             .as_object()
             .expect("network properties generation can not fail; qed")
@@ -185,9 +196,10 @@ pub fn staging_testnet_config() -> Result<ChainSpec, String> {
     let root_key: AccountId =
         hex!["8a5b214c82362a8aba60af2a5fee63989f1ae4ce3ec802251c0b3ff9f4ad1826"].into();
     // bash:
-    // for i in 1 2; do for j in stash controller; do subkey inspect "$SECRET//$i//$j"; done; done
-    // for i in 1 2; do for j in babe; do subkey inspect --scheme Sr25519 "$SECRET//$i//$j"; done; done
-    // for i in 1 2; do for j in grandpa; do subkey inspect --scheme Ed25519 "$SECRET//$i//$j"; done; done
+    // for i in 1 2 3 4; do for j in stash controller; do subkey inspect "$SECRET//$i//$j"; done; done
+    // for i in 1 2 3 4; do for j in babe; do subkey inspect --scheme Sr25519 "$SECRET//$i//$j"; done; done
+    // for i in 1 2 3 4; do for j in grandpa; do subkey inspect --scheme Ed25519 "$SECRET//$i//$j"; done; done
+    // for i in 1 2 3 4; do for j in im_online; do subkey inspect --scheme Sr25519 "$SECRET//$i//$j"; done; done
 
     // stash & controller
     let (stash1, controller1): (AccountId, AccountId) = (
@@ -202,13 +214,31 @@ pub fn staging_testnet_config() -> Result<ChainSpec, String> {
         // 5DMRmiSn4DTdo7HZM2frH88UZFapYGMCgEQukpD6yd5fc1Pm
         hex!["38fd41ccf5b2020e4f79ab9007e0496096ff5edd692c57cba1dbfce5eaa77c69"].into(),
     );
+    let (stash3, controller3): (AccountId, AccountId) = (
+        // 5EEbdKijxzqspBP1SKAbE7gREHx4m5AXfAAB9vaga9rWkEFB
+        hex!["6003f2d767ffb437bad9a5cdf0ea3782cbb36207edd3e284a84eba2419ae3c4d"].into(),
+        // 5G9ALoW7Ccpm8zDwz21RdGHRFhfGYQKFgMDf7JkYXFCnLKHo
+        hex!["b4571275b5dfdcafca6f42e77dd627da0ecde9bd9e60426b38d90dbca511a654"].into(),
+    );
+    let (stash4, controller4): (AccountId, AccountId) = (
+        // 5GvFNec4YCaH2Wu5ysmG938AjtHcrka2h6u8GD9aEiJHut7n
+        hex!["d6ba0dd1b58e3fe1a380f51f289e5745d2bdf3dfef712e5febaea4f867c57429"].into(),
+        // 5Cafs4eRGLi9yyat5YwduLNL2xZA36PoLKjvApk1Cm1ScMwA
+        hex!["16daa7070bf20d6170f39b468b5abadd5d0ad810f7c1e8303fa48a79081d6d44"].into(),
+    );
     // babe
-    // 5EtZp8WCs4yRDvfLapwU8GrSoS9e7qpXVtYZVCNDFBXuVsiW
+    // 5DhZaXAow1FwaJPSn2JNHxMqsmjp6reNLWQmPNuqq5PNZ4CW
     let babe1: BabeId =
-        hex!["7cf92b27e280cef89900a7d351e37cdc6a578104a71f918165f52fee77aef647"].unchecked_into();
-    // 5GRaVtCnSKjeXXXu6S5cVEcqn5yGbnCTGYYeKodxiRbnnZBd
+        hex!["485872201949c11fed2706383b0bdece75f891e579bf44458b7e40d90ab7b84d"].unchecked_into();
+    // 5H3wddAi5xfRvGApjJ4ZQj3bwHf2UNxRGdy6397SxZ48ryyK
     let babe2: BabeId =
-        hex!["c0dc511c88d7ef3bc5b465de48aac4efc643283f179b93d413f97e4a7aac714b"].unchecked_into();
+        hex!["dc984b002d46efcadf477db5fa64fccc14282999663ec909bb6e90b16de24e23"].unchecked_into();
+    // 5Do1StjFe2SPe6fUCKWyVwTg9CKGAd2ZRir2e7XSdQVo6K83
+    let babe3: BabeId =
+        hex!["4c7fc0fe786089da8571fb20b2546d31b6be583b4c640cdf2878461c6ab6ee15"].unchecked_into();
+    // 5Gs4SpDKNQDZxPtB3asd6B3M7mwo8VMasW7YLwLiNu1or4cG
+    let babe4: BabeId =
+        hex!["d44b87bdd403d8b7380ae2380cae6fea08a965c8910791c89b8b595eac90e474"].unchecked_into();
     // grandpa
     // 5CwDbbQZY7dWGhgPvGqbi2WnhcFw7WkpW2ZrmvSvhtM7qVKn
     let grandpa1: GrandpaId =
@@ -216,17 +246,72 @@ pub fn staging_testnet_config() -> Result<ChainSpec, String> {
     // 5G6VvSAqrqNLoqoRM4GUxrKQkfHuZ3ggnW8bbsQZbi187kfu
     let grandpa2: GrandpaId =
         hex!["b24f3f629e5cc692b50f08b9714c67be656b057293bb077beb44781a9a0e2992"].unchecked_into();
-    // authority_discovery same with babe
-    // 5EtZp8WCs4yRDvfLapwU8GrSoS9e7qpXVtYZVCNDFBXuVsiW
+    // 5DTqERGezEdBkhNKaAczspP9MTzv73GAQr91Rf1t82csFUbJ
+    let grandpa3: GrandpaId =
+        hex!["3ddfb449782bb812d1a85a1a05870667549847c254ab981a4586c43d89f09203"].unchecked_into();
+    // 5FVKQ3FXyUSGWt8eBK6Q2NJuzoZaSBtoukGPfqbMfb4RtqV4
+    let grandpa4: GrandpaId =
+        hex!["977a3b37d4be87bcdc027461c30d6c5f7a0e2c4fc11c91b618444a1be9a2b18c"].unchecked_into();
+    // im_online
+    // 5DCVpVpaogBmFaovbpLkvjdzwsNoASYZoFDhyLvGBCi4YdLa
+    let imonline1: ImOnlineId =
+        hex!["322dacd21c5f1db0a530fb8e3d87c5347d9c2e01aab574fea5797ef76a239147"].unchecked_into();
+    // 5EcYTkD6yYBUvtfBi7Y5VtZzCDMfqhGbe2LWTm7yrjudC8VC
+    let imonline2: ImOnlineId =
+        hex!["70c0b15510e3d2d1fda9dbc7568c211932ef6aa49eb4bf48a7068dbeb9acf26e"].unchecked_into();
+    // 5EWsJmZebbHLAnghieEMKrpBpTmu7bSGaT6VRfcV7tpmFnvX
+    let imonline3: ImOnlineId =
+        hex!["6c6ca8b2c42dd0f37981a89998ef37ccb05b6808518e96e01a3d920e02cb6452"].unchecked_into();
+    // 5ESAnfDPdLXAozgazozAPsyoJXy6xD9c1WBbyKQ4pxRZGn5D
+    let imonline4: ImOnlineId =
+        hex!["68d7471ed1508b29497258a46a0cd0bd2eb5b3cce8eefb03b09044827b3bdf0c"].unchecked_into();
+    // authority_discovery (same as im_online)
+    // 5DCVpVpaogBmFaovbpLkvjdzwsNoASYZoFDhyLvGBCi4YdLa
     let audi1: AuthorityDiscoveryId =
-        hex!["7cf92b27e280cef89900a7d351e37cdc6a578104a71f918165f52fee77aef647"].unchecked_into();
-    // 5GRaVtCnSKjeXXXu6S5cVEcqn5yGbnCTGYYeKodxiRbnnZBd
+        hex!["322dacd21c5f1db0a530fb8e3d87c5347d9c2e01aab574fea5797ef76a239147"].unchecked_into();
+    // 5EcYTkD6yYBUvtfBi7Y5VtZzCDMfqhGbe2LWTm7yrjudC8VC
     let audi2: AuthorityDiscoveryId =
-        hex!["c0dc511c88d7ef3bc5b465de48aac4efc643283f179b93d413f97e4a7aac714b"].unchecked_into();
+        hex!["70c0b15510e3d2d1fda9dbc7568c211932ef6aa49eb4bf48a7068dbeb9acf26e"].unchecked_into();
+    // 5EWsJmZebbHLAnghieEMKrpBpTmu7bSGaT6VRfcV7tpmFnvX
+    let audi3: AuthorityDiscoveryId =
+        hex!["6c6ca8b2c42dd0f37981a89998ef37ccb05b6808518e96e01a3d920e02cb6452"].unchecked_into();
+    // 5ESAnfDPdLXAozgazozAPsyoJXy6xD9c1WBbyKQ4pxRZGn5D
+    let audi4: AuthorityDiscoveryId =
+        hex!["68d7471ed1508b29497258a46a0cd0bd2eb5b3cce8eefb03b09044827b3bdf0c"].unchecked_into();
 
     let initial_authorities: Vec<AuthorityKeysTuple> = vec![
-        (controller1.clone(), stash1.clone(), babe1, grandpa1, audi1),
-        (controller2.clone(), stash2.clone(), babe2, grandpa2, audi2),
+        (
+            controller1.clone(),
+            stash1.clone(),
+            babe1,
+            grandpa1,
+            imonline1,
+            audi1,
+        ),
+        (
+            controller2.clone(),
+            stash2.clone(),
+            babe2,
+            grandpa2,
+            imonline2,
+            audi2,
+        ),
+        (
+            controller3.clone(),
+            stash3.clone(),
+            babe3,
+            grandpa3,
+            imonline3,
+            audi3,
+        ),
+        (
+            controller4.clone(),
+            stash4.clone(),
+            babe4,
+            grandpa4,
+            imonline4,
+            audi4,
+        ),
     ];
 
     Ok(ChainSpec::from_genesis(
@@ -249,17 +334,28 @@ pub fn staging_testnet_config() -> Result<ChainSpec, String> {
                     stash1.clone(),
                     controller2.clone(),
                     stash2.clone(),
+                    controller3.clone(),
+                    stash3.clone(),
+                    controller4.clone(),
+                    stash4.clone(),
                 ],
                 true,
             )
         },
         // Bootnodes
         vec![
-            "/dns/p2p.staging-1.patract.io/tcp/30333/p2p/12D3KooWERffViUKxaPU1XEpQ11wPyjBM775XZU6jkApz25wxzEZ".to_string().try_into().expect("must be valid bootnode"),
-            "/dns/p2p.staging-2.patract.io/tcp/30334/p2p/12D3KooWK4YK8jbwirhMsmfMX4QgyihZJGQz72G1Jd4iV8zLjjpq".to_string().try_into().expect("must be valid bootnode"),
+            "/dns/staging-1.jupiter.p2p.patract.io/tcp/30333/p2p/12D3KooWA8LCSwvSvrsVL5ANMzY5z23NDKrnSqLtyNq3geRmUsRT".to_string().try_into().expect("must be valid bootnode"),
+            "/dns/staging-2.jupiter.p2p.patract.io/tcp/30334/p2p/12D3KooWSZAzpj81ouT2bZJFbfL6JTKiMiGZZq82AJZMUDB23JJ5".to_string().try_into().expect("must be valid bootnode"),
+            "/dns/staging-3.jupiter.p2p.patract.io/tcp/30335/p2p/12D3KooWEm8wPo1AAZeiNifEGPz6doJeQeyk3z5343scxpiU46ef".to_string().try_into().expect("must be valid bootnode"),
+            "/dns/staging-4.jupiter.p2p.patract.io/tcp/30336/p2p/12D3KooWMx9TH6AtZf8y7DnVxDfYJmLPrL43uVbrhsnH8JtsvH2r".to_string().try_into().expect("must be valid bootnode"),
         ],
         // Telemetry
-        None,
+        Some(TelemetryEndpoints::new(
+            vec![
+                (PATRACT_TELEMETRY_URL.to_string(), 0)
+            ])
+                 .expect("Polkadot Staging telemetry url is valid; qed"),
+        ),
         // Protocol ID
         Some("jupiter_staging_testnet"),
         // Properties
@@ -286,6 +382,16 @@ fn testnet_genesis(
     endowed_accounts: Vec<AccountId>,
     enable_println: bool,
 ) -> GenesisConfig {
+    const ENDOWMENT: u128 = 1_000_000 * DOTS;
+    const STASH: u128 = 100 * DOTS;
+
+    let mut endowed_accounts: Vec<AccountId> = endowed_accounts;
+    initial_authorities.iter().for_each(|x| {
+        if !endowed_accounts.contains(&x.0) {
+            endowed_accounts.push(x.0.clone())
+        }
+    });
+
     GenesisConfig {
         frame_system: Some(SystemConfig {
             // Add Wasm runtime to storage.
@@ -293,20 +399,15 @@ fn testnet_genesis(
             changes_trie_config: Default::default(),
         }),
         pallet_balances: Some(BalancesConfig {
-            // Configure endowed accounts with initial balance of 1 << 60.
             balances: endowed_accounts
                 .iter()
-                .cloned()
-                .map(|k| (k, 1 << 60))
+                .map(|k: &AccountId| (k.clone(), ENDOWMENT))
                 .collect(),
         }),
         pallet_indices: Some(IndicesConfig { indices: vec![] }),
-        pallet_babe: Some(BabeConfig {
-            authorities: vec![],
-        }),
-        pallet_grandpa: Some(GrandpaConfig {
-            authorities: vec![],
-        }),
+        pallet_babe: Some(Default::default()),
+        pallet_grandpa: Some(Default::default()),
+        pallet_im_online: Some(Default::default()),
         pallet_authority_discovery: Some(AuthorityDiscoveryConfig { keys: vec![] }),
         pallet_session: Some(SessionConfig {
             keys: initial_authorities
@@ -315,7 +416,7 @@ fn testnet_genesis(
                     (
                         x.0.clone(),
                         x.0.clone(),
-                        session_keys(x.2.clone(), x.3.clone(), x.4.clone()),
+                        session_keys(x.2.clone(), x.3.clone(), x.4.clone(), x.5.clone()),
                     )
                 })
                 .collect::<Vec<_>>(),
@@ -326,6 +427,33 @@ fn testnet_genesis(
                 ..Default::default()
             },
         }),
+        pallet_staking: Some(StakingConfig {
+            validator_count: if initial_authorities.len() < 4 {
+                initial_authorities.len() as u32 * 2
+            } else {
+                50
+            },
+            minimum_validator_count: initial_authorities.len() as u32,
+            stakers: initial_authorities
+                .iter()
+                .map(|x| (x.0.clone(), x.1.clone(), STASH, StakerStatus::Validator))
+                .collect(),
+            invulnerables: initial_authorities.iter().map(|x| x.0.clone()).collect(),
+            force_era: Forcing::ForceNone,
+            slash_reward_fraction: Perbill::from_percent(10),
+            ..Default::default()
+        }),
+        pallet_elections_phragmen: Some(Default::default()),
+        pallet_democracy: Some(Default::default()),
+        pallet_collective_Instance1: Some(CouncilConfig {
+            members: vec![],
+            phantom: Default::default(),
+        }),
+        pallet_collective_Instance2: Some(TechnicalCommitteeConfig {
+            members: vec![],
+            phantom: Default::default(),
+        }),
+        pallet_membership_Instance1: Some(Default::default()),
         pallet_sudo: Some(SudoConfig {
             // Assign network admin rights.
             key: root_key,

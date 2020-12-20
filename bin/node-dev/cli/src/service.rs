@@ -21,7 +21,7 @@ native_executor_instance!(
     pub Executor,
     jupiter_dev_runtime::api::dispatch,
     jupiter_dev_runtime::native_version,
-    (frame_benchmarking::benchmarking::HostFunctions, jupiter_io::zk_snarks::HostFunctions),
+    (frame_benchmarking::benchmarking::HostFunctions, jupiter_io::pairing::HostFunctions),
 );
 
 /// Returns most parts of a service. Not enough to run a full chain,
@@ -158,7 +158,7 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
         task_manager: &mut task_manager,
         transaction_pool: transaction_pool.clone(),
         telemetry_connection_sinks: telemetry_connection_sinks.clone(),
-        rpc_extensions_builder: rpc_extensions_builder,
+        rpc_extensions_builder,
         on_demand: None,
         remote_blockchain: None,
         backend,
