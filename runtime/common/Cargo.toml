@@ -28,6 +28,8 @@ pallet-session = { version = "2.0.0", git = "https://github.com/paritytech/subst
 pallet-staking = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-timestamp = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-treasury = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-bounties = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-tips = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-utility = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 
 jupiter-primitives = { path = "../../primitives", default-features = false }
@@ -56,6 +58,8 @@ std = [
     "pallet-staking/std",
     "pallet-timestamp/std",
     "pallet-treasury/std",
+    "pallet-bounties/std",
+    "pallet-tips/std",
     "pallet-utility/std",
 
     "jupiter-primitives/std",
@@ -80,5 +84,7 @@ runtime-benchmarks = [
     "pallet-staking/runtime-benchmarks",
     "pallet-timestamp/runtime-benchmarks",
     "pallet-treasury/runtime-benchmarks",
+    "pallet-bounties/runtime-benchmarks",
+    "pallet-tips/runtime-benchmarks",
     "pallet-utility/runtime-benchmarks",
 ]

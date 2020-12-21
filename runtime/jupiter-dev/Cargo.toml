@@ -50,7 +50,7 @@ pallet-contracts = { path = "../../vendor/substrate/frame/contracts", default-fe
 pallet-template = { path = "../../pallets/template", default-features = false }
 
 jupiter-primitives = { path = "../../primitives", default-features = false }
-jupiter-chain-extension = { path = "../../primitives/chain-extension", default-features = false }
+jupiter-chain-extension = { path = "../../primitives/chain-extension", default-features = false, features = [ "native-support" ] }
 jupiter-runtime-common = { path = "../common", default-features = false }
 
 [build-dependencies]

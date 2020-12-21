@@ -20,8 +20,19 @@ impl ChainExtension for JupiterExt {
 
         // The memory of the vm stores buf in scale-codec
         let input: Vec<u8> = env.read_as()?;
-        let raw_output: Vec<u8> = curve::call(func_id, &input)
-            .map_err(|_| DispatchError::Other("Call chain extension failed"))?;
+
+        #[allow(unused_assignments)]
+        let mut raw_output: Vec<u8> = Vec::with_capacity(0);
+        #[cfg(feature = "native-support")]
+        {
+            raw_output = jupiter_io::pairing::call(func_id, &input)
+                .ok_or(DispatchError::Other("Call Native chain extension failed"))?;
+        }
+        #[cfg(not(feature = "native-support"))]
+        {
+            raw_output = curve::call(func_id, &input)
+                .map_err(|_| DispatchError::Other("Call chain extension failed"))?;
+        }
 
         // Encode back to the memory
         let output: Vec<u8> = raw_output.encode();

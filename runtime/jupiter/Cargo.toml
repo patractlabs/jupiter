@@ -56,6 +56,8 @@ pallet-sudo = { version = "2.0.0", git = "https://github.com/paritytech/substrat
 pallet-transaction-payment = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-transaction-payment-rpc-runtime-api = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-treasury = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-bounties = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-tips = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-timestamp = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-utility = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 
@@ -67,8 +69,8 @@ pallet-contracts-rpc-runtime-api = { version = "0.8.0", git = "https://github.co
 
 # local runtime module
 jupiter-primitives = { path = "../../primitives", default-features = false }
+jupiter-chain-extension = { path = "../../primitives/chain-extension", default-features = false, features = [ "native-support" ] }
 jupiter-runtime-common = { path = "../common", default-features = false }
-jupiter-chain-extension = { path = "../../primitives/chain-extension", default-features = false }
 
 [build-dependencies]
 substrate-wasm-builder = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
@@ -125,9 +127,12 @@ std = [
     "pallet-transaction-payment/std",
     "pallet-transaction-payment-rpc-runtime-api/std",
     "pallet-treasury/std",
+    "pallet-bounties/std",
+    "pallet-tips/std",
     "pallet-utility/std",
 
     "jupiter-primitives/std",
+    "jupiter-chain-extension/std",
     "jupiter-runtime-common/std",
     "jupiter-chain-extension/std",
 ]

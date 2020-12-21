@@ -581,7 +581,7 @@ parameter_types! {
     pub const ProposalBondMinimum: Balance = 20 * DOLLARS;
     pub const SpendPeriod: BlockNumber = 6 * DAYS;
     pub const Burn: Permill = Permill::from_perthousand(2);
-    pub const TreasuryModuleId: ModuleId = ModuleId(*b"py/trsry");
+    pub const TreasuryModuleId: ModuleId = ModuleId(*b"pt/trsry");
 
     pub const TipCountdown: BlockNumber = 1 * DAYS;
     pub const TipFindersFee: Percent = Percent::from_percent(20);
@@ -606,25 +606,38 @@ impl pallet_treasury::Config for Runtime {
     type Currency = Balances;
     type ApproveOrigin = ApproveOrigin;
     type RejectOrigin = MoreThanHalfCouncil;
-    type Tippers = ElectionsPhragmen;
-    type TipCountdown = TipCountdown;
-    type TipFindersFee = TipFindersFee;
-    type TipReportDepositBase = TipReportDepositBase;
-    type DataDepositPerByte = DataDepositPerByte;
     type Event = Event;
     type OnSlash = Treasury;
     type ProposalBond = ProposalBond;
     type ProposalBondMinimum = ProposalBondMinimum;
     type SpendPeriod = SpendPeriod;
     type Burn = Burn;
+    type BurnDestination = ();
+    type WeightInfo = weights::pallet_treasury::WeightInfo<Runtime>;
+    type SpendFunds = Bounties;
+}
+
+impl pallet_bounties::Config for Runtime {
     type BountyDepositBase = BountyDepositBase;
     type BountyDepositPayoutDelay = BountyDepositPayoutDelay;
     type BountyUpdatePeriod = BountyUpdatePeriod;
-    type MaximumReasonLength = MaximumReasonLength;
     type BountyCuratorDeposit = BountyCuratorDeposit;
     type BountyValueMinimum = BountyValueMinimum;
-    type BurnDestination = ();
-    type WeightInfo = weights::pallet_treasury::WeightInfo<Runtime>;
+    type DataDepositPerByte = DataDepositPerByte;
+    type Event = Event;
+    type MaximumReasonLength = MaximumReasonLength;
+    type WeightInfo = weights::pallet_bounties::WeightInfo<Runtime>;
+}
+
+impl pallet_tips::Config for Runtime {
+    type MaximumReasonLength = MaximumReasonLength;
+    type DataDepositPerByte = DataDepositPerByte;
+    type Tippers = ElectionsPhragmen;
+    type TipCountdown = TipCountdown;
+    type TipFindersFee = TipFindersFee;
+    type TipReportDepositBase = TipReportDepositBase;
+    type Event = Event;
+    type WeightInfo = weights::pallet_tips::WeightInfo<Runtime>;
 }
 
 parameter_types! {
@@ -871,7 +884,7 @@ construct_runtime!(
         NodeBlock = jupiter_primitives::Block,
         UncheckedExtrinsic = UncheckedExtrinsic
     {
-        // Basic stuff; balances is uncallable initially.
+        // Basic stuff;
         System: frame_system::{Module, Call, Config, Storage, Event<T>} = 0,
 
         // Must be before session.
@@ -880,45 +893,48 @@ construct_runtime!(
         Timestamp: pallet_timestamp::{Module, Call, Storage, Inherent} = 2,
         Indices: pallet_indices::{Module, Call, Storage, Config<T>, Event<T>} = 3,
         Balances: pallet_balances::{Module, Call, Storage, Config<T>, Event<T>} = 4,
-        TransactionPayment: pallet_transaction_payment::{Module, Storage} = 33,
+        TransactionPayment: pallet_transaction_payment::{Module, Storage} = 5,
 
         // Consensus support.
-        Authorship: pallet_authorship::{Module, Call, Storage} = 5,
-        Staking: pallet_staking::{Module, Call, Storage, Config<T>, Event<T>, ValidateUnsigned} = 6,
-        Offences: pallet_offences::{Module, Call, Storage, Event} = 7,
-        Historical: pallet_session_historical::{Module} = 34,
-        Session: pallet_session::{Module, Call, Storage, Event, Config<T>} = 8,
-        Grandpa: pallet_grandpa::{Module, Call, Storage, Config, Event, ValidateUnsigned} = 10,
-        ImOnline: pallet_im_online::{Module, Call, Storage, Event<T>, ValidateUnsigned, Config<T>} = 11,
-        AuthorityDiscovery: pallet_authority_discovery::{Module, Call, Storage, Config} = 12,
+        Authorship: pallet_authorship::{Module, Call, Storage} = 6,
+        Staking: pallet_staking::{Module, Call, Storage, Config<T>, Event<T>, ValidateUnsigned} = 7,
+        Offences: pallet_offences::{Module, Call, Storage, Event} = 8,
+        Historical: pallet_session_historical::{Module} = 9,
+        Session: pallet_session::{Module, Call, Storage, Event, Config<T>} = 10,
+        Grandpa: pallet_grandpa::{Module, Call, Storage, Config, Event, ValidateUnsigned} = 11,
+        ImOnline: pallet_im_online::{Module, Call, Storage, Event<T>, ValidateUnsigned, Config<T>} = 12,
+        AuthorityDiscovery: pallet_authority_discovery::{Module, Call, Storage, Config} = 13,
 
         // Governance stuff; uncallable initially.
-        Democracy: pallet_democracy::{Module, Call, Storage, Config, Event<T>} = 13,
-        Council: pallet_collective::<Instance1>::{Module, Call, Storage, Origin<T>, Event<T>, Config<T>} = 14,
-        TechnicalCommittee: pallet_collective::<Instance2>::{Module, Call, Storage, Origin<T>, Event<T>, Config<T>} = 15,
-        ElectionsPhragmen: pallet_elections_phragmen::{Module, Call, Storage, Event<T>, Config<T>} = 16,
-        TechnicalMembership: pallet_membership::<Instance1>::{Module, Call, Storage, Event<T>, Config<T>} = 17,
-        Treasury: pallet_treasury::{Module, Call, Storage, Event<T>} = 18,
-
-        // Contracts module
-        Contracts: pallet_contracts::{Module, Call, Config<T>, Storage, Event<T>} = 20,
+        Democracy: pallet_democracy::{Module, Call, Storage, Config, Event<T>} = 14,
+        Council: pallet_collective::<Instance1>::{Module, Call, Storage, Origin<T>, Event<T>, Config<T>} = 15,
+        TechnicalCommittee: pallet_collective::<Instance2>::{Module, Call, Storage, Origin<T>, Event<T>, Config<T>} = 16,
+        ElectionsPhragmen: pallet_elections_phragmen::{Module, Call, Storage, Event<T>, Config<T>} = 17,
+        TechnicalMembership: pallet_membership::<Instance1>::{Module, Call, Storage, Event<T>, Config<T>} = 18,
+        Treasury: pallet_treasury::{Module, Call, Storage, Event<T>} = 19,
+        // Bounties module.
+        Bounties: pallet_bounties::{Module, Call, Storage, Event<T>} = 20,
+        // Tips module.
+        Tips: pallet_tips::{Module, Call, Storage, Event<T>} = 21,
 
         // Utility module.
-        Utility: pallet_utility::{Module, Call, Event} = 24,
+        Utility: pallet_utility::{Module, Call, Event} = 22,
 
         // Less simple identity module.
-        Identity: pallet_identity::{Module, Call, Storage, Event<T>} = 25,
+        Identity: pallet_identity::{Module, Call, Storage, Event<T>} = 23,
 
         // System scheduler.
-        Scheduler: pallet_scheduler::{Module, Call, Storage, Event<T>} = 29,
+        Scheduler: pallet_scheduler::{Module, Call, Storage, Event<T>} = 24,
 
         // Proxy module. Late addition.
-        Proxy: pallet_proxy::{Module, Call, Storage, Event<T>} = 30,
+        Proxy: pallet_proxy::{Module, Call, Storage, Event<T>} = 25,
 
         // Multisig module. Late addition.
-        Multisig: pallet_multisig::{Module, Call, Storage, Event<T>} = 31,
+        Multisig: pallet_multisig::{Module, Call, Storage, Event<T>} = 26,
 
-        Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>} = 19, // replace claims in ksm
+        Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>} = 27,
+        // Contracts module
+        Contracts: pallet_contracts::{Module, Call, Config<T>, Storage, Event<T>} = 30,
     }
 );
 
