@@ -4,26 +4,25 @@ declare -a curves=(
     'bls12_381'
     'bn254'
     'bw6_761'
-    'cp6_782'
 )
+
 
 declare -a exs=(
     'add'
     'mul'
     'pairing_two'
-    'pairing_six'
-    'verify'
 )
 
+
 function bm() {
-    ../target/release/node-template \
+    target/release/jupiter-dev \
         benchmark \
         -p 'pallet_template' \
         -e "$1" "${@:2}" | grep 'Time ~=' -m 1
 }
 
 
-function main() {
+function ops() {
     for p in "${curves[@]}"
     do
         echo "Curve: ${p}"
@@ -31,19 +30,50 @@ function main() {
         for q in "${exs[@]}"
         do
             echo "--->${q}"
-            echo -n "Wasm:   "
+            printf "Wasm:   "
             d=wasm_"${p}"_"${q}"
-            bm "$d" '--execution=Wasm' '--wasm-execution=Interpreted' "-r=1000" # '|' 'grep' "'Time ~='" '-m' '1'
-
-            # "RuIn" means the `runtime_interface` implementation in test
-            echo -n "RuIn:   "
+            bm "$d" '--execution=Wasm' '--wasm-execution=Compiled' '-r=3'
+            printf "RuIn:   "
             d=native_"${p}"_"${q}"
-            bm "$d" '--execution=Wasm' '--wasm-execution=Interpreted' "-r=1000" # '|' 'grep' "'Time ~='" '-m' '1'
-#            bm wasm_"${p}"_"${q}" --execution Native | grep 'Time ~=' -m 1
+            bm "$d" '--execution=Wasm' '--wasm-execution=Compiled' '-r=3'
         done
         echo ""
         echo ""
     done
+}
+
+
+function groth16() {
+    echo '=========================µs'
+    for p in "${curves[@]}"
+    do
+        echo "---> ${p}"
+        bm "${p}"_verify '--execution=Wasm' '--wasm-execution=Compiled' '-r=3'
+    done
+}
+
+function verify() {
+    echo "Wasm groth16 verification:"
+    # JIO_MODE=WASM
+    groth16
+
+    printf "\n\n"
+
+    echo "NATIVE groth16 verification:"
+    # JIO_MODE=NATIVE
+    groth16
+}
+
+function main() {
+    case $1 in
+        groth16)
+            verify
+            ;;
+        *)
+            ops
+            ;;
+    esac
+
 }
 
 main $@

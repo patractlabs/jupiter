@@ -20,8 +20,13 @@ impl ChainExtension for JupiterExt {
 
         // The memory of the vm stores buf in scale-codec
         let input: Vec<u8> = env.read_as()?;
-        let raw_output: Vec<u8> = curve::call(func_id, &input)
-            .map_err(|_| DispatchError::Other("Call chain extension failed"))?;
+        let raw_output: Vec<u8> = if jupiter_io::pairing::wasm() {
+            curve::call(func_id, &input)
+                .map_err(|_| DispatchError::Other("Call chain extension failed"))?
+        } else {
+            jupiter_io::pairing::call(func_id, &input)
+                .ok_or(DispatchError::Other("Call chain extension failed"))?
+        };
 
         // Encode back to the memory
         let output: Vec<u8> = raw_output.encode();
