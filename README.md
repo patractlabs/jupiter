@@ -17,6 +17,9 @@ Jupiter `FRAME contracts pallet` contains our `ChainExtension` to provide many p
 * ChainExtension
     - [ ] Contract Logger support
     - [x] Zero-Knowledge support, refer to this link [PIP-101](https://github.com/patractlabs/PIPs/blob/main/PIPs/pip-101.md)
+        
+        *Currently we use a simple static way to charge weight for ZKP, we would change this part with benchmarks result in future.*
+    
 * Jupiter modifications
     * // No features for now.
     
