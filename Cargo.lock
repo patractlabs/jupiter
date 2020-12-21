@@ -2680,7 +2680,7 @@ dependencies = [
 
 [[package]]
 name = "jupiter"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "jupiter-cli",
 ]
@@ -2701,7 +2701,7 @@ dependencies = [
 
 [[package]]
 name = "jupiter-cli"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "futures 0.3.8",
  "hex-literal 0.2.1",
@@ -2742,14 +2742,14 @@ dependencies = [
 
 [[package]]
 name = "jupiter-dev"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "jupiter-dev-cli",
 ]
 
 [[package]]
 name = "jupiter-dev-cli"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "frame-benchmarking",
  "frame-benchmarking-cli",
