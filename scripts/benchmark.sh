@@ -54,14 +54,12 @@ function groth16() {
 
 function verify() {
     echo "Wasm groth16 verification:"
-    # JIO_MODE=WASM
-    groth16
+    JIO_MODE=WASM groth16
 
     printf "\n\n"
 
     echo "NATIVE groth16 verification:"
-    # JIO_MODE=NATIVE
-    groth16
+    JIO_MODE=NATIVE groth16
 }
 
 function main() {

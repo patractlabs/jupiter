@@ -4,8 +4,6 @@
 use sp_runtime_interface::runtime_interface;
 use sp_std::vec::Vec;
 
-// pub mod groth16;
-
 /// Pairing runtime interface
 #[runtime_interface]
 pub trait Pairing {
