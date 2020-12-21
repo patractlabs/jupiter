@@ -45,7 +45,7 @@ This repo provide three type node:
 
     **Jupiter open provider link is:**
   
-    - `wss://jupiter.elara.patract.io/` (not yet)
+    - `wss://jupiter.elara.patract.io/`
     - `wss://ws.jupiter.patract.cn/`
     
     Jupiter open telemetry link is [https://telemetry.patract.io/](https://telemetry.patract.io/)
