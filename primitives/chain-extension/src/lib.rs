@@ -38,7 +38,7 @@ impl ChainExtension for JupiterExt {
                         let k = if input.len() > 194 {
                             input.len() as u64 / 194
                         } else {
-                            1_64
+                            1
                         };
                         16_000_000 * k
                     }
