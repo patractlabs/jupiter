@@ -142,7 +142,7 @@ checksum = "4d25d88fd6b8041580a654f9d0c581a047baee2b3efee13275f2fc392fc75034"
 [[package]]
 name = "ark-bls12-377"
 version = "0.1.0"
-source = "git+https://github.com/arkworks-rs/curves#e7d7d01a027ce6445a8865a881f78ef6910815d8"
+source = "git+https://github.com/arkworks-rs/curves#23e87bf224c23be5c5bccc6084aae31fff8bb83f"
 dependencies = [
  "ark-ec",
  "ark-ff",
@@ -152,7 +152,7 @@ dependencies = [
 [[package]]
 name = "ark-bls12-381"
 version = "0.1.0"
-source = "git+https://github.com/arkworks-rs/curves#e7d7d01a027ce6445a8865a881f78ef6910815d8"
+source = "git+https://github.com/arkworks-rs/curves#23e87bf224c23be5c5bccc6084aae31fff8bb83f"
 dependencies = [
  "ark-ec",
  "ark-ff",
@@ -162,7 +162,7 @@ dependencies = [
 [[package]]
 name = "ark-bn254"
 version = "0.1.0"
-source = "git+https://github.com/arkworks-rs/curves#e7d7d01a027ce6445a8865a881f78ef6910815d8"
+source = "git+https://github.com/arkworks-rs/curves#23e87bf224c23be5c5bccc6084aae31fff8bb83f"
 dependencies = [
  "ark-ec",
  "ark-ff",
@@ -172,7 +172,7 @@ dependencies = [
 [[package]]
 name = "ark-bw6-761"
 version = "0.1.0"
-source = "git+https://github.com/arkworks-rs/curves#e7d7d01a027ce6445a8865a881f78ef6910815d8"
+source = "git+https://github.com/arkworks-rs/curves#23e87bf224c23be5c5bccc6084aae31fff8bb83f"
 dependencies = [
  "ark-bls12-377",
  "ark-ec",
@@ -183,7 +183,7 @@ dependencies = [
 [[package]]
 name = "ark-cp6-782"
 version = "0.1.0"
-source = "git+https://github.com/arkworks-rs/curves#e7d7d01a027ce6445a8865a881f78ef6910815d8"
+source = "git+https://github.com/arkworks-rs/curves#23e87bf224c23be5c5bccc6084aae31fff8bb83f"
 dependencies = [
  "ark-bls12-377",
  "ark-ec",
@@ -211,7 +211,7 @@ dependencies = [
 [[package]]
 name = "ark-ec"
 version = "0.1.0"
-source = "git+https://github.com/arkworks-rs/algebra#861b116f06194ceef75b91879a9d2a7582a9ff10"
+source = "git+https://github.com/arkworks-rs/algebra#70ebfa6bed96c6738535a13372e3c30a5008c751"
 dependencies = [
  "ark-ff",
  "ark-serialize",
@@ -225,10 +225,9 @@ dependencies = [
 [[package]]
 name = "ark-ff"
 version = "0.1.0"
-source = "git+https://github.com/arkworks-rs/algebra#861b116f06194ceef75b91879a9d2a7582a9ff10"
+source = "git+https://github.com/arkworks-rs/algebra#70ebfa6bed96c6738535a13372e3c30a5008c751"
 dependencies = [
  "ark-ff-asm",
- "ark-ff-macros",
  "ark-serialize",
  "ark-std",
  "derivative",
@@ -241,19 +240,8 @@ dependencies = [
 [[package]]
 name = "ark-ff-asm"
 version = "0.1.0"
-source = "git+https://github.com/arkworks-rs/algebra#861b116f06194ceef75b91879a9d2a7582a9ff10"
+source = "git+https://github.com/arkworks-rs/algebra#70ebfa6bed96c6738535a13372e3c30a5008c751"
 dependencies = [
- "quote",
- "syn",
-]
-
-[[package]]
-name = "ark-ff-macros"
-version = "0.1.0"
-source = "git+https://github.com/arkworks-rs/algebra#861b116f06194ceef75b91879a9d2a7582a9ff10"
-dependencies = [
- "num-bigint 0.3.1",
- "num-traits",
  "quote",
  "syn",
 ]
@@ -261,7 +249,7 @@ dependencies = [
 [[package]]
 name = "ark-groth16"
 version = "0.1.0"
-source = "git+https://github.com/arkworks-rs/groth16#772f43bc1fec7f108ab2d60059654c5c63fe4126"
+source = "git+https://github.com/arkworks-rs/groth16#412e5a58372b847d4599e0373776cd87dd92d579"
 dependencies = [
  "ark-crypto-primitives",
  "ark-ec",
@@ -277,7 +265,7 @@ dependencies = [
 [[package]]
 name = "ark-poly"
 version = "0.1.0"
-source = "git+https://github.com/arkworks-rs/algebra#861b116f06194ceef75b91879a9d2a7582a9ff10"
+source = "git+https://github.com/arkworks-rs/algebra#61bde284e4ed1e61cb0e86df0d5ed73b8e6dfd45"
 dependencies = [
  "ark-ff",
  "ark-serialize",
@@ -289,7 +277,7 @@ dependencies = [
 [[package]]
 name = "ark-relations"
 version = "0.1.0"
-source = "git+https://github.com/arkworks-rs/snark#b4477552cf7ac41d6da48fb5bafc300864dc3669"
+source = "git+https://github.com/arkworks-rs/snark#0648c547e4f9fda46a40ad0a4896652b87c2316b"
 dependencies = [
  "ark-ff",
  "ark-std",
@@ -299,7 +287,7 @@ dependencies = [
 [[package]]
 name = "ark-serialize"
 version = "0.1.0"
-source = "git+https://github.com/arkworks-rs/algebra#861b116f06194ceef75b91879a9d2a7582a9ff10"
+source = "git+https://github.com/arkworks-rs/algebra#70ebfa6bed96c6738535a13372e3c30a5008c751"
 dependencies = [
  "ark-serialize-derive",
  "ark-std",
@@ -308,7 +296,7 @@ dependencies = [
 [[package]]
 name = "ark-serialize-derive"
 version = "0.1.1-alpha.0"
-source = "git+https://github.com/arkworks-rs/algebra#861b116f06194ceef75b91879a9d2a7582a9ff10"
+source = "git+https://github.com/arkworks-rs/algebra#70ebfa6bed96c6738535a13372e3c30a5008c751"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -318,7 +306,7 @@ dependencies = [
 [[package]]
 name = "ark-snark"
 version = "0.1.0"
-source = "git+https://github.com/arkworks-rs/snark#b4477552cf7ac41d6da48fb5bafc300864dc3669"
+source = "git+https://github.com/arkworks-rs/snark#0648c547e4f9fda46a40ad0a4896652b87c2316b"
 dependencies = [
  "ark-ff",
  "ark-relations",
@@ -329,10 +317,7 @@ dependencies = [
 [[package]]
 name = "ark-std"
 version = "0.1.0"
-source = "git+https://github.com/arkworks-rs/utils#5cac2c78e8ddeea95c4eeea6832dd92f2dea36b9"
-dependencies = [
- "rand 0.7.3",
-]
+source = "git+https://github.com/arkworks-rs/utils#f6974ac72f59339b7ab798a728a84c5a7b8bac45"
 
 [[package]]
 name = "arrayref"
@@ -571,7 +556,7 @@ checksum = "904dfeac50f3cdaba28fc6f57fdcddb75f49ed61346676a78c4ffe55877802fd"
 [[package]]
 name = "bench-utils"
 version = "0.1.0"
-source = "git+https://github.com/arkworks-rs/utils#5cac2c78e8ddeea95c4eeea6832dd92f2dea36b9"
+source = "git+https://github.com/arkworks-rs/utils#f6974ac72f59339b7ab798a728a84c5a7b8bac45"
 
 [[package]]
 name = "bincode"
@@ -2704,9 +2689,12 @@ dependencies = [
 name = "jupiter-chain-extension"
 version = "0.1.0"
 dependencies = [
+ "frame-support",
+ "hex",
  "jupiter-io",
  "megaclite-arkworks",
  "pallet-contracts",
+ "parity-scale-codec",
  "sp-runtime",
  "sp-std",
 ]
@@ -3667,7 +3655,7 @@ checksum = "60302e4db3a61da70c0cb7991976248362f30319e88850c487b9b95bbf059e00"
 [[package]]
 name = "megaclite-arkworks"
 version = "0.1.0"
-source = "git+https://github.com/patractlabs/megaclite.git#b40b9b1e795dccec06bfa04771e2e8bc7b2f41a3"
+source = "git+https://github.com/patractlabs/megaclite.git#40b05c1dee61e1dc77b785e8d12914a9eb7db272"
 dependencies = [
  "ark-bls12-377",
  "ark-bls12-381",
@@ -3680,8 +3668,9 @@ dependencies = [
  "ark-relations",
  "ark-serialize",
  "ark-std",
+ "cfg-if 1.0.0",
  "num-bigint 0.3.1",
- "num-traits",
+ "parity-scale-codec",
  "rand 0.7.3",
  "rustc-hex",
 ]
@@ -4542,18 +4531,25 @@ dependencies = [
 name = "pallet-template"
 version = "2.0.0"
 dependencies = [
+ "assert_matches",
  "frame-benchmarking",
  "frame-support",
  "frame-system",
+ "hex",
+ "jupiter-chain-extension",
  "jupiter-io",
+ "jupiter-runtime-common",
  "megaclite-arkworks",
+ "pallet-balances",
  "pallet-contracts",
+ "pallet-randomness-collective-flip",
+ "pallet-timestamp",
+ "pallet-transaction-payment",
  "parity-scale-codec",
  "sp-core",
  "sp-io",
  "sp-runtime",
  "sp-std",
- "wat",
 ]
 
 [[package]]
