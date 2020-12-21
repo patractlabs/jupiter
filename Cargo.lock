@@ -2689,6 +2689,8 @@ dependencies = [
 name = "jupiter-chain-extension"
 version = "0.1.0"
 dependencies = [
+ "frame-support",
+ "hex",
  "jupiter-io",
  "megaclite-arkworks",
  "pallet-contracts",

@@ -21,17 +21,31 @@ impl ChainExtension for JupiterExt {
         // The memory of the vm stores buf in scale-codec
         let input: Vec<u8> = env.read_as()?;
 
+        frame_support::debug::native::trace!(
+            target: "runtime",
+            "[ChainExtension]|call|func_id:{:}|input:{:}",
+            func_id,
+            hex::encode(&input)
+        );
+
         #[allow(unused_assignments)]
         let mut raw_output: Vec<u8> = Vec::with_capacity(0);
         #[cfg(feature = "native-support")]
         {
-            raw_output = jupiter_io::pairing::call(func_id, &input)
-                .ok_or(DispatchError::Other("Call Native chain extension failed"))?;
+            raw_output = jupiter_io::pairing::call(func_id, &input).ok_or(DispatchError::Other(
+                "ChainExtension failed to call native `jupiter_io::pairing`",
+            ))?;
         }
         #[cfg(not(feature = "native-support"))]
         {
-            raw_output = curve::call(func_id, &input)
-                .map_err(|_| DispatchError::Other("Call chain extension failed"))?;
+            raw_output = curve::call(func_id, &input).map_err(|e| {
+                frame_support::debug::error!(
+                    "call zkp lib `curve::call` meet an error|func_id:{:}|err:{:?}",
+                    func_id,
+                    e
+                );
+                DispatchError::Other("ChainExtension failed to call `curve::call`")
+            })?;
         }
 
         // Encode back to the memory
