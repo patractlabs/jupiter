@@ -14,8 +14,8 @@ sp-std = { git = "https://github.com/paritytech/substrate.git", branch = "master
 [dependencies.curve]
 git = "https://github.com/patractlabs/megaclite.git"
 package = "megaclite-arkworks"
-default-features = false
 features = [ "tests" ]
+default-features = false
 
 [dependencies.num-bigint]
 version = "0.3.1"

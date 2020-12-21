@@ -4,8 +4,6 @@
 use sp_runtime_interface::runtime_interface;
 use sp_std::vec::Vec;
 
-pub mod groth16;
-
 /// Pairing runtime interface
 #[runtime_interface]
 pub trait Pairing {
@@ -19,16 +17,6 @@ pub trait Pairing {
         false
     }
 
-    /// Curve calls
-    ///
-    /// add     0x2a
-    /// mul     0x3a
-    /// pairing 0x4a
-    ///
-    /// bls12_377 0
-    /// bls12_181 1
-    /// bn254     2
-    /// bw6_761   3
     fn call(func_id: u32, input: &[u8]) -> Option<Vec<u8>> {
         curve::call(func_id, input).ok()
     }

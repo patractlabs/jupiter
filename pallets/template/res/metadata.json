@@ -1,0 +1,274 @@
+{
+  "metadataVersion": "0.1.0",
+  "source": {
+    "hash": "0xf4cd725fc486c0d1e5c9d196641450e301fb0deb5d3f368f9676a9d479aee4a4",
+    "language": "ink! 3.0.0-rc2",
+    "compiler": "rustc 1.50.0-nightly"
+  },
+  "contract": {
+    "name": "groth16",
+    "version": "0.1.0",
+    "authors": [
+      "[your_name] <[your_email]>"
+    ]
+  },
+  "spec": {
+    "constructors": [
+      {
+        "args": [],
+        "docs": [],
+        "name": [
+          "default"
+        ],
+        "selector": "0x6a3712e2"
+      }
+    ],
+    "docs": [],
+    "events": [],
+    "messages": [
+      {
+        "args": [
+          {
+            "name": "vk_gamma_abc",
+            "type": {
+              "displayName": [
+                "Vec"
+              ],
+              "type": 1
+            }
+          },
+          {
+            "name": "vk",
+            "type": {
+              "displayName": [
+                "Vec"
+              ],
+              "type": 2
+            }
+          },
+          {
+            "name": "proof",
+            "type": {
+              "displayName": [
+                "Vec"
+              ],
+              "type": 2
+            }
+          },
+          {
+            "name": "public_inputs",
+            "type": {
+              "displayName": [
+                "Vec"
+              ],
+              "type": 1
+            }
+          }
+        ],
+        "docs": [],
+        "mutates": false,
+        "name": [
+          "bls12_377_verify"
+        ],
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "bool"
+          ],
+          "type": 4
+        },
+        "selector": "0x4e1f2d81"
+      },
+      {
+        "args": [
+          {
+            "name": "vk_gamma_abc",
+            "type": {
+              "displayName": [
+                "Vec"
+              ],
+              "type": 1
+            }
+          },
+          {
+            "name": "vk",
+            "type": {
+              "displayName": [
+                "Vec"
+              ],
+              "type": 2
+            }
+          },
+          {
+            "name": "proof",
+            "type": {
+              "displayName": [
+                "Vec"
+              ],
+              "type": 2
+            }
+          },
+          {
+            "name": "public_inputs",
+            "type": {
+              "displayName": [
+                "Vec"
+              ],
+              "type": 1
+            }
+          }
+        ],
+        "docs": [],
+        "mutates": false,
+        "name": [
+          "bls12_381_verify"
+        ],
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "bool"
+          ],
+          "type": 4
+        },
+        "selector": "0x99a06637"
+      },
+      {
+        "args": [
+          {
+            "name": "vk_gamma_abc",
+            "type": {
+              "displayName": [
+                "Vec"
+              ],
+              "type": 1
+            }
+          },
+          {
+            "name": "vk",
+            "type": {
+              "displayName": [
+                "Vec"
+              ],
+              "type": 2
+            }
+          },
+          {
+            "name": "proof",
+            "type": {
+              "displayName": [
+                "Vec"
+              ],
+              "type": 2
+            }
+          },
+          {
+            "name": "public_inputs",
+            "type": {
+              "displayName": [
+                "Vec"
+              ],
+              "type": 1
+            }
+          }
+        ],
+        "docs": [],
+        "mutates": false,
+        "name": [
+          "bn254_verify"
+        ],
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "bool"
+          ],
+          "type": 4
+        },
+        "selector": "0xe0282497"
+      },
+      {
+        "args": [
+          {
+            "name": "vk_gamma_abc",
+            "type": {
+              "displayName": [
+                "Vec"
+              ],
+              "type": 1
+            }
+          },
+          {
+            "name": "vk",
+            "type": {
+              "displayName": [
+                "Vec"
+              ],
+              "type": 2
+            }
+          },
+          {
+            "name": "proof",
+            "type": {
+              "displayName": [
+                "Vec"
+              ],
+              "type": 2
+            }
+          },
+          {
+            "name": "public_inputs",
+            "type": {
+              "displayName": [
+                "Vec"
+              ],
+              "type": 1
+            }
+          }
+        ],
+        "docs": [],
+        "mutates": false,
+        "name": [
+          "bw6_761"
+        ],
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "bool"
+          ],
+          "type": 4
+        },
+        "selector": "0x4399fe06"
+      }
+    ]
+  },
+  "storage": {
+    "struct": {
+      "fields": []
+    }
+  },
+  "types": [
+    {
+      "def": {
+        "sequence": {
+          "type": 2
+        }
+      }
+    },
+    {
+      "def": {
+        "sequence": {
+          "type": 3
+        }
+      }
+    },
+    {
+      "def": {
+        "primitive": "u8"
+      }
+    },
+    {
+      "def": {
+        "primitive": "bool"
+      }
+    }
+  ]
+}

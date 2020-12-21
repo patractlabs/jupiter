@@ -69,8 +69,8 @@ pallet-contracts-rpc-runtime-api = { version = "0.8.0", git = "https://github.co
 
 # local runtime module
 jupiter-primitives = { path = "../../primitives", default-features = false }
-jupiter-chain-extension = { path = "../../primitives/chain-extension", default-features = false, features = [ "native-support" ] }
 jupiter-runtime-common = { path = "../common", default-features = false }
+jupiter-chain-extension = { path = "../../primitives/chain-extension", default-features = false, features = [ "native-support" ] }
 
 [build-dependencies]
 substrate-wasm-builder = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
@@ -132,6 +132,6 @@ std = [
     "pallet-utility/std",
 
     "jupiter-primitives/std",
-    "jupiter-chain-extension/std",
     "jupiter-runtime-common/std",
+    "jupiter-chain-extension/std",
 ]

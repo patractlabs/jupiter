@@ -33,4 +33,3 @@ pallet-transaction-payment-rpc = { version = "2.0.0", git = "https://github.com/
 pallet-contracts-rpc = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 
 jupiter-primitives = { path = "../primitives" }
-

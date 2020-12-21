@@ -17,6 +17,9 @@ Jupiter `FRAME contracts pallet` contains our `ChainExtension` to provide many p
 * ChainExtension
     - [ ] Contract Logger support
     - [x] Zero-Knowledge support, refer to this link [PIP-101](https://github.com/patractlabs/PIPs/blob/main/PIPs/pip-101.md)
+        
+        *Currently we use a simple static way to charge weight for ZKP, we would change this part with benchmarks result in future.*
+    
 * Jupiter modifications
     * // No features for now.
     
@@ -45,7 +48,7 @@ This repo provide three type node:
     - `wss://jupiter.elara.patract.io/` (not yet)
     - `wss://ws.jupiter.patract.cn/`
     
-    Jupiter open telemetry link is [https://telemetry.polkadot.io/](https://telemetry.polkadot.io/)
+    Jupiter open telemetry link is [https://telemetry.patract.io/](https://telemetry.patract.io/)
   
 * Jupiter parachain node: (This node is not merged into `master` branch now.)
 
@@ -174,7 +177,7 @@ Moving the execution file `jupiter` to other place and launch the node by follow
 Those steps is same to any other substrate node, just should notice this parameter `--chain` should use `testnet`. If you 
 want to start a validator node, please wait until we announce starting PoS.
 
-You could lookup your node in [https://telemetry.polkadot.io/](https://telemetry.polkadot.io/).
+You could lookup your node in [https://telemetry.patract.io/](https://telemetry.patract.io/).
 
 ##### 4.1.2 start local dev mode jupiter blockchain
 Notice this dev mode just means jupiter start with `--dev`, which is using dev config to start `jupiter`, not the 
