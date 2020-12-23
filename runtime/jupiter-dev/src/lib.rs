@@ -37,6 +37,7 @@ pub use frame_support::{
     StorageValue,
 };
 pub use pallet_balances::Call as BalancesCall;
+pub use pallet_template::Call as TemplateCall;
 pub use pallet_timestamp::Call as TimestampCall;
 
 pub use jupiter_primitives::{
@@ -233,11 +234,16 @@ impl pallet_contracts::Config for Runtime {
     type MaxValueSize = MaxValueSize;
     type WeightPrice = pallet_transaction_payment::Module<Self>;
     type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
+    type ChainExtension = jupiter_chain_extension::JupiterExt;
 }
 
 impl pallet_sudo::Config for Runtime {
     type Event = Event;
     type Call = Call;
+}
+
+impl pallet_template::Config for Runtime {
+    type Event = Event;
 }
 
 // Create the runtime by composing the FRAME pallets that were previously configured.
@@ -262,6 +268,9 @@ construct_runtime!(
         Contracts: pallet_contracts::{Module, Call, Config<T>, Storage, Event<T>},
 
         Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>},
+
+        // Test
+        Template: pallet_template::{Module, Call, Storage, Event<T>},
     }
 );
 
@@ -280,8 +289,7 @@ pub type SignedExtra = (
     frame_system::CheckSpecVersion<Runtime>,
     frame_system::CheckTxVersion<Runtime>,
     frame_system::CheckGenesis<Runtime>,
-    // TODO: enable "CheckEra" after the package publish for issue: https://github.com/polkadot-js/api/issues/2909
-    // frame_system::CheckEra<Runtime>,
+    frame_system::CheckEra<Runtime>,
     frame_system::CheckNonce<Runtime>,
     frame_system::CheckWeight<Runtime>,
     pallet_transaction_payment::ChargeTransactionPayment<Runtime>,
@@ -385,7 +393,7 @@ impl_runtime_apis! {
             gas_limit: u64,
             input_data: Vec<u8>,
         ) -> pallet_contracts_primitives::ContractExecResult {
-            Contracts::bare_call(origin, dest.into(), value, gas_limit, input_data)
+            Contracts::bare_call(origin, dest, value, gas_limit, input_data)
         }
 
         fn get_storage(
@@ -455,6 +463,7 @@ impl_runtime_apis! {
             add_benchmark!(params, batches, pallet_contracts, Contracts);
             add_benchmark!(params, batches, pallet_indices, Indices);
             add_benchmark!(params, batches, pallet_timestamp, Timestamp);
+            add_benchmark!(params, batches, pallet_template, Template);
 
             if batches.is_empty() { return Err("Benchmark not found for this pallet.".into()) }
             Ok(batches)

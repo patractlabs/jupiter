@@ -1,9 +1,8 @@
 use serde_json::json;
-use std::convert::TryInto;
 
 use hex_literal::hex;
 
-use sc_service::ChainType;
+use sc_service::{config::TelemetryEndpoints, ChainType};
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_consensus_babe::AuthorityId as BabeId;
 use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public};
@@ -24,7 +23,7 @@ use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use pallet_staking::{Forcing, StakerStatus};
 
 // The URL for the telemetry server.
-// const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
+const PATRACT_TELEMETRY_URL: &str = "wss://telemetry.patract.io/submit";
 
 /// Specialized `ChainSpec`. This is a specialization of the general Substrate ChainSpec type.
 pub type ChainSpec = sc_service::GenericChainSpec<GenesisConfig>;
@@ -343,14 +342,14 @@ pub fn staging_testnet_config() -> Result<ChainSpec, String> {
             )
         },
         // Bootnodes
-        vec![
-            "/dns/staging-1.jupiter.p2p.patract.io/tcp/30333/p2p/12D3KooWA8LCSwvSvrsVL5ANMzY5z23NDKrnSqLtyNq3geRmUsRT".to_string().try_into().expect("must be valid bootnode"),
-            "/dns/staging-2.jupiter.p2p.patract.io/tcp/30334/p2p/12D3KooWSZAzpj81ouT2bZJFbfL6JTKiMiGZZq82AJZMUDB23JJ5".to_string().try_into().expect("must be valid bootnode"),
-            "/dns/staging-3.jupiter.p2p.patract.io/tcp/30335/p2p/12D3KooWEm8wPo1AAZeiNifEGPz6doJeQeyk3z5343scxpiU46ef".to_string().try_into().expect("must be valid bootnode"),
-            "/dns/staging-4.jupiter.p2p.patract.io/tcp/30336/p2p/12D3KooWMx9TH6AtZf8y7DnVxDfYJmLPrL43uVbrhsnH8JtsvH2r".to_string().try_into().expect("must be valid bootnode"),
-        ],
+        vec![],
         // Telemetry
-        None,
+        Some(TelemetryEndpoints::new(
+            vec![
+                (PATRACT_TELEMETRY_URL.to_string(), 0)
+            ])
+                 .expect("Polkadot Staging telemetry url is valid; qed"),
+        ),
         // Protocol ID
         Some("jupiter_staging_testnet"),
         // Properties
@@ -367,6 +366,10 @@ pub fn staging_testnet_config() -> Result<ChainSpec, String> {
         // Extensions
         None,
     ))
+}
+
+pub fn testnet_config() -> Result<ChainSpec, String> {
+    ChainSpec::from_json_bytes(&include_bytes!("../res/testnet.json")[..])
 }
 
 /// Configure initial storage state for FRAME modules.

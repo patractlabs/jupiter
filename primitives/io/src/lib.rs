@@ -1,38 +1,103 @@
 //! Jupiter primitives - IO Module
-#![deny(missing_docs)]
+#![allow(missing_docs)]
 #![cfg_attr(not(feature = "std"), no_std)]
 use sp_runtime_interface::runtime_interface;
+use sp_std::vec::Vec;
 
-/// ZK-SNARKs runtime interface
+/// Pairing runtime interface
 #[runtime_interface]
-pub trait ZkSnarks {
-    /// altbn_128 add
-    fn altbn_128_add(input: &[u8]) -> Option<[u8; 64]> {
-        megaclite::altbn_128::add(input).ok()
+pub trait Pairing {
+    fn wasm() -> bool {
+        if let Ok(mode) = ::std::env::var("JIO_MODE") {
+            if mode.to_uppercase() == "WASM" {
+                return true;
+            }
+        }
+
+        false
     }
 
-    /// altbn_128 mul
-    fn altbn_128_mul(input: &[u8]) -> Option<[u8; 64]> {
-        megaclite::altbn_128::mul(input).ok()
+    fn call(func_id: u32, input: &[u8]) -> Option<Vec<u8>> {
+        curve::call(func_id, input).ok()
     }
 
-    /// altbn_128 pairing
-    fn altbn_128_pairing(input: &[u8]) -> Option<bool> {
-        megaclite::altbn_128::pairing(input).ok()
+    fn bls12_377_add() {
+        curve::tests::add(0x2a);
     }
 
-    /// bls12_381 add
-    fn bls12_381_add(input: &[u8]) -> Option<[u8; 96]> {
-        megaclite::bls12_381::add(input).ok()
+    fn bls12_377_mul() {
+        curve::tests::mul(0x2a);
     }
 
-    /// bls12_381 mul
-    fn bls12_381_mul(input: &[u8]) -> Option<[u8; 96]> {
-        megaclite::bls12_381::mul(input).ok()
+    fn bls12_377_pairing_two() {
+        curve::tests::pairing(0x2a);
     }
 
-    /// bls12_381 pairing
-    fn bls12_381_pairing(input: &[u8]) -> Option<bool> {
-        megaclite::bls12_381::pairing(input).ok()
+    fn bls12_377_pairing_six() {
+        curve::tests::pairing_six(0x2a);
+    }
+
+    fn bls12_377_verify() {
+        curve::tests::verify(0x2a);
+    }
+
+    fn bls12_381_add() {
+        curve::tests::add(0x2b);
+    }
+
+    fn bls12_381_mul() {
+        curve::tests::mul(0x2b);
+    }
+
+    fn bls12_381_pairing_two() {
+        curve::tests::pairing(0x2b);
+    }
+
+    fn bls12_381_pairing_six() {
+        curve::tests::pairing_six(0x2b);
+    }
+
+    fn bls12_381_verify() {
+        curve::tests::verify(0x2b);
+    }
+
+    fn bn254_add() {
+        curve::tests::add(0x2c);
+    }
+
+    fn bn254_mul() {
+        curve::tests::mul(0x2c);
+    }
+
+    fn bn254_pairing_two() {
+        curve::tests::pairing(0x2c);
+    }
+
+    fn bn254_pairing_six() {
+        curve::tests::pairing_six(0x2c);
+    }
+
+    fn bn254_verify() {
+        curve::tests::verify(0x2c);
+    }
+
+    fn bw6_761_add() {
+        curve::tests::add(0x2d);
+    }
+
+    fn bw6_761_mul() {
+        curve::tests::mul(0x2d);
+    }
+
+    fn bw6_761_pairing_two() {
+        curve::tests::pairing(0x2d);
+    }
+
+    fn bw6_761_pairing_six() {
+        curve::tests::pairing_six(0x2d);
+    }
+
+    fn bw6_761_verify() {
+        curve::tests::verify(0x2d);
     }
 }

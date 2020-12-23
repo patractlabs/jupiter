@@ -1,6 +1,6 @@
 [package]
 name = "jupiter-dev-cli"
-version = "0.1.0"
+version = "1.0.0"
 authors = ["Jupiter <https://github.com/patractlabs/jupiter>"]
 edition = "2018"
 
@@ -14,7 +14,7 @@ structopt = "0.3.8"
 parking_lot = "0.10.0"
 serde_json = "1.0"
 
-sc-cli = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+sc-cli = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master", features = ["wasmtime"] }
 sp-core = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 sc-executor = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 sc-service = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master" }
@@ -36,7 +36,7 @@ frame-benchmarking-cli = { version = "2.0.0", git = "https://github.com/parityte
 
 jupiter-primitives = { path = "../../../primitives" }
 jupiter-dev-runtime = { path = "../../../runtime/jupiter-dev" }
-jupiter-dev-executor = { path = "../executor" }
+# jupiter-dev-executor = { path = "../executor" }
 jupiter-rpc = { path = "../../../rpc" }
 jupiter-io = { path = "../../../primitives/io" }
 

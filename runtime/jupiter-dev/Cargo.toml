@@ -47,9 +47,11 @@ pallet-contracts-rpc-runtime-api = { version = "0.8.0", git = "https://github.co
 
 # local runtime module
 pallet-contracts = { path = "../../vendor/substrate/frame/contracts", default-features = false }
+pallet-template = { path = "../../pallets/template", default-features = false }
 
 jupiter-primitives = { path = "../../primitives", default-features = false }
 jupiter-runtime-common = { path = "../common", default-features = false }
+jupiter-chain-extension = { path = "../../primitives/chain-extension", default-features = false, features = [ "native-support" ] }
 
 [build-dependencies]
 substrate-wasm-builder = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
@@ -68,6 +70,7 @@ std = [
     "sp-std/std",
     "sp-transaction-pool/std",
     "sp-version/std",
+    "sp-offchain/std",
 
     "frame-executive/std",
     "frame-support/std",
@@ -87,15 +90,23 @@ std = [
     "pallet-contracts-rpc-runtime-api/std",
 
     "pallet-contracts/std",
+    "pallet-template/std",
 
     "jupiter-primitives/std",
     "jupiter-runtime-common/std",
+    "jupiter-chain-extension/std",
 ]
 runtime-benchmarks = [
     "hex-literal",
     "frame-benchmarking",
     "frame-system-benchmarking",
 
+    "sp-runtime/runtime-benchmarks",
+
+    "pallet-timestamp/runtime-benchmarks",
+    "pallet-indices/runtime-benchmarks",
+    "pallet-balances/runtime-benchmarks",
+    "pallet-template/runtime-benchmarks",
     "pallet-contracts/runtime-benchmarks",
 
     "jupiter-runtime-common/runtime-benchmarks",

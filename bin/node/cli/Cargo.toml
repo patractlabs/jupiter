@@ -1,6 +1,6 @@
 [package]
 name = "jupiter-cli"
-version = "0.1.0"
+version = "1.0.0"
 authors = ["Jupiter <https://github.com/patractlabs/jupiter>"]
 edition = "2018"
 
@@ -37,10 +37,13 @@ sp-authority-discovery = { version = "2.0.0", git = "https://github.com/parityte
 sc-cli = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master", optional = true }
 sc-service = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master", optional = true }
 
-pallet-contracts = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 pallet-authority-discovery = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 pallet-im-online = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 pallet-staking = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+
+# vendor
+# pallet-contracts = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+pallet-contracts = { path = "../../../vendor/substrate/frame/contracts" }
 
 jupiter-primitives = { path = "../../../primitives" }
 jupiter-runtime = { path = "../../../runtime/jupiter" }
