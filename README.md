@@ -196,8 +196,10 @@ but in same network, you should add `--bootnodes` parameter when start second no
 
 #### 4.2 jupiter-para
 `jupiter-para` use for join parachain collector.
-
-// TODO
+```bash
+./target/release/jupiter-para --parachain-id=1000 --collator -d .sub \
+-- --chain=rococo.json
+```
 
 #### 4.3 jupiter-dev
 `jupiter-dev` just use for local develop, it provider a nice and quick experience for contract developing for developer 
