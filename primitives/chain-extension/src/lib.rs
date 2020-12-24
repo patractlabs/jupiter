@@ -3,14 +3,21 @@
 use pallet_contracts::chain_extension::{
     ChainExtension, Environment, Ext, InitState, RetVal, SysConfig, UncheckedFrom,
 };
-use parity_scale_codec::Encode;
+use parity_scale_codec::{Decode, Encode};
 use sp_runtime::DispatchError;
-use sp_std::vec::Vec;
+use sp_std::{str, vec::Vec};
 
 use frame_support::debug::{error, native};
 
 /// The chain Extension of Jupiter
 pub struct JupiterExt;
+
+#[derive(Debug, PartialEq, Encode, Decode)]
+pub struct LogRecord {
+    level: u32,
+    target: Vec<u8>,
+    args: Vec<u8>,
+}
 
 impl ChainExtension for JupiterExt {
     fn call<E: Ext>(func_id: u32, env: Environment<E, InitState>) -> Result<RetVal, DispatchError>
@@ -80,6 +87,33 @@ impl ChainExtension for JupiterExt {
                 // Encode back to the memory
                 let output: Vec<u8> = raw_output.encode();
                 env.write(&output, false, None)?;
+            }
+            // 0xfeffff00-0xfeffffff reserved for pallet-contracts log and print system
+            // 0xfeffff00 => ink-log
+            0xfeffff00 => {
+                // The memory of the vm stores buf in scale-codec
+                let input: LogRecord = env.read_as()?;
+                let target = str::from_utf8(input.target.as_slice()).unwrap();
+                let args = str::from_utf8(input.args.as_slice()).unwrap();
+
+                match input.level {
+                    1 => {
+                        native::error!(target: target, "❌ {}", args);
+                    }
+                    2 => {
+                        native::warn!(target: target, "⚠️  {}", args);
+                    }
+                    3 => {
+                        native::info!(target: target, "❤️  {}", args);
+                    }
+                    4 => {
+                        native::debug!(target: target, "📋  {}", args);
+                    }
+                    5 => {
+                        native::trace!(target: target, "🏷  {}", args);
+                    }
+                    _ => (),
+                }
             }
             _ => {
                 error!("call an unregistered `func_id`, func_id:{:}", func_id);
