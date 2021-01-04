@@ -1,27 +1,35 @@
 [package]
 name = "jupiter-chain-extension"
 version = "0.1.0"
-authors = ["clearloop <udtrokia@gmail.com>"]
+authors = ["Jupiter <https://github.com/patractlabs/jupiter>"]
 edition = "2018"
 
 [dependencies]
-sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
-sp-std = { git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+parity-scale-codec = { version = "1.3.5", features = ["derive"], default-features = false }
+hex = { version = "0.4.2", optional = true }
 
+sp-runtime = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+sp-std = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+
+frame-support = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-contracts = { path = "../../vendor/substrate/frame/contracts", default-features = false }
-
 jupiter-io = { path = "../io", default-features = false, optional = true }
 
 [dependencies.curve]
 git = "https://github.com/patractlabs/megaclite.git"
 package = "megaclite-arkworks"
+default-features = false
 
 [features]
 default = ["std"]
 std = [
-  "jupiter-io/std",
-  "pallet-contracts/std",
+  "parity-scale-codec/std",
+  "hex",
   "sp-runtime/std",
+  "sp-std/std",
+  "frame-support/std",
+  "pallet-contracts/std",
+  "jupiter-io/std",
 ]
 native-support = [
   "jupiter-io"

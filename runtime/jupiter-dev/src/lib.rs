@@ -88,6 +88,7 @@ parameter_types! {
     pub MaximumExtrinsicWeight: Weight = AvailableBlockRatio::get()
         .saturating_sub(Perbill::from_percent(10)) * MaximumBlockWeight::get();
     pub const MaximumBlockLength: u32 = 5 * 1024 * 1024;
+    pub const SS58Prefix: u8 = 42;
 }
 
 // Configure FRAME pallets to include in runtime.
@@ -139,6 +140,7 @@ impl frame_system::Config for Runtime {
     type OnKilledAccount = ();
     /// Weight information for the extrinsics of this pallet.
     type SystemWeightInfo = weights::frame_system::WeightInfo;
+    type SS58Prefix = SS58Prefix;
 }
 
 parameter_types! {

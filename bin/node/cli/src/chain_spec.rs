@@ -1,5 +1,4 @@
 use serde_json::json;
-use std::convert::TryInto;
 
 use hex_literal::hex;
 
@@ -343,12 +342,7 @@ pub fn staging_testnet_config() -> Result<ChainSpec, String> {
             )
         },
         // Bootnodes
-        vec![
-            "/dns/staging-1.jupiter.p2p.patract.io/tcp/30333/p2p/12D3KooWA8LCSwvSvrsVL5ANMzY5z23NDKrnSqLtyNq3geRmUsRT".to_string().try_into().expect("must be valid bootnode"),
-            "/dns/staging-2.jupiter.p2p.patract.io/tcp/30334/p2p/12D3KooWSZAzpj81ouT2bZJFbfL6JTKiMiGZZq82AJZMUDB23JJ5".to_string().try_into().expect("must be valid bootnode"),
-            "/dns/staging-3.jupiter.p2p.patract.io/tcp/30335/p2p/12D3KooWEm8wPo1AAZeiNifEGPz6doJeQeyk3z5343scxpiU46ef".to_string().try_into().expect("must be valid bootnode"),
-            "/dns/staging-4.jupiter.p2p.patract.io/tcp/30336/p2p/12D3KooWMx9TH6AtZf8y7DnVxDfYJmLPrL43uVbrhsnH8JtsvH2r".to_string().try_into().expect("must be valid bootnode"),
-        ],
+        vec![],
         // Telemetry
         Some(TelemetryEndpoints::new(
             vec![
@@ -372,6 +366,10 @@ pub fn staging_testnet_config() -> Result<ChainSpec, String> {
         // Extensions
         None,
     ))
+}
+
+pub fn testnet_config() -> Result<ChainSpec, String> {
+    ChainSpec::from_json_bytes(&include_bytes!("../res/testnet.json")[..])
 }
 
 /// Configure initial storage state for FRAME modules.

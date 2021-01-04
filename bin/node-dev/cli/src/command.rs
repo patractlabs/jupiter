@@ -60,7 +60,7 @@ pub fn run() -> sc_cli::Result<()> {
                 }
             })
         }
-        Some(Subcommand::Key(cmd)) => cmd.run(),
+        Some(Subcommand::Key(cmd)) => cmd.run(&cli),
         Some(Subcommand::Sign(cmd)) => cmd.run(),
         Some(Subcommand::Verify(cmd)) => cmd.run(),
         Some(Subcommand::Vanity(cmd)) => cmd.run(),

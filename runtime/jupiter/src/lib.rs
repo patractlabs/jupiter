@@ -127,6 +127,7 @@ type MoreThanHalfCouncil = EnsureOneOf<
 
 parameter_types! {
     pub const Version: RuntimeVersion = VERSION;
+    pub const SS58Prefix: u8 = 42;
 }
 impl frame_system::Config for Runtime {
     /// The basic call filter to use in dispatchable.
@@ -173,6 +174,7 @@ impl frame_system::Config for Runtime {
     type OnKilledAccount = ();
     /// Weight information for the extrinsics of this pallet.
     type SystemWeightInfo = weights::frame_system::WeightInfo;
+    type SS58Prefix = SS58Prefix;
 }
 
 parameter_types! {
@@ -1054,6 +1056,10 @@ impl_runtime_apis! {
         fn current_epoch_start() -> sp_consensus_babe::SlotNumber {
             Babe::current_epoch_start()
         }
+
+        fn current_epoch() -> sp_consensus_babe::Epoch {
+			Babe::current_epoch()
+		}
 
         fn generate_key_ownership_proof(
             _slot_number: sp_consensus_babe::SlotNumber,

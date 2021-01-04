@@ -17,6 +17,9 @@ Jupiter `FRAME contracts pallet` contains our `ChainExtension` to provide many p
 * ChainExtension
     - [ ] Contract Logger support
     - [x] Zero-Knowledge support, refer to this link [PIP-101](https://github.com/patractlabs/PIPs/blob/main/PIPs/pip-101.md)
+        
+        *Currently we use a simple static way to charge weight for ZKP, we would change this part with benchmarks result in future.*
+    
 * Jupiter modifications
     * // No features for now.
     
@@ -42,7 +45,7 @@ This repo provide three type node:
 
     **Jupiter open provider link is:**
   
-    - `wss://jupiter.elara.patract.io/` (not yet)
+    - `wss://jupiter.elara.patract.io/`
     - `wss://ws.jupiter.patract.cn/`
     
     Jupiter open telemetry link is [https://telemetry.patract.io/](https://telemetry.patract.io/)
@@ -78,7 +81,7 @@ Note: Substrate newest master is very different with Substrate v2.0.0 version. I
 master as dependencies, and in Jupiter `substrate-v2.0.0` branch, we use Substrate v2.0.0 from "crates.io" as dependencies.
 
 Thus, jupiter has two main branch. In different branch, we provide different `pallet-contracts` features:
-* master: we track newest master, currently we use substrate commit:[`987a9723920217917f2708388d150add5ef52ef7`](https://github.com/paritytech/substrate/commit/987a9723920217917f2708388d150add5ef52ef7).
+* master: we track newest master, currently we use substrate commit:[`532cce0118fe7a64168413e638b177e7e144ef72`](https://github.com/paritytech/substrate/commit/532cce0118fe7a64168413e638b177e7e144ef72).
     * In master, we use `src pallet-contract` or `modified pallet-contract`
     * `src pallet-contract` is belong to substrate commit version.
     * `modified pallet-contract` is belong to the forked substrate in vendor directory. We usually track the newest substrate version.
