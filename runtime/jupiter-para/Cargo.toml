@@ -65,7 +65,7 @@ xcm-executor = { git = "https://github.com/paritytech/polkadot", default-feature
 # local runtime module
 jupiter-primitives = { path = "../../primitives", default-features = false }
 jupiter-runtime-common = { path = "../common", default-features = false }
-jupiter-chain-extension = { path = "../../primitives/chain-extension", default-features = false, features = [ "native-support" ] }
+jupiter-chain-extension = { path = "../../primitives/chain-extension", default-features = false }
 
 # token-dealer = { path = "../../pallets/token-dealer", default-features = false}
 
