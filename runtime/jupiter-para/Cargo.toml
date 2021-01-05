@@ -42,7 +42,9 @@ pallet-transaction-payment = { version = "2.0.0", git = "https://github.com/pari
 pallet-transaction-payment-rpc-runtime-api = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master",default-features = false }
 pallet-utility = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master",default-features = false }
 pallet-multisig = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master",default-features = false }
-pallet-contracts = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false}
+
+# contracts
+pallet-contracts = { path = "../../vendor/substrate/frame/contracts", default-features = false }
 pallet-contracts-primitives = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master",default-features = false }
 pallet-contracts-rpc-runtime-api = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master",default-features = false }
 
@@ -63,6 +65,7 @@ xcm-executor = { git = "https://github.com/paritytech/polkadot", default-feature
 # local runtime module
 jupiter-primitives = { path = "../../primitives", default-features = false }
 jupiter-runtime-common = { path = "../common", default-features = false }
+jupiter-chain-extension = { path = "../../primitives/chain-extension", default-features = false, features = [ "native-support" ] }
 
 # token-dealer = { path = "../../pallets/token-dealer", default-features = false}
 

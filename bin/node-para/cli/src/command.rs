@@ -144,6 +144,8 @@ fn extract_genesis_wasm(chain_spec: &Box<dyn sc_service::ChainSpec>) -> Result<V
 pub fn run() -> Result<()> {
     let cli = Cli::from_args();
 
+    set_default_ss58_version();
+
     match &cli.subcommand {
         Some(Subcommand::BuildSpec(cmd)) => {
             let runner = cli.create_runner(cmd)?;
@@ -424,4 +426,12 @@ impl CliConfiguration<Self> for RelayChainCli {
     fn init<C: SubstrateCli>(&self) -> Result<()> {
         unreachable!("PolkadotCli is never initialized; qed");
     }
+}
+
+fn set_default_ss58_version() {
+    use sp_core::crypto::Ss58AddressFormat;
+
+    let ss58_version = Ss58AddressFormat::Custom(26);
+
+    sp_core::crypto::set_default_ss58_version(ss58_version);
 }

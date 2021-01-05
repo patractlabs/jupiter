@@ -20,6 +20,7 @@ use sp_std::prelude::*;
 use sp_version::NativeVersion;
 use sp_version::RuntimeVersion;
 
+use pallet_contracts::WeightInfo;
 use pallet_contracts_primitives::ContractExecResult;
 use pallet_transaction_payment_rpc_runtime_api::RuntimeDispatchInfo;
 
@@ -44,7 +45,8 @@ pub use jupiter_primitives::{
 };
 use jupiter_runtime_common::{
     constants::{currency::*, fee::WeightToFee, time::*},
-    impls, weights, BlockHashCount, BlockLength, BlockWeights
+    impls, weights, BlockHashCount, BlockLength, BlockWeights,
+    AVERAGE_ON_INITIALIZE_RATIO,
 };
 
 // XCM imports
@@ -210,6 +212,14 @@ parameter_types! {
     pub const MaxDepth: u32 = 32;
     pub const StorageSizeOffset: u32 = 8;
     pub const MaxValueSize: u32 = 16 * 1024;
+    pub DeletionWeightLimit: Weight = AVERAGE_ON_INITIALIZE_RATIO *
+        BlockWeights::get().max_block;
+    // The weight needed for decoding the queue should be less or equal than a fifth
+    // of the overall weight dedicated to the lazy deletion.
+    pub DeletionQueueDepth: u32 = ((DeletionWeightLimit::get() / (
+            <Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(1) -
+            <Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(0)
+        )) / 5) as u32;
 }
 
 impl pallet_contracts::Config for Runtime {
@@ -228,6 +238,9 @@ impl pallet_contracts::Config for Runtime {
     type MaxValueSize = MaxValueSize;
     type WeightPrice = pallet_transaction_payment::Module<Self>;
     type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
+    type ChainExtension = jupiter_chain_extension::JupiterExt;
+    type DeletionQueueDepth = DeletionQueueDepth;
+    type DeletionWeightLimit = DeletionWeightLimit;
 }
 
 impl pallet_sudo::Config for Runtime {
