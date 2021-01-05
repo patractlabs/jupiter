@@ -3,7 +3,7 @@ Testnet blockchain for Substrate `FRAME contracts pallet`.
 
 Currently Jupiter provide an independent substrate blockchain node, a parachain node and a local dev test node(three type executable file), 
 which all contain `pallet-contracts` module to provide contract feature. In the future, the Jupiter parachain node would become a
-parachain for Rococo and Kusama.
+parachain for Rococo.
 
 All type node use `FRAME contracts pallet` to provide contract feature, and allow [`ink!`](https://github.com/paritytech/ink),
 [`Ask!`](https://github.com/patractlabs/ask) and [`Solong`](https://github.com/hyperledger-labs/solang) or else compatible project
@@ -81,13 +81,13 @@ Note: Substrate newest master is very different with Substrate v2.0.0 version. I
 master as dependencies, and in Jupiter `substrate-v2.0.0` branch, we use Substrate v2.0.0 from "crates.io" as dependencies.
 
 Thus, jupiter has two main branch. In different branch, we provide different `pallet-contracts` features:
-* master: we track newest master, currently we use substrate commit:[`532cce0118fe7a64168413e638b177e7e144ef72`](https://github.com/paritytech/substrate/commit/532cce0118fe7a64168413e638b177e7e144ef72).
+* master: we track newest master, currently we use substrate commit:[`30009d9c995c3509be745b42ed8b968ca98395d7`](https://github.com/paritytech/substrate/commit/30009d9c995c3509be745b42ed8b968ca98395d7).
     * In master, we use `src pallet-contract` or `modified pallet-contract`
     * `src pallet-contract` is belong to substrate commit version.
     * `modified pallet-contract` is belong to the forked substrate in vendor directory. We usually track the newest substrate version.
 * [substrate-v2.0.0](https://github.com/patractlabs/jupiter/tree/substrate-v2.0.0): we keep v2.0.0 dependencies in this branch. **But this branch could only provide version 2.0.0 `pallet-contracts`.**
     * Version 2.0.0 may not match for newest ink!. If you what to test contract in this branch, please peek a suitable ink!
-      version for v2.0.0 `palset-contracts`.
+      version for v2.0.0 `pallet-contracts`.
     * In this branch, the Extending types must use the following (or switch to this branch, the readme would show more details):
         ```json
         {
