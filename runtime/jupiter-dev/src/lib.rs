@@ -20,6 +20,7 @@ use sp_std::prelude::*;
 use sp_version::NativeVersion;
 use sp_version::RuntimeVersion;
 
+use pallet_contracts::WeightInfo;
 use pallet_transaction_payment_rpc_runtime_api::RuntimeDispatchInfo;
 
 // A few exports that help ease life for downstream crates.
@@ -45,7 +46,7 @@ pub use jupiter_primitives::{
 };
 use jupiter_runtime_common::{
     constants::{currency::*, fee::WeightToFee, time::SLOT_DURATION},
-    impls, weights, BlockLength, BlockWeights,
+    impls, weights, BlockLength, BlockWeights, AVERAGE_ON_INITIALIZE_RATIO,
 };
 use pallet_transaction_payment::CurrencyAdapter;
 
@@ -139,6 +140,8 @@ impl frame_system::Config for Runtime {
     type OnKilledAccount = ();
     /// Weight information for the extrinsics of this pallet.
     type SystemWeightInfo = weights::frame_system::WeightInfo;
+    /// This is used as an identifier of the chain. Jupiter-dev use default 42 as prefix.
+    type SS58Prefix = ();
 }
 
 parameter_types! {
@@ -216,6 +219,15 @@ parameter_types! {
     pub const MaxDepth: u32 = 32;
     pub const StorageSizeOffset: u32 = 8;
     pub const MaxValueSize: u32 = 16 * 1024;
+        // The lazy deletion runs inside on_initialize.
+    pub DeletionWeightLimit: Weight = AVERAGE_ON_INITIALIZE_RATIO *
+        BlockWeights::get().max_block;
+    // The weight needed for decoding the queue should be less or equal than a fifth
+    // of the overall weight dedicated to the lazy deletion.
+    pub DeletionQueueDepth: u32 = ((DeletionWeightLimit::get() / (
+            <Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(1) -
+            <Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(0)
+        )) / 5) as u32;
 }
 
 impl pallet_contracts::Config for Runtime {
@@ -235,6 +247,8 @@ impl pallet_contracts::Config for Runtime {
     type WeightPrice = pallet_transaction_payment::Module<Self>;
     type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
     type ChainExtension = jupiter_chain_extension::JupiterExt;
+    type DeletionQueueDepth = DeletionQueueDepth;
+    type DeletionWeightLimit = DeletionWeightLimit;
 }
 
 impl pallet_sudo::Config for Runtime {

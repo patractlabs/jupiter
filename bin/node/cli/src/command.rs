@@ -51,6 +51,8 @@ impl SubstrateCli for Cli {
 pub fn run() -> sc_cli::Result<()> {
     let cli = Cli::from_args();
 
+    set_default_ss58_version();
+
     match &cli.subcommand {
         None => {
             let runner = cli.create_runner(&cli.run)?;
@@ -61,7 +63,7 @@ pub fn run() -> sc_cli::Result<()> {
                 }
             })
         }
-        Some(Subcommand::Key(cmd)) => cmd.run(),
+        Some(Subcommand::Key(cmd)) => cmd.run(&cli),
         Some(Subcommand::Sign(cmd)) => cmd.run(),
         Some(Subcommand::Verify(cmd)) => cmd.run(),
         Some(Subcommand::Vanity(cmd)) => cmd.run(),
@@ -139,4 +141,12 @@ pub fn run() -> sc_cli::Result<()> {
             })
         }
     }
+}
+
+fn set_default_ss58_version() {
+    use sp_core::crypto::Ss58AddressFormat;
+
+    let ss58_version = Ss58AddressFormat::Custom(26);
+
+    sp_core::crypto::set_default_ss58_version(ss58_version);
 }

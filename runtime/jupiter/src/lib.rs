@@ -27,10 +27,15 @@ use sp_runtime::{
 use sp_std::prelude::*;
 use static_assertions::const_assert;
 
+use frame_system::{EnsureOneOf, EnsureRoot};
+use pallet_contracts::WeightInfo;
+use pallet_contracts_primitives::ContractExecResult;
 use pallet_grandpa::{
     fg_primitives, AuthorityId as GrandpaId, AuthorityList as GrandpaAuthorityList,
 };
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
+use pallet_transaction_payment::CurrencyAdapter;
+use pallet_transaction_payment_rpc_runtime_api::RuntimeDispatchInfo;
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 
 #[cfg(feature = "std")]
@@ -39,11 +44,6 @@ use sp_staking::SessionIndex;
 #[cfg(feature = "std")]
 use sp_version::NativeVersion;
 use sp_version::RuntimeVersion;
-
-use frame_system::{EnsureOneOf, EnsureRoot};
-use pallet_contracts_primitives::ContractExecResult;
-use pallet_transaction_payment::CurrencyAdapter;
-use pallet_transaction_payment_rpc_runtime_api::RuntimeDispatchInfo;
 
 // A few exports that help ease life for downstream crates.
 #[cfg(any(feature = "std", test))]
@@ -71,6 +71,7 @@ pub use jupiter_primitives::{
 use jupiter_runtime_common::{
     constants::{currency::*, fee::WeightToFee, time::*},
     impls, weights, BlockHashCount, BlockLength, BlockWeights, OffchainSolutionWeightLimit,
+    AVERAGE_ON_INITIALIZE_RATIO,
 };
 
 impl_opaque_keys! {
@@ -127,6 +128,7 @@ type MoreThanHalfCouncil = EnsureOneOf<
 
 parameter_types! {
     pub const Version: RuntimeVersion = VERSION;
+    pub const SS58Prefix: u8 = 26;
 }
 impl frame_system::Config for Runtime {
     /// The basic call filter to use in dispatchable.
@@ -173,6 +175,8 @@ impl frame_system::Config for Runtime {
     type OnKilledAccount = ();
     /// Weight information for the extrinsics of this pallet.
     type SystemWeightInfo = weights::frame_system::WeightInfo;
+    /// This is used as an identifier of the chain.
+    type SS58Prefix = SS58Prefix;
 }
 
 parameter_types! {
@@ -728,6 +732,15 @@ parameter_types! {
     pub const MaxDepth: u32 = 32;
     pub const StorageSizeOffset: u32 = 8;
     pub const MaxValueSize: u32 = 16 * 1024;
+    // The lazy deletion runs inside on_initialize.
+    pub DeletionWeightLimit: Weight = AVERAGE_ON_INITIALIZE_RATIO *
+        BlockWeights::get().max_block;
+    // The weight needed for decoding the queue should be less or equal than a fifth
+    // of the overall weight dedicated to the lazy deletion.
+    pub DeletionQueueDepth: u32 = ((DeletionWeightLimit::get() / (
+            <Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(1) -
+            <Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(0)
+        )) / 5) as u32;
 }
 
 impl pallet_contracts::Config for Runtime {
@@ -747,6 +760,8 @@ impl pallet_contracts::Config for Runtime {
     type WeightPrice = pallet_transaction_payment::Module<Self>;
     type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
     type ChainExtension = jupiter_chain_extension::JupiterExt;
+    type DeletionQueueDepth = DeletionQueueDepth;
+    type DeletionWeightLimit = DeletionWeightLimit;
 }
 
 impl pallet_utility::Config for Runtime {
@@ -1053,6 +1068,10 @@ impl_runtime_apis! {
 
         fn current_epoch_start() -> sp_consensus_babe::SlotNumber {
             Babe::current_epoch_start()
+        }
+
+        fn current_epoch() -> sp_consensus_babe::Epoch {
+            Babe::current_epoch()
         }
 
         fn generate_key_ownership_proof(

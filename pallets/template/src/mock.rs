@@ -53,6 +53,7 @@ impl system::Config for Test {
     type SystemWeightInfo = ();
     type BlockWeights = ();
     type BlockLength = ();
+    type SS58Prefix = ();
 }
 
 parameter_types! {
@@ -104,6 +105,8 @@ parameter_types! {
     pub const SurchargeReward: u128 = 150;
     pub const MaxDepth: u32 = 100;
     pub const MaxValueSize: u32 = 16_384;
+    pub DeletionWeightLimit: Weight = 500_000_000_000;
+    pub DeletionQueueDepth: u32 = 1024;
 }
 
 impl contract::Config for Test {
@@ -123,6 +126,8 @@ impl contract::Config for Test {
     type WeightPrice = Self;
     type WeightInfo = ();
     type ChainExtension = jupiter_chain_extension::JupiterExt;
+    type DeletionQueueDepth = DeletionQueueDepth;
+    type DeletionWeightLimit = DeletionWeightLimit;
 }
 
 pub type Contracts = contract::Module<Test>;
