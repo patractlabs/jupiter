@@ -67,8 +67,6 @@ jupiter-primitives = { path = "../../primitives", default-features = false }
 jupiter-runtime-common = { path = "../common", default-features = false }
 jupiter-chain-extension = { path = "../../primitives/chain-extension", default-features = false }
 
-# token-dealer = { path = "../../pallets/token-dealer", default-features = false}
-
 [build-dependencies]
 substrate-wasm-builder = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 

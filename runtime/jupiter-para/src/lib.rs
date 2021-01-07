@@ -337,7 +337,6 @@ construct_runtime!(
 		MessageBroker: cumulus_message_broker::{Module, Storage, Call, Inherent},
 		ParachainInfo: parachain_info::{Module, Storage, Config},
 		XcmHandler: xcm_handler::{Module, Event<T>, Origin},
-        // TokenDealer: token_dealer::{Module, Call, Event<T>},
     }
 );
 
