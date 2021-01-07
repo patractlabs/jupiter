@@ -55,7 +55,7 @@ This repo provide three type node:
     It's a parachain blockchain network which would be deployed to Kusama network. Recently, we would deploy this parachain
     node into Rococo V1 network. And in this parachain, we would try to use the random number which relayed from relay chain in future.
 
-    This node uses `src pallet-contract` now.
+    This node uses `modified pallet-contract` now.
     
 * Jupiter local develop node: 
     
@@ -149,7 +149,7 @@ cargo build
 ### 4. run
 Now the directory `target/release` would contain two executable files.
 * `jupiter`, which is Jupiter Testnet node.
-* `jupiter-para`, which is Jupiter Testnet parachain node. (Cannot produce this file now)
+* `jupiter-para`, which is Jupiter Testnet parachain node.
 * `jupiter-dev`, which is Jupiter local develop node.
 
 Following parameters means:
@@ -199,8 +199,10 @@ but in same network, you should add `--bootnodes` parameter when start second no
 
 #### 4.2 jupiter-para
 `jupiter-para` use for join parachain collector.
-
-// TODO
+```bash
+./target/release/jupiter-para --parachain-id=1000 --collator -d .sub \
+-- --chain=rococo.json
+```
 
 #### 4.3 jupiter-dev
 `jupiter-dev` just use for local develop, it provider a nice and quick experience for contract developing for developer 

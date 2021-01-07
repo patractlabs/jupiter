@@ -42,7 +42,9 @@ pallet-transaction-payment = { version = "2.0.0", git = "https://github.com/pari
 pallet-transaction-payment-rpc-runtime-api = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master",default-features = false }
 pallet-utility = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master",default-features = false }
 pallet-multisig = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master",default-features = false }
-pallet-contracts = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master",default-features = false }
+
+# contracts
+pallet-contracts = { path = "../../vendor/substrate/frame/contracts", default-features = false }
 pallet-contracts-primitives = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master",default-features = false }
 pallet-contracts-rpc-runtime-api = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master",default-features = false }
 
@@ -50,18 +52,23 @@ pallet-contracts-rpc-runtime-api = { version = "0.8.0", git = "https://github.co
 cumulus-parachain-upgrade = { git = "https://github.com/paritytech/cumulus", branch = "master", default-features = false }
 cumulus-primitives = { git = "https://github.com/paritytech/cumulus", branch = "master", default-features = false }
 cumulus-runtime = { git = "https://github.com/paritytech/cumulus", branch = "master", default-features = false }
+cumulus-message-broker = { git = "https://github.com/paritytech/cumulus", branch = "master", default-features = false }
 parachain-info = { git = "https://github.com/paritytech/cumulus", branch = "master", default-features = false }
-# token-dealer = { path = "../../pallets/token-dealer", default-features = false}
+xcm-handler = { git = "https://github.com/paritytech/cumulus", branch = "master", default-features = false }
+
+# Polkadot dependencies
+polkadot-parachain = { git = "https://github.com/paritytech/polkadot", default-features = false , branch = "master" }
+xcm = { git = "https://github.com/paritytech/polkadot", default-features = false , branch = "master" }
+xcm-builder = { git = "https://github.com/paritytech/polkadot", default-features = false , branch = "master" }
+xcm-executor = { git = "https://github.com/paritytech/polkadot", default-features = false , branch = "master" }
 
 # local runtime module
-pallet-contracts-ext = { path = "../../frame/contracts-ext", default-features = false }
-
 jupiter-primitives = { path = "../../primitives", default-features = false }
 jupiter-runtime-common = { path = "../common", default-features = false }
+jupiter-chain-extension = { path = "../../primitives/chain-extension", default-features = false }
 
 [build-dependencies]
-wasm-builder-runner = { package = "substrate-wasm-builder-runner", version = "1.0.6"}
-#substrate-wasm-builder = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+substrate-wasm-builder = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 
 [features]
 default = ["std"]
@@ -102,19 +109,20 @@ std = [
     "pallet-contracts-primitives/std",
     "pallet-contracts-rpc-runtime-api/std",
 
-    "pallet-contracts-ext/std",
-
     "jupiter-primitives/std",
     "jupiter-runtime-common/std",
 
     "cumulus-parachain-upgrade/std",
     "cumulus-primitives/std",
     "cumulus-runtime/std",
+    "cumulus-message-broker/std",
     "parachain-info/std",
+    "xcm-handler/std",
+
+    "xcm/std",
+    "xcm-builder/std",
+    "xcm-executor/std",
+    "polkadot-parachain/std",
+
 #    "token-dealer/std",
 ]
-
-## Will be enabled by the `wasm-builder` when building the runtime for WASM.
-#runtime-wasm = [
-#    "cumulus-upward-message/runtime-wasm",
-#]
