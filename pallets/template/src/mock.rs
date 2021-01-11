@@ -98,15 +98,16 @@ type Randomness = pallet_randomness_collective_flip::Module<Test>;
 
 parameter_types! {
     pub const SignedClaimHandicap: u64 = 2;
-    pub const TombstoneDeposit: u128 = 16;
-    pub const StorageSizeOffset: u32 = 8;
-    pub const RentByteFee: u128 = 4;
-    pub const RentDepositOffset: u128 = 10_000;
-    pub const SurchargeReward: u128 = 150;
-    pub const MaxDepth: u32 = 100;
-    pub const MaxValueSize: u32 = 16_384;
-    pub DeletionWeightLimit: Weight = 500_000_000_000;
-    pub DeletionQueueDepth: u32 = 1024;
+	pub const TombstoneDeposit: u64 = 16;
+	pub const DepositPerContract: u64 = 8 * DepositPerStorageByte::get();
+	pub const DepositPerStorageByte: u64 = 10_000;
+	pub const DepositPerStorageItem: u64 = 10_000;
+	pub RentFraction: Perbill = Perbill::from_rational_approximation(4u32, 10_000u32);
+	pub const SurchargeReward: u64 = 150;
+	pub const MaxDepth: u32 = 100;
+	pub const MaxValueSize: u32 = 16_384;
+	pub const DeletionQueueDepth: u32 = 1024;
+	pub const DeletionWeightLimit: Weight = 500_000_000_000;
 }
 
 impl contract::Config for Test {
@@ -117,9 +118,10 @@ impl contract::Config for Test {
     type RentPayment = ();
     type SignedClaimHandicap = SignedClaimHandicap;
     type TombstoneDeposit = TombstoneDeposit;
-    type StorageSizeOffset = StorageSizeOffset;
-    type RentByteFee = RentByteFee;
-    type RentDepositOffset = RentDepositOffset;
+    type DepositPerContract = DepositPerContract;
+    type DepositPerStorageByte = DepositPerStorageByte;
+    type DepositPerStorageItem = DepositPerStorageItem;
+    type RentFraction = RentFraction;
     type SurchargeReward = SurchargeReward;
     type MaxDepth = MaxDepth;
     type MaxValueSize = MaxValueSize;

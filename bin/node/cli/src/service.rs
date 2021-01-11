@@ -170,10 +170,7 @@ pub fn new_full_base(mut config: Configuration) -> Result<NewFullBase, ServiceEr
 
     let (shared_voter_state, _) = rpc_setup;
 
-    config
-        .network
-        .notifications_protocols
-        .push(sc_finality_grandpa::GRANDPA_PROTOCOL_NAME.into());
+    config.network.extra_sets.push(sc_finality_grandpa::grandpa_peers_set_config());
 
     let (network, network_status_sinks, system_rpc_tx, network_starter) =
         sc_service::build_network(sc_service::BuildNetworkParams {

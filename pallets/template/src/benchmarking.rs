@@ -63,7 +63,6 @@ benchmarks! {
         T::AccountId: UncheckedFrom<T::Hash>,
         T::AccountId: AsRef<[u8]>,
     }
-    _ {}
 
     bls12_377_verify {
         let (addr, caller) = addr!();
