@@ -81,7 +81,7 @@ Note: Substrate newest master is very different with Substrate v2.0.0 version. I
 master as dependencies, and in Jupiter `substrate-v2.0.0` branch, we use Substrate v2.0.0 from "crates.io" as dependencies.
 
 Thus, jupiter has two main branch. In different branch, we provide different `pallet-contracts` features:
-* master: we track newest master, currently we use substrate commit:[`30009d9c995c3509be745b42ed8b968ca98395d7`](https://github.com/paritytech/substrate/commit/30009d9c995c3509be745b42ed8b968ca98395d7).
+* master: we track newest master, currently we use substrate commit:[`712085115cdef4a79a66747338c920d6ba4e479f`](https://github.com/paritytech/substrate/commit/712085115cdef4a79a66747338c920d6ba4e479f).
     * In master, we use `src pallet-contract` or `modified pallet-contract`
     * `src pallet-contract` is belong to substrate commit version.
     * `modified pallet-contract` is belong to the forked substrate in vendor directory. We usually track the newest substrate version.
