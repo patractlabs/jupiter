@@ -1802,7 +1802,7 @@ dependencies = [
 [[package]]
 name = "frame-benchmarking-cli"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate?branch=master#885c1f17cb6fcb542d7977ea3bd2136b9466c921"
+source = "git+https://github.com/paritytech/substrate?branch=master#712085115cdef4a79a66747338c920d6ba4e479f"
 dependencies = [
  "Inflector",
  "chrono",
@@ -1927,7 +1927,7 @@ dependencies = [
 [[package]]
 name = "frame-system-benchmarking"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate?branch=master#885c1f17cb6fcb542d7977ea3bd2136b9466c921"
+source = "git+https://github.com/paritytech/substrate?branch=master#712085115cdef4a79a66747338c920d6ba4e479f"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4686,7 +4686,7 @@ dependencies = [
 [[package]]
 name = "pallet-contracts-primitives"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate?branch=master#885c1f17cb6fcb542d7977ea3bd2136b9466c921"
+source = "git+https://github.com/paritytech/substrate?branch=master#712085115cdef4a79a66747338c920d6ba4e479f"
 dependencies = [
  "bitflags",
  "parity-scale-codec",
@@ -4706,7 +4706,7 @@ dependencies = [
 [[package]]
 name = "pallet-contracts-rpc"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate?branch=master#885c1f17cb6fcb542d7977ea3bd2136b9466c921"
+source = "git+https://github.com/paritytech/substrate?branch=master#712085115cdef4a79a66747338c920d6ba4e479f"
 dependencies = [
  "jsonrpc-core",
  "jsonrpc-core-client",
@@ -4725,7 +4725,7 @@ dependencies = [
 [[package]]
 name = "pallet-contracts-rpc-runtime-api"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate?branch=master#885c1f17cb6fcb542d7977ea3bd2136b9466c921"
+source = "git+https://github.com/paritytech/substrate?branch=master#712085115cdef4a79a66747338c920d6ba4e479f"
 dependencies = [
  "pallet-contracts-primitives",
  "parity-scale-codec",
@@ -7369,7 +7369,7 @@ dependencies = [
 [[package]]
 name = "sc-consensus-aura"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate?branch=master#885c1f17cb6fcb542d7977ea3bd2136b9466c921"
+source = "git+https://github.com/paritytech/substrate?branch=master#712085115cdef4a79a66747338c920d6ba4e479f"
 dependencies = [
  "derive_more",
  "futures 0.3.9",
@@ -7482,7 +7482,7 @@ dependencies = [
 [[package]]
 name = "sc-consensus-manual-seal"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate?branch=master#885c1f17cb6fcb542d7977ea3bd2136b9466c921"
+source = "git+https://github.com/paritytech/substrate?branch=master#712085115cdef4a79a66747338c920d6ba4e479f"
 dependencies = [
  "assert_matches",
  "derive_more",
@@ -8723,7 +8723,7 @@ dependencies = [
 [[package]]
 name = "sp-consensus-aura"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate?branch=master#885c1f17cb6fcb542d7977ea3bd2136b9466c921"
+source = "git+https://github.com/paritytech/substrate?branch=master#712085115cdef4a79a66747338c920d6ba4e479f"
 dependencies = [
  "parity-scale-codec",
  "sp-api",
@@ -9033,7 +9033,7 @@ dependencies = [
 [[package]]
 name = "sp-sandbox"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate?branch=master#885c1f17cb6fcb542d7977ea3bd2136b9466c921"
+source = "git+https://github.com/paritytech/substrate?branch=master#712085115cdef4a79a66747338c920d6ba4e479f"
 dependencies = [
  "parity-scale-codec",
  "sp-core",
@@ -9345,7 +9345,7 @@ dependencies = [
 [[package]]
 name = "substrate-build-script-utils"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate?branch=master#885c1f17cb6fcb542d7977ea3bd2136b9466c921"
+source = "git+https://github.com/paritytech/substrate?branch=master#712085115cdef4a79a66747338c920d6ba4e479f"
 dependencies = [
  "platforms",
 ]
@@ -9406,7 +9406,7 @@ dependencies = [
 [[package]]
 name = "substrate-wasm-builder"
 version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?branch=master#885c1f17cb6fcb542d7977ea3bd2136b9466c921"
+source = "git+https://github.com/paritytech/substrate?branch=master#712085115cdef4a79a66747338c920d6ba4e479f"
 dependencies = [
  "ansi_term 0.12.1",
  "atty",
