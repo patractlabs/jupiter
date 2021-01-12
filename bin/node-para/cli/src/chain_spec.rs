@@ -118,7 +118,12 @@ pub fn staging_testnet_config(id: ParaId) -> Result<ChainSpec, String> {
             )
         },
         Vec::new(),
-        None,
+        Some(TelemetryEndpoints::new(
+            vec![
+                (PATRACT_TELEMETRY_URL.to_string(), 0)
+            ])
+                 .expect("Polkadot Staging telemetry url is valid; qed"),
+        ),
         Some("jupiter_para_staging_testnet"),
         Some(
             json!({

@@ -139,6 +139,7 @@ async fn start_node_impl<RB>(
 
     let rpc_client = client.clone();
     let rpc_extensions_builder = Box::new(move |_, _| rpc_ext_builder(rpc_client.clone()));
+    let telemetry_connection_sinks = sc_service::TelemetryConnectionSinks::default();
 
     sc_service::spawn_tasks(sc_service::SpawnTasksParams {
         on_demand: None,
@@ -147,7 +148,7 @@ async fn start_node_impl<RB>(
         client: client.clone(),
         transaction_pool: transaction_pool.clone(),
         task_manager: &mut task_manager,
-        telemetry_connection_sinks: Default::default(),
+        telemetry_connection_sinks: telemetry_connection_sinks.clone(),
         config: parachain_config,
         keystore: params.keystore_container.sync_keystore(),
         backend: backend.clone(),
