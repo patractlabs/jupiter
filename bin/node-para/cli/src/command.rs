@@ -22,6 +22,8 @@ use std::{io::Write, net::SocketAddr};
 fn load_spec(id: &str, para_id: ParaId) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
     Ok(match id {
         "" | "dev" => Box::new(chain_spec::development_config(para_id)?),
+        "staging" => Box::new(chain_spec::staging_testnet_config(para_id)?),
+        "testnet" => Box::new(chain_spec::testnet_config()?),
         path => Box::new(chain_spec::ChainSpec::from_json_file(
             path.into(),
         )?),
@@ -267,7 +269,7 @@ pub fn run() -> Result<()> {
                 // TODO
                 let key = sp_core::Pair::generate().0;
 
-                let extension = chain_spec::Extensions::try_get(&config.chain_spec);
+                let extension = chain_spec::Extensions::try_get(&*config.chain_spec);
                 let relay_chain_id = extension.map(|e| e.relay_chain.clone());
                 let para_id = extension.map(|e| e.para_id);
 
