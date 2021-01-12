@@ -1,19 +1,14 @@
 {
-  "name": "Jupiter Parachain Staging Testnet",
-  "id": "jupiter_para staging_testnet",
+  "name": "Jupiter Parachain Testnet",
+  "id": "jupiter_para_testnet",
   "chainType": "Live",
   "bootNodes": [],
-  "telemetryEndpoints": [
-    [
-      "/dns/telemetry.patract.io/tcp/443/x-parity-wss/%2Fsubmit",
-      0
-    ]
-  ],
-  "protocolId": "jupiter_para_staging_testnet",
+  "telemetryEndpoints": [],
+  "protocolId": "jupiter_para_testnet",
   "properties": {
     "ss58Format": 42,
     "tokenDecimals": 10,
-    "tokenSymbol": "J-DOT"
+    "tokenSymbol": "jDOT"
   },
   "relay_chain": "rococo",
   "para_id": 1024,

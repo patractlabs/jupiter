@@ -88,7 +88,7 @@ pub fn development_config(id: ParaId) -> Result<ChainSpec, String> {
             json!({
                 "ss58Format": 42,
                 "tokenDecimals": 10,
-                "tokenSymbol": "J-DOT"
+                "tokenSymbol": "jDOT"
             })
             .as_object()
             .expect("network properties generation can not fail; qed")
@@ -118,18 +118,13 @@ pub fn staging_testnet_config(id: ParaId) -> Result<ChainSpec, String> {
             )
         },
         Vec::new(),
-        Some(TelemetryEndpoints::new(
-            vec![
-                (PATRACT_TELEMETRY_URL.to_string(), 0)
-            ])
-                 .expect("Polkadot Staging telemetry url is valid; qed"),
-        ),
+        None,
         Some("jupiter_para_staging_testnet"),
         Some(
             json!({
                 "ss58Format": 42,
                 "tokenDecimals": 10,
-                "tokenSymbol": "J-DOT"
+                "tokenSymbol": "jDOT"
             })
                 .as_object()
                 .expect("network properties generation can not fail; qed")
