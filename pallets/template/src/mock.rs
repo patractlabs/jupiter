@@ -98,7 +98,7 @@ type Randomness = pallet_randomness_collective_flip::Module<Test>;
 
 parameter_types! {
     pub const SignedClaimHandicap: u64 = 2;
-	pub const TombstoneDeposit: u64 = 16;
+    pub const TombstoneDeposit: u64 = 16;
 	pub const DepositPerContract: u64 = 8 * DepositPerStorageByte::get();
 	pub const DepositPerStorageByte: u64 = 10_000;
 	pub const DepositPerStorageItem: u64 = 10_000;
