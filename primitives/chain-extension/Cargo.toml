@@ -8,10 +8,10 @@ edition = "2018"
 parity-scale-codec = { version = "1.3.5", features = ["derive"], default-features = false }
 hex = { version = "0.4.2", optional = true }
 
-sp-runtime = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
-sp-std = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+sp-runtime = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "rococo-v1", default-features = false }
+sp-std = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "rococo-v1", default-features = false }
 
-frame-support = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+frame-support = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "rococo-v1", default-features = false }
 pallet-contracts = { path = "../../vendor/substrate/frame/contracts", default-features = false }
 jupiter-io = { path = "../io", default-features = false, optional = true }
 
