@@ -23,7 +23,7 @@ use sp_version::RuntimeVersion;
 
 use pallet_contracts::WeightInfo;
 use pallet_contracts_primitives::ContractExecResult;
-use pallet_transaction_payment_rpc_runtime_api::RuntimeDispatchInfo;
+use pallet_transaction_payment::{FeeDetails, RuntimeDispatchInfo};
 
 // A few exports that help ease life for downstream crates.
 #[cfg(any(feature = "std", test))]
@@ -258,6 +258,7 @@ impl pallet_sudo::Config for Runtime {
 impl cumulus_parachain_upgrade::Config for Runtime {
     type Event = Event;
     type OnValidationData = ();
+    type SelfParaId = parachain_info::Module<Runtime>;
 }
 
 impl cumulus_message_broker::Config for Runtime {
@@ -466,6 +467,9 @@ impl_runtime_apis! {
         fn query_info(uxt: <Block as BlockT>::Extrinsic, len: u32) -> RuntimeDispatchInfo<Balance> {
             TransactionPayment::query_info(uxt, len)
         }
+        fn query_fee_details(uxt: <Block as BlockT>::Extrinsic, len: u32) -> FeeDetails<Balance> {
+			TransactionPayment::query_fee_details(uxt, len)
+		}
     }
 
     impl pallet_contracts_rpc_runtime_api::ContractsApi<Block, AccountId, Balance, BlockNumber>

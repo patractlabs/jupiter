@@ -56,7 +56,7 @@ impl SubstrateCli for Cli {
     }
 
     fn load_spec(&self, id: &str) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
-        load_spec(id, self.run.parachain_id.unwrap_or(200).into())
+        load_spec(id, self.run.parachain_id.unwrap_or(1024).into())
     }
 
     fn native_runtime_version(_: &Box<dyn ChainSpec>) -> &'static RuntimeVersion {
@@ -74,10 +74,10 @@ impl SubstrateCli for RelayChainCli {
     }
 
     fn description() -> String {
-        "Parachain Collator Template\n\nThe command-line arguments provided first will be \
+        "Jupiter parachain collator\n\nThe command-line arguments provided first will be \
 		passed to the parachain node, while the arguments provided after -- will be passed \
 		to the relaychain node.\n\n\
-		parachain-collator [parachain-args] -- [relaychain-args]"
+		jupiter-para [parachain-args] -- [relaychain-args]"
             .into()
     }
 
@@ -90,7 +90,7 @@ impl SubstrateCli for RelayChainCli {
     }
 
     fn copyright_start_year() -> i32 {
-        2017
+        2020
     }
 
     fn load_spec(&self, id: &str) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
@@ -304,6 +304,7 @@ pub fn run() -> Result<()> {
                 crate::service::start_node(config, key, polkadot_config, id, collator)
                     .await
                     .map(|r| r.0)
+                    .map_err(Into::into)
             })
         }
     }
