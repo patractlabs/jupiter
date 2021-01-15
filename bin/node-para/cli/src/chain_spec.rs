@@ -105,7 +105,7 @@ pub fn development_config(id: ParaId) -> Result<ChainSpec, String> {
 pub fn staging_testnet_config(id: ParaId) -> Result<ChainSpec, String> {
     Ok(ChainSpec::from_genesis(
         "Jupiter Parachain Staging Testnet",
-        "jupiter_para staging_testnet",
+        "jupiter_para_staging_testnet",
         ChainType::Live,
         move || {
             testnet_genesis(
