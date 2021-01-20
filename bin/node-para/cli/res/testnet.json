@@ -3,12 +3,7 @@
   "id": "jupiter_para_testnet",
   "chainType": "Live",
   "bootNodes": [],
-  "telemetryEndpoints": [
-    [
-      "/dns/telemetry.patract.io/tcp/443/x-parity-wss/%2Fsubmit",
-      0
-    ]
-  ],
+  "telemetryEndpoints": null,
   "protocolId": "jupiter_para_testnet",
   "properties": {
     "ss58Format": 42,
