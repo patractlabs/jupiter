@@ -8,7 +8,7 @@ use sp_core::Pair;
 
 use sc_executor::native_executor_instance;
 pub use sc_executor::NativeExecutor;
-use sc_service::{error::Error as ServiceError, Configuration, TaskManager, Role};
+use sc_service::{error::Error as ServiceError, Configuration, TaskManager, Role, PartialComponents};
 
 use jupiter_para_runtime::{self, RuntimeApi};
 use jupiter_primitives::Block;
@@ -34,11 +34,11 @@ pub fn new_partial(
         (),
         sp_consensus::DefaultImportQueue<Block, FullClient>,
         sc_transaction_pool::FullPool<Block, FullClient>,
-        ()
+        Option<sc_telemetry::TelemetrySpan>,
     >,
     ServiceError,
 > {
-    let (client, backend, keystore_container, task_manager) =
+    let (client, backend, keystore_container, task_manager, telemetry_span) =
         sc_service::new_full_parts::<Block, RuntimeApi, Executor>(&config)?;
     let client = Arc::new(client);
 
@@ -61,23 +61,25 @@ pub fn new_partial(
         registry.clone(),
     )?;
 
-    Ok(sc_service::PartialComponents {
-        client,
+    let params = PartialComponents {
         backend,
-        task_manager,
-        keystore_container,
-        select_chain: (),
+        client,
         import_queue,
+        keystore_container,
+        task_manager,
         transaction_pool,
         inherent_data_providers,
-        other: (),
-    })
+        select_chain: (),
+        other: telemetry_span,
+    };
+
+    Ok(params)
 }
 
 /// Start a node with the given parachain `Configuration` and relay chain `Configuration`.
 ///
 /// This is the actual implementation that is abstract over the executor and the runtime api.
-#[sc_cli::prefix_logs_with("Parachain")]
+#[sc_tracing::logging::prefix_logs_with("Parachain")]
 async fn start_node_impl<RB>(
     parachain_config: Configuration,
     collator_key: CollatorPair,
@@ -108,6 +110,7 @@ async fn start_node_impl<RB>(
         )?;
 
     let params = new_partial(&parachain_config)?;
+    let telemetry_span = params.other;
     params
         .inherent_data_providers
         .register_provider(sp_timestamp::InherentDataProvider)
@@ -139,7 +142,6 @@ async fn start_node_impl<RB>(
 
     let rpc_client = client.clone();
     let rpc_extensions_builder = Box::new(move |_, _| rpc_ext_builder(rpc_client.clone()));
-    let telemetry_connection_sinks = sc_service::TelemetryConnectionSinks::default();
 
     sc_service::spawn_tasks(sc_service::SpawnTasksParams {
         on_demand: None,
@@ -148,18 +150,18 @@ async fn start_node_impl<RB>(
         client: client.clone(),
         transaction_pool: transaction_pool.clone(),
         task_manager: &mut task_manager,
-        telemetry_connection_sinks: telemetry_connection_sinks.clone(),
         config: parachain_config,
         keystore: params.keystore_container.sync_keystore(),
         backend: backend.clone(),
         network: network.clone(),
         network_status_sinks,
         system_rpc_tx,
+        telemetry_span,
     })?;
 
     let announce_block = {
         let network = network.clone();
-        Arc::new(move |hash, data| network.announce_block(hash, data))
+        Arc::new(move |hash, data| network.announce_block(hash, Some(data)))
     };
 
     if validator {
