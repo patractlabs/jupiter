@@ -10,7 +10,8 @@ members = [
     "primitives",
     "primitives/io",
     "primitives/chain-extension",
-    "pallets/template",
+#    "pallets/template",
+    "pallets/randomness_collect",
     "rpc",
 ]
 exclude = ["vendor/substrate"]

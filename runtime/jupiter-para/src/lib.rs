@@ -9,11 +9,10 @@ include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 use sp_api::impl_runtime_apis;
 use sp_core::OpaqueMetadata;
 use sp_runtime::{
-    create_runtime_str,
-    generic, impl_opaque_keys,
-    traits::{AccountIdLookup, BlakeTwo256, Block as BlockT},
-    transaction_validity::{TransactionSource, TransactionValidity},
-    ApplyExtrinsicResult, Perbill
+    create_runtime_str, generic, impl_opaque_keys,
+    ApplyExtrinsicResult, Perbill,
+    transaction_validity::{TransactionSource, TransactionValidity, TransactionPriority},
+    traits::{AccountIdLookup, BlakeTwo256, Block as BlockT}
 };
 use sp_std::prelude::*;
 
@@ -30,7 +29,7 @@ use pallet_transaction_payment::{FeeDetails, RuntimeDispatchInfo};
 pub use sp_runtime::BuildStorage;
 
 pub use frame_support::{
-    construct_runtime, parameter_types,
+    construct_runtime, parameter_types, debug,
     traits::{KeyOwnerProofSystem, Randomness},
     weights::{
         constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_PER_SECOND},
@@ -63,6 +62,9 @@ use xcm_executor::{
     traits::{NativeAsset, IsConcrete},
 };
 
+pub use randomness_collect::{OCW_DB_RANDOM, RpcPort};
+use randomness_collect::sr25519::AuthorityId as RandomCollectId;
+
 impl_opaque_keys! {
 	pub struct SessionKeys {}
 }
@@ -82,10 +84,10 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
     spec_name: create_runtime_str!("jupiter-para"),
     impl_name: create_runtime_str!("jupiter-para"),
     authoring_version: 1,
-    spec_version: 1,
-    impl_version: 1,
+    spec_version: 2,
+    impl_version: 0,
     apis: RUNTIME_API_VERSIONS,
-    transaction_version: 1,
+    transaction_version: 2,
 };
 
 /// Native version.
@@ -321,6 +323,23 @@ impl xcm_handler::Config for Runtime {
     type HrmpMessageSender = MessageBroker;
 }
 
+impl<C> frame_system::offchain::SendTransactionTypes<C> for Runtime where
+    Call: From<C>,
+{
+    type Extrinsic = UncheckedExtrinsic;
+    type OverarchingCall = Call;
+}
+
+parameter_types! {
+	pub const RandomCollectUnsignedPriority: TransactionPriority = TransactionPriority::max_value();
+}
+
+impl randomness_collect::Config for Runtime {
+    type AuthorityId = RandomCollectId;
+    type UnsignedPriority = RandomCollectUnsignedPriority;
+}
+
+
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
     pub enum Runtime where
@@ -328,23 +347,24 @@ construct_runtime!(
         NodeBlock = jupiter_primitives::Block,
         UncheckedExtrinsic = UncheckedExtrinsic
     {
-        // Basic stuff; balances is uncallable initially.
-        System: frame_system::{Module, Call, Config, Storage, Event<T>},
-        RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Module, Call, Storage},
+        System: frame_system::{Module, Call, Config, Storage, Event<T>} = 0,
+        RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Module, Call, Storage} = 6,
 
-        Timestamp: pallet_timestamp::{Module, Call, Storage, Inherent},
-        Balances: pallet_balances::{Module, Call, Storage, Config<T>, Event<T>},
-        Indices: pallet_indices::{Module, Call, Storage, Config<T>, Event<T>},
-        TransactionPayment: pallet_transaction_payment::{Module, Storage},
+        Timestamp: pallet_timestamp::{Module, Call, Storage, Inherent} = 1,
+        Balances: pallet_balances::{Module, Call, Storage, Config<T>, Event<T>} = 2,
+        Indices: pallet_indices::{Module, Call, Storage, Config<T>, Event<T>} = 3,
+        TransactionPayment: pallet_transaction_payment::{Module, Storage} = 4,
 
-        Contracts: pallet_contracts::{Module, Call, Config<T>, Storage, Event<T>},
+        Contracts: pallet_contracts::{Module, Call, Config<T>, Storage, Event<T>} = 5,
 
-        Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>},
+        Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>} = 7,
 
-        ParachainUpgrade: cumulus_parachain_upgrade::{Module, Call, Storage, Inherent, Event},
-		MessageBroker: cumulus_message_broker::{Module, Storage, Call, Inherent},
-		ParachainInfo: parachain_info::{Module, Storage, Config},
-		XcmHandler: xcm_handler::{Module, Event<T>, Origin},
+        ParachainUpgrade: cumulus_parachain_upgrade::{Module, Call, Storage, Inherent, Event} = 8,
+		MessageBroker: cumulus_message_broker::{Module, Storage, Call, Inherent} = 9,
+		ParachainInfo: parachain_info::{Module, Storage, Config} = 10,
+		XcmHandler: xcm_handler::{Module, Event<T>, Origin} = 11,
+
+		RandomnessCollect: randomness_collect::{Module, Call, Storage, ValidateUnsigned} = 12,
     }
 );
 
@@ -370,6 +390,8 @@ pub type SignedExtra = (
 );
 /// Unchecked extrinsic type as expected by this runtime.
 pub type UncheckedExtrinsic = generic::UncheckedExtrinsic<Address, Call, Signature, SignedExtra>;
+/// The payload being signed in transactions.
+pub type SignedPayload = generic::SignedPayload<Call, SignedExtra>;
 /// Extrinsic type that has already been checked.
 pub type CheckedExtrinsic = generic::CheckedExtrinsic<AccountId, Call, SignedExtra>;
 /// Executive: handles dispatch to the various modules.

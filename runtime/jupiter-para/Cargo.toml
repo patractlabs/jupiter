@@ -67,6 +67,9 @@ jupiter-primitives = { path = "../../primitives", default-features = false }
 jupiter-runtime-common = { path = "../common", default-features = false }
 jupiter-chain-extension = { path = "../../primitives/chain-extension", default-features = false }
 
+# Jupiter Pallets
+randomness_collect = { path = "../../pallets/randomness_collect", default-features = false }
+
 [build-dependencies]
 substrate-wasm-builder = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "rococo-v1" }
 
@@ -124,4 +127,6 @@ std = [
     "jupiter-primitives/std",
     "jupiter-runtime-common/std",
     "jupiter-chain-extension/std",
+
+    "randomness_collect/std",
 ]

@@ -9,9 +9,13 @@ use sp_core::Pair;
 use sc_executor::native_executor_instance;
 pub use sc_executor::NativeExecutor;
 use sc_service::{error::Error as ServiceError, Configuration, TaskManager, Role, PartialComponents};
+use sc_client_api::Backend;
+use sp_core::offchain::OffchainStorage;
 
-use jupiter_para_runtime::{self, RuntimeApi};
+use jupiter_para_runtime::{self, RuntimeApi, OCW_DB_RANDOM, RpcPort};
 use jupiter_primitives::Block;
+
+use codec::Encode;
 
 // Declare an instance of the native executor named `Executor`. Include the wasm binary as the
 // equivalent wasm code.
@@ -101,6 +105,8 @@ async fn start_node_impl<RB>(
 
     let parachain_config = prepare_node_config(parachain_config);
 
+    let rpc_port = polkadot_config.rpc_http.clone();
+
     let polkadot_full_node =
         cumulus_service::build_polkadot_full_node(polkadot_config, collator_key.public()).map_err(
             |e| match e {
@@ -140,6 +146,12 @@ async fn start_node_impl<RB>(
             block_announce_validator_builder: Some(Box::new(|_| block_announce_validator)),
         })?;
 
+    if parachain_config.offchain_worker.enabled {
+        sc_service::build_offchain_workers(
+            &parachain_config, backend.clone(), task_manager.spawn_handle(), client.clone(), network.clone(),
+        );
+    }
+
     let rpc_client = client.clone();
     let rpc_extensions_builder = Box::new(move |_, _| rpc_ext_builder(rpc_client.clone()));
 
@@ -174,6 +186,14 @@ async fn start_node_impl<RB>(
         let spawner = task_manager.spawn_handle();
 
         let polkadot_backend = polkadot_full_node.backend.clone();
+
+        if let Some(rpc_port_addr) = rpc_port {
+            let rpc_port = RpcPort{ 0: rpc_port_addr.to_string().into() };
+            let offchain_storage = backend.offchain_storage();
+            if let Some(mut offchain_storage) = offchain_storage {
+                offchain_storage.set(sp_offchain::STORAGE_PREFIX, OCW_DB_RANDOM, &rpc_port.encode());
+            }
+        }
 
         let params = StartCollatorParams {
             para_id: id,
