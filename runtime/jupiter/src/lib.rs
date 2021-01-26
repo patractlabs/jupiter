@@ -34,7 +34,7 @@ use pallet_grandpa::{
     fg_primitives, AuthorityId as GrandpaId, AuthorityList as GrandpaAuthorityList,
 };
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
-use pallet_transaction_payment::CurrencyAdapter;
+use pallet_transaction_payment::{CurrencyAdapter, FeeDetails};
 use pallet_transaction_payment_rpc_runtime_api::RuntimeDispatchInfo;
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 
@@ -523,7 +523,10 @@ impl pallet_collective::Config<CouncilCollective> for Runtime {
 
 parameter_types! {
     pub const CandidacyBond: Balance = 1 * DOLLARS;
-    pub const VotingBond: Balance = 5 * CENTS;
+    // 1 storage item created, key size is 32 bytes, value size is 16+16.
+    pub const VotingBondBase: Balance = deposit(1, 64);
+    // additional data per vote is 32 bytes (account id).
+    pub const VotingBondFactor: Balance = deposit(0, 32);
     /// Daily council elections.
     pub const TermDuration: BlockNumber = 24 * HOURS;
     pub const DesiredMembers: u32 = 19;
@@ -540,9 +543,9 @@ impl pallet_elections_phragmen::Config for Runtime {
     type InitializeMembers = Council;
     type CurrencyToVote = U128CurrencyToVote;
     type CandidacyBond = CandidacyBond;
-    type VotingBond = VotingBond;
+    type VotingBondBase = VotingBondBase;
+    type VotingBondFactor = VotingBondFactor;
     type LoserCandidate = Treasury;
-    type BadReport = Treasury;
     type KickedMember = Treasury;
     type DesiredMembers = DesiredMembers;
     type DesiredRunnersUp = DesiredRunnersUp;
@@ -657,7 +660,7 @@ impl pallet_timestamp::Config for Runtime {
 }
 
 parameter_types! {
-    pub const IndexDeposit: Balance = 10 * DOLLARS;
+    pub const IndexDeposit: Balance = 1 * DOLLARS;
 }
 
 impl pallet_indices::Config for Runtime {
@@ -669,7 +672,7 @@ impl pallet_indices::Config for Runtime {
 }
 
 parameter_types! {
-    pub const ExistentialDeposit: Balance = 100 * CENTS;
+    pub const ExistentialDeposit: Balance = 1 * CENTS;
     // For weight estimation, we assume that the most locks on an individual account will be 50.
     // This number may need to be adjusted in the future if this assumption no longer holds true.
     pub const MaxLocks: u32 = 50;
@@ -724,27 +727,28 @@ impl pallet_identity::Config for Runtime {
 }
 
 parameter_types! {
+    // TODO
     pub const TombstoneDeposit: Balance = tombstone_deposit(
-		1,
-		sp_std::mem::size_of::<pallet_contracts::ContractInfo<Runtime>>() as u32
-	);
-	pub const DepositPerContract: Balance = TombstoneDeposit::get();
-	pub const DepositPerStorageByte: Balance = deposit(0, 1);
-	pub const DepositPerStorageItem: Balance = deposit(1, 0);
-	pub RentFraction: Perbill = Perbill::from_rational_approximation(1u32, 30 * DAYS);
-	pub const SurchargeReward: Balance = 150 * MILLICENTS;
-	pub const SignedClaimHandicap: u32 = 2;
-	pub const MaxDepth: u32 = 32;
-	pub const MaxValueSize: u32 = 16 * 1024;
-	// The lazy deletion runs inside on_initialize.
-	pub DeletionWeightLimit: Weight = AVERAGE_ON_INITIALIZE_RATIO *
-		BlockWeights::get().max_block;
-	// The weight needed for decoding the queue should be less or equal than a fifth
-	// of the overall weight dedicated to the lazy deletion.
-	pub DeletionQueueDepth: u32 = ((DeletionWeightLimit::get() / (
-			<Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(1) -
-			<Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(0)
-		)) / 5) as u32;
+        1,
+        sp_std::mem::size_of::<pallet_contracts::ContractInfo<Runtime>>() as u32
+    );
+    pub const DepositPerContract: Balance = TombstoneDeposit::get();
+    pub const DepositPerStorageByte: Balance = deposit(0, 1);
+    pub const DepositPerStorageItem: Balance = deposit(1, 0);
+    pub RentFraction: Perbill = Perbill::from_rational_approximation(1u32, 30 * DAYS);
+    pub const SurchargeReward: Balance = 0;
+    pub const SignedClaimHandicap: u32 = 2;
+    pub const MaxDepth: u32 = 32;
+    pub const MaxValueSize: u32 = 16 * 1024;
+    // The lazy deletion runs inside on_initialize.
+    pub DeletionWeightLimit: Weight = AVERAGE_ON_INITIALIZE_RATIO *
+        BlockWeights::get().max_block;
+    // The weight needed for decoding the queue should be less or equal than a fifth
+    // of the overall weight dedicated to the lazy deletion.
+    pub DeletionQueueDepth: u32 = ((DeletionWeightLimit::get() / (
+            <Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(1) -
+            <Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(0)
+        )) / 5) as u32;
 }
 
 impl pallet_contracts::Config for Runtime {
@@ -752,7 +756,7 @@ impl pallet_contracts::Config for Runtime {
     type Randomness = Babe;
     type Currency = Balances;
     type Event = Event;
-    type RentPayment = ();
+    type RentPayment = Treasury;
     type SignedClaimHandicap = SignedClaimHandicap;
     type TombstoneDeposit = TombstoneDeposit;
     type DepositPerContract = DepositPerContract;
@@ -858,12 +862,17 @@ impl InstanceFilter<Call> for ProxyType {
                     | Call::TechnicalCommittee(..)
                     | Call::ElectionsPhragmen(..)
                     | Call::Treasury(..)
+                    | Call::Bounties(..)
+                    | Call::Tips(..)
                     | Call::Utility(..)
             ),
             ProxyType::Staking => {
                 matches!(c, Call::Staking(..) | Call::Session(..) | Call::Utility(..))
             }
-            ProxyType::IdentityJudgement => matches!(c, Call::Utility(..)),
+            ProxyType::IdentityJudgement => matches!(
+                c,
+                Call::Identity(pallet_identity::Call::provide_judgement(..)) | Call::Utility(..)
+            ),
         }
     }
     fn is_superset(&self, o: &Self) -> bool {
@@ -1080,8 +1089,8 @@ impl_runtime_apis! {
         }
 
         fn next_epoch() -> sp_consensus_babe::Epoch {
-			Babe::next_epoch()
-		}
+            Babe::next_epoch()
+        }
 
         fn generate_key_ownership_proof(
             _slot_number: sp_consensus_babe::SlotNumber,
@@ -1169,6 +1178,9 @@ impl_runtime_apis! {
     > for Runtime {
         fn query_info(uxt: <Block as BlockT>::Extrinsic, len: u32) -> RuntimeDispatchInfo<Balance> {
             TransactionPayment::query_info(uxt, len)
+        }
+        fn query_fee_details(uxt: <Block as BlockT>::Extrinsic, len: u32) -> FeeDetails<Balance> {
+            TransactionPayment::query_fee_details(uxt, len)
         }
     }
 
