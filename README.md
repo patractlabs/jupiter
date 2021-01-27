@@ -53,7 +53,8 @@ This repo provide three type node:
 * Jupiter parachain node: (This node is not merged into `master` branch now.)
 
     It's a parachain blockchain network which would be deployed to Kusama network. Recently, we would deploy this parachain
-    node into Rococo V1 network. And in this parachain, we would try to use the random number which relayed from relay chain in future.
+    node into Rococo V1 network. And in this parachain, we would try to use the random number which relayed from relay chain.
+    For now, we have already add a simple pallet `randomness_collect` to achieve it.
 
     This node uses `modified pallet-contract` now.
     
@@ -198,10 +199,10 @@ Note if you start those two nodes in a machine, there could connect to each othe
 but in same network, you should add `--bootnodes` parameter when start second node. More details please lookup [https://substrate.dev/](https://substrate.dev/)
 
 #### 4.2 jupiter-para
-`jupiter-para` use for join parachain collector.
+`jupiter-para` use for join parachain collator.
 ```bash
-./target/release/jupiter-para --parachain-id=1000 --collator -d .sub \
--- --chain=rococo.json
+./target/release/jupiter-para --validator --chain=testnet --rpc-port=9966 -d .sub \
+-- --chain=rococo --execution=wasm --rpc-port=9967
 ```
 
 #### 4.3 jupiter-dev
