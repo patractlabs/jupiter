@@ -257,13 +257,10 @@ impl pallet_sudo::Config for Runtime {
     type Call = Call;
 }
 
-impl cumulus_parachain_upgrade::Config for Runtime {
+impl cumulus_parachain_system::Config for Runtime {
     type Event = Event;
     type OnValidationData = ();
     type SelfParaId = parachain_info::Module<Runtime>;
-}
-
-impl cumulus_message_broker::Config for Runtime {
     type DownwardMessageHandlers = ();
     type HrmpMessageHandlers = ();
 }
@@ -319,8 +316,8 @@ impl Config for XcmConfig {
 impl xcm_handler::Config for Runtime {
     type Event = Event;
     type XcmExecutor = XcmExecutor<XcmConfig>;
-    type UpwardMessageSender = MessageBroker;
-    type HrmpMessageSender = MessageBroker;
+    type UpwardMessageSender = ParachainSystem;
+    type HrmpMessageSender = ParachainSystem;
 }
 
 impl<C> frame_system::offchain::SendTransactionTypes<C> for Runtime where
@@ -348,7 +345,7 @@ construct_runtime!(
         UncheckedExtrinsic = UncheckedExtrinsic
     {
         System: frame_system::{Module, Call, Config, Storage, Event<T>} = 0,
-        RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Module, Call, Storage} = 6,
+        RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Module, Call, Storage} = 7,
 
         Timestamp: pallet_timestamp::{Module, Call, Storage, Inherent} = 1,
         Balances: pallet_balances::{Module, Call, Storage, Config<T>, Event<T>} = 2,
@@ -357,14 +354,13 @@ construct_runtime!(
 
         Contracts: pallet_contracts::{Module, Call, Config<T>, Storage, Event<T>} = 5,
 
-        Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>} = 7,
+        Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>} = 6,
 
-        ParachainUpgrade: cumulus_parachain_upgrade::{Module, Call, Storage, Inherent, Event} = 8,
-		MessageBroker: cumulus_message_broker::{Module, Storage, Call, Inherent} = 9,
-		ParachainInfo: parachain_info::{Module, Storage, Config} = 10,
-		XcmHandler: xcm_handler::{Module, Event<T>, Origin} = 11,
+        ParachainSystem: cumulus_parachain_system::{Module, Call, Storage, Inherent, Event} = 8,
+		ParachainInfo: parachain_info::{Module, Storage, Config} = 9,
+		XcmHandler: xcm_handler::{Module, Event<T>, Origin} = 10,
 
-		RandomnessCollect: randomness_collect::{Module, Call, Storage, ValidateUnsigned} = 12,
+		RandomnessCollect: randomness_collect::{Module, Call, Storage, ValidateUnsigned} = 11,
     }
 );
 
