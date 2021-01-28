@@ -436,8 +436,9 @@ impl pallet_staking::Config for Runtime {
 }
 
 parameter_types! {
-    pub const LaunchPeriod: BlockNumber = 7 * DAYS;
-    pub const VotingPeriod: BlockNumber = 7 * DAYS;
+    // TODO
+    pub const LaunchPeriod: BlockNumber = 1 * DAYS;
+    pub const VotingPeriod: BlockNumber = 1 * DAYS;
     pub const FastTrackVotingPeriod: BlockNumber = 3 * HOURS;
     pub const MinimumDeposit: Balance = 1 * DOLLARS;
     pub const EnactmentPeriod: BlockNumber = 8 * DAYS;
@@ -586,7 +587,7 @@ impl pallet_membership::Config<pallet_membership::Instance1> for Runtime {
 parameter_types! {
     pub const ProposalBond: Permill = Permill::from_percent(5);
     pub const ProposalBondMinimum: Balance = 20 * DOLLARS;
-    pub const SpendPeriod: BlockNumber = 6 * DAYS;
+    pub const SpendPeriod: BlockNumber = 1 * DAYS;
     pub const Burn: Permill = Permill::from_perthousand(2);
     pub const TreasuryModuleId: ModuleId = ModuleId(*b"pt/trsry");
 
