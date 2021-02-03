@@ -441,8 +441,8 @@ parameter_types! {
     pub const VotingPeriod: BlockNumber = 1 * DAYS;
     pub const FastTrackVotingPeriod: BlockNumber = 3 * HOURS;
     pub const MinimumDeposit: Balance = 1 * DOLLARS;
-    pub const EnactmentPeriod: BlockNumber = 8 * DAYS;
-    pub const CooloffPeriod: BlockNumber = 7 * DAYS;
+    pub const EnactmentPeriod: BlockNumber = 1 * DAYS;
+    pub const CooloffPeriod: BlockNumber = 1 * DAYS;
     // One cent: $10,000 / MB
     pub const PreimageByteDeposit: Balance = 10 * MILLICENTS;
     pub const InstantAllowed: bool = true;
@@ -738,8 +738,8 @@ parameter_types! {
     pub const DepositPerStorageItem: Balance = deposit(1, 0);
     pub RentFraction: Perbill = Perbill::from_rational_approximation(1u32, 30 * DAYS);
     pub const SurchargeReward: Balance = 0;
-    pub const SignedClaimHandicap: u32 = 2;
-    pub const MaxDepth: u32 = 32;
+    pub const SignedClaimHandicap: u32 = 0;
+    pub const MaxDepth: u32 = 100;
     pub const MaxValueSize: u32 = 16 * 1024;
     // The lazy deletion runs inside on_initialize.
     pub DeletionWeightLimit: Weight = AVERAGE_ON_INITIALIZE_RATIO *
