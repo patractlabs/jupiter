@@ -8,7 +8,7 @@ include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 
 use sp_api::impl_runtime_apis;
 use sp_core::OpaqueMetadata;
-use sp_runtime::traits::{AccountIdLookup, BlakeTwo256, Block as BlockT, Saturating};
+use sp_runtime::traits::{AccountIdLookup, BlakeTwo256, Block as BlockT};
 use sp_runtime::{
     create_runtime_str, generic,
     transaction_validity::{TransactionSource, TransactionValidity},
@@ -46,7 +46,7 @@ pub use jupiter_primitives::{
 };
 use jupiter_runtime_common::{
     constants::{currency::*, fee::WeightToFee, time::*},
-    impls, weights, BlockLength, BlockWeights, AVERAGE_ON_INITIALIZE_RATIO,
+    impls, weights, BlockHashCount, BlockLength, BlockWeights, AVERAGE_ON_INITIALIZE_RATIO,
 };
 use pallet_transaction_payment::{CurrencyAdapter, FeeDetails};
 
@@ -78,17 +78,6 @@ pub fn native_version() -> NativeVersion {
         runtime_version: VERSION,
         can_author_with: Default::default(),
     }
-}
-
-parameter_types! {
-    pub const BlockHashCount: BlockNumber = 2400;
-    /// We allow for 2 seconds of compute with a 6 second average block time.
-    pub const MaximumBlockWeight: Weight = 2 * WEIGHT_PER_SECOND;
-    pub const AvailableBlockRatio: Perbill = Perbill::from_percent(75);
-    /// Assume 10% of weight for average on_initialize calls.
-    pub MaximumExtrinsicWeight: Weight = AvailableBlockRatio::get()
-        .saturating_sub(Perbill::from_percent(10)) * MaximumBlockWeight::get();
-    pub const MaximumBlockLength: u32 = 5 * 1024 * 1024;
 }
 
 // Configure FRAME pallets to include in runtime.
@@ -169,7 +158,7 @@ impl pallet_timestamp::Config for Runtime {
 }
 
 parameter_types! {
-    pub const IndexDeposit: Balance = 10 * DOLLARS;
+    pub const IndexDeposit: Balance = 1 * DOLLARS;
 }
 
 impl pallet_indices::Config for Runtime {
@@ -216,12 +205,12 @@ parameter_types! {
         sp_std::mem::size_of::<pallet_contracts::ContractInfo<Runtime>>() as u32
     );
     pub const DepositPerContract: Balance = TombstoneDeposit::get();
-    pub const DepositPerStorageByte: Balance = deposit(0, 1);
-    pub const DepositPerStorageItem: Balance = deposit(1, 0);
-    pub RentFraction: Perbill = Perbill::from_rational_approximation(1u32, 30 * DAYS);
-    pub const SurchargeReward: Balance = 150 * MILLICENTS;
-    pub const SignedClaimHandicap: u32 = 2;
-    pub const MaxDepth: u32 = 32;
+    pub const DepositPerStorageByte: Balance = 1 * MILLICENTS;
+    pub const DepositPerStorageItem: Balance = 10 * MILLICENTS;
+    pub RentFraction: Perbill = Perbill::from_rational_approximation(1u32, 60 * DAYS);
+    pub const SurchargeReward: Balance = 0;
+    pub const SignedClaimHandicap: u32 = 0;
+    pub const MaxDepth: u32 = 100;
     pub const MaxValueSize: u32 = 16 * 1024;
     // The lazy deletion runs inside on_initialize.
     pub DeletionWeightLimit: Weight = AVERAGE_ON_INITIALIZE_RATIO *

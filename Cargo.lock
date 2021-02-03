@@ -3085,6 +3085,7 @@ dependencies = [
  "smallvec 1.6.0",
  "sp-runtime",
  "sp-std",
+ "static_assertions",
 ]
 
 [[package]]

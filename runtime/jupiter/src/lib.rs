@@ -445,7 +445,7 @@ parameter_types! {
     pub const EnactmentPeriod: BlockNumber = 1 * DAYS;
     pub const CooloffPeriod: BlockNumber = 1 * DAYS;
     // One cent: $10,000 / MB
-    pub const PreimageByteDeposit: Balance = 10 * MILLICENTS;
+    pub const PreimageByteDeposit: Balance = 1 * CENTS;
     pub const InstantAllowed: bool = true;
     pub const MaxVotes: u32 = 100;
     pub const MaxProposals: u32 = 100;
@@ -524,7 +524,7 @@ impl pallet_collective::Config<CouncilCollective> for Runtime {
 }
 
 parameter_types! {
-    pub const CandidacyBond: Balance = 1 * DOLLARS;
+    pub const CandidacyBond: Balance = 100 * DOLLARS;
     // 1 storage item created, key size is 32 bytes, value size is 16+16.
     pub const VotingBondBase: Balance = deposit(1, 64);
     // additional data per vote is 32 bytes (account id).
@@ -674,7 +674,7 @@ impl pallet_indices::Config for Runtime {
 }
 
 parameter_types! {
-    pub const ExistentialDeposit: Balance = 1 * CENTS;
+    pub const ExistentialDeposit: Balance = 100 * CENTS;
     // For weight estimation, we assume that the most locks on an individual account will be 50.
     // This number may need to be adjusted in the future if this assumption no longer holds true.
     pub const MaxLocks: u32 = 50;
@@ -704,7 +704,6 @@ impl pallet_transaction_payment::Config for Runtime {
 }
 
 parameter_types! {
-    // Minimum 100 bytes/KSM deposited (1 CENT/byte)
     pub const BasicDeposit: Balance = 10 * DOLLARS;       // 258 bytes on-chain
     pub const FieldDeposit: Balance = 250 * CENTS;        // 66 bytes on-chain
     pub const SubAccountDeposit: Balance = 2 * DOLLARS;   // 53 bytes on-chain
@@ -729,15 +728,14 @@ impl pallet_identity::Config for Runtime {
 }
 
 parameter_types! {
-    // TODO
     pub const TombstoneDeposit: Balance = tombstone_deposit(
         1,
         sp_std::mem::size_of::<pallet_contracts::ContractInfo<Runtime>>() as u32
     );
     pub const DepositPerContract: Balance = TombstoneDeposit::get();
-    pub const DepositPerStorageByte: Balance = deposit(0, 1);
-    pub const DepositPerStorageItem: Balance = deposit(1, 0);
-    pub RentFraction: Perbill = Perbill::from_rational_approximation(1u32, 30 * DAYS);
+    pub const DepositPerStorageByte: Balance = 1 * MILLICENTS;
+    pub const DepositPerStorageItem: Balance = 10 * MILLICENTS;
+    pub RentFraction: Perbill = Perbill::from_rational_approximation(1u32, 60 * DAYS);
     pub const SurchargeReward: Balance = 0;
     pub const SignedClaimHandicap: u32 = 0;
     pub const MaxDepth: u32 = 100;
