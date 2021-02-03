@@ -72,7 +72,8 @@ or other 3rd parties client to connect Jupiter node, please remember to add ["ex
 Jupiter **current** "extending types" is (This may be changed for different Jupiter version):
 ```json
 {
-  "LookupSource": "MultiAddress"
+  "LookupSource": "MultiAddress",
+  "Address": "MultiAddress"
 }
 ```
 
@@ -81,7 +82,7 @@ Note: Substrate newest master is very different with Substrate v2.0.0 version. I
 master as dependencies, and in Jupiter `substrate-v2.0.0` branch, we use Substrate v2.0.0 from "crates.io" as dependencies.
 
 Thus, jupiter has two main branch. In different branch, we provide different `pallet-contracts` features:
-* master: we track newest master, currently we use substrate commit:[`712085115cdef4a79a66747338c920d6ba4e479f`](https://github.com/paritytech/substrate/commit/712085115cdef4a79a66747338c920d6ba4e479f).
+* master: we track newest master, currently we use substrate commit:[`56c64cf728278ca9f16308f7ffb1959dd89332af`](https://github.com/paritytech/substrate/commit/56c64cf728278ca9f16308f7ffb1959dd89332af).
     * In master, we use `src pallet-contract` or `modified pallet-contract`
     * `src pallet-contract` is belong to substrate commit version.
     * `modified pallet-contract` is belong to the forked substrate in vendor directory. We usually track the newest substrate version.
@@ -149,7 +150,7 @@ cargo build
 ### 4. run
 Now the directory `target/release` would contain two executable files.
 * `jupiter`, which is Jupiter Testnet node.
-* `jupiter-para`, which is Jupiter Testnet parachain node.
+* `jupiter-para`, which is Jupiter Testnet parachain node. (Temporarily Unavailable)
 * `jupiter-dev`, which is Jupiter local develop node.
 
 Following parameters means:
@@ -197,7 +198,7 @@ jupiter --chain=local --bob --execution=NativeElseWasm -d <database path for you
 Note if you start those two nodes in a machine, there could connect to each other directly. If you start in different 
 but in same network, you should add `--bootnodes` parameter when start second node. More details please lookup [https://substrate.dev/](https://substrate.dev/)
 
-#### 4.2 jupiter-para
+#### 4.2 jupiter-para (Temporarily Unavailable)
 `jupiter-para` use for join parachain collector.
 ```bash
 ./target/release/jupiter-para --parachain-id=1000 --collator -d .sub \

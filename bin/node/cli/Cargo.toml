@@ -33,7 +33,6 @@ sp-consensus = { version = "0.8.0", git = "https://github.com/paritytech/substra
 sp-finality-grandpa = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 sp-runtime = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 sp-authority-discovery = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
-sc-telemetry = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 
 sc-cli = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master", optional = true }
 sc-service = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master", optional = true }

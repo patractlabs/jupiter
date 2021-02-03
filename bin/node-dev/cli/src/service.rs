@@ -45,7 +45,7 @@ pub fn new_partial(
         .map_err(Into::into)
         .map_err(sp_consensus::error::Error::InherentData)?;
 
-    let (client, backend, keystore_container, task_manager, _telemetry_span) =
+    let (client, backend, keystore_container, task_manager) =
         sc_service::new_full_parts::<Block, RuntimeApi, Executor>(&config)?;
     let client = Arc::new(client);
 
@@ -163,7 +163,6 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
         backend,
         network_status_sinks,
         system_rpc_tx,
-        telemetry_span: None,
     })?;
 
     if role.is_authority() {
@@ -196,7 +195,7 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
 
 /// Builds a new service for a light client.
 pub fn new_light(config: Configuration) -> Result<TaskManager, ServiceError> {
-    let (client, backend, keystore_container, mut task_manager, on_demand, _telemetry_span) =
+    let (client, backend, keystore_container, mut task_manager, on_demand) =
         sc_service::new_light_parts::<Block, RuntimeApi, Executor>(&config)?;
 
     let transaction_pool = Arc::new(sc_transaction_pool::BasicPool::new_light(
@@ -247,7 +246,6 @@ pub fn new_light(config: Configuration) -> Result<TaskManager, ServiceError> {
         network,
         network_status_sinks,
         system_rpc_tx,
-        telemetry_span: None,
     })?;
 
     network_starter.start_network();

@@ -8,7 +8,6 @@ use sc_client_api::{ExecutorProvider, RemoteBackend};
 use sc_finality_grandpa::FinalityProofProvider as GrandpaFinalityProofProvider;
 use sc_network::{Event, NetworkService};
 use sc_service::{error::Error as ServiceError, Configuration, TaskManager};
-use sc_telemetry::TelemetrySpan;
 use sp_inherents::InherentDataProviders;
 use sp_runtime::traits::Block as BlockT;
 
@@ -39,12 +38,11 @@ pub fn new_partial(
                 sc_consensus_babe::BabeLink<Block>,
             ),
             sc_finality_grandpa::SharedVoterState,
-            Option<TelemetrySpan>,
         ),
     >,
     ServiceError,
 > {
-    let (client, backend, keystore_container, task_manager, telemetry_span) =
+    let (client, backend, keystore_container, task_manager) =
         sc_service::new_full_parts::<Block, RuntimeApi, Executor>(&config)?;
     let client = Arc::new(client);
 
@@ -93,7 +91,6 @@ pub fn new_partial(
         let shared_voter_state = sc_finality_grandpa::SharedVoterState::empty();
         let finality_proof_provider = GrandpaFinalityProofProvider::new_for_service(
             backend.clone(),
-            client.clone(),
             Some(shared_authority_set.clone()),
         );
 
@@ -143,12 +140,7 @@ pub fn new_partial(
         import_queue,
         transaction_pool,
         inherent_data_providers,
-        other: (
-            rpc_extensions_builder,
-            import_setup,
-            rpc_setup,
-            telemetry_span,
-        ),
+        other: (rpc_extensions_builder, import_setup, rpc_setup),
     })
 }
 
@@ -172,7 +164,7 @@ pub fn new_full_base(mut config: Configuration) -> Result<NewFullBase, ServiceEr
         select_chain,
         transaction_pool,
         inherent_data_providers,
-        other: (rpc_extensions_builder, import_setup, rpc_setup, telemetry_span),
+        other: (rpc_extensions_builder, import_setup, rpc_setup),
     } = new_partial(&config)?;
 
     let shared_voter_state = rpc_setup;
@@ -224,7 +216,6 @@ pub fn new_full_base(mut config: Configuration) -> Result<NewFullBase, ServiceEr
             remote_blockchain: None,
             network_status_sinks: network_status_sinks.clone(),
             system_rpc_tx,
-            telemetry_span,
         })?;
 
     let (block_import, grandpa_link, babe_link) = import_setup;
@@ -347,7 +338,7 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
 
 /// Builds a new service for a light client.
 pub fn new_light(config: Configuration) -> Result<TaskManager, ServiceError> {
-    let (client, backend, keystore_container, mut task_manager, on_demand, telemetry_span) =
+    let (client, backend, keystore_container, mut task_manager, on_demand) =
         sc_service::new_light_parts::<Block, RuntimeApi, Executor>(&config)?;
 
     let select_chain = sc_consensus::LongestChain::new(backend.clone());
@@ -427,7 +418,6 @@ pub fn new_light(config: Configuration) -> Result<TaskManager, ServiceError> {
         network,
         network_status_sinks,
         system_rpc_tx,
-        telemetry_span,
     })?;
 
     Ok(task_manager)
