@@ -134,7 +134,6 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
 
     let role = config.role.clone();
     let prometheus_registry = config.prometheus_registry().cloned();
-    let telemetry_connection_sinks = sc_service::TelemetryConnectionSinks::default();
 
     let rpc_extensions_builder = {
         let client = client.clone();
@@ -152,19 +151,18 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
     };
 
     sc_service::spawn_tasks(sc_service::SpawnTasksParams {
+        config,
         network: network.clone(),
         client: client.clone(),
         keystore: keystore_container.sync_keystore(),
         task_manager: &mut task_manager,
         transaction_pool: transaction_pool.clone(),
-        telemetry_connection_sinks: telemetry_connection_sinks.clone(),
         rpc_extensions_builder,
         on_demand: None,
         remote_blockchain: None,
         backend,
         network_status_sinks,
         system_rpc_tx,
-        config,
     })?;
 
     if role.is_authority() {
@@ -241,7 +239,6 @@ pub fn new_light(config: Configuration) -> Result<TaskManager, ServiceError> {
         task_manager: &mut task_manager,
         on_demand: Some(on_demand),
         rpc_extensions_builder: Box::new(|_, _| ()),
-        telemetry_connection_sinks: sc_service::TelemetryConnectionSinks::default(),
         config,
         client,
         keystore: keystore_container.sync_keystore(),

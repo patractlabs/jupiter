@@ -34,7 +34,7 @@ use pallet_grandpa::{
     fg_primitives, AuthorityId as GrandpaId, AuthorityList as GrandpaAuthorityList,
 };
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
-use pallet_transaction_payment::CurrencyAdapter;
+use pallet_transaction_payment::{CurrencyAdapter, FeeDetails};
 use pallet_transaction_payment_rpc_runtime_api::RuntimeDispatchInfo;
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 
@@ -322,8 +322,9 @@ parameter_types! {
 impl pallet_im_online::Config for Runtime {
     type AuthorityId = ImOnlineId;
     type Event = Event;
-    type ReportUnresponsiveness = Offences;
     type SessionDuration = SessionDuration;
+    type ValidatorSet = Historical;
+    type ReportUnresponsiveness = Offences;
     type UnsignedPriority = ImOnlineUnsignedPriority;
     type WeightInfo = weights::pallet_im_online::WeightInfo<Runtime>;
 }
@@ -436,14 +437,15 @@ impl pallet_staking::Config for Runtime {
 }
 
 parameter_types! {
-    pub const LaunchPeriod: BlockNumber = 7 * DAYS;
-    pub const VotingPeriod: BlockNumber = 7 * DAYS;
+    // TODO
+    pub const LaunchPeriod: BlockNumber = 1 * DAYS;
+    pub const VotingPeriod: BlockNumber = 1 * DAYS;
     pub const FastTrackVotingPeriod: BlockNumber = 3 * HOURS;
     pub const MinimumDeposit: Balance = 1 * DOLLARS;
-    pub const EnactmentPeriod: BlockNumber = 8 * DAYS;
-    pub const CooloffPeriod: BlockNumber = 7 * DAYS;
+    pub const EnactmentPeriod: BlockNumber = 1 * DAYS;
+    pub const CooloffPeriod: BlockNumber = 1 * DAYS;
     // One cent: $10,000 / MB
-    pub const PreimageByteDeposit: Balance = 10 * MILLICENTS;
+    pub const PreimageByteDeposit: Balance = 1 * CENTS;
     pub const InstantAllowed: bool = true;
     pub const MaxVotes: u32 = 100;
     pub const MaxProposals: u32 = 100;
@@ -522,8 +524,11 @@ impl pallet_collective::Config<CouncilCollective> for Runtime {
 }
 
 parameter_types! {
-    pub const CandidacyBond: Balance = 1 * DOLLARS;
-    pub const VotingBond: Balance = 5 * CENTS;
+    pub const CandidacyBond: Balance = 100 * DOLLARS;
+    // 1 storage item created, key size is 32 bytes, value size is 16+16.
+    pub const VotingBondBase: Balance = deposit(1, 64);
+    // additional data per vote is 32 bytes (account id).
+    pub const VotingBondFactor: Balance = deposit(0, 32);
     /// Daily council elections.
     pub const TermDuration: BlockNumber = 24 * HOURS;
     pub const DesiredMembers: u32 = 19;
@@ -540,9 +545,9 @@ impl pallet_elections_phragmen::Config for Runtime {
     type InitializeMembers = Council;
     type CurrencyToVote = U128CurrencyToVote;
     type CandidacyBond = CandidacyBond;
-    type VotingBond = VotingBond;
+    type VotingBondBase = VotingBondBase;
+    type VotingBondFactor = VotingBondFactor;
     type LoserCandidate = Treasury;
-    type BadReport = Treasury;
     type KickedMember = Treasury;
     type DesiredMembers = DesiredMembers;
     type DesiredRunnersUp = DesiredRunnersUp;
@@ -583,7 +588,7 @@ impl pallet_membership::Config<pallet_membership::Instance1> for Runtime {
 parameter_types! {
     pub const ProposalBond: Permill = Permill::from_percent(5);
     pub const ProposalBondMinimum: Balance = 20 * DOLLARS;
-    pub const SpendPeriod: BlockNumber = 6 * DAYS;
+    pub const SpendPeriod: BlockNumber = 1 * DAYS;
     pub const Burn: Permill = Permill::from_perthousand(2);
     pub const TreasuryModuleId: ModuleId = ModuleId(*b"pt/trsry");
 
@@ -657,7 +662,7 @@ impl pallet_timestamp::Config for Runtime {
 }
 
 parameter_types! {
-    pub const IndexDeposit: Balance = 10 * DOLLARS;
+    pub const IndexDeposit: Balance = 1 * DOLLARS;
 }
 
 impl pallet_indices::Config for Runtime {
@@ -699,7 +704,6 @@ impl pallet_transaction_payment::Config for Runtime {
 }
 
 parameter_types! {
-    // Minimum 100 bytes/KSM deposited (1 CENT/byte)
     pub const BasicDeposit: Balance = 10 * DOLLARS;       // 258 bytes on-chain
     pub const FieldDeposit: Balance = 250 * CENTS;        // 66 bytes on-chain
     pub const SubAccountDeposit: Balance = 2 * DOLLARS;   // 53 bytes on-chain
@@ -725,26 +729,26 @@ impl pallet_identity::Config for Runtime {
 
 parameter_types! {
     pub const TombstoneDeposit: Balance = tombstone_deposit(
-		1,
-		sp_std::mem::size_of::<pallet_contracts::ContractInfo<Runtime>>() as u32
-	);
-	pub const DepositPerContract: Balance = TombstoneDeposit::get();
-	pub const DepositPerStorageByte: Balance = deposit(0, 1);
-	pub const DepositPerStorageItem: Balance = deposit(1, 0);
-	pub RentFraction: Perbill = Perbill::from_rational_approximation(1u32, 30 * DAYS);
-	pub const SurchargeReward: Balance = 150 * MILLICENTS;
-	pub const SignedClaimHandicap: u32 = 2;
-	pub const MaxDepth: u32 = 32;
-	pub const MaxValueSize: u32 = 16 * 1024;
-	// The lazy deletion runs inside on_initialize.
-	pub DeletionWeightLimit: Weight = AVERAGE_ON_INITIALIZE_RATIO *
-		BlockWeights::get().max_block;
-	// The weight needed for decoding the queue should be less or equal than a fifth
-	// of the overall weight dedicated to the lazy deletion.
-	pub DeletionQueueDepth: u32 = ((DeletionWeightLimit::get() / (
-			<Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(1) -
-			<Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(0)
-		)) / 5) as u32;
+        1,
+        sp_std::mem::size_of::<pallet_contracts::ContractInfo<Runtime>>() as u32
+    );
+    pub const DepositPerContract: Balance = TombstoneDeposit::get();
+    pub const DepositPerStorageByte: Balance = 1 * MILLICENTS;
+    pub const DepositPerStorageItem: Balance = 10 * MILLICENTS;
+    pub RentFraction: Perbill = Perbill::from_rational_approximation(1u32, 60 * DAYS);
+    pub const SurchargeReward: Balance = 0;
+    pub const SignedClaimHandicap: u32 = 0;
+    pub const MaxDepth: u32 = 100;
+    pub const MaxValueSize: u32 = 16 * 1024;
+    // The lazy deletion runs inside on_initialize.
+    pub DeletionWeightLimit: Weight = AVERAGE_ON_INITIALIZE_RATIO *
+        BlockWeights::get().max_block;
+    // The weight needed for decoding the queue should be less or equal than a fifth
+    // of the overall weight dedicated to the lazy deletion.
+    pub DeletionQueueDepth: u32 = ((DeletionWeightLimit::get() / (
+            <Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(1) -
+            <Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(0)
+        )) / 5) as u32;
 }
 
 impl pallet_contracts::Config for Runtime {
@@ -752,7 +756,7 @@ impl pallet_contracts::Config for Runtime {
     type Randomness = Babe;
     type Currency = Balances;
     type Event = Event;
-    type RentPayment = ();
+    type RentPayment = Treasury;
     type SignedClaimHandicap = SignedClaimHandicap;
     type TombstoneDeposit = TombstoneDeposit;
     type DepositPerContract = DepositPerContract;
@@ -858,12 +862,17 @@ impl InstanceFilter<Call> for ProxyType {
                     | Call::TechnicalCommittee(..)
                     | Call::ElectionsPhragmen(..)
                     | Call::Treasury(..)
+                    | Call::Bounties(..)
+                    | Call::Tips(..)
                     | Call::Utility(..)
             ),
             ProxyType::Staking => {
                 matches!(c, Call::Staking(..) | Call::Session(..) | Call::Utility(..))
             }
-            ProxyType::IdentityJudgement => matches!(c, Call::Utility(..)),
+            ProxyType::IdentityJudgement => matches!(
+                c,
+                Call::Identity(pallet_identity::Call::provide_judgement(..)) | Call::Utility(..)
+            ),
         }
     }
     fn is_superset(&self, o: &Self) -> bool {
@@ -1071,7 +1080,7 @@ impl_runtime_apis! {
             }
         }
 
-        fn current_epoch_start() -> sp_consensus_babe::SlotNumber {
+        fn current_epoch_start() -> sp_consensus_babe::Slot {
             Babe::current_epoch_start()
         }
 
@@ -1080,11 +1089,11 @@ impl_runtime_apis! {
         }
 
         fn next_epoch() -> sp_consensus_babe::Epoch {
-			Babe::next_epoch()
-		}
+            Babe::next_epoch()
+        }
 
         fn generate_key_ownership_proof(
-            _slot_number: sp_consensus_babe::SlotNumber,
+            _slot_number: sp_consensus_babe::Slot,
             authority_id: sp_consensus_babe::AuthorityId,
         ) -> Option<sp_consensus_babe::OpaqueKeyOwnershipProof> {
             use codec::Encode;
@@ -1169,6 +1178,9 @@ impl_runtime_apis! {
     > for Runtime {
         fn query_info(uxt: <Block as BlockT>::Extrinsic, len: u32) -> RuntimeDispatchInfo<Balance> {
             TransactionPayment::query_info(uxt, len)
+        }
+        fn query_fee_details(uxt: <Block as BlockT>::Extrinsic, len: u32) -> FeeDetails<Balance> {
+            TransactionPayment::query_fee_details(uxt, len)
         }
     }
 

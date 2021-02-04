@@ -117,7 +117,7 @@ pub fn development_config() -> Result<ChainSpec, String> {
             json!({
                 "ss58Format": 42,
                 "tokenDecimals": 10,
-                "tokenSymbol": "JPT"
+                "tokenSymbol": "DOT"
             })
             .as_object()
             .expect("network properties generation can not fail; qed")
@@ -176,7 +176,7 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
             json!({
                 "ss58Format": 42,
                 "tokenDecimals": 10,
-                "tokenSymbol": "JPT"
+                "tokenSymbol": "DOT"
             })
             .as_object()
             .expect("network properties generation can not fail; qed")
@@ -344,11 +344,9 @@ pub fn staging_testnet_config() -> Result<ChainSpec, String> {
         // Bootnodes
         vec![],
         // Telemetry
-        Some(TelemetryEndpoints::new(
-            vec![
-                (PATRACT_TELEMETRY_URL.to_string(), 0)
-            ])
-                 .expect("Polkadot Staging telemetry url is valid; qed"),
+        Some(
+            TelemetryEndpoints::new(vec![(PATRACT_TELEMETRY_URL.to_string(), 0)])
+                .expect("Polkadot Staging telemetry url is valid; qed"),
         ),
         // Protocol ID
         Some("jupiter_staging_testnet"),
@@ -357,7 +355,7 @@ pub fn staging_testnet_config() -> Result<ChainSpec, String> {
             json!({
                 "ss58Format": 42,
                 "tokenDecimals": 10,
-                "tokenSymbol": "JPT"
+                "tokenSymbol": "DOT"
             })
             .as_object()
             .expect("network properties generation can not fail; qed")

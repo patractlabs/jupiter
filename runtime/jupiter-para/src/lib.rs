@@ -9,11 +9,10 @@ include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 use sp_api::impl_runtime_apis;
 use sp_core::OpaqueMetadata;
 use sp_runtime::{
-    create_runtime_str,
-    generic, impl_opaque_keys,
+    create_runtime_str, generic, impl_opaque_keys,
     traits::{AccountIdLookup, BlakeTwo256, Block as BlockT},
     transaction_validity::{TransactionSource, TransactionValidity},
-    ApplyExtrinsicResult, Perbill
+    ApplyExtrinsicResult, Perbill,
 };
 use sp_std::prelude::*;
 
@@ -46,25 +45,24 @@ pub use jupiter_primitives::{
 };
 use jupiter_runtime_common::{
     constants::{currency::*, fee::WeightToFee, time::*},
-    impls, weights, BlockHashCount, BlockLength, BlockWeights,
-    AVERAGE_ON_INITIALIZE_RATIO,
+    impls, weights, BlockHashCount, BlockLength, BlockWeights, AVERAGE_ON_INITIALIZE_RATIO,
 };
 
 // XCM imports
 use polkadot_parachain::primitives::Sibling;
-use xcm::v0::{MultiLocation, NetworkId, Junction};
+use xcm::v0::{Junction, MultiLocation, NetworkId};
 use xcm_builder::{
-    ParentIsDefault, SiblingParachainConvertsVia, AccountId32Aliases, LocationInverter,
-    SovereignSignedViaLocation, SiblingParachainAsNative,
-    RelayChainAsNative, SignedAccountId32AsNative, CurrencyAdapter
+    AccountId32Aliases, CurrencyAdapter, LocationInverter, ParentIsDefault, RelayChainAsNative,
+    SiblingParachainAsNative, SiblingParachainConvertsVia, SignedAccountId32AsNative,
+    SovereignSignedViaLocation,
 };
 use xcm_executor::{
-    XcmExecutor, Config,
-    traits::{NativeAsset, IsConcrete},
+    traits::{IsConcrete, NativeAsset},
+    Config, XcmExecutor,
 };
 
 impl_opaque_keys! {
-	pub struct SessionKeys {}
+    pub struct SessionKeys {}
 }
 
 #[cfg(feature = "std")]
@@ -206,26 +204,26 @@ impl pallet_transaction_payment::Config for Runtime {
 
 parameter_types! {
     pub const TombstoneDeposit: Balance = tombstone_deposit(
-		1,
-		sp_std::mem::size_of::<pallet_contracts::ContractInfo<Runtime>>() as u32
-	);
-	pub const DepositPerContract: Balance = TombstoneDeposit::get();
-	pub const DepositPerStorageByte: Balance = deposit(0, 1);
-	pub const DepositPerStorageItem: Balance = deposit(1, 0);
-	pub RentFraction: Perbill = Perbill::from_rational_approximation(1u32, 30 * DAYS);
-	pub const SurchargeReward: Balance = 150 * MILLICENTS;
-	pub const SignedClaimHandicap: u32 = 2;
-	pub const MaxDepth: u32 = 32;
-	pub const MaxValueSize: u32 = 16 * 1024;
-	// The lazy deletion runs inside on_initialize.
-	pub DeletionWeightLimit: Weight = AVERAGE_ON_INITIALIZE_RATIO *
-		BlockWeights::get().max_block;
-	// The weight needed for decoding the queue should be less or equal than a fifth
-	// of the overall weight dedicated to the lazy deletion.
-	pub DeletionQueueDepth: u32 = ((DeletionWeightLimit::get() / (
-			<Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(1) -
-			<Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(0)
-		)) / 5) as u32;
+        1,
+        sp_std::mem::size_of::<pallet_contracts::ContractInfo<Runtime>>() as u32
+    );
+    pub const DepositPerContract: Balance = TombstoneDeposit::get();
+    pub const DepositPerStorageByte: Balance = deposit(0, 1);
+    pub const DepositPerStorageItem: Balance = deposit(1, 0);
+    pub RentFraction: Perbill = Perbill::from_rational_approximation(1u32, 30 * DAYS);
+    pub const SurchargeReward: Balance = 150 * MILLICENTS;
+    pub const SignedClaimHandicap: u32 = 2;
+    pub const MaxDepth: u32 = 32;
+    pub const MaxValueSize: u32 = 16 * 1024;
+    // The lazy deletion runs inside on_initialize.
+    pub DeletionWeightLimit: Weight = AVERAGE_ON_INITIALIZE_RATIO *
+        BlockWeights::get().max_block;
+    // The weight needed for decoding the queue should be less or equal than a fifth
+    // of the overall weight dedicated to the lazy deletion.
+    pub DeletionQueueDepth: u32 = ((DeletionWeightLimit::get() / (
+            <Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(1) -
+            <Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(0)
+        )) / 5) as u32;
 }
 
 impl pallet_contracts::Config for Runtime {
@@ -268,12 +266,12 @@ impl cumulus_message_broker::Config for Runtime {
 impl parachain_info::Config for Runtime {}
 
 parameter_types! {
-	pub const RococoLocation: MultiLocation = MultiLocation::X1(Junction::Parent);
-	pub const RococoNetwork: NetworkId = NetworkId::Polkadot;
-	pub RelayChainOrigin: Origin = xcm_handler::Origin::Relay.into();
-	pub Ancestry: MultiLocation = Junction::Parachain {
-		id: ParachainInfo::parachain_id().into()
-	}.into();
+    pub const RococoLocation: MultiLocation = MultiLocation::X1(Junction::Parent);
+    pub const RococoNetwork: NetworkId = NetworkId::Polkadot;
+    pub RelayChainOrigin: Origin = xcm_handler::Origin::Relay.into();
+    pub Ancestry: MultiLocation = Junction::Parachain {
+        id: ParachainInfo::parachain_id().into()
+    }.into();
 }
 
 type LocationConverter = (
@@ -282,8 +280,7 @@ type LocationConverter = (
     AccountId32Aliases<RococoNetwork, AccountId>,
 );
 
-type LocalAssetTransactor =
-CurrencyAdapter<
+type LocalAssetTransactor = CurrencyAdapter<
     // Use this currency:
     Balances,
     // Use this currency when it is a fungible asset matching the given location or name:
@@ -341,9 +338,9 @@ construct_runtime!(
         Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>},
 
         ParachainUpgrade: cumulus_parachain_upgrade::{Module, Call, Storage, Inherent, Event},
-		MessageBroker: cumulus_message_broker::{Module, Storage, Call, Inherent},
-		ParachainInfo: parachain_info::{Module, Storage, Config},
-		XcmHandler: xcm_handler::{Module, Event<T>, Origin},
+        MessageBroker: cumulus_message_broker::{Module, Storage, Call, Inherent},
+        ParachainInfo: parachain_info::{Module, Storage, Config},
+        XcmHandler: xcm_handler::{Module, Event<T>, Origin},
     }
 );
 
@@ -442,16 +439,16 @@ impl_runtime_apis! {
     }
 
     impl sp_session::SessionKeys<Block> for Runtime {
-		fn decode_session_keys(
-			encoded: Vec<u8>,
-		) -> Option<Vec<(Vec<u8>, sp_core::crypto::KeyTypeId)>> {
-			SessionKeys::decode_into_raw_public_keys(&encoded)
-		}
+        fn decode_session_keys(
+            encoded: Vec<u8>,
+        ) -> Option<Vec<(Vec<u8>, sp_core::crypto::KeyTypeId)>> {
+            SessionKeys::decode_into_raw_public_keys(&encoded)
+        }
 
-		fn generate_session_keys(seed: Option<Vec<u8>>) -> Vec<u8> {
-			SessionKeys::generate(seed)
-		}
-	}
+        fn generate_session_keys(seed: Option<Vec<u8>>) -> Vec<u8> {
+            SessionKeys::generate(seed)
+        }
+    }
 
     impl frame_system_rpc_runtime_api::AccountNonceApi<Block, AccountId, Index> for Runtime {
         fn account_nonce(account: AccountId) -> Index {

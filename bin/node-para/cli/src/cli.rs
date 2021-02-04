@@ -70,7 +70,6 @@ pub struct ExportGenesisWasmCommand {
     pub chain: Option<String>,
 }
 
-
 #[derive(Debug, StructOpt)]
 pub struct RunCmd {
     #[structopt(flatten)]
@@ -103,8 +102,8 @@ pub struct Cli {
     pub run: RunCmd,
 
     /// Run node as collator.
-	///
-	/// Note that this is the same as running with `--validator`.
+    ///
+    /// Note that this is the same as running with `--validator`.
     #[structopt(long, conflicts_with = "validator")]
     pub collator: bool,
 

@@ -1,14 +1,14 @@
 //! Service and ServiceFactory implementation. Specialized wrapper over substrate service.
-use std::sync::Arc;
 use cumulus_service::{
     prepare_node_config, start_collator, start_full_node, StartCollatorParams, StartFullNodeParams,
 };
 use polkadot_primitives::v0::CollatorPair;
 use sp_core::Pair;
+use std::sync::Arc;
 
 use sc_executor::native_executor_instance;
 pub use sc_executor::NativeExecutor;
-use sc_service::{error::Error as ServiceError, Configuration, TaskManager, Role};
+use sc_service::{error::Error as ServiceError, Configuration, Role, TaskManager};
 
 use jupiter_para_runtime::{self, RuntimeApi};
 use jupiter_primitives::Block;
@@ -34,7 +34,7 @@ pub fn new_partial(
         (),
         sp_consensus::DefaultImportQueue<Block, FullClient>,
         sc_transaction_pool::FullPool<Block, FullClient>,
-        ()
+        (),
     >,
     ServiceError,
 > {
@@ -86,12 +86,8 @@ async fn start_node_impl<RB>(
     validator: bool,
     rpc_ext_builder: RB,
 ) -> sc_service::error::Result<(TaskManager, Arc<FullClient>)>
-    where
-        RB: Fn(
-            Arc<FullClient>,
-        ) -> jupiter_rpc::IoHandler
-        + Send
-        + 'static,
+where
+    RB: Fn(Arc<FullClient>) -> jupiter_rpc::IoHandler + Send + 'static,
 {
     if matches!(parachain_config.role, Role::Light) {
         return Err("Light client not supported!".into());
@@ -222,5 +218,5 @@ pub async fn start_node(
         validator,
         |_| Default::default(),
     )
-        .await
+    .await
 }

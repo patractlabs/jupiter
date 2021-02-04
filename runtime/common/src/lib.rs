@@ -29,6 +29,10 @@ const NORMAL_DISPATCH_RATIO: Perbill = Perbill::from_percent(75);
 /// We allow for 2 seconds of compute with a 6 second average block time.
 pub const MAXIMUM_BLOCK_WEIGHT: Weight = 2 * WEIGHT_PER_SECOND;
 
+static_assertions::const_assert!(
+    NORMAL_DISPATCH_RATIO.deconstruct() >= AVERAGE_ON_INITIALIZE_RATIO.deconstruct()
+);
+
 // Common constants used in all runtimes.
 parameter_types! {
     pub const BlockHashCount: BlockNumber = 2400;
