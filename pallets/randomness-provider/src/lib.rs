@@ -67,6 +67,7 @@ where
 }
 
 impl<T: Config> Module<T> {
+    // Return babe randomness info for current epoch
     pub fn current_epoch() -> BabeRandomness {
         let epoch = <pallet_babe::Module<T>>::current_epoch();
         BabeRandomness {
@@ -77,6 +78,7 @@ impl<T: Config> Module<T> {
         }
     }
 
+    // Return babe randomness info for next epoch
     pub fn next_epoch() -> BabeRandomness {
         let epoch = <pallet_babe::Module<T>>::next_epoch();
         BabeRandomness {
@@ -87,10 +89,12 @@ impl<T: Config> Module<T> {
         }
     }
 
+    // Return babe randomness for historical epoch
     pub fn randomness_of(epoch: u64) -> Hash {
         Hash::from(<HistoricalRandomness>::get(&epoch))
     }
 
+    // Return randomness with provider subject
     pub fn random(subject: &[u8]) -> T::Hash {
         <pallet_babe::Module<T>>::random(subject)
     }

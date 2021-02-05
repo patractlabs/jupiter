@@ -353,7 +353,7 @@ parameter_types! {
     pub const DisabledValidatorsThreshold: Perbill = Perbill::from_percent(17);
 }
 
-impl pallet_chain_extension::Config for Runtime {
+impl pallet_randomness_provider::Config for Runtime {
     type ValidatorId = AccountId;
 }
 
@@ -363,7 +363,7 @@ impl pallet_session::Config for Runtime {
     type ValidatorIdOf = pallet_staking::StashOf<Self>;
     type ShouldEndSession = Babe;
     type NextSessionRotation = Babe;
-    type SessionManager = pallet_chain_extension::NoteHistoricalRandomness<
+    type SessionManager = pallet_randomness_provider::NoteHistoricalRandomness<
         Self,
         pallet_session::historical::NoteHistoricalRoot<Self, Staking>,
     >;
@@ -774,7 +774,7 @@ impl pallet_contracts::Config for Runtime {
     type MaxValueSize = MaxValueSize;
     type WeightPrice = pallet_transaction_payment::Module<Self>;
     type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
-    type ChainExtension = JupiterExt;
+    type ChainExtension = RandomnessProvider;
     type DeletionQueueDepth = DeletionQueueDepth;
     type DeletionWeightLimit = DeletionWeightLimit;
 }
@@ -971,7 +971,7 @@ construct_runtime!(
         // Contracts module
         Contracts: pallet_contracts::{Module, Call, Config<T>, Storage, Event<T>} = 30,
 
-        JupiterExt: pallet_chain_extension::{Module, Storage} = 31,
+        RandomnessProvider: pallet_randomness_provider::{Module, Storage} = 31,
     }
 );
 

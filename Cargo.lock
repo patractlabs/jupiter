@@ -3011,7 +3011,6 @@ dependencies = [
  "pallet-babe",
  "pallet-balances",
  "pallet-bounties",
- "pallet-chain-extension",
  "pallet-collective",
  "pallet-contracts",
  "pallet-contracts-primitives",
@@ -3026,6 +3025,7 @@ dependencies = [
  "pallet-multisig",
  "pallet-offences",
  "pallet-proxy",
+ "pallet-randomness-provider",
  "pallet-scheduler",
  "pallet-session",
  "pallet-staking",
@@ -4299,25 +4299,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pallet-chain-extension"
-version = "2.0.0"
-dependencies = [
- "frame-support",
- "frame-system",
- "jupiter-chain-extension",
- "jupiter-primitives",
- "pallet-babe",
- "pallet-contracts",
- "pallet-session",
- "parity-scale-codec 2.0.0",
- "serde",
- "sp-consensus-vrf",
- "sp-runtime",
- "sp-staking",
- "sp-std",
-]
-
-[[package]]
 name = "pallet-collective"
 version = "2.0.1"
 source = "git+https://github.com/paritytech/substrate?branch=master#56c64cf728278ca9f16308f7ffb1959dd89332af"
@@ -4581,6 +4562,25 @@ dependencies = [
  "parity-scale-codec 2.0.0",
  "safe-mix",
  "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
+name = "pallet-randomness-provider"
+version = "2.0.0"
+dependencies = [
+ "frame-support",
+ "frame-system",
+ "jupiter-chain-extension",
+ "jupiter-primitives",
+ "pallet-babe",
+ "pallet-contracts",
+ "pallet-session",
+ "parity-scale-codec 2.0.0",
+ "serde",
+ "sp-consensus-vrf",
+ "sp-runtime",
+ "sp-staking",
  "sp-std",
 ]
 
