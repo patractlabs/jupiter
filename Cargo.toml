@@ -11,6 +11,7 @@ members = [
     "primitives/io",
     "primitives/chain-extension",
     "pallets/template",
+    "pallets/chain-extension",
     "rpc",
 ]
 exclude = ["vendor/substrate"]
