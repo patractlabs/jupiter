@@ -4571,10 +4571,7 @@ version = "2.0.0"
 dependencies = [
  "frame-support",
  "frame-system",
- "jupiter-chain-extension",
- "jupiter-primitives",
  "pallet-babe",
- "pallet-contracts",
  "pallet-session",
  "parity-scale-codec 2.0.0",
  "serde",

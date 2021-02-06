@@ -16,19 +16,15 @@ targets = ["x86_64-unknown-linux-gnu"]
 codec = { package = "parity-scale-codec", version = "2.0.0", default-features = false, features = ["derive"]}
 serde = { version = "1.0.101", optional = true, features = ["derive"] }
 
-frame-support = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
-frame-system = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
-pallet-babe = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
-pallet-contracts = { path = "../../vendor/substrate/frame/contracts", default-features = false }
-pallet-session = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false, features = ["historical"] }
-
 sp-consensus-vrf = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 sp-runtime = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 sp-staking = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 sp-std = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 
-jupiter-chain-extension = { path = "../../primitives/chain-extension", default-features = false, features = [ "native-support" ] }
-jupiter-primitives = { path = "../../primitives", default-features = false }
+frame-support = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+frame-system = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-babe = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-session = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false, features = ["historical"] }
 
 [features]
 default = ["std"]
@@ -45,8 +41,4 @@ std = [
     "frame-system/std",
     "pallet-babe/std",
     "pallet-session/std",
-	"pallet-contracts/std",
-
-    "jupiter-primitives/std",
-    "jupiter-chain-extension/std",
 ]

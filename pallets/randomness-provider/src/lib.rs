@@ -1,17 +1,8 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use codec::Encode;
-use frame_support::{
-    decl_module, decl_storage,
-    traits::{Get, Randomness},
-    weights::Weight,
-    Parameter,
-};
-use jupiter_chain_extension::JupiterExt;
-use jupiter_primitives::Hash;
-use pallet_contracts::chain_extension::{
-    ChainExtension, Environment, Ext, InitState, Result, RetVal, SysConfig, UncheckedFrom,
-};
+use frame_support::{decl_module, decl_storage, traits::Randomness as RandomnessT, Parameter};
+
 use pallet_session::SessionManager;
 
 use sp_consensus_vrf::schnorrkel;
@@ -24,7 +15,7 @@ pub struct BabeRandomness {
     pub epoch: u64,
     pub start_slot: u64,
     pub duration: u64,
-    pub randomness: Hash,
+    pub randomness: schnorrkel::Randomness,
 }
 
 pub trait Config: pallet_babe::Config + frame_system::Config {
@@ -74,7 +65,7 @@ impl<T: Config> Module<T> {
             epoch: epoch.epoch_index,
             start_slot: *epoch.start_slot,
             duration: epoch.duration,
-            randomness: Hash::from(epoch.randomness),
+            randomness: epoch.randomness,
         }
     }
 
@@ -85,92 +76,17 @@ impl<T: Config> Module<T> {
             epoch: epoch.epoch_index,
             start_slot: *epoch.start_slot,
             duration: epoch.duration,
-            randomness: Hash::from(epoch.randomness),
+            randomness: epoch.randomness,
         }
     }
 
-    // Return babe randomness for historical epoch
-    pub fn randomness_of(epoch: u64) -> Hash {
-        Hash::from(<HistoricalRandomness>::get(&epoch))
+    /// Return babe randomness for historical epoch
+    pub fn randomness_of(epoch: u64) -> schnorrkel::Randomness {
+        <HistoricalRandomness>::get(&epoch)
     }
 
-    // Return randomness with provider subject
+    /// Return randomness with provider subject
     pub fn random(subject: &[u8]) -> T::Hash {
         <pallet_babe::Module<T>>::random(subject)
-    }
-}
-
-impl<T: Config> ChainExtension for Module<T> {
-    fn call<E: Ext>(func_id: u32, env: Environment<E, InitState>) -> Result<RetVal>
-    where
-        <E::T as SysConfig>::AccountId: UncheckedFrom<<E::T as SysConfig>::Hash> + AsRef<[u8]>,
-    {
-        match func_id {
-            // 0x0000ffff - 0x01000000
-            // 0x00010000 - 0x0001ffff => std runtime
-            // current epoch randomness
-            0x00010000 => {
-                let mut env = env.buf_in_buf_out();
-                // reference seal_random
-                let gas = (166_160_000 as Weight)
-                    // Standard Error: 237_000
-                    .saturating_add((594_474_000 as Weight).saturating_mul(1 as Weight))
-                    .saturating_add(<E::T as SysConfig>::DbWeight::get().reads(6 as Weight));
-                env.charge_weight(gas)?;
-
-                let cur_epoch = Self::current_epoch();
-                env.write(&cur_epoch.encode(), false, None)?;
-                Ok(RetVal::Converging(0))
-            }
-            // next epoch randomness
-            0x00010001 => {
-                let mut env = env.buf_in_buf_out();
-                // reference seal_random
-                let gas = (166_160_000 as Weight)
-                    // Standard Error: 237_000
-                    .saturating_add((594_474_000 as Weight).saturating_mul(1 as Weight))
-                    .saturating_add(<E::T as SysConfig>::DbWeight::get().reads(6 as Weight));
-                env.charge_weight(gas)?;
-
-                let next_epoch = Self::next_epoch();
-                env.write(&next_epoch.encode(), false, None)?;
-                Ok(RetVal::Converging(0))
-            }
-            // query historical randomness with specified epoch
-            0x00010002 => {
-                let mut env = env.buf_in_buf_out();
-                // reference seal_random
-                let gas = (166_160_000 as Weight)
-                    // Standard Error: 237_000
-                    .saturating_add((594_474_000 as Weight).saturating_mul(1 as Weight))
-                    .saturating_add(<E::T as SysConfig>::DbWeight::get().reads(6 as Weight));
-                env.charge_weight(gas)?;
-
-                let input: u64 = env.read_as()?;
-                let randomness = Self::randomness_of(input);
-                env.write(&randomness.encode(), false, None)?;
-                Ok(RetVal::Converging(0))
-            }
-            // random with subject input
-            0x00010003 => {
-                let mut env = env.buf_in_buf_out();
-                // reference seal_random
-                let gas = (166_160_000 as Weight)
-                    // Standard Error: 237_000
-                    .saturating_add((594_474_000 as Weight).saturating_mul(1 as Weight))
-                    .saturating_add(<E::T as SysConfig>::DbWeight::get().reads(6 as Weight));
-                env.charge_weight(gas)?;
-
-                let input: Vec<u8> = env.read_as()?;
-                let randomness = Self::random(input.as_slice());
-                env.write(&randomness.encode(), false, None)?;
-                Ok(RetVal::Converging(0))
-            }
-            _ => JupiterExt::call(func_id, env),
-        }
-    }
-
-    fn enabled() -> bool {
-        true
     }
 }

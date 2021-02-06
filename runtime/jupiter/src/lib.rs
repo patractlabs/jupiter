@@ -6,6 +6,8 @@
 #[cfg(feature = "std")]
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 
+mod chain_extension;
+
 use codec::{Decode, Encode};
 use sp_api::impl_runtime_apis;
 use sp_core::{
@@ -774,7 +776,7 @@ impl pallet_contracts::Config for Runtime {
     type MaxValueSize = MaxValueSize;
     type WeightPrice = pallet_transaction_payment::Module<Self>;
     type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
-    type ChainExtension = RandomnessProvider;
+    type ChainExtension = chain_extension::JupiterExtension;
     type DeletionQueueDepth = DeletionQueueDepth;
     type DeletionWeightLimit = DeletionWeightLimit;
 }
