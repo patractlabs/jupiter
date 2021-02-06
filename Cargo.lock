@@ -2913,6 +2913,7 @@ dependencies = [
  "pallet-contracts-rpc-runtime-api",
  "pallet-indices",
  "pallet-randomness-collective-flip",
+ "pallet-randomness-provider",
  "pallet-sudo",
  "pallet-template",
  "pallet-timestamp",
@@ -3025,6 +3026,7 @@ dependencies = [
  "pallet-multisig",
  "pallet-offences",
  "pallet-proxy",
+ "pallet-randomness-provider",
  "pallet-scheduler",
  "pallet-session",
  "pallet-staking",
@@ -3042,6 +3044,7 @@ dependencies = [
  "sp-authority-discovery",
  "sp-block-builder",
  "sp-consensus-babe",
+ "sp-consensus-vrf",
  "sp-core",
  "sp-inherents",
  "sp-io",
@@ -4560,6 +4563,22 @@ dependencies = [
  "parity-scale-codec 2.0.0",
  "safe-mix",
  "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
+name = "pallet-randomness-provider"
+version = "2.0.0"
+dependencies = [
+ "frame-support",
+ "frame-system",
+ "pallet-babe",
+ "pallet-session",
+ "parity-scale-codec 2.0.0",
+ "serde",
+ "sp-consensus-vrf",
+ "sp-runtime",
+ "sp-staking",
  "sp-std",
 ]
 

@@ -6,6 +6,8 @@
 #[cfg(feature = "std")]
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 
+mod chain_extension;
+
 use codec::{Decode, Encode};
 use sp_api::impl_runtime_apis;
 use sp_core::{
@@ -353,13 +355,20 @@ parameter_types! {
     pub const DisabledValidatorsThreshold: Perbill = Perbill::from_percent(17);
 }
 
+impl pallet_randomness_provider::Config for Runtime {
+    type ValidatorId = AccountId;
+}
+
 impl pallet_session::Config for Runtime {
     type Event = Event;
     type ValidatorId = AccountId;
     type ValidatorIdOf = pallet_staking::StashOf<Self>;
     type ShouldEndSession = Babe;
     type NextSessionRotation = Babe;
-    type SessionManager = pallet_session::historical::NoteHistoricalRoot<Self, Staking>;
+    type SessionManager = pallet_randomness_provider::NoteHistoricalRandomness<
+        Self,
+        pallet_session::historical::NoteHistoricalRoot<Self, Staking>,
+    >;
     type SessionHandler = <SessionKeys as OpaqueKeys>::KeyTypeIdProviders;
     type Keys = SessionKeys;
     type DisabledValidatorsThreshold = DisabledValidatorsThreshold;
@@ -437,7 +446,6 @@ impl pallet_staking::Config for Runtime {
 }
 
 parameter_types! {
-    // TODO
     pub const LaunchPeriod: BlockNumber = 1 * DAYS;
     pub const VotingPeriod: BlockNumber = 1 * DAYS;
     pub const FastTrackVotingPeriod: BlockNumber = 3 * HOURS;
@@ -768,7 +776,7 @@ impl pallet_contracts::Config for Runtime {
     type MaxValueSize = MaxValueSize;
     type WeightPrice = pallet_transaction_payment::Module<Self>;
     type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
-    type ChainExtension = jupiter_chain_extension::JupiterExt;
+    type ChainExtension = chain_extension::JupiterExtension;
     type DeletionQueueDepth = DeletionQueueDepth;
     type DeletionWeightLimit = DeletionWeightLimit;
 }
@@ -964,6 +972,8 @@ construct_runtime!(
         Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>} = 27,
         // Contracts module
         Contracts: pallet_contracts::{Module, Call, Config<T>, Storage, Event<T>} = 30,
+
+        RandomnessProvider: pallet_randomness_provider::{Module, Storage} = 31,
     }
 );
 

@@ -1,0 +1,44 @@
+[package]
+name = "pallet-randomness-provider"
+version = "2.0.0"
+authors = ["Tyler <tyler@patract.io>"]
+edition = "2018"
+license = "Unlicense"
+homepage = "https://patract.io"
+repository = "https://github.com/patractlabs/jupiter"
+description = "FRAME provide randomness pallet"
+readme = "README.md"
+
+[package.metadata.docs.rs]
+targets = ["x86_64-unknown-linux-gnu"]
+
+[dependencies]
+codec = { package = "parity-scale-codec", version = "2.0.0", default-features = false, features = ["derive"]}
+serde = { version = "1.0.101", optional = true, features = ["derive"] }
+
+sp-consensus-vrf = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+sp-runtime = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+sp-staking = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+sp-std = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+
+frame-support = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+frame-system = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-babe = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-session = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false, features = ["historical"] }
+
+[features]
+default = ["std"]
+std = [
+    "codec/std",
+	"serde",
+
+    "sp-consensus-vrf/std",
+    "sp-runtime/std",
+    "sp-staking/std",
+    "sp-std/std",
+
+    "frame-support/std",
+    "frame-system/std",
+    "pallet-babe/std",
+    "pallet-session/std",
+]

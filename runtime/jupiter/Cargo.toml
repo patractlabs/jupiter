@@ -16,6 +16,7 @@ static_assertions = "1.1.0"
 sp-api = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 sp-block-builder = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 sp-consensus-babe = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+sp-consensus-vrf = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 sp-authority-discovery = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 sp-core = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 sp-inherents = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
@@ -67,6 +68,9 @@ pallet-contracts = { path = "../../vendor/substrate/frame/contracts", default-fe
 pallet-contracts-primitives = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-contracts-rpc-runtime-api = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 
+# local pallet define
+pallet-randomness-provider = { path = "../../pallets/randomness-provider", default-features = false }
+
 # local runtime module
 jupiter-primitives = { path = "../../primitives", default-features = false }
 jupiter-runtime-common = { path = "../common", default-features = false }
@@ -85,6 +89,7 @@ std = [
     "sp-api/std",
     "sp-block-builder/std",
     "sp-consensus-babe/std",
+    "sp-consensus-vrf/std",
     "sp-core/std",
     "sp-inherents/std",
     "sp-io/std",
@@ -130,6 +135,8 @@ std = [
     "pallet-bounties/std",
     "pallet-tips/std",
     "pallet-utility/std",
+
+    "pallet-randomness-provider/std",
 
     "jupiter-primitives/std",
     "jupiter-runtime-common/std",
