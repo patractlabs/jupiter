@@ -84,8 +84,8 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
     spec_name: create_runtime_str!("jupiter-para"),
     impl_name: create_runtime_str!("jupiter-para"),
     authoring_version: 1,
-    spec_version: 2,
-    impl_version: 0,
+    spec_version: 3,
+    impl_version: 1,
     apis: RUNTIME_API_VERSIONS,
     transaction_version: 2,
 };
@@ -101,7 +101,7 @@ pub fn native_version() -> NativeVersion {
 
 parameter_types! {
     pub const Version: RuntimeVersion = VERSION;
-    pub const SS58Prefix: u8 = 26;
+    pub const SS58Prefix: u8 = 42;
 }
 
 impl frame_system::Config for Runtime {
