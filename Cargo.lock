@@ -2913,6 +2913,7 @@ dependencies = [
  "pallet-contracts-rpc-runtime-api",
  "pallet-indices",
  "pallet-randomness-collective-flip",
+ "pallet-randomness-provider",
  "pallet-sudo",
  "pallet-template",
  "pallet-timestamp",

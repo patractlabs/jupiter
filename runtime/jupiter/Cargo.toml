@@ -67,6 +67,8 @@ pallet-utility = { version = "2.0.0", git = "https://github.com/paritytech/subst
 pallet-contracts = { path = "../../vendor/substrate/frame/contracts", default-features = false }
 pallet-contracts-primitives = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-contracts-rpc-runtime-api = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+
+# local pallet define
 pallet-randomness-provider = { path = "../../pallets/randomness-provider", default-features = false }
 
 # local runtime module
@@ -122,7 +124,6 @@ std = [
     "pallet-multisig/std",
     "pallet-offences/std",
     "pallet-proxy/std",
-    "pallet-randomness-provider/std",
     "pallet-sudo/std",
     "pallet-scheduler/std",
     "pallet-session/std",
@@ -134,6 +135,8 @@ std = [
     "pallet-bounties/std",
     "pallet-tips/std",
     "pallet-utility/std",
+
+    "pallet-randomness-provider/std",
 
     "jupiter-primitives/std",
     "jupiter-runtime-common/std",

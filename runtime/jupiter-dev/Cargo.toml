@@ -42,12 +42,13 @@ pallet-transaction-payment = { version = "2.0.0", git = "https://github.com/pari
 pallet-transaction-payment-rpc-runtime-api = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 
 # vendor modules
+pallet-contracts = { path = "../../vendor/substrate/frame/contracts", default-features = false }
 pallet-contracts-primitives = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-contracts-rpc-runtime-api = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 
-# local runtime module
-pallet-contracts = { path = "../../vendor/substrate/frame/contracts", default-features = false }
+# local pallet define
 pallet-template = { path = "../../pallets/template", default-features = false }
+pallet-randomness-provider = { path = "../../pallets/randomness-provider", default-features = false }
 
 jupiter-primitives = { path = "../../primitives", default-features = false }
 jupiter-runtime-common = { path = "../common", default-features = false }
@@ -86,11 +87,12 @@ std = [
     "pallet-balances/std",
     "pallet-transaction-payment/std",
     "pallet-transaction-payment-rpc-runtime-api/std",
+    "pallet-contracts/std",
     "pallet-contracts-primitives/std",
     "pallet-contracts-rpc-runtime-api/std",
 
-    "pallet-contracts/std",
     "pallet-template/std",
+    "pallet-randomness-provider/std",
 
     "jupiter-primitives/std",
     "jupiter-runtime-common/std",
