@@ -1,24 +1,18 @@
 # Patract
-Wasm contract blockchain with Substrate `FRAME contracts pallet`.
+WASM smart contract networks powered by Substrate `FRAME Contracts pallet` in Polkadot ecosystem.
 
-Patract aims to be the **system parachain** in Polkadot ecosystem, supporting contract developers to use [ink!](https://github.com/paritytech/ink),
-[Ask!](https://github.com/patractlabs/ask), [Solang](https://github.com/hyperledger-labs/solang) and other language framework which compilation target
-could run on `FRAME contracts pallet`.
+Patract aims to be the **system parachain** (aka common-good parachain) in Polkadot ecosystem, supporting contract developers to use [ink!](https://github.com/paritytech/ink), [Ask!](https://github.com/patractlabs/ask), [Solang](https://github.com/hyperledger-labs/solang) and other language frameworks which can run on `FRAME Contracts pallet`. We will directly use KSM/DOT as native token for gas fee, staking and governance.
 
-For different requirements, this repo contains different runtime for different situation (The content in following parentheses is the name of the executable file):
+For different requirements, this repo contains different runtime for different situations (The content in following parentheses is the name of the executable file):
 
-* Patract Mainnets:
-    
-    * Patract PoA (patract-pilot): The advance network for Kusama system parachain. When Kusama support parachain system 
-      and Patract competes the system parachain, we would **migrate Patract PoA newest state** to Kusama parachain and
-      become Patract K1 parachain.
-    * Patract K1 (patract): Patract Kusama system parachin V1. (not yet)
-    * Patract P1 (patract): Patract Polkadot system parachain V1. (not yet)
-    
-* Jupiter Testnets:
-  
-    * Jupiter PoA (patract-pilot): The single blockchain with independent consensus system for helping contract developers to test contracts. This blockchain network contains newest features.
-    * Jupiter Rococo (patract): The testnet parachain for Rococo network.
+* Patract Mainnets  (not yet released):
+    * Patract K1 (patract): Patract's 1st system parachain on Kusama Network.
+    * Patract P1 (patract): Patract's 1st system parachain on Polkadot Network.
+    * TBD: Patract PoA (patract-poa): Patract's early released independent blockchain secured by centralized selected validators through PoA (Proof of Authority) consensus algorithm. This is only necessary if Kusama need long time to really support system parachain deployment and the Jupiter testnet and WASM contract technology is ready. If we release this network as mainnet and support developers to deploy contracts and issue assets in production environment, we will migrate all the state into Patract K1 or support contracts to migrate into other parachains.
+
+* Jupiter Testnets (already running):
+    * Jupiter PoA (patract-poa): The independent blockchain matained by PoA validators only for deploying test contracts and issuing test assets with no value. This blockchain network contains newest features.
+    * Jupiter Rococo (patract): Almost the same position of Jupiter PoA , excepted the consensus algorithm switched from PoA to Rococo shared security, and can simulate cross-chain messaging functions.
     
 * Development Node:
   
