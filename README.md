@@ -1,4 +1,4 @@
-# jupiter
+# patract
 Testnet blockchain for Substrate `FRAME contracts pallet`.
 
 Currently Jupiter provide an independent substrate blockchain node, a parachain node and a local dev test node(three type executable file), 

@@ -11,8 +11,9 @@ use sc_service::{error::Error as ServiceError, Configuration, TaskManager};
 use sp_inherents::InherentDataProviders;
 use sp_runtime::traits::Block as BlockT;
 
-use jupiter_executor::Executor;
-use jupiter_primitives::Block;
+use patract_executor::Executor;
+use patract_primitives::Block;
+
 use jupiter_runtime::{self, RuntimeApi};
 
 type FullClient = sc_service::TFullClient<Block, RuntimeApi, Executor>;
@@ -31,7 +32,7 @@ pub fn new_partial(
         sp_consensus::DefaultImportQueue<Block, FullClient>,
         sc_transaction_pool::FullPool<Block, FullClient>,
         (
-            impl Fn(jupiter_rpc::DenyUnsafe, sc_rpc::SubscriptionTaskExecutor) -> jupiter_rpc::IoHandler,
+            impl Fn(patract_rpc::DenyUnsafe, sc_rpc::SubscriptionTaskExecutor) -> patract_rpc::IoHandler,
             (
                 sc_consensus_babe::BabeBlockImport<Block, FullClient, FullGrandpaBlockImport>,
                 sc_finality_grandpa::LinkHalf<Block, FullClient, FullSelectChain>,
@@ -105,19 +106,19 @@ pub fn new_partial(
         let keystore = keystore_container.sync_keystore();
 
         let rpc_extensions_builder = Box::new(move |deny_unsafe, subscription_executor| {
-            let deps = jupiter_rpc::FullDeps {
-                basic: jupiter_rpc::BasicDeps {
+            let deps = patract_rpc::FullDeps {
+                basic: patract_rpc::BasicDeps {
                     client: client.clone(),
                     pool: pool.clone(),
                     deny_unsafe,
                 },
                 select_chain: select_chain.clone(),
-                babe: jupiter_rpc::BabeDeps {
+                babe: patract_rpc::BabeDeps {
                     babe_config: babe_config.clone(),
                     shared_epoch_changes: shared_epoch_changes.clone(),
                     keystore: keystore.clone(),
                 },
-                grandpa: jupiter_rpc::GrandpaDeps {
+                grandpa: patract_rpc::GrandpaDeps {
                     shared_voter_state: shared_voter_state.clone(),
                     shared_authority_set: shared_authority_set.clone(),
                     justification_stream: justification_stream.clone(),
@@ -126,7 +127,7 @@ pub fn new_partial(
                 },
             };
 
-            jupiter_rpc::create_full(deps)
+            patract_rpc::create_full(deps)
         });
 
         (rpc_extensions_builder, rpc_setup)
@@ -397,14 +398,14 @@ pub fn new_light(config: Configuration) -> Result<TaskManager, ServiceError> {
         );
     }
 
-    let light_deps = jupiter_rpc::LightDeps {
+    let light_deps = patract_rpc::LightDeps {
         remote_blockchain: backend.remote_blockchain(),
         fetcher: on_demand.clone(),
         client: client.clone(),
         pool: transaction_pool.clone(),
     };
 
-    let rpc_extensions = jupiter_rpc::create_light(light_deps);
+    let rpc_extensions = patract_rpc::create_light(light_deps);
     sc_service::spawn_tasks(sc_service::SpawnTasksParams {
         remote_blockchain: Some(backend.remote_blockchain()),
         transaction_pool,

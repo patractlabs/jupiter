@@ -31,7 +31,7 @@ fn load_spec(
 
 impl SubstrateCli for Cli {
     fn impl_name() -> String {
-        "Jupiter Parachain Node".into()
+        "Patract Parachain Node".into()
     }
 
     fn impl_version() -> String {
@@ -47,7 +47,7 @@ impl SubstrateCli for Cli {
     }
 
     fn support_url() -> String {
-        "https://github.com/patractlabs/jupiter".into()
+        "https://github.com/patractlabs/patract".into()
     }
 
     fn copyright_start_year() -> i32 {

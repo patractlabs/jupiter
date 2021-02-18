@@ -5,7 +5,7 @@ members = [
     "bin/node-dev",
 #    "bin/node-para",
     "runtime/jupiter",
-    "runtime/jupiter-dev",
+    "runtime/patract-dev",
 #    "runtime/jupiter-para",
     "primitives",
     "primitives/io",

@@ -1,13 +1,13 @@
 [package]
-name = "jupiter"
+name = "patract"
 version = "1.0.0"
-authors = ["Jupiter <https://github.com/patractlabs/jupiter>"]
+authors = ["Patract <https://github.com/patractlabs/patract>"]
 edition = "2018"
 description = ""
-default-run = "jupiter"
+default-run = "patract"
 
 [dependencies]
-cli = { package = "jupiter-cli", path = "cli" }
+cli = { package = "patract-cli", path = "cli" }
 
 [target.'cfg(target_arch="x86_64")'.dependencies]
-cli = { package = "jupiter-cli", path = "cli", features = [ "wasmtime" ] }
+cli = { package = "patract-cli", path = "cli", features = [ "wasmtime" ] }

@@ -9,7 +9,7 @@ use pallet_contracts::chain_extension::{
     ChainExtension, Environment, Ext, InitState, Result, RetVal, SysConfig, UncheckedFrom,
 };
 
-use jupiter_chain_extension::JupiterExt;
+use patract_chain_extension::PatractExt;
 
 use crate::RandomnessProvider;
 
@@ -74,7 +74,7 @@ impl ChainExtension for JupiterExtension {
                 env.write(&randomness.encode(), false, None)?;
                 Ok(RetVal::Converging(0))
             }
-            _ => JupiterExt::call(func_id, env),
+            _ => PatractExt::call(func_id, env),
         }
     }
 

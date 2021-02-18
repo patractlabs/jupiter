@@ -1,7 +1,7 @@
 [package]
-name = "jupiter-cli"
+name = "patract-cli"
 version = "1.0.0"
-authors = ["Jupiter <https://github.com/patractlabs/jupiter>"]
+authors = ["Patract <https://github.com/patractlabs/patract>"]
 edition = "2018"
 
 [package.metadata.docs.rs]
@@ -45,11 +45,12 @@ pallet-staking = { version = "2.0.0", git = "https://github.com/paritytech/subst
 # pallet-contracts = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 pallet-contracts = { path = "../../../vendor/substrate/frame/contracts" }
 
-jupiter-primitives = { path = "../../../primitives" }
+patract-primitives = { path = "../../../primitives" }
+patract-runtime-common = { path = "../../../runtime/common" }
+patract-executor = { path = "../executor" }
+patract-rpc = { path = "../../../rpc" }
+
 jupiter-runtime = { path = "../../../runtime/jupiter" }
-jupiter-runtime-common = { path = "../../../runtime/common" }
-jupiter-executor = { path = "../executor" }
-jupiter-rpc = { path = "../../../rpc" }
 
 [build-dependencies]
 substrate-build-script-utils = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
@@ -59,10 +60,10 @@ default = ["cli"]
 cli = [
     "sc-cli",
     "sc-service",
-    "jupiter-executor/wasmi-errno",
+    "patract-executor/wasmi-errno",
 ]
 wasmtime = [
     "sc-cli/wasmtime",
     "sc-service/wasmtime",
-    "jupiter-executor/wasmtime",
+    "patract-executor/wasmtime",
 ]

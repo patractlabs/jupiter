@@ -7,7 +7,7 @@ use crate::service::{self, new_partial};
 
 impl SubstrateCli for Cli {
     fn impl_name() -> String {
-        "Jupiter Node".into()
+        "Patract Node".into()
     }
 
     fn impl_version() -> String {
@@ -23,7 +23,7 @@ impl SubstrateCli for Cli {
     }
 
     fn support_url() -> String {
-        "https://github.com/patractlabs/jupiter".into()
+        "https://github.com/patractlabs/patract".into()
     }
 
     fn copyright_start_year() -> i32 {
@@ -32,17 +32,34 @@ impl SubstrateCli for Cli {
 
     fn load_spec(&self, id: &str) -> Result<Box<dyn sc_service::ChainSpec>, String> {
         Ok(match id {
-            "dev" => Box::new(chain_spec::development_config()?),
-            "local" => Box::new(chain_spec::local_testnet_config()?),
-            "staging" => Box::new(chain_spec::staging_testnet_config()?),
-            "" | "testnet" => Box::new(chain_spec::testnet_config()?),
-            path => Box::new(chain_spec::ChainSpec::from_json_file(
-                std::path::PathBuf::from(path),
-            )?),
+            "jupiter-dev" => Box::new(chain_spec::jupiter::development_config()?),
+            "jupiter-local" => Box::new(chain_spec::jupiter::local_config()?),
+            "jupiter-staging" => Box::new(chain_spec::jupiter::staging_testnet_config()?),
+            "jupiter" => Box::new(chain_spec::jupiter::jupiter_config()?),
+            // TODO add patract spec
+            "" | "patract" => return Err("Not implement patract spec know".to_string()),
+            path => {
+                let path = std::path::PathBuf::from(path);
+
+                let starts_with = |prefix: &str| {
+                    path.file_name()
+                        .map(|f| f.to_str().map(|s| s.starts_with(&prefix)))
+                        .flatten()
+                        .unwrap_or(false)
+                };
+                if self.run.force_jupiter || starts_with("jupiter") {
+                    Box::new(chain_spec::jupiter::ChainSpec::from_json_file(
+                        std::path::PathBuf::from(path),
+                    )?)
+                } else {
+                    return Err("Not implement patract spec know".to_string());
+                }
+            }
         })
     }
 
     fn native_runtime_version(_: &Box<dyn ChainSpec>) -> &'static RuntimeVersion {
+        // todo add if condition to distinguish patract and jupiter
         &jupiter_runtime::VERSION
     }
 }
@@ -55,7 +72,7 @@ pub fn run() -> sc_cli::Result<()> {
 
     match &cli.subcommand {
         None => {
-            let runner = cli.create_runner(&cli.run)?;
+            let runner = cli.create_runner(&cli.run.base)?;
             runner.run_node_until_exit(|config| async move {
                 match config.role {
                     Role::Light => service::new_light(config),

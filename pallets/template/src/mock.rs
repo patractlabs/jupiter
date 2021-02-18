@@ -127,7 +127,7 @@ impl contract::Config for Test {
     type MaxValueSize = MaxValueSize;
     type WeightPrice = Self;
     type WeightInfo = ();
-    type ChainExtension = jupiter_chain_extension::JupiterExt;
+    type ChainExtension = patract_chain_extension::PatractExt;
     type DeletionQueueDepth = DeletionQueueDepth;
     type DeletionWeightLimit = DeletionWeightLimit;
 }

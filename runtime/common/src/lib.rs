@@ -18,7 +18,7 @@ use frame_system::limits;
 
 use pallet_transaction_payment::Multiplier;
 
-use jupiter_primitives::BlockNumber;
+use patract_primitives::BlockNumber;
 
 /// We assume that an on-initialize consumes 2.5% of the weight on average, hence a single extrinsic
 /// will not be allowed to consume more than `AvailableBlockRatio - 2.5%`.

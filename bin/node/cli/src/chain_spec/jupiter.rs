@@ -18,9 +18,9 @@ use jupiter_runtime::{
     IndicesConfig, SessionConfig, StakingConfig, SudoConfig, SystemConfig,
     TechnicalCommitteeConfig, WASM_BINARY,
 };
-use jupiter_runtime_common::constants::currency::DOTS;
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use pallet_staking::{Forcing, StakerStatus};
+use patract_runtime_common::constants::currency::DOTS;
 
 // The URL for the telemetry server.
 const PATRACT_TELEMETRY_URL: &str = "wss://telemetry.patract.io/submit";
@@ -128,7 +128,7 @@ pub fn development_config() -> Result<ChainSpec, String> {
     ))
 }
 
-pub fn local_testnet_config() -> Result<ChainSpec, String> {
+pub fn local_config() -> Result<ChainSpec, String> {
     let wasm_binary = WASM_BINARY.ok_or("Development wasm binary not available".to_string())?;
 
     Ok(ChainSpec::from_genesis(
@@ -366,8 +366,8 @@ pub fn staging_testnet_config() -> Result<ChainSpec, String> {
     ))
 }
 
-pub fn testnet_config() -> Result<ChainSpec, String> {
-    ChainSpec::from_json_bytes(&include_bytes!("../res/testnet.json")[..])
+pub fn jupiter_config() -> Result<ChainSpec, String> {
+    ChainSpec::from_json_bytes(&include_bytes!("../../res/jupiter.json")[..])
 }
 
 /// Configure initial storage state for FRAME modules.
