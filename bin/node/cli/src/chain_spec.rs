@@ -115,7 +115,7 @@ pub fn development_config() -> Result<ChainSpec, String> {
         // Properties
         Some(
             json!({
-                "ss58Format": 42,
+                "ss58Format": jupiter_runtime::SS58Prefix::get(),
                 "tokenDecimals": 10,
                 "tokenSymbol": "DOT"
             })
@@ -174,7 +174,7 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
         // Properties
         Some(
             json!({
-                "ss58Format": 42,
+                "ss58Format": jupiter_runtime::SS58Prefix::get(),
                 "tokenDecimals": 10,
                 "tokenSymbol": "DOT"
             })
@@ -353,7 +353,7 @@ pub fn staging_testnet_config() -> Result<ChainSpec, String> {
         // Properties
         Some(
             json!({
-                "ss58Format": 42,
+                "ss58Format": jupiter_runtime::SS58Prefix::get(),
                 "tokenDecimals": 10,
                 "tokenSymbol": "DOT"
             })
