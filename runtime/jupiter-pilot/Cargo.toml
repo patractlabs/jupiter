@@ -1,5 +1,5 @@
 [package]
-name = "jupiter-runtime"
+name = "jupiter-pilot-runtime"
 version = "0.1.0"
 authors = ["Patract <https://github.com/patractlabs/patract>"]
 edition = "2018"

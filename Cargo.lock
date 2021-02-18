@@ -2791,7 +2791,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "jupiter-runtime"
+name = "jupiter-pilot-runtime"
 version = "0.1.0"
 dependencies = [
  "frame-executive",
@@ -4829,13 +4829,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "patract"
-version = "1.0.0"
-dependencies = [
- "patract-cli",
-]
-
-[[package]]
 name = "patract-chain-extension"
 version = "0.1.0"
 dependencies = [
@@ -4855,7 +4848,7 @@ version = "1.0.0"
 dependencies = [
  "futures 0.3.9",
  "hex-literal 0.2.1",
- "jupiter-runtime",
+ "jupiter-pilot-runtime",
  "log",
  "pallet-authority-discovery",
  "pallet-contracts",
@@ -4978,7 +4971,7 @@ name = "patract-executor"
 version = "0.1.0"
 dependencies = [
  "frame-benchmarking",
- "jupiter-runtime",
+ "jupiter-pilot-runtime",
  "patract-io",
  "sc-executor",
 ]
@@ -4992,6 +4985,13 @@ dependencies = [
  "num-traits",
  "sp-runtime-interface",
  "sp-std",
+]
+
+[[package]]
+name = "patract-pilot"
+version = "1.0.0"
+dependencies = [
+ "patract-cli",
 ]
 
 [[package]]
