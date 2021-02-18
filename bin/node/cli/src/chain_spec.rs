@@ -115,7 +115,7 @@ pub fn development_config() -> Result<ChainSpec, String> {
         // Properties
         Some(
             json!({
-                "ss58Format": jupiter_runtime::SS58Prefix,
+                "ss58Format": jupiter_runtime::SS58Prefix::get(),
                 "tokenDecimals": 10,
                 "tokenSymbol": "DOT"
             })
