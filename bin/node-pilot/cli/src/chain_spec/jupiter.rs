@@ -80,14 +80,14 @@ fn session_keys(
     }
 }
 
-pub fn development_config() -> Result<ChainSpec, String> {
+pub fn poa_development_config() -> Result<ChainSpec, String> {
     let wasm_binary = WASM_BINARY.ok_or("Development wasm binary not available".to_string())?;
 
     Ok(ChainSpec::from_genesis(
         // Name
         "Development",
         // ID
-        "dev",
+        "jupiter_poa_dev",
         ChainType::Development,
         move || {
             testnet_genesis(
@@ -128,14 +128,14 @@ pub fn development_config() -> Result<ChainSpec, String> {
     ))
 }
 
-pub fn local_config() -> Result<ChainSpec, String> {
+pub fn poa_local_config() -> Result<ChainSpec, String> {
     let wasm_binary = WASM_BINARY.ok_or("Development wasm binary not available".to_string())?;
 
     Ok(ChainSpec::from_genesis(
         // Name
         "Local Testnet",
         // ID
-        "local_testnet",
+        "jupiter_poa_local_testnet",
         ChainType::Local,
         move || {
             testnet_genesis(
@@ -187,7 +187,7 @@ pub fn local_config() -> Result<ChainSpec, String> {
     ))
 }
 
-pub fn staging_testnet_config() -> Result<ChainSpec, String> {
+pub fn poa_staging_config() -> Result<ChainSpec, String> {
     let wasm_binary = WASM_BINARY.ok_or("Testnet wasm binary not available".to_string())?;
 
     // subkey inspect "$SECRET"
@@ -315,9 +315,9 @@ pub fn staging_testnet_config() -> Result<ChainSpec, String> {
 
     Ok(ChainSpec::from_genesis(
         // Name
-        "Jupiter Staging Testnet",
+        "Jupiter PoA Staging",
         // ID
-        "jupiter_staging_testnet",
+        "jupiter_poa_staging",
         ChainType::Live,
         move || {
             testnet_genesis(
@@ -349,7 +349,7 @@ pub fn staging_testnet_config() -> Result<ChainSpec, String> {
                 .expect("Polkadot Staging telemetry url is valid; qed"),
         ),
         // Protocol ID
-        Some("jupiter_staging_testnet"),
+        Some("jupiter_poa_staging"),
         // Properties
         Some(
             json!({
@@ -366,8 +366,8 @@ pub fn staging_testnet_config() -> Result<ChainSpec, String> {
     ))
 }
 
-pub fn jupiter_config() -> Result<ChainSpec, String> {
-    ChainSpec::from_json_bytes(&include_bytes!("../../res/jupiter.json")[..])
+pub fn poa_config() -> Result<ChainSpec, String> {
+    ChainSpec::from_json_bytes(&include_bytes!("../../res/jupiter_poa.json")[..])
 }
 
 /// Configure initial storage state for FRAME modules.
