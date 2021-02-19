@@ -4320,7 +4320,7 @@ dependencies = [
 
 [[package]]
 name = "pallet-randomness-provider"
-version = "3.0.0"
+version = "0.1.0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4882,7 +4882,7 @@ dependencies = [
 
 [[package]]
 name = "patract-dev"
-version = "1.0.0"
+version = "0.1.0"
 dependencies = [
  "patract-dev-cli",
 ]
@@ -4987,7 +4987,7 @@ dependencies = [
 
 [[package]]
 name = "patract-pilot"
-version = "1.0.0"
+version = "0.1.0"
 dependencies = [
  "patract-cli",
 ]

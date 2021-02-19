@@ -1,9 +1,9 @@
 [package]
 name = "pallet-randomness-provider"
-version = "3.0.0"
-authors = ["Tyler <tyler@patract.io>"]
+version = "0.1.0"
+authors = ["Patract <https://github.com/patractlabs/patract>"]
 edition = "2018"
-license = "Unlicense"
+license = "Apache-2.0"
 homepage = "https://patract.io"
 repository = "https://github.com/patractlabs/jupiter"
 description = "FRAME provide randomness pallet"

@@ -1,6 +1,6 @@
 [package]
 name = "patract-pilot"
-version = "1.0.0"
+version = "0.1.0"
 authors = ["Patract <https://github.com/patractlabs/patract>"]
 edition = "2018"
 description = ""
