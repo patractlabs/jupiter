@@ -6,6 +6,7 @@ use sc_client_api::RemoteBackend;
 use sc_executor::native_executor_instance;
 pub use sc_executor::NativeExecutor;
 use sc_service::{error::Error as ServiceError, Configuration, TaskManager};
+use sc_telemetry::TelemetrySpan;
 use sp_inherents::InherentDataProviders;
 
 use jupiter_dev_runtime::{self, RuntimeApi};
@@ -53,6 +54,7 @@ pub fn new_partial(
 
     let transaction_pool = sc_transaction_pool::BasicPool::new_full(
         config.transaction_pool.clone(),
+        config.role.is_authority().into(),
         config.prometheus_registry(),
         task_manager.spawn_handle(),
         client.clone(),
@@ -150,6 +152,9 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
         })
     };
 
+    let telemetry_span = TelemetrySpan::new();
+    let _telemetry_span_entered = telemetry_span.enter();
+
     sc_service::spawn_tasks(sc_service::SpawnTasksParams {
         config,
         network: network.clone(),
@@ -163,6 +168,7 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
         backend,
         network_status_sinks,
         system_rpc_tx,
+        telemetry_span: Some(telemetry_span.clone()),
     })?;
 
     if role.is_authority() {
@@ -233,6 +239,9 @@ pub fn new_light(config: Configuration) -> Result<TaskManager, ServiceError> {
         );
     }
 
+    let telemetry_span = TelemetrySpan::new();
+    let _telemetry_span_entered = telemetry_span.enter();
+
     sc_service::spawn_tasks(sc_service::SpawnTasksParams {
         remote_blockchain: Some(backend.remote_blockchain()),
         transaction_pool,
@@ -246,6 +255,7 @@ pub fn new_light(config: Configuration) -> Result<TaskManager, ServiceError> {
         network,
         network_status_sinks,
         system_rpc_tx,
+        telemetry_span: Some(telemetry_span.clone()),
     })?;
 
     network_starter.start_network();

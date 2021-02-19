@@ -38,12 +38,11 @@ macro_rules! addr {
         // Put WASM module
         let module = include_bytes!("../res/groth16.wasm").to_vec();
         let hash = T::Hashing::hash(&module);
-        <Contracts<T>>::put_code(origin.clone().into(), module)?;
-        if let Err(e) = <Contracts<T>>::instantiate(
+        if let Err(e) = <Contracts<T>>::instantiate_with_code(
             origin.clone().into(),
             BalanceOf::<T>::max_value() / 2_u32.into(), // endowment
             Weight::max_value(),                        // gas_limit
-            hash.clone(),                               // code_hash
+            module,                                     // code_hash
             [106, 55, 18, 226].to_vec(),                // deafult
             b"".to_vec(),                               // salt
         ) {

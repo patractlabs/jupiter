@@ -4,6 +4,7 @@ use frame_support::{traits::Get, weights::Weight};
 
 use sp_core::H256;
 use sp_runtime::traits::Hash;
+use sp_std::marker::PhantomData;
 use sp_std::vec::Vec;
 
 use pallet_contracts::chain_extension::{
@@ -15,11 +16,12 @@ use jupiter_chain_extension::JupiterExt;
 
 use crate::Runtime;
 
-pub struct JupiterDevExtension;
+pub struct JupiterDevExtension<C>(PhantomData<C>);
 
-impl ChainExtension for JupiterDevExtension {
+impl<C: pallet_contracts::Config> ChainExtension<C> for JupiterDevExtension<C> {
     fn call<E: Ext>(func_id: u32, env: Environment<E, InitState>) -> Result<RetVal>
     where
+        E: Ext<T = C>,
         <E::T as SysConfig>::AccountId: UncheckedFrom<<E::T as SysConfig>::Hash> + AsRef<[u8]>,
     {
         let randomness_gas = || {

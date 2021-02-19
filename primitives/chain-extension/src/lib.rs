@@ -12,9 +12,10 @@ use frame_support::debug::{error, native};
 /// The chain Extension of Jupiter
 pub struct JupiterExt;
 
-impl ChainExtension for JupiterExt {
-    fn call<E: Ext>(func_id: u32, env: Environment<E, InitState>) -> Result<RetVal, DispatchError>
+impl<C: pallet_contracts::Config> ChainExtension<C> for JupiterExt {
+    fn call<E>(func_id: u32, env: Environment<E, InitState>) -> Result<RetVal, DispatchError>
     where
+        E: Ext<T = C>,
         <E::T as SysConfig>::AccountId: UncheckedFrom<<E::T as SysConfig>::Hash> + AsRef<[u8]>,
     {
         let mut env = env.buf_in_buf_out();
