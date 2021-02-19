@@ -1,17 +1,20 @@
 [workspace]
 members = [
 #    "bin/node",
-#    "bin/node/executor",
-#    "bin/node-dev",
-    "bin/node-para",
-#    "runtime/jupiter",
-#    "runtime/jupiter-dev",
-    "runtime/jupiter-para",
+    "bin/node-pilot",
+    "bin/node-pilot/executor",
+    "bin/node-dev",
+
+#    "runtime/jupiter-para",
+    "runtime/jupiter-pilot",
+    "runtime/patract-dev",
+
     "primitives",
     "primitives/io",
-#    "primitives/chain-extension",
-#    "pallets/template",
-    "pallets/randomness_collect",
+    "primitives/chain-extension",
+    "pallets/template",
+    "pallets/randomness-provider",
+#    "pallets/randomness_collect",
     "rpc",
 ]
 exclude = ["vendor/substrate"]

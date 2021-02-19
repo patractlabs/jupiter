@@ -4,8 +4,8 @@ use sc_service::ChainType;
 use sp_core::{sr25519, Pair, Public};
 use sp_runtime::traits::{IdentifyAccount, Verify};
 
-use jupiter_dev_runtime::{AccountId, Signature};
-use jupiter_dev_runtime::{
+use patract_dev_runtime::{AccountId, Signature};
+use patract_dev_runtime::{
     BalancesConfig, ContractsConfig, GenesisConfig, IndicesConfig, SudoConfig, SystemConfig,
     WASM_BINARY,
 };
@@ -41,7 +41,7 @@ pub fn development_config() -> Result<ChainSpec, String> {
         // Name
         "Development",
         // ID
-        "jupiter-dev",
+        "patract-dev",
         ChainType::Development,
         move || {
             testnet_genesis(
@@ -69,7 +69,7 @@ pub fn development_config() -> Result<ChainSpec, String> {
             json!({
                 "ss58Format": 42,
                 "tokenDecimals": 10,
-                "tokenSymbol": "JPT"
+                "tokenSymbol": "DOT"
             })
             .as_object()
             .expect("network properties generation can not fail; qed")

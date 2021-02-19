@@ -1,19 +1,20 @@
 [package]
-name = "jupiter-chain-extension"
+name = "patract-chain-extension"
 version = "0.1.0"
-authors = ["Jupiter <https://github.com/patractlabs/jupiter>"]
+authors = ["Patract <https://github.com/patractlabs/patract>"]
 edition = "2018"
 
 [dependencies]
-parity-scale-codec = { version = "3.0.0", features = ["derive"], default-features = false }
+parity-scale-codec = { version = "2.0.0", features = ["derive"], default-features = false }
 hex = { version = "0.4.2", optional = true }
 
-sp-runtime = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "rococo-v1", default-features = false }
-sp-std = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "rococo-v1", default-features = false }
+sp-runtime = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+sp-std = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 
-frame-support = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "rococo-v1", default-features = false }
+frame-support = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-contracts = { path = "../../vendor/substrate/frame/contracts", default-features = false }
-jupiter-io = { path = "../io", default-features = false, optional = true }
+
+patract-io = { path = "../io", default-features = false, optional = true }
 
 [dependencies.curve]
 git = "https://github.com/patractlabs/megaclite.git"
@@ -25,12 +26,15 @@ default = ["std"]
 std = [
   "parity-scale-codec/std",
   "hex",
+
   "sp-runtime/std",
   "sp-std/std",
+
   "frame-support/std",
   "pallet-contracts/std",
-  "jupiter-io/std",
+
+  "patract-io/std",
 ]
 native-support = [
-  "jupiter-io"
+  "patract-io"
 ]

@@ -2,7 +2,7 @@
 
 /// Money matters.
 pub mod currency {
-    use jupiter_primitives::Balance;
+    use patract_primitives::Balance;
 
     pub const DOTS: Balance = 1_000_000_000_000; // old dot, one Dot is 100 Dot(new) now
     pub const DOLLARS: Balance = DOTS / 100; // 10_000_000_000 // one Dollar is 1 Dot(new) now
@@ -20,13 +20,13 @@ pub mod currency {
 
 /// Time.
 pub mod time {
-    use jupiter_primitives::{BlockNumber, Moment};
+    use patract_primitives::{BlockNumber, Moment};
 
     pub const MILLISECS_PER_BLOCK: Moment = 6000;
     pub const SECS_PER_BLOCK: Moment = MILLISECS_PER_BLOCK / 1000;
 
     pub const SLOT_DURATION: Moment = MILLISECS_PER_BLOCK;
-    pub const EPOCH_DURATION_IN_BLOCKS: BlockNumber = 4 * HOURS;
+    pub const EPOCH_DURATION_IN_BLOCKS: BlockNumber = 1 * HOURS;
 
     // These time units are defined in number of blocks.
     pub const MINUTES: BlockNumber = 60 / (SECS_PER_BLOCK as BlockNumber);
@@ -43,7 +43,7 @@ pub mod fee {
         constants::ExtrinsicBaseWeight, WeightToFeeCoefficient, WeightToFeeCoefficients,
         WeightToFeePolynomial,
     };
-    use jupiter_primitives::Balance;
+    use patract_primitives::Balance;
     use smallvec::smallvec;
     pub use sp_runtime::Perbill;
 

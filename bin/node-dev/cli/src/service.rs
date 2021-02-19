@@ -6,10 +6,12 @@ use sc_client_api::RemoteBackend;
 use sc_executor::native_executor_instance;
 pub use sc_executor::NativeExecutor;
 use sc_service::{error::Error as ServiceError, Configuration, TaskManager};
+use sc_telemetry::TelemetrySpan;
 use sp_inherents::InherentDataProviders;
 
-use jupiter_dev_runtime::{self, RuntimeApi};
-use jupiter_primitives::Block;
+use patract_primitives::Block;
+
+use patract_dev_runtime::{self, RuntimeApi};
 
 type FullClient = sc_service::TFullClient<Block, RuntimeApi, Executor>;
 type FullBackend = sc_service::TFullBackend<Block>;
@@ -19,9 +21,9 @@ type FullSelectChain = sc_consensus::LongestChain<FullBackend, Block>;
 // equivalent wasm code.
 native_executor_instance!(
     pub Executor,
-    jupiter_dev_runtime::api::dispatch,
-    jupiter_dev_runtime::native_version,
-    (frame_benchmarking::benchmarking::HostFunctions, jupiter_io::pairing::HostFunctions),
+    patract_dev_runtime::api::dispatch,
+    patract_dev_runtime::native_version,
+    (frame_benchmarking::benchmarking::HostFunctions, patract_io::pairing::HostFunctions),
 );
 
 /// Returns most parts of a service. Not enough to run a full chain,
@@ -53,6 +55,7 @@ pub fn new_partial(
 
     let transaction_pool = sc_transaction_pool::BasicPool::new_full(
         config.transaction_pool.clone(),
+        config.role.is_authority().into(),
         config.prometheus_registry(),
         task_manager.spawn_handle(),
         client.clone(),
@@ -134,37 +137,39 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
 
     let role = config.role.clone();
     let prometheus_registry = config.prometheus_registry().cloned();
-    let telemetry_connection_sinks = sc_service::TelemetryConnectionSinks::default();
 
     let rpc_extensions_builder = {
         let client = client.clone();
         let pool = transaction_pool.clone();
 
         Box::new(move |deny_unsafe, _| {
-            let deps = jupiter_rpc::BasicDeps {
+            let deps = patract_rpc::BasicDeps {
                 client: client.clone(),
                 pool: pool.clone(),
                 deny_unsafe,
             };
 
-            jupiter_rpc::create_basic(deps)
+            patract_rpc::create_basic(deps)
         })
     };
 
+    let telemetry_span = TelemetrySpan::new();
+    let _telemetry_span_entered = telemetry_span.enter();
+
     sc_service::spawn_tasks(sc_service::SpawnTasksParams {
+        config,
         network: network.clone(),
         client: client.clone(),
         keystore: keystore_container.sync_keystore(),
         task_manager: &mut task_manager,
         transaction_pool: transaction_pool.clone(),
-        telemetry_connection_sinks: telemetry_connection_sinks.clone(),
         rpc_extensions_builder,
         on_demand: None,
         remote_blockchain: None,
         backend,
         network_status_sinks,
         system_rpc_tx,
-        config,
+        telemetry_span: Some(telemetry_span.clone()),
     })?;
 
     if role.is_authority() {
@@ -235,13 +240,15 @@ pub fn new_light(config: Configuration) -> Result<TaskManager, ServiceError> {
         );
     }
 
+    let telemetry_span = TelemetrySpan::new();
+    let _telemetry_span_entered = telemetry_span.enter();
+
     sc_service::spawn_tasks(sc_service::SpawnTasksParams {
         remote_blockchain: Some(backend.remote_blockchain()),
         transaction_pool,
         task_manager: &mut task_manager,
         on_demand: Some(on_demand),
         rpc_extensions_builder: Box::new(|_, _| ()),
-        telemetry_connection_sinks: sc_service::TelemetryConnectionSinks::default(),
         config,
         client,
         keystore: keystore_container.sync_keystore(),
@@ -249,6 +256,7 @@ pub fn new_light(config: Configuration) -> Result<TaskManager, ServiceError> {
         network,
         network_status_sinks,
         system_rpc_tx,
+        telemetry_span: Some(telemetry_span.clone()),
     })?;
 
     network_starter.start_network();

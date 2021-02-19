@@ -1,15 +1,15 @@
 [package]
-name = "jupiter-io"
+name = "patract-io"
 version = "0.2.0"
-authors = ["Jupiter <https://github.com/patractlabs/jupiter>"]
+authors = ["Patract <https://github.com/patractlabs/patract>"]
 edition = "2018"
 
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
-sp-runtime-interface = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-v1", default-features = false }
-sp-std = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-v1", default-features = false }
+sp-runtime-interface = { git = "https://github.com/paritytech/substrate.git", branch = "master", default-features = false }
+sp-std = { git = "https://github.com/paritytech/substrate.git", branch = "master", default-features = false }
 
 [dependencies.curve]
 git = "https://github.com/patractlabs/megaclite.git"

@@ -99,15 +99,15 @@ type Randomness = pallet_randomness_collective_flip::Module<Test>;
 parameter_types! {
     pub const SignedClaimHandicap: u64 = 2;
     pub const TombstoneDeposit: u64 = 16;
-	pub const DepositPerContract: u64 = 8 * DepositPerStorageByte::get();
-	pub const DepositPerStorageByte: u64 = 10_000;
-	pub const DepositPerStorageItem: u64 = 10_000;
-	pub RentFraction: Perbill = Perbill::from_rational_approximation(4u32, 10_000u32);
-	pub const SurchargeReward: u64 = 150;
-	pub const MaxDepth: u32 = 100;
-	pub const MaxValueSize: u32 = 16_384;
-	pub const DeletionQueueDepth: u32 = 1024;
-	pub const DeletionWeightLimit: Weight = 500_000_000_000;
+    pub const DepositPerContract: u64 = 8 * DepositPerStorageByte::get();
+    pub const DepositPerStorageByte: u64 = 10_000;
+    pub const DepositPerStorageItem: u64 = 10_000;
+    pub RentFraction: Perbill = Perbill::from_rational_approximation(4u32, 10_000u32);
+    pub const SurchargeReward: u64 = 150;
+    pub const MaxDepth: u32 = 100;
+    pub const MaxValueSize: u32 = 16_384;
+    pub const DeletionQueueDepth: u32 = 1024;
+    pub const DeletionWeightLimit: Weight = 500_000_000_000;
 }
 
 impl contract::Config for Test {
@@ -127,7 +127,7 @@ impl contract::Config for Test {
     type MaxValueSize = MaxValueSize;
     type WeightPrice = Self;
     type WeightInfo = ();
-    type ChainExtension = jupiter_chain_extension::JupiterExt;
+    type ChainExtension = patract_chain_extension::PatractExt;
     type DeletionQueueDepth = DeletionQueueDepth;
     type DeletionWeightLimit = DeletionWeightLimit;
 }

@@ -1,0 +1,115 @@
+[package]
+name = "patract-dev-runtime"
+version = "0.1.0"
+authors = ["Patract <https://github.com/patractlabs/patract>"]
+edition = "2018"
+
+[package.metadata.docs.rs]
+targets = ["x86_64-unknown-linux-gnu"]
+
+[dependencies]
+codec = { package = "parity-scale-codec", version = "2.0.0", default-features = false, features = ["derive"] }
+serde = { version = "1.0.101", optional = true, features = ["derive"] }
+static_assertions = "1.1.0"
+hex-literal = { version = "0.3.1", optional = true }
+
+# Substrate primitives
+sp-api = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+sp-block-builder = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+sp-core = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+sp-inherents = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+sp-runtime = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+sp-std = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+sp-offchain = { version = "3.0.0", default-features = false, git = "https://github.com/paritytech/substrate", branch = "master" }
+sp-session = { version = "3.0.0", default-features = false, git = "https://github.com/paritytech/substrate", branch = "master" }
+sp-transaction-pool = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+sp-version = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+
+# Substrate pallets
+frame-executive = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+frame-benchmarking = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false, optional = true }
+frame-support = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+frame-system = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+frame-system-benchmarking = { version = "3.0.0", default-features = false, git = "https://github.com/paritytech/substrate", branch = "master", optional = true }
+frame-system-rpc-runtime-api = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-authorship = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-randomness-collective-flip = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-sudo = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-timestamp = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-indices = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-balances = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-transaction-payment = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-transaction-payment-rpc-runtime-api = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+
+# vendor modules
+pallet-contracts = { path = "../../vendor/substrate/frame/contracts", default-features = false }
+pallet-contracts-primitives = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-contracts-rpc-runtime-api = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+
+# local pallet define
+pallet-template = { path = "../../pallets/template", default-features = false }
+pallet-randomness-provider = { path = "../../pallets/randomness-provider", default-features = false }
+
+patract-primitives = { path = "../../primitives", default-features = false }
+patract-runtime-common = { path = "../common", default-features = false }
+patract-chain-extension = { path = "../../primitives/chain-extension", default-features = false, features = [ "native-support" ] }
+
+[build-dependencies]
+substrate-wasm-builder = { version = "4.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+
+[features]
+default = ["std"]
+std = [
+    "codec/std",
+    "serde",
+
+    "sp-api/std",
+    "sp-block-builder/std",
+    "sp-core/std",
+    "sp-inherents/std",
+    "sp-runtime/std",
+    "sp-std/std",
+    "sp-transaction-pool/std",
+    "sp-version/std",
+    "sp-offchain/std",
+
+    "frame-executive/std",
+    "frame-support/std",
+    "frame-system/std",
+    "frame-system-rpc-runtime-api/std",
+    "frame-benchmarking/std",
+
+    "pallet-authorship/std",
+    "pallet-randomness-collective-flip/std",
+    "pallet-sudo/std",
+    "pallet-timestamp/std",
+    "pallet-indices/std",
+    "pallet-balances/std",
+    "pallet-transaction-payment/std",
+    "pallet-transaction-payment-rpc-runtime-api/std",
+    "pallet-contracts/std",
+    "pallet-contracts-primitives/std",
+    "pallet-contracts-rpc-runtime-api/std",
+
+    "pallet-template/std",
+    "pallet-randomness-provider/std",
+
+    "patract-primitives/std",
+    "patract-runtime-common/std",
+    "patract-chain-extension/std",
+]
+runtime-benchmarks = [
+    "hex-literal",
+    "frame-benchmarking",
+    "frame-system-benchmarking",
+
+    "sp-runtime/runtime-benchmarks",
+
+    "pallet-timestamp/runtime-benchmarks",
+    "pallet-indices/runtime-benchmarks",
+    "pallet-balances/runtime-benchmarks",
+    "pallet-template/runtime-benchmarks",
+    "pallet-contracts/runtime-benchmarks",
+
+    "patract-runtime-common/runtime-benchmarks",
+]

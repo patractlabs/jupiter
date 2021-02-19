@@ -1,7 +1,7 @@
 [package]
 name = "jupiter-para-runtime"
 version = "0.1.0"
-authors = ["Jupiter <https://github.com/patractlabs/jupiter>"]
+authors = ["Patract <https://github.com/patractlabs/patract>"]
 edition = "2018"
 
 [package.metadata.docs.rs]
@@ -62,9 +62,9 @@ xcm-builder = { git = "https://github.com/paritytech/polkadot", branch = "rococo
 xcm-executor = { git = "https://github.com/paritytech/polkadot", branch = "rococo-v1", default-features = false }
 
 # local runtime module
-jupiter-primitives = { path = "../../primitives", default-features = false }
-jupiter-runtime-common = { path = "../common", default-features = false }
-jupiter-io = { path = "../../primitives/io", default-features = false, optional = true }
+patract-primitives = { path = "../../primitives", default-features = false }
+patract-runtime-common = { path = "../common", default-features = false }
+patract-chain-extension = { path = "../../primitives/chain-extension", default-features = false, features = [ "native-support" ] }
 
 # Jupiter Pallets
 randomness_collect = { path = "../../pallets/randomness_collect", default-features = false }
@@ -123,9 +123,9 @@ std = [
     "xcm-builder/std",
     "xcm-executor/std",
 
-    "jupiter-primitives/std",
-    "jupiter-runtime-common/std",
-    "jupiter-io/std",
+    "patract-primitives/std",
+    "patract-runtime-common/std",
+    "patract-chain-extension/std",
 
     "randomness_collect/std",
 ]
