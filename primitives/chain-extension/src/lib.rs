@@ -9,10 +9,10 @@ use sp_std::vec::Vec;
 
 use frame_support::debug::{error, native};
 
-/// The chain Extension of Jupiter
-pub struct JupiterExt;
+/// The chain Extension of Patract
+pub struct PatractExt;
 
-impl ChainExtension for JupiterExt {
+impl ChainExtension for PatractExt {
     fn call<E: Ext>(func_id: u32, env: Environment<E, InitState>) -> Result<RetVal, DispatchError>
     where
         <E::T as SysConfig>::AccountId: UncheckedFrom<<E::T as SysConfig>::Hash> + AsRef<[u8]>,
@@ -62,8 +62,8 @@ impl ChainExtension for JupiterExt {
                 #[cfg(feature = "native-support")]
                 {
                     raw_output =
-                        jupiter_io::pairing::call(func_id, &input).ok_or(DispatchError::Other(
-                            "ChainExtension failed to call native `jupiter_io::pairing`",
+                        patract_io::pairing::call(func_id, &input).ok_or(DispatchError::Other(
+                            "ChainExtension failed to call native `patract_io::pairing`",
                         ))?;
                 }
                 #[cfg(not(feature = "native-support"))]

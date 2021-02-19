@@ -1,14 +1,16 @@
 [package]
-name = "jupiter-executor"
+name = "patract-executor"
 version = "0.1.0"
-authors = ["Jupiter <https://github.com/patractlabs/jupiter>"]
+authors = ["Patract <https://github.com/patractlabs/patract>"]
 edition = "2018"
 
 [dependencies]
 frame-benchmarking = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 sc-executor = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master" }
-jupiter-runtime = { path = "../../../runtime/jupiter" }
-jupiter-io = { path = "../../../primitives/io" }
+
+patract-io = { path = "../../../primitives/io" }
+
+jupiter-runtime = { package = "jupiter-pilot-runtime", path = "../../../runtime/jupiter-pilot" }
 
 [features]
 wasmtime = [

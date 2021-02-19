@@ -3,21 +3,19 @@ use codec::Encode;
 use frame_support::{traits::Get, weights::Weight};
 
 use sp_core::H256;
-use sp_runtime::traits::Hash;
 use sp_std::vec::Vec;
 
 use pallet_contracts::chain_extension::{
     ChainExtension, Environment, Ext, InitState, Result, RetVal, SysConfig, UncheckedFrom,
 };
-use pallet_randomness_provider::BabeRandomness;
 
-use jupiter_chain_extension::JupiterExt;
+use patract_chain_extension::PatractExt;
 
-use crate::Runtime;
+use crate::RandomnessProvider;
 
-pub struct JupiterDevExtension;
+pub struct JupiterExtension;
 
-impl ChainExtension for JupiterDevExtension {
+impl ChainExtension for JupiterExtension {
     fn call<E: Ext>(func_id: u32, env: Environment<E, InitState>) -> Result<RetVal>
     where
         <E::T as SysConfig>::AccountId: UncheckedFrom<<E::T as SysConfig>::Hash> + AsRef<[u8]>,
@@ -38,8 +36,8 @@ impl ChainExtension for JupiterDevExtension {
                 let mut env = env.buf_in_buf_out();
 
                 env.charge_weight(randomness_gas())?;
-                // mock for jupiter-dev
-                let cur_epoch: u64 = 1;
+
+                let cur_epoch = RandomnessProvider::current_epoch();
                 env.write(&cur_epoch.encode(), false, None)?;
                 Ok(RetVal::Converging(0))
             }
@@ -49,13 +47,7 @@ impl ChainExtension for JupiterDevExtension {
 
                 env.charge_weight(randomness_gas())?;
 
-                // mock for jupiter-dev
-                let next_epoch = BabeRandomness {
-                    epoch: 1,
-                    start_slot: 1,
-                    duration: 1,
-                    randomness: Default::default(),
-                };
+                let next_epoch = RandomnessProvider::next_epoch();
                 env.write(&next_epoch.encode(), false, None)?;
                 Ok(RetVal::Converging(0))
             }
@@ -65,9 +57,9 @@ impl ChainExtension for JupiterDevExtension {
 
                 env.charge_weight(randomness_gas())?;
 
-                let _: u64 = env.read_as()?;
-                // mock for jupiter-dev
-                let randomness: H256 = Default::default();
+                let input: u64 = env.read_as()?;
+
+                let randomness = H256::from(RandomnessProvider::randomness_of(input));
                 env.write(&randomness.encode(), false, None)?;
                 Ok(RetVal::Converging(0))
             }
@@ -78,13 +70,11 @@ impl ChainExtension for JupiterDevExtension {
                 env.charge_weight(randomness_gas())?;
 
                 let input: Vec<u8> = env.read_as()?;
-
-                let randomness =
-                    <Runtime as frame_system::Config>::Hashing::hash_of(&input.as_slice());
+                let randomness = RandomnessProvider::random(input.as_slice());
                 env.write(&randomness.encode(), false, None)?;
                 Ok(RetVal::Converging(0))
             }
-            _ => JupiterExt::call(func_id, env),
+            _ => PatractExt::call(func_id, env),
         }
     }
 

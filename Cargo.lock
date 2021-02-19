@@ -2791,222 +2791,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "jupiter"
-version = "1.0.0"
-dependencies = [
- "jupiter-cli",
-]
-
-[[package]]
-name = "jupiter-chain-extension"
-version = "0.1.0"
-dependencies = [
- "frame-support",
- "hex",
- "jupiter-io",
- "megaclite-arkworks",
- "pallet-contracts",
- "parity-scale-codec 1.3.6",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
-name = "jupiter-cli"
-version = "1.0.0"
-dependencies = [
- "futures 0.3.9",
- "hex-literal 0.2.1",
- "jupiter-executor",
- "jupiter-primitives",
- "jupiter-rpc",
- "jupiter-runtime",
- "jupiter-runtime-common",
- "log",
- "pallet-authority-discovery",
- "pallet-contracts",
- "pallet-im-online",
- "pallet-staking",
- "parking_lot 0.10.2",
- "sc-authority-discovery",
- "sc-basic-authorship",
- "sc-cli",
- "sc-client-api",
- "sc-consensus",
- "sc-consensus-babe",
- "sc-finality-grandpa",
- "sc-network",
- "sc-rpc",
- "sc-service",
- "sc-transaction-pool",
- "serde_json",
- "sp-authority-discovery",
- "sp-consensus",
- "sp-consensus-babe",
- "sp-core",
- "sp-finality-grandpa",
- "sp-inherents",
- "sp-runtime",
- "sp-transaction-pool",
- "structopt",
- "substrate-build-script-utils",
-]
-
-[[package]]
-name = "jupiter-dev"
-version = "1.0.0"
-dependencies = [
- "jupiter-dev-cli",
-]
-
-[[package]]
-name = "jupiter-dev-cli"
-version = "1.0.0"
-dependencies = [
- "frame-benchmarking",
- "frame-benchmarking-cli",
- "futures 0.3.9",
- "jupiter-dev-runtime",
- "jupiter-io",
- "jupiter-primitives",
- "jupiter-rpc",
- "log",
- "pallet-contracts",
- "parking_lot 0.10.2",
- "sc-basic-authorship",
- "sc-cli",
- "sc-client-api",
- "sc-consensus",
- "sc-consensus-manual-seal",
- "sc-executor",
- "sc-service",
- "sc-transaction-pool",
- "serde_json",
- "sp-api",
- "sp-consensus",
- "sp-core",
- "sp-inherents",
- "sp-runtime",
- "sp-timestamp",
- "structopt",
- "substrate-build-script-utils",
-]
-
-[[package]]
-name = "jupiter-dev-runtime"
-version = "0.1.0"
-dependencies = [
- "frame-benchmarking",
- "frame-executive",
- "frame-support",
- "frame-system",
- "frame-system-benchmarking",
- "frame-system-rpc-runtime-api",
- "hex-literal 0.3.1",
- "jupiter-chain-extension",
- "jupiter-primitives",
- "jupiter-runtime-common",
- "pallet-authorship",
- "pallet-balances",
- "pallet-contracts",
- "pallet-contracts-primitives",
- "pallet-contracts-rpc-runtime-api",
- "pallet-indices",
- "pallet-randomness-collective-flip",
- "pallet-randomness-provider",
- "pallet-sudo",
- "pallet-template",
- "pallet-timestamp",
- "pallet-transaction-payment",
- "pallet-transaction-payment-rpc-runtime-api",
- "parity-scale-codec 2.0.0",
- "serde",
- "sp-api",
- "sp-block-builder",
- "sp-core",
- "sp-inherents",
- "sp-offchain",
- "sp-runtime",
- "sp-session",
- "sp-std",
- "sp-transaction-pool",
- "sp-version",
- "static_assertions",
- "substrate-wasm-builder",
-]
-
-[[package]]
-name = "jupiter-executor"
-version = "0.1.0"
-dependencies = [
- "frame-benchmarking",
- "jupiter-io",
- "jupiter-runtime",
- "sc-executor",
-]
-
-[[package]]
-name = "jupiter-io"
-version = "0.2.0"
-dependencies = [
- "megaclite-arkworks",
- "num-bigint 0.3.1",
- "num-traits",
- "sp-runtime-interface",
- "sp-std",
-]
-
-[[package]]
-name = "jupiter-primitives"
-version = "0.1.0"
-dependencies = [
- "frame-system",
- "parity-scale-codec 2.0.0",
- "serde",
- "sp-application-crypto",
- "sp-core",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
-name = "jupiter-rpc"
-version = "0.1.0"
-dependencies = [
- "jsonrpc-core",
- "jupiter-primitives",
- "pallet-contracts-rpc",
- "pallet-transaction-payment-rpc",
- "sc-client-api",
- "sc-consensus-babe",
- "sc-consensus-babe-rpc",
- "sc-consensus-epochs",
- "sc-finality-grandpa",
- "sc-finality-grandpa-rpc",
- "sc-rpc",
- "sc-rpc-api",
- "sp-api",
- "sp-block-builder",
- "sp-blockchain",
- "sp-consensus",
- "sp-consensus-babe",
- "sp-keystore",
- "sp-runtime",
- "sp-transaction-pool",
- "substrate-frame-rpc-system",
-]
-
-[[package]]
-name = "jupiter-runtime"
+name = "jupiter-pilot-runtime"
 version = "0.1.0"
 dependencies = [
  "frame-executive",
  "frame-support",
  "frame-system",
  "frame-system-rpc-runtime-api",
- "jupiter-chain-extension",
- "jupiter-primitives",
- "jupiter-runtime-common",
  "pallet-authority-discovery",
  "pallet-authorship",
  "pallet-babe",
@@ -3039,6 +2830,9 @@ dependencies = [
  "pallet-treasury",
  "pallet-utility",
  "parity-scale-codec 2.0.0",
+ "patract-chain-extension",
+ "patract-primitives",
+ "patract-runtime-common",
  "serde",
  "sp-api",
  "sp-authority-discovery",
@@ -3057,38 +2851,6 @@ dependencies = [
  "sp-version",
  "static_assertions",
  "substrate-wasm-builder",
-]
-
-[[package]]
-name = "jupiter-runtime-common"
-version = "0.1.0"
-dependencies = [
- "frame-support",
- "frame-system",
- "jupiter-primitives",
- "pallet-authorship",
- "pallet-balances",
- "pallet-bounties",
- "pallet-collective",
- "pallet-democracy",
- "pallet-elections-phragmen",
- "pallet-identity",
- "pallet-im-online",
- "pallet-indices",
- "pallet-multisig",
- "pallet-proxy",
- "pallet-scheduler",
- "pallet-session",
- "pallet-staking",
- "pallet-timestamp",
- "pallet-tips",
- "pallet-transaction-payment",
- "pallet-treasury",
- "pallet-utility",
- "smallvec 1.6.0",
- "sp-runtime",
- "sp-std",
- "static_assertions",
 ]
 
 [[package]]
@@ -4673,9 +4435,6 @@ dependencies = [
  "frame-support",
  "frame-system",
  "hex",
- "jupiter-chain-extension",
- "jupiter-io",
- "jupiter-runtime-common",
  "megaclite-arkworks",
  "pallet-balances",
  "pallet-contracts",
@@ -4683,6 +4442,9 @@ dependencies = [
  "pallet-timestamp",
  "pallet-transaction-payment",
  "parity-scale-codec 2.0.0",
+ "patract-chain-extension",
+ "patract-io",
+ "patract-runtime-common",
  "sp-core",
  "sp-io",
  "sp-runtime",
@@ -5064,6 +4826,244 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d95a7db200b97ef370c8e6de0088252f7e0dfff7d047a28528e47456c0fc98b6"
 dependencies = [
  "proc-macro-hack",
+]
+
+[[package]]
+name = "patract-chain-extension"
+version = "0.1.0"
+dependencies = [
+ "frame-support",
+ "hex",
+ "megaclite-arkworks",
+ "pallet-contracts",
+ "parity-scale-codec 1.3.6",
+ "patract-io",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
+name = "patract-cli"
+version = "1.0.0"
+dependencies = [
+ "futures 0.3.9",
+ "hex-literal 0.2.1",
+ "jupiter-pilot-runtime",
+ "log",
+ "pallet-authority-discovery",
+ "pallet-contracts",
+ "pallet-im-online",
+ "pallet-staking",
+ "parking_lot 0.10.2",
+ "patract-executor",
+ "patract-primitives",
+ "patract-rpc",
+ "patract-runtime-common",
+ "sc-authority-discovery",
+ "sc-basic-authorship",
+ "sc-cli",
+ "sc-client-api",
+ "sc-consensus",
+ "sc-consensus-babe",
+ "sc-finality-grandpa",
+ "sc-network",
+ "sc-rpc",
+ "sc-service",
+ "sc-transaction-pool",
+ "serde_json",
+ "sp-authority-discovery",
+ "sp-consensus",
+ "sp-consensus-babe",
+ "sp-core",
+ "sp-finality-grandpa",
+ "sp-inherents",
+ "sp-runtime",
+ "sp-transaction-pool",
+ "structopt",
+ "substrate-build-script-utils",
+]
+
+[[package]]
+name = "patract-dev"
+version = "1.0.0"
+dependencies = [
+ "patract-dev-cli",
+]
+
+[[package]]
+name = "patract-dev-cli"
+version = "1.0.0"
+dependencies = [
+ "frame-benchmarking",
+ "frame-benchmarking-cli",
+ "futures 0.3.9",
+ "log",
+ "pallet-contracts",
+ "parking_lot 0.10.2",
+ "patract-dev-runtime",
+ "patract-io",
+ "patract-primitives",
+ "patract-rpc",
+ "sc-basic-authorship",
+ "sc-cli",
+ "sc-client-api",
+ "sc-consensus",
+ "sc-consensus-manual-seal",
+ "sc-executor",
+ "sc-service",
+ "sc-transaction-pool",
+ "serde_json",
+ "sp-api",
+ "sp-consensus",
+ "sp-core",
+ "sp-inherents",
+ "sp-runtime",
+ "sp-timestamp",
+ "structopt",
+ "substrate-build-script-utils",
+]
+
+[[package]]
+name = "patract-dev-runtime"
+version = "0.1.0"
+dependencies = [
+ "frame-benchmarking",
+ "frame-executive",
+ "frame-support",
+ "frame-system",
+ "frame-system-benchmarking",
+ "frame-system-rpc-runtime-api",
+ "hex-literal 0.3.1",
+ "pallet-authorship",
+ "pallet-balances",
+ "pallet-contracts",
+ "pallet-contracts-primitives",
+ "pallet-contracts-rpc-runtime-api",
+ "pallet-indices",
+ "pallet-randomness-collective-flip",
+ "pallet-randomness-provider",
+ "pallet-sudo",
+ "pallet-template",
+ "pallet-timestamp",
+ "pallet-transaction-payment",
+ "pallet-transaction-payment-rpc-runtime-api",
+ "parity-scale-codec 2.0.0",
+ "patract-chain-extension",
+ "patract-primitives",
+ "patract-runtime-common",
+ "serde",
+ "sp-api",
+ "sp-block-builder",
+ "sp-core",
+ "sp-inherents",
+ "sp-offchain",
+ "sp-runtime",
+ "sp-session",
+ "sp-std",
+ "sp-transaction-pool",
+ "sp-version",
+ "static_assertions",
+ "substrate-wasm-builder",
+]
+
+[[package]]
+name = "patract-executor"
+version = "0.1.0"
+dependencies = [
+ "frame-benchmarking",
+ "jupiter-pilot-runtime",
+ "patract-io",
+ "sc-executor",
+]
+
+[[package]]
+name = "patract-io"
+version = "0.2.0"
+dependencies = [
+ "megaclite-arkworks",
+ "num-bigint 0.3.1",
+ "num-traits",
+ "sp-runtime-interface",
+ "sp-std",
+]
+
+[[package]]
+name = "patract-pilot"
+version = "1.0.0"
+dependencies = [
+ "patract-cli",
+]
+
+[[package]]
+name = "patract-primitives"
+version = "0.1.0"
+dependencies = [
+ "frame-system",
+ "parity-scale-codec 2.0.0",
+ "serde",
+ "sp-application-crypto",
+ "sp-core",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
+name = "patract-rpc"
+version = "0.1.0"
+dependencies = [
+ "jsonrpc-core",
+ "pallet-contracts-rpc",
+ "pallet-transaction-payment-rpc",
+ "patract-primitives",
+ "sc-client-api",
+ "sc-consensus-babe",
+ "sc-consensus-babe-rpc",
+ "sc-consensus-epochs",
+ "sc-finality-grandpa",
+ "sc-finality-grandpa-rpc",
+ "sc-rpc",
+ "sc-rpc-api",
+ "sp-api",
+ "sp-block-builder",
+ "sp-blockchain",
+ "sp-consensus",
+ "sp-consensus-babe",
+ "sp-keystore",
+ "sp-runtime",
+ "sp-transaction-pool",
+ "substrate-frame-rpc-system",
+]
+
+[[package]]
+name = "patract-runtime-common"
+version = "0.1.0"
+dependencies = [
+ "frame-support",
+ "frame-system",
+ "pallet-authorship",
+ "pallet-balances",
+ "pallet-bounties",
+ "pallet-collective",
+ "pallet-democracy",
+ "pallet-elections-phragmen",
+ "pallet-identity",
+ "pallet-im-online",
+ "pallet-indices",
+ "pallet-multisig",
+ "pallet-proxy",
+ "pallet-scheduler",
+ "pallet-session",
+ "pallet-staking",
+ "pallet-timestamp",
+ "pallet-tips",
+ "pallet-transaction-payment",
+ "pallet-treasury",
+ "pallet-utility",
+ "patract-primitives",
+ "smallvec 1.6.0",
+ "sp-runtime",
+ "sp-std",
+ "static_assertions",
 ]
 
 [[package]]
