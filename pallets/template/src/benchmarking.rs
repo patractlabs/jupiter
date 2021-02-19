@@ -42,8 +42,8 @@ macro_rules! addr {
             origin.clone().into(),
             BalanceOf::<T>::max_value() / 2_u32.into(), // endowment
             Weight::max_value(),                        // gas_limit
-            module,                                     // code_hash
-            [106, 55, 18, 226].to_vec(),                // deafult
+            module,                                     // code
+            [106, 55, 18, 226].to_vec(),                // default
             b"".to_vec(),                               // salt
         ) {
             panic!("{:?}", e);
