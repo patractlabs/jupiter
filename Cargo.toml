@@ -9,7 +9,7 @@ members = [
     "runtime/jupiter-para",
     "primitives",
     "primitives/io",
-    "primitives/chain-extension",
+#    "primitives/chain-extension",
 #    "pallets/template",
     "pallets/randomness_collect",
     "rpc",

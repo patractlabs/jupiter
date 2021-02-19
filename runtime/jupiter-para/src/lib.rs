@@ -12,7 +12,8 @@ use sp_runtime::{
     create_runtime_str, generic, impl_opaque_keys,
     ApplyExtrinsicResult, Perbill,
     transaction_validity::{TransactionSource, TransactionValidity, TransactionPriority},
-    traits::{AccountIdLookup, BlakeTwo256, Block as BlockT}
+    traits::{AccountIdLookup, BlakeTwo256, Block as BlockT},
+    DispatchError
 };
 use sp_std::prelude::*;
 
@@ -23,6 +24,12 @@ use sp_version::RuntimeVersion;
 use pallet_contracts::WeightInfo;
 use pallet_contracts_primitives::ContractExecResult;
 use pallet_transaction_payment::{FeeDetails, RuntimeDispatchInfo};
+use pallet_contracts::chain_extension::{
+    ChainExtension, Environment, Ext, InitState, RetVal, SysConfig, UncheckedFrom,
+};
+
+use codec::Encode;
+use frame_support::debug::{error, native};
 
 // A few exports that help ease life for downstream crates.
 #[cfg(any(feature = "std", test))]
@@ -84,10 +91,10 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
     spec_name: create_runtime_str!("jupiter-para"),
     impl_name: create_runtime_str!("jupiter-para"),
     authoring_version: 1,
-    spec_version: 3,
+    spec_version: 4,
     impl_version: 1,
     apis: RUNTIME_API_VERSIONS,
-    transaction_version: 2,
+    transaction_version: 1,
 };
 
 /// Native version.
@@ -206,6 +213,91 @@ impl pallet_transaction_payment::Config for Runtime {
     type FeeMultiplierUpdate = impls::SlowAdjustingFeeUpdate<Self>;
 }
 
+pub struct PatractExt;
+
+impl ChainExtension<Runtime> for PatractExt {
+    fn call<E: Ext>(func_id: u32, env: Environment<E, InitState>) -> Result<RetVal, DispatchError>
+        where
+            <E::T as SysConfig>::AccountId: UncheckedFrom<<E::T as SysConfig>::Hash> + AsRef<[u8]>,
+    {
+        let mut env = env.buf_in_buf_out();
+
+        // func_id refer to https://github.com/patractlabs/PIPs/blob/main/PIPs/pip-100.md
+        match func_id {
+            // 0x01000000-0x010000ff Patract ZKP Support
+            0x01000000..=0x010000ff => {
+                // The memory of the vm stores buf in scale-codec
+                let input: Vec<u8> = env.read_as()?;
+                // currently only support [PIP-101](https://github.com/patractlabs/PIPs/blob/main/PIPs/pip-101.md)
+                // TODO just charge weight in a simple way. ADD/MUL is less then SHA256's weight
+                // and Paring is more than SHA256's weight. Change this part with benchmark result in future.
+                let simple_weight = match func_id & 0x01 {
+                    0 => 100_000,   // add, In ethereum: 500
+                    1 => 8_000_000, // 80x then add, In ethereum: 40000
+                    2 => {
+                        // paring.
+                        // In ethereum:
+                        // Pairing ：80 000 * k + 100 000, where k is the number of points or, equivalently, the length of the input divided by 192
+                        let k = if input.len() > 194 {
+                            input.len() as u64 / 194
+                        } else {
+                            1
+                        };
+                        16_000_000 * k
+                    }
+                    _ => {
+                        error!("[PIP-101]call an unregistered `func_id` in Patract ZKP field, func_id:{:}", func_id);
+                        return Err(DispatchError::Other("Unimplemented Patract ZKP func_id"));
+                    }
+                };
+                env.charge_weight(simple_weight)?;
+
+                native::trace!(
+                    target: "runtime",
+                    "[ChainExtension]|call|func_id:{:}|charge-weight:{:}|input:{:}",
+                    func_id,
+                    simple_weight,
+                    hex::encode(&input)
+                );
+
+                #[allow(unused_assignments)]
+                    let mut raw_output: Vec<u8> = Vec::with_capacity(0);
+                #[cfg(feature = "native-support")]
+                    {
+                        raw_output =
+                            jupiter_io::pairing::call(func_id, &input).ok_or(DispatchError::Other(
+                                "ChainExtension failed to call native `jupiter_io::pairing`",
+                            ))?;
+                    }
+                #[cfg(not(feature = "native-support"))]
+                    {
+                        raw_output = curve::call(func_id, &input).map_err(|e| {
+                            error!(
+                                "call zkp lib `curve::call` meet an error|func_id:{:}|err:{:?}",
+                                func_id, e
+                            );
+                            DispatchError::Other("ChainExtension failed to call `curve::call`")
+                        })?;
+                    }
+
+                // Encode back to the memory
+                let output: Vec<u8> = raw_output.encode();
+                env.write(&output, false, None)?;
+            }
+            _ => {
+                error!("call an unregistered `func_id`, func_id:{:}", func_id);
+                return Err(DispatchError::Other("Unimplemented func_id"));
+            }
+        }
+
+        Ok(RetVal::Converging(0))
+    }
+
+    fn enabled() -> bool {
+        true
+    }
+}
+
 parameter_types! {
     pub const TombstoneDeposit: Balance = tombstone_deposit(
 		1,
@@ -247,7 +339,7 @@ impl pallet_contracts::Config for Runtime {
     type MaxValueSize = MaxValueSize;
     type WeightPrice = pallet_transaction_payment::Module<Self>;
     type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
-    type ChainExtension = jupiter_chain_extension::JupiterExt;
+    type ChainExtension = PatractExt;
     type DeletionQueueDepth = DeletionQueueDepth;
     type DeletionWeightLimit = DeletionWeightLimit;
 }
@@ -257,7 +349,7 @@ impl pallet_sudo::Config for Runtime {
     type Call = Call;
 }
 
-impl cumulus_parachain_system::Config for Runtime {
+impl cumulus_pallet_parachain_system::Config for Runtime {
     type Event = Event;
     type OnValidationData = ();
     type SelfParaId = parachain_info::Module<Runtime>;
@@ -270,7 +362,7 @@ impl parachain_info::Config for Runtime {}
 parameter_types! {
 	pub const RococoLocation: MultiLocation = MultiLocation::X1(Junction::Parent);
 	pub const RococoNetwork: NetworkId = NetworkId::Polkadot;
-	pub RelayChainOrigin: Origin = xcm_handler::Origin::Relay.into();
+	pub RelayChainOrigin: Origin = cumulus_pallet_xcm_handler::Origin::Relay.into();
 	pub Ancestry: MultiLocation = Junction::Parachain {
 		id: ParachainInfo::parachain_id().into()
 	}.into();
@@ -297,7 +389,7 @@ CurrencyAdapter<
 type LocalOriginConverter = (
     SovereignSignedViaLocation<LocationConverter, Origin>,
     RelayChainAsNative<RelayChainOrigin, Origin>,
-    SiblingParachainAsNative<xcm_handler::Origin, Origin>,
+    SiblingParachainAsNative<cumulus_pallet_xcm_handler::Origin, Origin>,
     SignedAccountId32AsNative<RococoNetwork, Origin>,
 );
 
@@ -313,7 +405,7 @@ impl Config for XcmConfig {
     type LocationInverter = LocationInverter<Ancestry>;
 }
 
-impl xcm_handler::Config for Runtime {
+impl cumulus_pallet_xcm_handler::Config for Runtime {
     type Event = Event;
     type XcmExecutor = XcmExecutor<XcmConfig>;
     type UpwardMessageSender = ParachainSystem;
@@ -356,9 +448,9 @@ construct_runtime!(
 
         Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>} = 6,
 
-        ParachainSystem: cumulus_parachain_system::{Module, Call, Storage, Inherent, Event} = 8,
+        ParachainSystem: cumulus_pallet_parachain_system::{Module, Call, Storage, Inherent, Event} = 8,
 		ParachainInfo: parachain_info::{Module, Storage, Config} = 9,
-		XcmHandler: xcm_handler::{Module, Event<T>, Origin} = 10,
+		XcmHandler: cumulus_pallet_xcm_handler::{Module, Call, Event<T>, Origin} = 10,
 
 		RandomnessCollect: randomness_collect::{Module, Call, Storage, ValidateUnsigned} = 11,
     }
@@ -518,4 +610,4 @@ impl_runtime_apis! {
     }
 }
 
-cumulus_runtime::register_validate_block!(Block, Executive);
+cumulus_pallet_parachain_system::register_validate_block!(Block, Executive);

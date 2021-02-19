@@ -12,11 +12,11 @@ use jupiter_para_runtime::{
     BalancesConfig, ContractsConfig, GenesisConfig, IndicesConfig,
     SudoConfig, SystemConfig, ParachainInfoConfig
 };
-use cumulus_primitives::ParaId;
-// use sc_service::config::TelemetryEndpoints;
+use cumulus_primitives_core::ParaId;
+use sc_service::config::TelemetryEndpoints;
 
 // The URL for the telemetry server.
-// const PATRACT_TELEMETRY_URL: &str = "wss://telemetry.patract.io/submit";
+const PATRACT_TELEMETRY_URL: &str = "wss://telemetry.patract.io/submit";
 
 /// Specialized `ChainSpec`. This is a specialization of the general Substrate ChainSpec type.
 pub type ChainSpec = sc_service::GenericChainSpec<GenesisConfig, Extensions>;
@@ -118,13 +118,12 @@ pub fn staging_testnet_config(id: ParaId) -> Result<ChainSpec, String> {
             )
         },
         Vec::new(),
-        // Some(TelemetryEndpoints::new(
-        //     vec![
-        //         (PATRACT_TELEMETRY_URL.to_string(), 0)
-        //     ])
-        //          .expect("Polkadot Staging telemetry url is valid; qed"),
-        // ),
-        None,
+        Some(TelemetryEndpoints::new(
+            vec![
+                (PATRACT_TELEMETRY_URL.to_string(), 0)
+            ])
+                 .expect("Polkadot Staging telemetry url is valid; qed"),
+        ),
         Some("jupiter_para_staging_testnet"),
         Some(
             json!({

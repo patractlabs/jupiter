@@ -1,8 +1,14 @@
 //! Service and ServiceFactory implementation. Specialized wrapper over substrate service.
 use std::sync::Arc;
-use cumulus_service::{
+use cumulus_client_consensus_relay_chain::{
+    build_relay_chain_consensus, BuildRelayChainConsensusParams,
+};
+use cumulus_client_network::build_block_announce_validator;
+use cumulus_primitives_core::ParaId;
+use cumulus_client_service::{
     prepare_node_config, start_collator, start_full_node, StartCollatorParams, StartFullNodeParams,
 };
+use sc_telemetry::TelemetrySpan;
 use polkadot_primitives::v0::CollatorPair;
 use sp_core::Pair;
 
@@ -38,16 +44,17 @@ pub fn new_partial(
         (),
         sp_consensus::DefaultImportQueue<Block, FullClient>,
         sc_transaction_pool::FullPool<Block, FullClient>,
-        Option<sc_telemetry::TelemetrySpan>,
+        (),
     >,
     ServiceError,
 > {
-    let (client, backend, keystore_container, task_manager, telemetry_span) =
+    let (client, backend, keystore_container, task_manager) =
         sc_service::new_full_parts::<Block, RuntimeApi, Executor>(&config)?;
     let client = Arc::new(client);
 
     let transaction_pool = sc_transaction_pool::BasicPool::new_full(
         config.transaction_pool.clone(),
+        config.role.is_authority().into(),
         config.prometheus_registry(),
         task_manager.spawn_handle(),
         client.clone(),
@@ -57,7 +64,7 @@ pub fn new_partial(
 
     let registry = config.prometheus_registry();
 
-    let import_queue = cumulus_consensus::import_queue::import_queue(
+    let import_queue = cumulus_client_consensus_relay_chain::import_queue(
         client.clone(),
         client.clone(),
         inherent_data_providers.clone(),
@@ -74,7 +81,7 @@ pub fn new_partial(
         transaction_pool,
         inherent_data_providers,
         select_chain: (),
-        other: telemetry_span,
+        other: (),
     };
 
     Ok(params)
@@ -88,7 +95,7 @@ async fn start_node_impl<RB>(
     parachain_config: Configuration,
     collator_key: CollatorPair,
     polkadot_config: Configuration,
-    id: polkadot_primitives::v0::Id,
+    id: ParaId,
     validator: bool,
     rpc_ext_builder: RB,
 ) -> sc_service::error::Result<(TaskManager, Arc<FullClient>)>
@@ -108,15 +115,13 @@ async fn start_node_impl<RB>(
     let rpc_port = polkadot_config.rpc_http.clone();
 
     let polkadot_full_node =
-        cumulus_service::build_polkadot_full_node(polkadot_config, collator_key.public()).map_err(
-            |e| match e {
+        cumulus_client_service::build_polkadot_full_node(polkadot_config, collator_key.public())
+            .map_err(|e| match e {
                 polkadot_service::Error::Sub(x) => x,
                 s => format!("{}", s).into(),
-            },
-        )?;
+            })?;
 
     let params = new_partial(&parachain_config)?;
-    let telemetry_span = params.other;
     params
         .inherent_data_providers
         .register_provider(sp_timestamp::InherentDataProvider)
@@ -124,7 +129,7 @@ async fn start_node_impl<RB>(
 
     let client = params.client.clone();
     let backend = params.backend.clone();
-    let block_announce_validator = cumulus_network::build_block_announce_validator(
+    let block_announce_validator = build_block_announce_validator(
         polkadot_full_node.client.clone(),
         id,
         Box::new(polkadot_full_node.network.clone()),
@@ -155,6 +160,9 @@ async fn start_node_impl<RB>(
     let rpc_client = client.clone();
     let rpc_extensions_builder = Box::new(move |_, _| rpc_ext_builder(rpc_client.clone()));
 
+    let telemetry_span = TelemetrySpan::new();
+    let _telemetry_span_entered = telemetry_span.enter();
+
     sc_service::spawn_tasks(sc_service::SpawnTasksParams {
         on_demand: None,
         remote_blockchain: None,
@@ -168,7 +176,7 @@ async fn start_node_impl<RB>(
         network: network.clone(),
         network_status_sinks,
         system_rpc_tx,
-        telemetry_span,
+        telemetry_span: Some(telemetry_span.clone()),
     })?;
 
     let announce_block = {
@@ -185,8 +193,6 @@ async fn start_node_impl<RB>(
         );
         let spawner = task_manager.spawn_handle();
 
-        let polkadot_backend = polkadot_full_node.backend.clone();
-
         if let Some(rpc_port_addr) = rpc_port {
             let rpc_port = RpcPort{ 0: rpc_port_addr.to_string().into() };
             let offchain_storage = backend.offchain_storage();
@@ -195,20 +201,26 @@ async fn start_node_impl<RB>(
             }
         }
 
-        let params = StartCollatorParams {
+        let parachain_consensus = build_relay_chain_consensus(BuildRelayChainConsensusParams {
             para_id: id,
-            block_import: client.clone(),
             proposer_factory,
             inherent_data_providers: params.inherent_data_providers,
+            block_import: client.clone(),
+            relay_chain_client: polkadot_full_node.client.clone(),
+            relay_chain_backend: polkadot_full_node.backend.clone(),
+        });
+
+        let params = StartCollatorParams {
+            para_id: id,
             block_status: client.clone(),
             announce_block,
             client: client.clone(),
             task_manager: &mut task_manager,
             collator_key,
-            polkadot_full_node,
+            relay_chain_full_node: polkadot_full_node,
             spawner,
             backend,
-            polkadot_backend,
+            parachain_consensus,
         };
 
         start_collator(params).await?;
@@ -234,7 +246,7 @@ pub async fn start_node(
     parachain_config: Configuration,
     collator_key: CollatorPair,
     polkadot_config: Configuration,
-    id: polkadot_primitives::v0::Id,
+    id: ParaId,
     validator: bool,
 ) -> sc_service::error::Result<(TaskManager, Arc<FullClient>)> {
     start_node_impl(
