@@ -23,8 +23,8 @@ sp-std = { git = "https://github.com/paritytech/substrate", branch = "master", d
 sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "master", default-features = false}
 hex = { version = "0.4.2", optional = true, default-features = false }
 
-[dependencies.jupiter-io]
-package = "jupiter-io"
+[dependencies.patract-io]
+package = "patract-io"
 path = "../../primitives/io"
 default-features = false
 
@@ -46,8 +46,8 @@ pallet-timestamp = { git = "https://github.com/paritytech/substrate", branch = "
 pallet-balances = { git = "https://github.com/paritytech/substrate", branch = "master" }
 pallet-randomness-collective-flip = { git = "https://github.com/paritytech/substrate", branch = "master" }
 pallet-transaction-payment = { git = "https://github.com/paritytech/substrate", branch = "master" }
-jupiter-runtime-common = { path = "../../runtime/common" }
-jupiter-chain-extension = { path = "../../primitives/chain-extension" }
+patract-runtime-common = { path = "../../runtime/common" }
+patract-chain-extension = { path = "../../primitives/chain-extension" }
 
 [features]
 default = ['std']
@@ -57,7 +57,7 @@ std = [
 	'frame-support/std',
 	'frame-system/std',
     'frame-benchmarking/std',
-    'jupiter-io/std',
+    'patract-io/std',
     'sp-std/std',
 ]
 runtime-benchmarks = [

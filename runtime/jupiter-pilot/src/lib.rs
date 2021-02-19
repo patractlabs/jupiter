@@ -67,10 +67,10 @@ pub use pallet_balances::Call as BalancesCall;
 pub use pallet_session::historical as pallet_session_historical;
 pub use pallet_timestamp::Call as TimestampCall;
 
-pub use jupiter_primitives::{
+pub use patract_primitives::{
     AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Signature,
 };
-use jupiter_runtime_common::{
+use patract_runtime_common::{
     constants::{currency::*, fee::WeightToFee, time::*},
     impls, weights, BlockHashCount, BlockLength, BlockWeights, OffchainSolutionWeightLimit,
     AVERAGE_ON_INITIALIZE_RATIO,
@@ -923,7 +923,7 @@ impl pallet_sudo::Config for Runtime {
 construct_runtime!(
     pub enum Runtime where
         Block = Block,
-        NodeBlock = jupiter_primitives::Block,
+        NodeBlock = patract_primitives::Block,
         UncheckedExtrinsic = UncheckedExtrinsic
     {
         // Basic stuff;

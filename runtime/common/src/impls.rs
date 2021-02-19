@@ -6,7 +6,7 @@ use pallet_balances::NegativeImbalance;
 use pallet_transaction_payment::{Multiplier, TargetedFeeAdjustment};
 use sp_runtime::{FixedPointNumber, Perquintill};
 
-use jupiter_primitives::AccountId;
+use patract_primitives::AccountId;
 
 pub struct ToAuthor<R>(sp_std::marker::PhantomData<R>);
 

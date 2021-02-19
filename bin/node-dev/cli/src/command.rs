@@ -1,4 +1,4 @@
-use jupiter_dev_runtime::Block;
+use patract_dev_runtime::Block;
 use sc_cli::{ChainSpec, Role, RuntimeVersion, SubstrateCli};
 use sc_service::PartialComponents;
 
@@ -9,7 +9,7 @@ use crate::service::{new_partial, Executor};
 
 impl SubstrateCli for Cli {
     fn impl_name() -> String {
-        "Jupiter Dev Node".into()
+        "Patract Dev Node".into()
     }
 
     fn impl_version() -> String {
@@ -25,7 +25,7 @@ impl SubstrateCli for Cli {
     }
 
     fn support_url() -> String {
-        "https://github.com/patractlabs/jupiter".into()
+        "https://github.com/patractlabs/patract".into()
     }
 
     fn copyright_start_year() -> i32 {
@@ -42,7 +42,7 @@ impl SubstrateCli for Cli {
     }
 
     fn native_runtime_version(_: &Box<dyn ChainSpec>) -> &'static RuntimeVersion {
-        &jupiter_dev_runtime::VERSION
+        &patract_dev_runtime::VERSION
     }
 }
 

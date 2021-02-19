@@ -7,5 +7,5 @@ native_executor_instance!(
     pub Executor,
     jupiter_runtime::api::dispatch,
     jupiter_runtime::native_version,
-    (frame_benchmarking::benchmarking::HostFunctions, jupiter_io::pairing::HostFunctions),
+    (frame_benchmarking::benchmarking::HostFunctions, patract_io::pairing::HostFunctions),
 );

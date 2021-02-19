@@ -23,6 +23,7 @@ use sp_version::NativeVersion;
 use sp_version::RuntimeVersion;
 
 use pallet_contracts::WeightInfo;
+use pallet_transaction_payment::{CurrencyAdapter, FeeDetails};
 use pallet_transaction_payment_rpc_runtime_api::RuntimeDispatchInfo;
 
 // A few exports that help ease life for downstream crates.
@@ -43,14 +44,13 @@ pub use pallet_balances::Call as BalancesCall;
 pub use pallet_template::Call as TemplateCall;
 pub use pallet_timestamp::Call as TimestampCall;
 
-pub use jupiter_primitives::{
+pub use patract_primitives::{
     AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Signature,
 };
-use jupiter_runtime_common::{
+use patract_runtime_common::{
     constants::{currency::*, fee::WeightToFee, time::*},
     impls, weights, BlockHashCount, BlockLength, BlockWeights, AVERAGE_ON_INITIALIZE_RATIO,
 };
-use pallet_transaction_payment::{CurrencyAdapter, FeeDetails};
 
 #[cfg(feature = "std")]
 /// Wasm binary unwrapped. If built with `BUILD_DUMMY_WASM_BINARY`, the function panics.
@@ -64,8 +64,8 @@ pub fn wasm_binary_unwrap() -> &'static [u8] {
 
 /// Runtime version.
 pub const VERSION: RuntimeVersion = RuntimeVersion {
-    spec_name: create_runtime_str!("jupiter-dev"),
-    impl_name: create_runtime_str!("jupiter-dev"),
+    spec_name: create_runtime_str!("patract-dev"),
+    impl_name: create_runtime_str!("patract-dev"),
     authoring_version: 1,
     spec_version: 1,
     impl_version: 1,
@@ -131,7 +131,7 @@ impl frame_system::Config for Runtime {
     type OnKilledAccount = ();
     /// Weight information for the extrinsics of this pallet.
     type SystemWeightInfo = weights::frame_system::WeightInfo;
-    /// This is used as an identifier of the chain. Jupiter-dev use default 42 as prefix.
+    /// This is used as an identifier of the chain. patract-dev use default 42 as prefix.
     type SS58Prefix = ();
 }
 
@@ -242,7 +242,7 @@ impl pallet_contracts::Config for Runtime {
     type MaxValueSize = MaxValueSize;
     type WeightPrice = pallet_transaction_payment::Module<Self>;
     type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
-    type ChainExtension = chain_extension::JupiterDevExtension<Self>;
+    type ChainExtension = chain_extension::DevExtension<Self>;
     type DeletionQueueDepth = DeletionQueueDepth;
     type DeletionWeightLimit = DeletionWeightLimit;
 }
@@ -260,7 +260,7 @@ impl pallet_template::Config for Runtime {
 construct_runtime!(
     pub enum Runtime where
         Block = Block,
-        NodeBlock = jupiter_primitives::Block,
+        NodeBlock = patract_primitives::Block,
         UncheckedExtrinsic = UncheckedExtrinsic
     {
         // Basic stuff; balances is uncallable initially.
