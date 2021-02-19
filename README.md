@@ -54,10 +54,10 @@ Now, Patract has launched following network:
     same with Polkadot network. This testnet blockchain uses Babe as consensus algorithm,
     and **provide Babe VRF random number for contract module.**
     
-    **Jupiter open provider link is:**
+    **Jupiter PoA open provider links are:**
     
-    - `wss://jupiter.elara.patract.io/`
-    - `wss://ws.jupiter.patract.cn/`
+    - `wss://jupiter-poa.elara.patract.io/`
+    - `wss://ws.jupiter-poa.patract.cn/`
     
     Jupiter open telemetry link is [https://telemetry.patract.io/](https://telemetry.patract.io/)
 
@@ -69,6 +69,10 @@ Now, Patract has launched following network:
     to use the random number which relayed from relay chain in future.
   
     This network uses `modified pallet-contract` now.
+
+    **Jupiter Rococo open provider links are:**
+      - `wss://jupiter.elara.patract.io/`
+      - `wss://ws.jupiter.patract.cn/`
 
 * Patract Dev node: 
     
@@ -182,26 +186,26 @@ All people could join this testnet as a sync node.
 ##### 4.1.1 join Jupiter PoA testnet
 Moving the execution file `patract-polit` to other place and launch the node by following steps:
 ```bash
-./patract-polit --chain=jupiter --name=<set you custom name> --pruning=archive --execution=NativeElseWasm
+./patract-polit --chain=jupiter-poa --name=<set you custom name> --pruning=archive --execution=NativeElseWasm
 ```
 Those steps is same to any other substrate node, just should notice this parameter `--chain` should use `jupiter`.
 
 You could lookup your node in [https://telemetry.patract.io/](https://telemetry.patract.io/).
 
-##### 4.1.2 start dev mode Jupiter blockchain
+##### 4.1.2 start dev mode Jupiter PoA blockchain
 Notice this dev mode just means Jupiter PoA start with `--dev`, which is using dev config to start Jupiter PoA, not the 
 `patract-dev` node.
 ```bash
 ./patract-polit --dev --execution=NativeElseWasm -d <database path for you>
 ```
 
-##### 4.1.2 start local test mode Jupiter blockchain
+##### 4.1.2 start local test mode Jupiter PoA blockchain
 Local test is a mode which is used to start a private blockchain network.
 ```bash
 # start first node
-./patract-polit --chain=jupiter-local --alice --execution=NativeElseWasm -d <database path for you>
+./patract-polit --chain=jupiter-poa-local --alice --execution=NativeElseWasm -d <database path for you>
 # start second node
-./patract-polit --chain=jupiter-local --bob --execution=NativeElseWasm -d <database path for you>
+./patract-polit --chain=jupiter-poa-local --bob --execution=NativeElseWasm -d <database path for you>
 ```
 Note if you start those two nodes in a machine, there could connect to each other directly. If you start in different 
 but in same network, you should add `--bootnodes` parameter when start second node. More details please lookup [https://substrate.dev/](https://substrate.dev/)

@@ -32,10 +32,10 @@ impl SubstrateCli for Cli {
 
     fn load_spec(&self, id: &str) -> Result<Box<dyn sc_service::ChainSpec>, String> {
         Ok(match id {
-            "jupiter-dev" | "dev" => Box::new(chain_spec::jupiter::development_config()?),
-            "jupiter-local" => Box::new(chain_spec::jupiter::local_config()?),
-            "jupiter-staging" => Box::new(chain_spec::jupiter::staging_testnet_config()?),
-            "jupiter" => Box::new(chain_spec::jupiter::jupiter_config()?),
+            "jupiter-poa-dev" | "dev" => Box::new(chain_spec::jupiter::poa_development_config()?),
+            "jupiter-poa-local" => Box::new(chain_spec::jupiter::poa_local_config()?),
+            "jupiter-poa-staging" => Box::new(chain_spec::jupiter::poa_staging_config()?),
+            "jupiter-poa" => Box::new(chain_spec::jupiter::poa_config()?),
             // TODO add patract spec
             "" | "patract" => return Err("Not implement patract spec know".to_string()),
             path => {
