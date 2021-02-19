@@ -3,6 +3,7 @@ use codec::Encode;
 use frame_support::{traits::Get, weights::Weight};
 
 use sp_core::H256;
+use sp_std::marker::PhantomData;
 use sp_std::vec::Vec;
 
 use pallet_contracts::chain_extension::{
@@ -13,11 +14,12 @@ use patract_chain_extension::PatractExt;
 
 use crate::RandomnessProvider;
 
-pub struct JupiterExtension;
+pub struct JupiterExtension<C>(PhantomData<C>);
 
-impl ChainExtension for JupiterExtension {
-    fn call<E: Ext>(func_id: u32, env: Environment<E, InitState>) -> Result<RetVal>
+impl<C: pallet_contracts::Config> ChainExtension<C> for JupiterExtension<C> {
+    fn call<E>(func_id: u32, env: Environment<E, InitState>) -> Result<RetVal>
     where
+        E: Ext<T = C>,
         <E::T as SysConfig>::AccountId: UncheckedFrom<<E::T as SysConfig>::Hash> + AsRef<[u8]>,
     {
         let randomness_gas = || {
