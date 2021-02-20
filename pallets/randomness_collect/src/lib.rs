@@ -138,7 +138,6 @@ decl_module! {
 
         fn offchain_worker(block_number: T::BlockNumber) {
             if sp_io::offchain::is_validator() {
-                debug::native::info!("randomness collect start.");
                 let root_key = Key::<T>::get();
                 let mut local_keys = T::AuthorityId::all();
                 local_keys.sort();
@@ -148,8 +147,6 @@ decl_module! {
                         let res = Self::fetch_epoch_and_send_signed(signer);
                         if let Err(e) = res {
                             debug::error!("Error: {}", e);
-                        } else {
-                            debug::native::info!("randomness collect success.");
                         }
                     });
             } else {
@@ -289,8 +286,6 @@ impl<T: Config> Module<T> {
                         } else {
                             Err("Get next epoch wrong")?;
                         }
-                    } else {
-                        debug::native::info!("epoch not upgrade.");
                     }
                 }
                 _ => Err("Get rpc_port failed")?,

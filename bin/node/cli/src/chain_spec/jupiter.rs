@@ -60,7 +60,7 @@ pub fn development_config(id: ParaId) -> Result<ChainSpec, String> {
         // Name
         "Development",
         // ID
-        "dev",
+        "jupiter_dev",
         ChainType::Development,
         move || {
             testnet_genesis(
@@ -82,13 +82,13 @@ pub fn development_config(id: ParaId) -> Result<ChainSpec, String> {
         // Telemetry
         None,
         // Protocol ID
-        Some("jupiter_dev_testnet"),
+        Some("jupiter_dev"),
         // Properties
         Some(
             json!({
                 "ss58Format": 42,
                 "tokenDecimals": 10,
-                "tokenSymbol": "jDOT"
+                "tokenSymbol": "DOT"
             })
                 .as_object()
                 .expect("network properties generation can not fail; qed")
@@ -102,10 +102,10 @@ pub fn development_config(id: ParaId) -> Result<ChainSpec, String> {
     ))
 }
 
-pub fn staging_testnet_config(id: ParaId) -> Result<ChainSpec, String> {
+pub fn staging_config(id: ParaId) -> Result<ChainSpec, String> {
     Ok(ChainSpec::from_genesis(
-        "Jupiter Staging Testnet",
-        "jupiter_staging_testnet",
+        "Jupiter Rococo Staging",
+        "jupiter_rococo_staging",
         ChainType::Live,
         move || {
             testnet_genesis(
@@ -122,12 +122,12 @@ pub fn staging_testnet_config(id: ParaId) -> Result<ChainSpec, String> {
             TelemetryEndpoints::new(vec![(PATRACT_TELEMETRY_URL.to_string(), 0)])
                 .expect("Polkadot Staging telemetry url is valid; qed"),
         ),
-        Some("jupiter_staging_testnet"),
+        Some("jupiter_rococo_staging"),
         Some(
             json!({
                 "ss58Format": 42,
                 "tokenDecimals": 10,
-                "tokenSymbol": "jDOT"
+                "tokenSymbol": "DOT"
             })
                 .as_object()
                 .expect("network properties generation can not fail; qed")
@@ -140,8 +140,8 @@ pub fn staging_testnet_config(id: ParaId) -> Result<ChainSpec, String> {
     ))
 }
 
-pub fn testnet_config() -> Result<ChainSpec, String> {
-    ChainSpec::from_json_bytes(&include_bytes!("../res/testnet.json")[..])
+pub fn jupiter_config() -> Result<ChainSpec, String> {
+    ChainSpec::from_json_bytes(&include_bytes!("../../res/jupiter_rococo.json")[..])
 }
 
 /// Configure initial storage state for FRAME modules.

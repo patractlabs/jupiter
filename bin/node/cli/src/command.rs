@@ -22,10 +22,10 @@ use std::{io::Write, net::SocketAddr};
 
 fn load_spec(id: &str, para_id: ParaId) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
     Ok(match id {
-        "" | "dev" => Box::new(chain_spec::development_config(para_id)?),
-        "staging" => Box::new(chain_spec::staging_testnet_config(para_id)?),
-        "testnet" => Box::new(chain_spec::testnet_config()?),
-        path => Box::new(chain_spec::ChainSpec::from_json_file(
+        "jupiter-dev" => Box::new(chain_spec::jupiter::development_config(para_id)?),
+        "jupiter-staging" => Box::new(chain_spec::jupiter::staging_config(para_id)?),
+        "" | "jupiter" => Box::new(chain_spec::jupiter::jupiter_config()?),
+        path => Box::new(chain_spec::jupiter::ChainSpec::from_json_file(
             path.into(),
         )?),
     })
@@ -33,7 +33,7 @@ fn load_spec(id: &str, para_id: ParaId) -> std::result::Result<Box<dyn sc_servic
 
 impl SubstrateCli for Cli {
     fn impl_name() -> String {
-        "Jupiter Parachain Node".into()
+        "Patract Parachain Node".into()
     }
 
     fn impl_version() -> String {
@@ -67,7 +67,7 @@ impl SubstrateCli for Cli {
 
 impl SubstrateCli for RelayChainCli {
     fn impl_name() -> String {
-        "Parachain Collator".into()
+        "Patract Parachain Collator".into()
     }
 
     fn impl_version() -> String {
@@ -75,10 +75,10 @@ impl SubstrateCli for RelayChainCli {
     }
 
     fn description() -> String {
-        "Jupiter parachain collator\n\nThe command-line arguments provided first will be \
+        "Patract parachain collator\n\nThe command-line arguments provided first will be \
 		passed to the parachain node, while the arguments provided after -- will be passed \
 		to the relaychain node.\n\n\
-		jupiter-para [parachain-args] -- [relaychain-args]"
+		patract [parachain-args] -- [relaychain-args]"
             .into()
     }
 
@@ -268,7 +268,7 @@ pub fn run() -> Result<()> {
                 // TODO
                 let key = sp_core::Pair::generate().0;
 
-                let extension = chain_spec::Extensions::try_get(&*config.chain_spec);
+                let extension = chain_spec::jupiter::Extensions::try_get(&*config.chain_spec);
                 let relay_chain_id = extension.map(|e| e.relay_chain.clone());
                 let para_id = extension.map(|e| e.para_id);
 
