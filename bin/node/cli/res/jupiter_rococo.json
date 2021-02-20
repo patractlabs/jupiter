@@ -3,8 +3,8 @@
   "id": "jupiter_rococo",
   "chainType": "Live",
   "bootNodes": [
-    "/dns/jp1.p2p.jupiter.patract.cn/tcp/30336/p2p/12D3KooWJMuNGwGodppsbrwNGCTFw4JM1kHkCDkDZgQMzKZcDmr3",
-    "/dns/fn1.p2p.jupiter.patract.cn/tcp/30337/p2p/12D3KooWE3MEL2d2tdGRutbnRm7RPYxsMxMZHAHKE37oLQMqBemd"
+    "/dns/jp1.p2p.jupiter.patract.cn/tcp/30336/p2p/12D3KooWPray6yFuNzk2aAjAxezTq4Qa1f34RkX831HGyqvg5qkD",
+    "/dns/fn1.p2p.jupiter.patract.cn/tcp/30337/p2p/12D3KooWJMuNGwGodppsbrwNGCTFw4JM1kHkCDkDZgQMzKZcDmr3"
   ],
   "telemetryEndpoints": [
     [
