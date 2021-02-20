@@ -6,16 +6,15 @@
 #[cfg(feature = "std")]
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 
-mod chain_extension;
+// mod chain_extension;
 
 use sp_api::impl_runtime_apis;
 use sp_core::OpaqueMetadata;
 use sp_runtime::{
     create_runtime_str, generic, impl_opaque_keys,
     ApplyExtrinsicResult, Perbill,
-    transaction_validity::{TransactionSource, TransactionValidity, TransactionPriority},
+    transaction_validity::{TransactionSource, TransactionValidity},
     traits::{AccountIdLookup, BlakeTwo256, Block as BlockT},
-    DispatchError
 };
 use sp_std::prelude::*;
 
@@ -26,12 +25,6 @@ use sp_version::RuntimeVersion;
 use pallet_contracts::WeightInfo;
 use pallet_contracts_primitives::ContractExecResult;
 use pallet_transaction_payment::{FeeDetails, RuntimeDispatchInfo};
-use pallet_contracts::chain_extension::{
-    ChainExtension, Environment, Ext, InitState, RetVal, SysConfig, UncheckedFrom,
-};
-
-use codec::Encode;
-use frame_support::debug::{error, native};
 
 // A few exports that help ease life for downstream crates.
 #[cfg(any(feature = "std", test))]
@@ -71,8 +64,8 @@ use xcm_executor::{
     traits::{NativeAsset, IsConcrete},
 };
 
-pub use randomness_collect::{OCW_DB_RANDOM, RpcPort};
-use randomness_collect::sr25519::AuthorityId as RandomCollectId;
+// pub use randomness_collect::{OCW_DB_RANDOM, RpcPort};
+// use randomness_collect::sr25519::AuthorityId as RandomCollectId;
 
 impl_opaque_keys! {
 	pub struct SessionKeys {}
@@ -256,7 +249,7 @@ impl pallet_contracts::Config for Runtime {
     type MaxValueSize = MaxValueSize;
     type WeightPrice = pallet_transaction_payment::Module<Self>;
     type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
-    type ChainExtension = chain_extension::JupiterParaExtension<Self>;
+    type ChainExtension = patract_chain_extension::PatractExt;
     type DeletionQueueDepth = DeletionQueueDepth;
     type DeletionWeightLimit = DeletionWeightLimit;
 }
@@ -336,14 +329,14 @@ impl<C> frame_system::offchain::SendTransactionTypes<C> for Runtime where
     type OverarchingCall = Call;
 }
 
-parameter_types! {
-	pub const RandomCollectUnsignedPriority: TransactionPriority = TransactionPriority::max_value();
-}
-
-impl randomness_collect::Config for Runtime {
-    type AuthorityId = RandomCollectId;
-    type UnsignedPriority = RandomCollectUnsignedPriority;
-}
+// parameter_types! {
+// 	pub const RandomCollectUnsignedPriority: TransactionPriority = TransactionPriority::max_value();
+// }
+//
+// impl randomness_collect::Config for Runtime {
+//     type AuthorityId = RandomCollectId;
+//     type UnsignedPriority = RandomCollectUnsignedPriority;
+// }
 
 
 // Create the runtime by composing the FRAME pallets that were previously configured.
@@ -369,7 +362,7 @@ construct_runtime!(
 		ParachainInfo: parachain_info::{Module, Storage, Config} = 9,
 		XcmHandler: cumulus_pallet_xcm_handler::{Module, Call, Event<T>, Origin} = 10,
 
-		RandomnessCollect: randomness_collect::{Module, Call, Storage, ValidateUnsigned} = 11,
+		// RandomnessCollect: randomness_collect::{Module, Call, Storage, ValidateUnsigned} = 11,
     }
 );
 

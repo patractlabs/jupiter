@@ -3,13 +3,14 @@ use crate::{
     cli::{Cli, RelayChainCli, Subcommand},
 };
 use codec::Encode;
-use cumulus_primitives::{genesis::generate_genesis_block, ParaId};
-use jupiter_para_runtime::Block;
+use cumulus_primitives_core::ParaId;
+use cumulus_client_service::genesis::generate_genesis_block;
 use log::info;
+use jupiter_para_runtime::Block;
 use polkadot_parachain::primitives::AccountIdConversion;
 use sc_cli::{
-    ChainSpec, CliConfiguration, DefaultConfigurationValues, ImportParams, InitLoggerParams,
-    KeystoreParams, NetworkParams, Result, RuntimeVersion, SharedParams, SubstrateCli,
+    ChainSpec, CliConfiguration, DefaultConfigurationValues, ImportParams, KeystoreParams,
+    NetworkParams, Result, RuntimeVersion, SharedParams, SubstrateCli,
 };
 use sc_service::{
     config::{BasePath, PrometheusConfig},
@@ -19,19 +20,20 @@ use sp_core::hexdisplay::HexDisplay;
 use sp_runtime::traits::{Block as BlockT, Hash as HashT, Header as HeaderT, Zero};
 use std::{io::Write, net::SocketAddr};
 
-fn load_spec(
-    id: &str,
-    para_id: ParaId,
-) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
+fn load_spec(id: &str, para_id: ParaId) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
     Ok(match id {
         "" | "dev" => Box::new(chain_spec::development_config(para_id)?),
-        path => Box::new(chain_spec::ChainSpec::from_json_file(path.into())?),
+        "staging" => Box::new(chain_spec::staging_testnet_config(para_id)?),
+        "testnet" => Box::new(chain_spec::testnet_config()?),
+        path => Box::new(chain_spec::ChainSpec::from_json_file(
+            path.into(),
+        )?),
     })
 }
 
 impl SubstrateCli for Cli {
     fn impl_name() -> String {
-        "Patract Parachain Node".into()
+        "Jupiter Parachain Node".into()
     }
 
     fn impl_version() -> String {
@@ -47,7 +49,7 @@ impl SubstrateCli for Cli {
     }
 
     fn support_url() -> String {
-        "https://github.com/patractlabs/patract".into()
+        "https://github.com/patractlabs/jupiter".into()
     }
 
     fn copyright_start_year() -> i32 {
@@ -55,7 +57,7 @@ impl SubstrateCli for Cli {
     }
 
     fn load_spec(&self, id: &str) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
-        load_spec(id, self.run.parachain_id.unwrap_or(200).into())
+        load_spec(id, self.run.parachain_id.unwrap_or(1).into())
     }
 
     fn native_runtime_version(_: &Box<dyn ChainSpec>) -> &'static RuntimeVersion {
@@ -73,10 +75,10 @@ impl SubstrateCli for RelayChainCli {
     }
 
     fn description() -> String {
-        "Parachain Collator Template\n\nThe command-line arguments provided first will be \
+        "Jupiter parachain collator\n\nThe command-line arguments provided first will be \
 		passed to the parachain node, while the arguments provided after -- will be passed \
 		to the relaychain node.\n\n\
-		parachain-collator [parachain-args] -- [relaychain-args]"
+		jupiter-para [parachain-args] -- [relaychain-args]"
             .into()
     }
 
@@ -89,7 +91,7 @@ impl SubstrateCli for RelayChainCli {
     }
 
     fn copyright_start_year() -> i32 {
-        2017
+        2020
     }
 
     fn load_spec(&self, id: &str) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
@@ -215,10 +217,9 @@ pub fn run() -> Result<()> {
             })
         }
         Some(Subcommand::ExportGenesisState(params)) => {
-            sc_cli::init_logger(InitLoggerParams {
-                tracing_receiver: sc_tracing::TracingReceiver::Log,
-                ..Default::default()
-            })?;
+            let mut builder = sc_cli::LoggerBuilder::new("");
+            builder.with_profiling(sc_tracing::TracingReceiver::Log, "");
+            let _ = builder.init();
 
             let block: Block = generate_genesis_block(&load_spec(
                 &params.chain.clone().unwrap_or_default(),
@@ -240,10 +241,9 @@ pub fn run() -> Result<()> {
             Ok(())
         }
         Some(Subcommand::ExportGenesisWasm(params)) => {
-            sc_cli::init_logger(InitLoggerParams {
-                tracing_receiver: sc_tracing::TracingReceiver::Log,
-                ..Default::default()
-            })?;
+            let mut builder = sc_cli::LoggerBuilder::new("");
+            builder.with_profiling(sc_tracing::TracingReceiver::Log, "");
+            let _ = builder.init();
 
             let raw_wasm_blob =
                 extract_genesis_wasm(&cli.load_spec(&params.chain.clone().unwrap_or_default())?)?;
@@ -268,7 +268,7 @@ pub fn run() -> Result<()> {
                 // TODO
                 let key = sp_core::Pair::generate().0;
 
-                let extension = chain_spec::Extensions::try_get(&config.chain_spec);
+                let extension = chain_spec::Extensions::try_get(&*config.chain_spec);
                 let relay_chain_id = extension.map(|e| e.relay_chain.clone());
                 let para_id = extension.map(|e| e.para_id);
 
@@ -280,7 +280,7 @@ pub fn run() -> Result<()> {
                         .chain(cli.relaychain_args.iter()),
                 );
 
-                let id = ParaId::from(cli.run.parachain_id.or(para_id).unwrap_or(100));
+                let id = ParaId::from(cli.run.parachain_id.or(para_id).unwrap_or(1));
 
                 let parachain_account =
                     AccountIdConversion::<polkadot_primitives::v0::AccountId>::into_account(&id);
@@ -290,9 +290,12 @@ pub fn run() -> Result<()> {
                 let genesis_state = format!("0x{:?}", HexDisplay::from(&block.header().encode()));
 
                 let task_executor = config.task_executor.clone();
-                let polkadot_config =
-                    SubstrateCli::create_configuration(&polkadot_cli, &polkadot_cli, task_executor)
-                        .map_err(|err| format!("Relay chain argument error: {}", err))?;
+                let polkadot_config = SubstrateCli::create_configuration(
+                    &polkadot_cli,
+                    &polkadot_cli,
+                    task_executor,
+                    None,
+                ).map_err(|err| format!("Relay chain argument error: {}", err))?;
                 let collator = cli.run.base.validator || cli.collator;
 
                 info!("Parachain id: {:?}", id);
@@ -303,6 +306,7 @@ pub fn run() -> Result<()> {
                 crate::service::start_node(config, key, polkadot_config, id, collator)
                     .await
                     .map(|r| r.0)
+                    .map_err(Into::into)
             })
         }
     }
@@ -424,7 +428,7 @@ impl CliConfiguration<Self> for RelayChainCli {
         self.base.base.announce_block()
     }
 
-    fn init<C: SubstrateCli>(&self) -> Result<()> {
+    fn init<C: SubstrateCli>(&self) -> Result<sc_telemetry::TelemetryWorker> {
         unreachable!("PolkadotCli is never initialized; qed");
     }
 }

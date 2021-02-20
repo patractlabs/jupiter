@@ -12,7 +12,7 @@ use pallet_contracts::chain_extension::{
 
 use patract_chain_extension::PatractExt;
 
-use crate::RandomnessProvider;
+use crate::RandomnessCollect;
 
 pub struct JupiterParaExtension<C>(PhantomData<C>);
 
@@ -39,7 +39,7 @@ impl<C: pallet_contracts::Config> ChainExtension<C> for JupiterParaExtension<C> 
 
 				env.charge_weight(randomness_gas())?;
 
-				let cur_epoch = RandomnessProvider::current_epoch();
+				let cur_epoch = RandomnessCollect::current_epoch();
 				env.write(&cur_epoch.encode(), false, None)?;
 				Ok(RetVal::Converging(0))
 			}
@@ -49,7 +49,7 @@ impl<C: pallet_contracts::Config> ChainExtension<C> for JupiterParaExtension<C> 
 
 				env.charge_weight(randomness_gas())?;
 
-				let next_epoch = RandomnessProvider::next_epoch();
+				let next_epoch = RandomnessCollect::next_epoch();
 				env.write(&next_epoch.encode(), false, None)?;
 				Ok(RetVal::Converging(0))
 			}
@@ -61,7 +61,7 @@ impl<C: pallet_contracts::Config> ChainExtension<C> for JupiterParaExtension<C> 
 
 				let input: u64 = env.read_as()?;
 
-				let randomness = H256::from(RandomnessProvider::randomness_of(input));
+				let randomness = H256::from(RandomnessCollect::randomness_of(input));
 				env.write(&randomness.encode(), false, None)?;
 				Ok(RetVal::Converging(0))
 			}
@@ -72,7 +72,7 @@ impl<C: pallet_contracts::Config> ChainExtension<C> for JupiterParaExtension<C> 
 				env.charge_weight(randomness_gas())?;
 
 				let input: Vec<u8> = env.read_as()?;
-				let randomness = RandomnessProvider::random(input.as_slice());
+				let randomness = RandomnessCollect::random(input.as_slice());
 				env.write(&randomness.encode(), false, None)?;
 				Ok(RetVal::Converging(0))
 			}

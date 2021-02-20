@@ -1,19 +1,19 @@
 [workspace]
 members = [
-#    "bin/node",
-    "bin/node-pilot",
-    "bin/node-pilot/executor",
-    "bin/node-dev",
+    "bin/node",
+#    "bin/node-pilot",
+#    "bin/node-pilot/executor",
+#    "bin/node-dev",
 
-#    "runtime/jupiter-para",
-    "runtime/jupiter-pilot",
-    "runtime/patract-dev",
+    "runtime/jupiter-para",
+#    "runtime/jupiter-pilot",
+#    "runtime/patract-dev",
 
     "primitives",
     "primitives/io",
     "primitives/chain-extension",
-    "pallets/template",
-    "pallets/randomness-provider",
+#    "pallets/template",
+#    "pallets/randomness-provider",
 #    "pallets/randomness_collect",
     "rpc",
 ]
