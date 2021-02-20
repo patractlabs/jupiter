@@ -36,12 +36,6 @@ use sp_std::prelude::*;
 
 pub const RAND_COLL: KeyTypeId = KeyTypeId(*b"rand");
 
-#[derive(Debug, PartialEq, Encode)]
-pub struct BabeRandomness {
-    pub epoch: u64,
-    pub randomness: schnorrkel::Randomness,
-}
-
 pub mod sr25519 {
     mod app_sr25519 {
         use crate::RAND_COLL;
@@ -50,14 +44,14 @@ pub mod sr25519 {
     }
 
     sp_application_crypto::with_pair! {
-        /// An i'm online keypair using sr25519 as its crypto.
+        /// An randomness_collect keypair using sr25519 as its crypto.
         pub type AuthorityPair = app_sr25519::Pair;
     }
 
-    /// An i'm online signature using sr25519 as its crypto.
+    /// An randomness_collect signature using sr25519 as its crypto.
     pub type AuthoritySignature = app_sr25519::Signature;
 
-    /// An i'm online identifier using sr25519 as its crypto.
+    /// An randomness_collect identifier using sr25519 as its crypto.
     pub type AuthorityId = app_sr25519::Public;
 }
 
@@ -86,12 +80,18 @@ pub const OCW_DB_RANDOM: &[u8] = b"ocw_collect_random";
 #[derive(Encode, Decode, Clone)]
 pub struct RpcPort(pub Vec<u8>);
 
-/// Random which is sent/received.
-#[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug)]
-pub struct Random {
-    randomness: schnorrkel::Randomness,
-    next_randomness: schnorrkel::Randomness,
-    epoch_index: u64,
+#[derive(Encode, Decode, PartialEq, RuntimeDebug, Clone)]
+pub struct EpochRecord {
+    current_epoch: BabeRandomness,
+    next_epoch: BabeRandomness,
+}
+
+#[derive(RuntimeDebug, PartialEq, Encode, Decode, Default, Clone)]
+pub struct BabeRandomness {
+    pub epoch: u64,
+    pub start_slot: u64,
+    pub duration: u64,
+    pub randomness: schnorrkel::Randomness,
 }
 
 pub trait Config: SendTransactionTypes<Call<Self>> + frame_system::Config {
@@ -102,11 +102,15 @@ pub trait Config: SendTransactionTypes<Call<Self>> + frame_system::Config {
 
 decl_storage! {
     trait Store for Module<T: Config> as RandomnessCollect {
-        Key get(fn key): T::AuthorityId;
+        /// Who can send unsigned extrinsic to set randomness
+        Keys get(fn keys): Vec<T::AuthorityId>;
         /// The `Babe::randomness` from relay chain.
         pub HistoricalRandomness get(fn historical_randomness): map hasher(twox_64_concat) u64 => schnorrkel::Randomness;
         /// The `epoch_index` from relay chain.
-        EpochIndex get(fn epoch_index): u64;
+        RelayChainEpochIndex get(fn relay_chain_epoch_index): u64;
+
+        pub CurrentEpoch get(fn current_epoch): BabeRandomness;
+        pub NextEpoch get(fn next_epoch): BabeRandomness;
     }
 }
 
@@ -116,39 +120,52 @@ decl_module! {
         fn set_key(origin, key: T::AuthorityId) -> DispatchResult {
             ensure_root(origin)?;
 
-            <Key<T>>::put(key);
-
+            <Keys<T>>::mutate(|keys| {
+                keys.push(key);
+                keys.sort();
+            });
             Ok(())
         }
 
         #[weight = 0]
         fn set_randomness(
             origin,
-            random: Random,
+            epoch_record: EpochRecord,
             _signature: <T::AuthorityId as RuntimeAppPublic>::Signature,
+            _index: u32,
         ) -> DispatchResult {
             ensure_none(origin)?;
 
-            HistoricalRandomness::insert(random.epoch_index, random.randomness);
-            HistoricalRandomness::insert(random.epoch_index + 1, random.next_randomness);
-            EpochIndex::put(random.epoch_index);
+            let current_epoch_index = epoch_record.current_epoch.epoch;
+            let next_epoch_index = epoch_record.next_epoch.epoch;
+
+            RelayChainEpochIndex::put(current_epoch_index);
+            if !HistoricalRandomness::contains_key(current_epoch_index) {
+                HistoricalRandomness::insert(current_epoch_index, epoch_record.current_epoch.randomness.clone());
+            }
+            HistoricalRandomness::insert(next_epoch_index, epoch_record.next_epoch.randomness.clone());
+
+            CurrentEpoch::put(epoch_record.current_epoch);
+            NextEpoch::put(epoch_record.next_epoch);
 
             Ok(())
         }
 
         fn offchain_worker(block_number: T::BlockNumber) {
             if sp_io::offchain::is_validator() {
-                let root_key = Key::<T>::get();
-                let mut local_keys = T::AuthorityId::all();
-                local_keys.sort();
-                local_keys.binary_search(&root_key)
-                    .ok().map(|location| {
-                        let signer: T::AuthorityId = local_keys[location].clone();
-                        let res = Self::fetch_epoch_and_send_signed(signer);
+                let privileged_keys = Keys::<T>::get();
+                let local_keys = T::AuthorityId::all();
+
+                for local_key in local_keys {
+                    privileged_keys.binary_search(&local_key)
+                    .ok().map(|index| {
+                        let signer: T::AuthorityId = local_key.clone();
+                        let res = Self::fetch_epoch_and_send_signed(signer, index as u32);
                         if let Err(e) = res {
                             debug::error!("Error: {}", e);
                         }
                     });
+                }
             } else {
                 debug::warn!(
                     target: "randomness_collect",
@@ -231,12 +248,17 @@ impl<T: Config> Module<T> {
             .and_then(|epoch_u8| Epoch::decode(&mut epoch_u8.as_slice()).ok())
     }
 
-    fn fetch_epoch(url: &str, method: &str) -> Result<(u64, schnorrkel::Randomness), http::Error> {
+    fn fetch_epoch(url: &str, method: &str) -> Result<BabeRandomness, http::Error> {
         let mut epoch_response_body = Vec::new();
         let epoch_response = Self::send_post(url, method, &mut epoch_response_body)?;
 
         let res = match Self::parse_epoch(epoch_response) {
-            Some(epoch) => Ok((epoch.epoch_index, epoch.randomness)),
+            Some(epoch) => Ok(BabeRandomness {
+                epoch: epoch.epoch_index,
+                start_slot: *epoch.start_slot,
+                duration: epoch.duration,
+                randomness: epoch.randomness,
+            }),
             None => {
                 debug::warn!(
                     "Unable to extract epoch from the response: {:?}",
@@ -248,7 +270,10 @@ impl<T: Config> Module<T> {
         res
     }
 
-    fn fetch_epoch_and_send_signed(signer: T::AuthorityId) -> Result<(), &'static str> {
+    fn fetch_epoch_and_send_signed(
+        signer: T::AuthorityId,
+        index: u32,
+    ) -> Result<(), &'static str> {
         let rpc_port = Self::get_rpc_port();
         if let Some(rpc_port) = rpc_port {
             match sp_std::str::from_utf8(&[b"http://", rpc_port.0.as_slice()].concat()) {
@@ -267,21 +292,24 @@ impl<T: Config> Module<T> {
 				            "method": "state_call",
 				            "params": ["BabeApi_next_epoch", "0x"]
 			            }"#;
-                    let (epoch_index, randomness) =
-                        Self::fetch_epoch(rpc_port_str, post_current_epoch).map_err(|_| "Fetch randomness failed")?;
-                    let current_epoch_index = Self::epoch_index();
-                    if epoch_index > current_epoch_index {
-                        let (next_epoch_index, next_randomness) =
-                            Self::fetch_epoch(rpc_port_str, post_next_epoch).map_err(|_| "Fetch randomness failed")?;
-                        if next_epoch_index == epoch_index + 1 {
-                            let random = Random {
-                                randomness,
-                                next_randomness,
-                                epoch_index,
+                    let current_epoch = Self::fetch_epoch(rpc_port_str, post_current_epoch)
+                        .map_err(|_| "Fetch randomness failed")?;
+                    let current_epoch_index = Self::relay_chain_epoch_index();
+                    if current_epoch.epoch > current_epoch_index {
+                        let next_epoch = Self::fetch_epoch(rpc_port_str, post_next_epoch)
+                            .map_err(|_| "Fetch randomness failed")?;
+                        if next_epoch.epoch == current_epoch.epoch + 1 {
+                            let epoch_record = EpochRecord {
+                                current_epoch,
+                                next_epoch,
                             };
-                            let signature = signer.sign(&random.encode()).ok_or("Failed to sign.")?;
-                            let call = Call::set_randomness(random, signature);
-                            SubmitTransaction::<T, Call<T>>::submit_unsigned_transaction(call.into())
+                            let signature = signer
+                                .sign(&epoch_record.encode())
+                                .ok_or("Failed to sign.")?;
+                            let call = Call::set_randomness(epoch_record, signature, index);
+                            SubmitTransaction::<T, Call<T>>::submit_unsigned_transaction(
+                                call.into(),
+                            )
                                 .map_err(|_| "Failed to submit unsigned transaction")?;
                         } else {
                             Err("Get next epoch wrong")?;
@@ -295,22 +323,6 @@ impl<T: Config> Module<T> {
         Ok(())
     }
 
-    pub fn current_epoch() -> BabeRandomness {
-        let epoch = Self::epoch_index();
-        BabeRandomness {
-            epoch,
-            randomness: Self::historical_randomness(&epoch),
-        }
-    }
-
-    pub fn next_epoch() -> BabeRandomness {
-        let epoch = Self::epoch_index() + 1;
-        BabeRandomness {
-            epoch,
-            randomness: Self::historical_randomness(&epoch),
-        }
-    }
-
     pub fn randomness_of(epoch: u64) -> schnorrkel::Randomness {
         <HistoricalRandomness>::get(&epoch)
     }
@@ -318,7 +330,8 @@ impl<T: Config> Module<T> {
     pub fn random(subject: &[u8]) -> T::Hash {
         let mut subject = subject.to_vec();
         subject.reserve(VRF_OUTPUT_LENGTH);
-        subject.extend_from_slice(&Self::historical_randomness(&Self::epoch_index())[..]);
+        subject
+            .extend_from_slice(&Self::historical_randomness(&Self::relay_chain_epoch_index())[..]);
 
         <T as frame_system::Config>::Hashing::hash(&subject[..])
     }
@@ -335,21 +348,26 @@ impl<T: Config> frame_support::unsigned::ValidateUnsigned for Module<T> {
     type Call = Call<T>;
 
     fn validate_unsigned(_source: TransactionSource, call: &Self::Call) -> TransactionValidity {
-        if let Call::set_randomness(ref random, ref signature) = call {
+        if let Call::set_randomness(ref epoch_record, ref signature, index) = call {
             // check signature
-            let key = Key::<T>::get();
-            let signature_valid =
-                random.using_encoded(|encoded_random| key.verify(&encoded_random, &signature));
-            if !signature_valid {
-                return InvalidTransaction::BadProof.into();
+            match Keys::<T>::get().get(*index as usize) {
+                None => InvalidTransaction::Call.into(),
+                Some(privileged_key) => {
+                    let signature_valid = epoch_record.using_encoded(|encoded_epoch_record| {
+                        privileged_key.verify(&encoded_epoch_record, &signature)
+                    });
+                    if !signature_valid {
+                        InvalidTransaction::BadProof.into()
+                    } else {
+                        ValidTransaction::with_tag_prefix("RandomnessCollect")
+                            .priority(T::UnsignedPriority::get())
+                            .and_provides((epoch_record.current_epoch.epoch, *index))
+                            .longevity(5)
+                            .propagate(true)
+                            .build()
+                    }
+                }
             }
-
-            ValidTransaction::with_tag_prefix("RandomnessCollect")
-                .priority(T::UnsignedPriority::get())
-                .and_provides((random.epoch_index, key))
-                .longevity(5)
-                .propagate(true)
-                .build()
         } else {
             InvalidTransaction::Call.into()
         }
