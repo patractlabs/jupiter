@@ -86,7 +86,7 @@ pub fn development_config(id: ParaId) -> Result<ChainSpec, String> {
         // Properties
         Some(
             json!({
-                "ss58Format": 42,
+                "ss58Format": jupiter_para_runtime::SS58Prefix::get(),
                 "tokenDecimals": 10,
                 "tokenSymbol": "DOT"
             })
@@ -104,8 +104,8 @@ pub fn development_config(id: ParaId) -> Result<ChainSpec, String> {
 
 pub fn staging_config(id: ParaId) -> Result<ChainSpec, String> {
     Ok(ChainSpec::from_genesis(
-        "Jupiter Rococo Staging",
-        "jupiter_rococo_staging",
+        "Jupiter PC1 Staging",
+        "jupiter_pc1_staging",
         ChainType::Live,
         move || {
             testnet_genesis(
@@ -122,10 +122,10 @@ pub fn staging_config(id: ParaId) -> Result<ChainSpec, String> {
             TelemetryEndpoints::new(vec![(PATRACT_TELEMETRY_URL.to_string(), 0)])
                 .expect("Polkadot Staging telemetry url is valid; qed"),
         ),
-        Some("jupiter_rococo_staging"),
+        Some("jupiter_pc1_staging"),
         Some(
             json!({
-                "ss58Format": 42,
+                "ss58Format": jupiter_para_runtime::SS58Prefix::get(),
                 "tokenDecimals": 10,
                 "tokenSymbol": "DOT"
             })

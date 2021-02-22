@@ -33,7 +33,7 @@ fn load_spec(id: &str, para_id: ParaId) -> std::result::Result<Box<dyn sc_servic
 
 impl SubstrateCli for Cli {
     fn impl_name() -> String {
-        "Patract Parachain Node".into()
+        "Patract Node".into()
     }
 
     fn impl_version() -> String {
