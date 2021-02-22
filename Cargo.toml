@@ -12,8 +12,11 @@ members = [
     "primitives",
     "primitives/io",
     "primitives/chain-extension",
+
+    "pallets/bridge/relaychain",
     "pallets/template",
     "pallets/randomness-provider",
+
     "rpc",
 ]
 exclude = ["vendor/substrate"]
