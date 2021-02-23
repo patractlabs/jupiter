@@ -15,7 +15,7 @@ use sp_runtime::{
 use jupiter_runtime::{AccountId, SessionKeys, Signature};
 use jupiter_runtime::{
     AuthorityDiscoveryConfig, BalancesConfig, ContractsConfig, CouncilConfig, GenesisConfig,
-    SessionConfig, StakingConfig, SystemConfig, TechnicalCommitteeConfig, WASM_BINARY,
+    SessionConfig, StakingConfig, SystemConfig, TechnicalCommitteeConfig, WASM_BINARY, SudoConfig
 };
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use pallet_staking::{Forcing, StakerStatus};
@@ -373,7 +373,7 @@ pub fn poa_config() -> Result<ChainSpec, String> {
 fn testnet_genesis(
     wasm_binary: &[u8],
     initial_authorities: Vec<AuthorityKeysTuple>,
-    _root_key: AccountId,
+    root_key: AccountId,
     endowed_accounts: Vec<AccountId>,
     enable_println: bool,
 ) -> GenesisConfig {
@@ -447,5 +447,8 @@ fn testnet_genesis(
             phantom: Default::default(),
         }),
         pallet_membership_Instance1: Some(Default::default()),
+        pallet_sudo: Some(SudoConfig {
+            key: root_key,
+        }),
     }
 }

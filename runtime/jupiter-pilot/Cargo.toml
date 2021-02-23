@@ -40,11 +40,9 @@ pallet-babe = { version = "3.0.0", git = "https://github.com/paritytech/substrat
 pallet-balances = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-collective = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-democracy = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
-pallet-elections-phragmen = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-grandpa = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-im-online = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-identity = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
-pallet-indices = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-membership = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-multisig = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-offences = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
@@ -115,11 +113,9 @@ std = [
     "pallet-contracts-primitives/std",
     "pallet-contracts-rpc-runtime-api/std",
     "pallet-democracy/std",
-    "pallet-elections-phragmen/std",
     "pallet-grandpa/std",
     "pallet-im-online/std",
     "pallet-identity/std",
-    "pallet-indices/std",
     "pallet-membership/std",
     "pallet-multisig/std",
     "pallet-offences/std",

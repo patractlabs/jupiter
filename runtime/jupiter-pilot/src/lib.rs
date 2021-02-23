@@ -863,6 +863,11 @@ impl pallet_proxy::Config for Runtime {
     type AnnouncementDepositFactor = AnnouncementDepositFactor;
 }
 
+impl pallet_sudo::Config for Runtime {
+    type Event = Event;
+    type Call = Call;
+}
+
 pub struct Authorities;
 impl Contains<AccountId> for Authorities {
     fn sorted_members() -> Vec<AccountId> {
@@ -932,6 +937,7 @@ construct_runtime!(
         // Multisig module. Late addition.
         Multisig: pallet_multisig::{Module, Call, Storage, Event<T>} = 26,
 
+        Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>} = 27,
         // Contracts module
         Contracts: pallet_contracts::{Module, Call, Config<T>, Storage, Event<T>} = 30,
 
