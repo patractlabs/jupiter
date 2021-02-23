@@ -100,7 +100,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
     spec_name: create_runtime_str!("jupiter"),
     impl_name: create_runtime_str!("patract-jupiter"),
     authoring_version: 1,
-    spec_version: 1,
+    spec_version: 2,
     impl_version: 1,
     apis: RUNTIME_API_VERSIONS,
     transaction_version: 1,
@@ -682,7 +682,7 @@ impl pallet_indices::Config for Runtime {
 }
 
 parameter_types! {
-    pub const ExistentialDeposit: Balance = 100 * CENTS;
+    pub const ExistentialDeposit: Balance = 0;
     // For weight estimation, we assume that the most locks on an individual account will be 50.
     // This number may need to be adjusted in the future if this assumption no longer holds true.
     pub const MaxLocks: u32 = 50;
