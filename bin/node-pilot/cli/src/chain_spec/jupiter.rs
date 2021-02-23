@@ -15,8 +15,7 @@ use sp_runtime::{
 use jupiter_runtime::{AccountId, SessionKeys, Signature};
 use jupiter_runtime::{
     AuthorityDiscoveryConfig, BalancesConfig, ContractsConfig, CouncilConfig, GenesisConfig,
-    IndicesConfig, SessionConfig, StakingConfig, SudoConfig, SystemConfig,
-    TechnicalCommitteeConfig, WASM_BINARY,
+    SessionConfig, StakingConfig, SystemConfig, TechnicalCommitteeConfig, WASM_BINARY,
 };
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use pallet_staking::{Forcing, StakerStatus};
@@ -374,7 +373,7 @@ pub fn poa_config() -> Result<ChainSpec, String> {
 fn testnet_genesis(
     wasm_binary: &[u8],
     initial_authorities: Vec<AuthorityKeysTuple>,
-    root_key: AccountId,
+    _root_key: AccountId,
     endowed_accounts: Vec<AccountId>,
     enable_println: bool,
 ) -> GenesisConfig {
@@ -400,7 +399,6 @@ fn testnet_genesis(
                 .map(|k: &AccountId| (k.clone(), ENDOWMENT))
                 .collect(),
         }),
-        pallet_indices: Some(IndicesConfig { indices: vec![] }),
         pallet_babe: Some(Default::default()),
         pallet_grandpa: Some(Default::default()),
         pallet_im_online: Some(Default::default()),
@@ -439,7 +437,6 @@ fn testnet_genesis(
             slash_reward_fraction: Perbill::from_percent(10),
             ..Default::default()
         }),
-        pallet_elections_phragmen: Some(Default::default()),
         pallet_democracy: Some(Default::default()),
         pallet_collective_Instance1: Some(CouncilConfig {
             members: vec![],
@@ -450,9 +447,5 @@ fn testnet_genesis(
             phantom: Default::default(),
         }),
         pallet_membership_Instance1: Some(Default::default()),
-        pallet_sudo: Some(SudoConfig {
-            // Assign network admin rights.
-            key: root_key,
-        }),
     }
 }

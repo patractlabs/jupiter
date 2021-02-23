@@ -27,7 +27,6 @@ use sp_runtime::{
     ApplyExtrinsicResult, ModuleId, Perbill, Percent, Permill,
 };
 use sp_std::prelude::*;
-use static_assertions::const_assert;
 
 use frame_system::{EnsureOneOf, EnsureRoot};
 use pallet_contracts::WeightInfo;
@@ -54,7 +53,8 @@ pub use sp_runtime::BuildStorage;
 pub use frame_support::{
     construct_runtime, debug, parameter_types,
     traits::{
-        Filter, InstanceFilter, KeyOwnerProofSystem, LockIdentifier, Randomness, U128CurrencyToVote,
+        Contains, ContainsLengthBound, Filter, InstanceFilter, KeyOwnerProofSystem, LockIdentifier,
+        Randomness, U128CurrencyToVote,
     },
     weights::{
         constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_PER_SECOND},
@@ -537,39 +537,6 @@ impl pallet_collective::Config<CouncilCollective> for Runtime {
 }
 
 parameter_types! {
-    pub const CandidacyBond: Balance = 100 * DOLLARS;
-    // 1 storage item created, key size is 32 bytes, value size is 16+16.
-    pub const VotingBondBase: Balance = deposit(1, 64);
-    // additional data per vote is 32 bytes (account id).
-    pub const VotingBondFactor: Balance = deposit(0, 32);
-    /// Daily council elections.
-    pub const TermDuration: BlockNumber = 24 * HOURS;
-    pub const DesiredMembers: u32 = 19;
-    pub const DesiredRunnersUp: u32 = 19;
-    pub const ElectionsPhragmenModuleId: LockIdentifier = *b"phrelect";
-}
-// Make sure that there are no more than MaxMembers members elected via phragmen.
-const_assert!(DesiredMembers::get() <= CouncilMaxMembers::get());
-
-impl pallet_elections_phragmen::Config for Runtime {
-    type Event = Event;
-    type Currency = Balances;
-    type ChangeMembers = Council;
-    type InitializeMembers = Council;
-    type CurrencyToVote = U128CurrencyToVote;
-    type CandidacyBond = CandidacyBond;
-    type VotingBondBase = VotingBondBase;
-    type VotingBondFactor = VotingBondFactor;
-    type LoserCandidate = Treasury;
-    type KickedMember = Treasury;
-    type DesiredMembers = DesiredMembers;
-    type DesiredRunnersUp = DesiredRunnersUp;
-    type TermDuration = TermDuration;
-    type ModuleId = ElectionsPhragmenModuleId;
-    type WeightInfo = weights::pallet_elections_phragmen::WeightInfo<Runtime>;
-}
-
-parameter_types! {
     pub const TechnicalMotionDuration: BlockNumber = 3 * DAYS;
     pub const TechnicalMaxProposals: u32 = 100;
     pub const TechnicalMaxMembers: u32 = 100;
@@ -654,7 +621,7 @@ impl pallet_bounties::Config for Runtime {
 impl pallet_tips::Config for Runtime {
     type MaximumReasonLength = MaximumReasonLength;
     type DataDepositPerByte = DataDepositPerByte;
-    type Tippers = ElectionsPhragmen;
+    type Tippers = Authorities;
     type TipCountdown = TipCountdown;
     type TipFindersFee = TipFindersFee;
     type TipReportDepositBase = TipReportDepositBase;
@@ -672,18 +639,6 @@ impl pallet_timestamp::Config for Runtime {
     type OnTimestampSet = Babe;
     type MinimumPeriod = MinimumPeriod;
     type WeightInfo = weights::pallet_timestamp::WeightInfo;
-}
-
-parameter_types! {
-    pub const IndexDeposit: Balance = 1 * DOLLARS;
-}
-
-impl pallet_indices::Config for Runtime {
-    type AccountIndex = AccountIndex;
-    type Currency = Balances;
-    type Deposit = IndexDeposit;
-    type Event = Event;
-    type WeightInfo = weights::pallet_indices::WeightInfo;
 }
 
 parameter_types! {
@@ -844,10 +799,6 @@ impl InstanceFilter<Call> for ProxyType {
                 Call::System(..) |
 				Call::Babe(..) |
 				Call::Timestamp(..) |
-				Call::Indices(pallet_indices::Call::claim(..)) |
-				Call::Indices(pallet_indices::Call::free(..)) |
-				Call::Indices(pallet_indices::Call::freeze(..)) |
-				// Specifically omitting Indices `transfer`, `force_transfer`
 				// Specifically omitting the entire Balances pallet
 				Call::Authorship(..) |
 				Call::Staking(..) |
@@ -859,7 +810,6 @@ impl InstanceFilter<Call> for ProxyType {
 				Call::Democracy(..) |
 				Call::Council(..) |
 				Call::TechnicalCommittee(..) |
-				Call::ElectionsPhragmen(..) |
 				Call::TechnicalMembership(..) |
 				Call::Treasury(..) |
 				Call::Utility(..) |
@@ -873,7 +823,6 @@ impl InstanceFilter<Call> for ProxyType {
                 Call::Democracy(..)
                     | Call::Council(..)
                     | Call::TechnicalCommittee(..)
-                    | Call::ElectionsPhragmen(..)
                     | Call::Treasury(..)
                     | Call::Bounties(..)
                     | Call::Tips(..)
@@ -914,9 +863,20 @@ impl pallet_proxy::Config for Runtime {
     type AnnouncementDepositFactor = AnnouncementDepositFactor;
 }
 
-impl pallet_sudo::Config for Runtime {
-    type Event = Event;
-    type Call = Call;
+pub struct Authorities;
+impl Contains<AccountId> for Authorities {
+    fn sorted_members() -> Vec<AccountId> {
+        vec![]
+    }
+}
+impl ContainsLengthBound for Authorities {
+    fn min_len() -> usize {
+        0
+    }
+
+    fn max_len() -> usize {
+        0
+    }
 }
 
 // Create the runtime by composing the FRAME pallets that were previously configured.
@@ -933,7 +893,6 @@ construct_runtime!(
         Babe: pallet_babe::{Module, Call, Storage, Config, ValidateUnsigned} = 1,
 
         Timestamp: pallet_timestamp::{Module, Call, Storage, Inherent} = 2,
-        Indices: pallet_indices::{Module, Call, Storage, Config<T>, Event<T>} = 3,
         Balances: pallet_balances::{Module, Call, Storage, Config<T>, Event<T>} = 4,
         TransactionPayment: pallet_transaction_payment::{Module, Storage} = 5,
 
@@ -951,7 +910,6 @@ construct_runtime!(
         Democracy: pallet_democracy::{Module, Call, Storage, Config, Event<T>} = 14,
         Council: pallet_collective::<Instance1>::{Module, Call, Storage, Origin<T>, Event<T>, Config<T>} = 15,
         TechnicalCommittee: pallet_collective::<Instance2>::{Module, Call, Storage, Origin<T>, Event<T>, Config<T>} = 16,
-        ElectionsPhragmen: pallet_elections_phragmen::{Module, Call, Storage, Event<T>, Config<T>} = 17,
         TechnicalMembership: pallet_membership::<Instance1>::{Module, Call, Storage, Event<T>, Config<T>} = 18,
         Treasury: pallet_treasury::{Module, Call, Storage, Event<T>} = 19,
         // Bounties module.
@@ -974,7 +932,6 @@ construct_runtime!(
         // Multisig module. Late addition.
         Multisig: pallet_multisig::{Module, Call, Storage, Event<T>} = 26,
 
-        Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>} = 27,
         // Contracts module
         Contracts: pallet_contracts::{Module, Call, Config<T>, Storage, Event<T>} = 30,
 
