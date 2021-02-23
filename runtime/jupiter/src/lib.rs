@@ -736,14 +736,11 @@ impl pallet_identity::Config for Runtime {
 }
 
 parameter_types! {
-    pub const TombstoneDeposit: Balance = tombstone_deposit(
-        1,
-        sp_std::mem::size_of::<pallet_contracts::ContractInfo<Runtime>>() as u32
-    );
+    pub const TombstoneDeposit: Balance = 0;
     pub const DepositPerContract: Balance = TombstoneDeposit::get();
-    pub const DepositPerStorageByte: Balance = 1 * MILLICENTS;
-    pub const DepositPerStorageItem: Balance = 10 * MILLICENTS;
-    pub RentFraction: Perbill = Perbill::from_rational_approximation(1u32, 60 * DAYS);
+    pub const DepositPerStorageByte: Balance = 0;
+    pub const DepositPerStorageItem: Balance = 0;
+    pub RentFraction: Perbill = Perbill::zero();
     pub const SurchargeReward: Balance = 0;
     pub const SignedClaimHandicap: u32 = 0;
     pub const MaxDepth: u32 = 100;

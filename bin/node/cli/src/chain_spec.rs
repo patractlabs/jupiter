@@ -315,9 +315,9 @@ pub fn staging_testnet_config() -> Result<ChainSpec, String> {
 
     Ok(ChainSpec::from_genesis(
         // Name
-        "Jupiter Staging Testnet",
+        "Jupiter Staging Testnet CC2",
         // ID
-        "jupiter_staging_testnet",
+        "jupiter_staging_testnet_cc2",
         ChainType::Live,
         move || {
             testnet_genesis(
@@ -349,7 +349,7 @@ pub fn staging_testnet_config() -> Result<ChainSpec, String> {
                 .expect("Polkadot Staging telemetry url is valid; qed"),
         ),
         // Protocol ID
-        Some("jupiter_staging_testnet"),
+        Some("jupiter_staging_testnet_cc2"),
         // Properties
         Some(
             json!({
