@@ -1,8 +1,13 @@
+#![cfg_attr(not(feature = "std"), no_std)]
+
 pub mod weights;
+
+#[cfg(feature = "std")]
+use serde::{Deserialize, Serialize};
 
 use frame_support::pallet_prelude::*;
 use sp_runtime::{traits::StaticLookup, RuntimeDebug};
-use sp_std::prelude::*;
+use sp_std::{collections::btree_map::BTreeMap, prelude::*};
 
 pub use pallet::*;
 pub use weights::WeightInfo;
@@ -16,15 +21,15 @@ pub mod pallet {
 
     #[pallet::config]
     pub trait Config: frame_system::Config {
+        /// The minimum amount required to keep an account open.
+        #[pallet::constant]
+        type MinimumAuthorities: Get<u32>;
         ///
         type CouncilOrigin: EnsureOrigin<Self::Origin>;
         /// The overarching event type.
         type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
         /// Weight information for extrinsics in this pallet.
         type WeightInfo: WeightInfo;
-        /// The minimum amount required to keep an account open.
-        #[pallet::constant]
-        type MinimumAuthorities: Get<u32>;
     }
 
     #[pallet::error]
@@ -55,6 +60,30 @@ pub mod pallet {
     #[pallet::pallet]
     #[pallet::generate_store(pub(super) trait Store)]
     pub struct Pallet<T>(PhantomData<T>);
+
+    #[pallet::genesis_config]
+    pub struct GenesisConfig<T: Config> {
+        pub init_authorities: Vec<T::AccountId>,
+    }
+    #[cfg(feature = "std")]
+    impl<T: Config> Default for GenesisConfig<T> {
+        fn default() -> Self {
+            Self {
+                init_authorities: Default::default(),
+            }
+        }
+    }
+    #[pallet::genesis_build]
+    impl<T: Config> GenesisBuild<T> for GenesisConfig<T> {
+        fn build(&self) {
+            if (self.init_authorities.len() as u32) < T::MinimumAuthorities::get() {
+                panic!("poa init authorities must larger than `MinimumAuthorities` requirement");
+            }
+            for a in self.init_authorities.iter() {
+                Authorities::<T>::insert(a.clone(), AuthorityState::Working);
+            }
+        }
+    }
 
     #[pallet::hooks]
     impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {}
@@ -104,6 +133,7 @@ pub mod pallet {
 }
 
 #[derive(Encode, Decode, Clone, Copy, PartialEq, Eq, RuntimeDebug)]
+#[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 pub enum AuthorityState {
     Working,
     Waiting,
@@ -120,5 +150,9 @@ impl<T: Config> Pallet<T> {
                 }
             })
             .collect()
+    }
+
+    pub fn authorities_map() -> BTreeMap<T::AccountId, AuthorityState> {
+        Authorities::<T>::iter().collect()
     }
 }

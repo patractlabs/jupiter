@@ -26,7 +26,7 @@ use sp_runtime::{
     transaction_validity::{TransactionPriority, TransactionSource, TransactionValidity},
     ApplyExtrinsicResult, ModuleId, Perbill, Percent, Permill,
 };
-use sp_std::prelude::*;
+use sp_std::{collections::btree_map::BTreeMap, prelude::*};
 
 use frame_system::{EnsureOneOf, EnsureRoot};
 use pallet_contracts::WeightInfo;
@@ -358,10 +358,6 @@ impl pallet_grandpa::Config for Runtime {
 
 parameter_types! {
     pub const DisabledValidatorsThreshold: Perbill = Perbill::from_percent(17);
-}
-
-impl pallet_randomness_provider::Config for Runtime {
-    type ValidatorId = AccountId;
 }
 
 impl pallet_session::Config for Runtime {
@@ -868,6 +864,21 @@ impl pallet_sudo::Config for Runtime {
     type Call = Call;
 }
 
+impl pallet_randomness_provider::Config for Runtime {
+    type ValidatorId = AccountId;
+}
+
+parameter_types! {
+    pub const MinimumAuthorities: u32 = 4;
+}
+
+impl pallet_poa::Config for Runtime {
+    type MinimumAuthorities = MinimumAuthorities;
+    type CouncilOrigin = MoreThanHalfCouncil;
+    type Event = Event;
+    type WeightInfo = ();
+}
+
 pub struct Authorities;
 impl Contains<AccountId> for Authorities {
     fn sorted_members() -> Vec<AccountId> {
@@ -942,6 +953,7 @@ construct_runtime!(
         Contracts: pallet_contracts::{Module, Call, Config<T>, Storage, Event<T>} = 30,
 
         RandomnessProvider: pallet_randomness_provider::{Module, Storage} = 31,
+        PoA: pallet_poa::{Module, Call, Config<T>, Storage, Event<T>} = 32,
     }
 );
 
@@ -1186,6 +1198,12 @@ impl_runtime_apis! {
             address: AccountId,
         ) -> pallet_contracts_primitives::RentProjectionResult<BlockNumber> {
             Contracts::rent_projection(address)
+        }
+    }
+
+    impl pallet_poa_rpc_runtime_api::PoaApi<Block, AccountId> for Runtime {
+        fn authorities() -> BTreeMap<AccountId, pallet_poa_rpc_runtime_api::AuthorityState> {
+            PoA::authorities_map()
         }
     }
 }

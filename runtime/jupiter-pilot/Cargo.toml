@@ -68,6 +68,8 @@ pallet-contracts-rpc-runtime-api = { version = "0.8.0", git = "https://github.co
 
 # local pallet define
 pallet-randomness-provider = { path = "../../pallets/randomness-provider", default-features = false }
+pallet-poa = { path = "../../pallets/poa", default-features = false }
+pallet-poa-rpc-runtime-api = { path = "../../pallets/poa/rpc/runtime-api", default-features = false }
 
 # local runtime module
 patract-primitives = { path = "../../primitives", default-features = false }
@@ -133,6 +135,8 @@ std = [
     "pallet-utility/std",
 
     "pallet-randomness-provider/std",
+    "pallet-poa/std",
+    "pallet-poa-rpc-runtime-api/std",
 
     "patract-primitives/std",
     "patract-runtime-common/std",

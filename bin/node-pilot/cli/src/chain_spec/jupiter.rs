@@ -15,7 +15,8 @@ use sp_runtime::{
 use jupiter_runtime::{AccountId, SessionKeys, Signature};
 use jupiter_runtime::{
     AuthorityDiscoveryConfig, BalancesConfig, ContractsConfig, CouncilConfig, GenesisConfig,
-    SessionConfig, StakingConfig, SystemConfig, TechnicalCommitteeConfig, WASM_BINARY, SudoConfig
+    PoAConfig, SessionConfig, StakingConfig, SudoConfig, SystemConfig, TechnicalCommitteeConfig,
+    WASM_BINARY,
 };
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use pallet_staking::{Forcing, StakerStatus};
@@ -447,8 +448,9 @@ fn testnet_genesis(
             phantom: Default::default(),
         }),
         pallet_membership_Instance1: Some(Default::default()),
-        pallet_sudo: Some(SudoConfig {
-            key: root_key,
+        pallet_sudo: Some(SudoConfig { key: root_key }),
+        pallet_poa: Some(PoAConfig {
+            init_authorities: vec![],
         }),
     }
 }

@@ -2810,6 +2810,8 @@ dependencies = [
  "pallet-membership",
  "pallet-multisig",
  "pallet-offences",
+ "pallet-poa",
+ "pallet-poa-rpc-runtime-api",
  "pallet-proxy",
  "pallet-randomness-provider",
  "pallet-scheduler",
@@ -4295,6 +4297,31 @@ dependencies = [
  "frame-system",
  "parity-scale-codec 2.0.0",
  "serde",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
+name = "pallet-poa-rpc"
+version = "0.1.0"
+dependencies = [
+ "jsonrpc-core",
+ "jsonrpc-core-client",
+ "jsonrpc-derive",
+ "pallet-poa-rpc-runtime-api",
+ "parity-scale-codec 2.0.0",
+ "sp-api",
+ "sp-blockchain",
+ "sp-runtime",
+]
+
+[[package]]
+name = "pallet-poa-rpc-runtime-api"
+version = "0.1.0"
+dependencies = [
+ "pallet-poa",
+ "parity-scale-codec 2.0.0",
+ "sp-api",
  "sp-runtime",
  "sp-std",
 ]
