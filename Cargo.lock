@@ -4288,6 +4288,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "pallet-poa"
+version = "0.1.0"
+dependencies = [
+ "frame-support",
+ "frame-system",
+ "parity-scale-codec 2.0.0",
+ "serde",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
 name = "pallet-proxy"
 version = "3.0.0"
 source = "git+https://github.com/paritytech/substrate?branch=master#f53d72f0fdadf56c34f3199bea96c652633f82a9"
