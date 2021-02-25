@@ -7,19 +7,15 @@ use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_consensus_babe::AuthorityId as BabeId;
 use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public};
 use sp_finality_grandpa::AuthorityId as GrandpaId;
-use sp_runtime::{
-    traits::{IdentifyAccount, Verify},
-    Perbill,
-};
+use sp_runtime::traits::{IdentifyAccount, Verify};
 
+use jupiter_runtime::Forcing;
 use jupiter_runtime::{AccountId, SessionKeys, Signature};
 use jupiter_runtime::{
     AuthorityDiscoveryConfig, BalancesConfig, ContractsConfig, CouncilConfig, GenesisConfig,
-    IndicesConfig, SessionConfig, StakingConfig, SudoConfig, SystemConfig,
-    TechnicalCommitteeConfig, WASM_BINARY,
+    PoAConfig, SessionConfig, SudoConfig, SystemConfig, TechnicalCommitteeConfig, WASM_BINARY,
 };
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
-use pallet_staking::{Forcing, StakerStatus};
 use patract_runtime_common::constants::currency::DOTS;
 
 // The URL for the telemetry server.
@@ -379,7 +375,6 @@ fn testnet_genesis(
     enable_println: bool,
 ) -> GenesisConfig {
     const ENDOWMENT: u128 = 1_000_000 * DOTS;
-    const STASH: u128 = 100 * DOTS;
 
     let mut endowed_accounts: Vec<AccountId> = endowed_accounts;
     initial_authorities.iter().for_each(|x| {
@@ -400,7 +395,6 @@ fn testnet_genesis(
                 .map(|k: &AccountId| (k.clone(), ENDOWMENT))
                 .collect(),
         }),
-        pallet_indices: Some(IndicesConfig { indices: vec![] }),
         pallet_babe: Some(Default::default()),
         pallet_grandpa: Some(Default::default()),
         pallet_im_online: Some(Default::default()),
@@ -423,23 +417,6 @@ fn testnet_genesis(
                 ..Default::default()
             },
         }),
-        pallet_staking: Some(StakingConfig {
-            validator_count: if initial_authorities.len() < 4 {
-                initial_authorities.len() as u32 * 2
-            } else {
-                50
-            },
-            minimum_validator_count: initial_authorities.len() as u32,
-            stakers: initial_authorities
-                .iter()
-                .map(|x| (x.0.clone(), x.1.clone(), STASH, StakerStatus::Validator))
-                .collect(),
-            invulnerables: initial_authorities.iter().map(|x| x.0.clone()).collect(),
-            force_era: Forcing::ForceNone,
-            slash_reward_fraction: Perbill::from_percent(10),
-            ..Default::default()
-        }),
-        pallet_elections_phragmen: Some(Default::default()),
         pallet_democracy: Some(Default::default()),
         pallet_collective_Instance1: Some(CouncilConfig {
             members: vec![],
@@ -450,9 +427,18 @@ fn testnet_genesis(
             phantom: Default::default(),
         }),
         pallet_membership_Instance1: Some(Default::default()),
-        pallet_sudo: Some(SudoConfig {
-            // Assign network admin rights.
-            key: root_key,
+        pallet_sudo: Some(SudoConfig { key: root_key }),
+        pallet_poa: Some(PoAConfig {
+            minimum_authority_count: initial_authorities.len() as u32,
+            init_authorities: initial_authorities
+                .iter()
+                .map(|x| x.0.clone())
+                .collect::<Vec<_>>(),
+            init_invulnerables: initial_authorities
+                .iter()
+                .map(|x| x.0.clone())
+                .collect::<Vec<_>>(),
+            force_era: Forcing::ForceNone,
         }),
     }
 }

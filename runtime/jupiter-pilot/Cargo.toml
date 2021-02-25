@@ -40,19 +40,15 @@ pallet-babe = { version = "3.0.0", git = "https://github.com/paritytech/substrat
 pallet-balances = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-collective = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-democracy = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
-pallet-elections-phragmen = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-grandpa = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-im-online = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-identity = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
-pallet-indices = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-membership = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-multisig = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-offences = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-proxy = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-scheduler = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-session = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false, features = ["historical"] }
-pallet-staking = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
-pallet-staking-reward-curve = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-sudo = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-transaction-payment = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-transaction-payment-rpc-runtime-api = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
@@ -70,6 +66,8 @@ pallet-contracts-rpc-runtime-api = { version = "0.8.0", git = "https://github.co
 
 # local pallet define
 pallet-randomness-provider = { path = "../../pallets/randomness-provider", default-features = false }
+pallet-poa = { path = "../../pallets/poa", default-features = false }
+pallet-poa-rpc-runtime-api = { path = "../../pallets/poa/rpc/runtime-api", default-features = false }
 
 # local runtime module
 patract-primitives = { path = "../../primitives", default-features = false }
@@ -115,11 +113,9 @@ std = [
     "pallet-contracts-primitives/std",
     "pallet-contracts-rpc-runtime-api/std",
     "pallet-democracy/std",
-    "pallet-elections-phragmen/std",
     "pallet-grandpa/std",
     "pallet-im-online/std",
     "pallet-identity/std",
-    "pallet-indices/std",
     "pallet-membership/std",
     "pallet-multisig/std",
     "pallet-offences/std",
@@ -127,7 +123,6 @@ std = [
     "pallet-sudo/std",
     "pallet-scheduler/std",
     "pallet-session/std",
-    "pallet-staking/std",
     "pallet-timestamp/std",
     "pallet-transaction-payment/std",
     "pallet-transaction-payment-rpc-runtime-api/std",
@@ -137,6 +132,8 @@ std = [
     "pallet-utility/std",
 
     "pallet-randomness-provider/std",
+    "pallet-poa/std",
+    "pallet-poa-rpc-runtime-api/std",
 
     "patract-primitives/std",
     "patract-runtime-common/std",

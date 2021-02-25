@@ -2804,20 +2804,18 @@ dependencies = [
  "pallet-contracts-primitives",
  "pallet-contracts-rpc-runtime-api",
  "pallet-democracy",
- "pallet-elections-phragmen",
  "pallet-grandpa",
  "pallet-identity",
  "pallet-im-online",
- "pallet-indices",
  "pallet-membership",
  "pallet-multisig",
  "pallet-offences",
+ "pallet-poa",
+ "pallet-poa-rpc-runtime-api",
  "pallet-proxy",
  "pallet-randomness-provider",
  "pallet-scheduler",
  "pallet-session",
- "pallet-staking",
- "pallet-staking-reward-curve",
  "pallet-sudo",
  "pallet-timestamp",
  "pallet-tips",
@@ -3272,9 +3270,9 @@ dependencies = [
 
 [[package]]
 name = "libp2p-swarm"
-version = "0.27.0"
+version = "0.27.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "22ea8c69839a0e593c8c6a24282cb234d48ac37be4153183f4914e00f5303e75"
+checksum = "7955b973e1fd2bd61ffd43ce261c1223f61f4aacd5bae362a924993f9a25fd98"
 dependencies = [
  "either",
  "futures 0.3.9",
@@ -4290,6 +4288,45 @@ dependencies = [
 ]
 
 [[package]]
+name = "pallet-poa"
+version = "0.1.0"
+dependencies = [
+ "frame-support",
+ "frame-system",
+ "pallet-session",
+ "parity-scale-codec 2.0.0",
+ "serde",
+ "sp-runtime",
+ "sp-staking",
+ "sp-std",
+]
+
+[[package]]
+name = "pallet-poa-rpc"
+version = "0.1.0"
+dependencies = [
+ "jsonrpc-core",
+ "jsonrpc-core-client",
+ "jsonrpc-derive",
+ "pallet-poa-rpc-runtime-api",
+ "parity-scale-codec 2.0.0",
+ "sp-api",
+ "sp-blockchain",
+ "sp-runtime",
+]
+
+[[package]]
+name = "pallet-poa-rpc-runtime-api"
+version = "0.1.0"
+dependencies = [
+ "pallet-poa",
+ "parity-scale-codec 2.0.0",
+ "sp-api",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
 name = "pallet-proxy"
 version = "3.0.0"
 source = "git+https://github.com/paritytech/substrate?branch=master#f53d72f0fdadf56c34f3199bea96c652633f82a9"
@@ -4389,17 +4426,6 @@ dependencies = [
  "sp-staking",
  "sp-std",
  "static_assertions",
-]
-
-[[package]]
-name = "pallet-staking-reward-curve"
-version = "3.0.0"
-source = "git+https://github.com/paritytech/substrate?branch=master#f53d72f0fdadf56c34f3199bea96c652633f82a9"
-dependencies = [
- "proc-macro-crate",
- "proc-macro2",
- "quote",
- "syn",
 ]
 
 [[package]]
@@ -4849,7 +4875,6 @@ dependencies = [
  "pallet-authority-discovery",
  "pallet-contracts",
  "pallet-im-online",
- "pallet-staking",
  "parking_lot 0.10.2",
  "patract-executor",
  "patract-primitives",
@@ -8639,7 +8664,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "04f8ab788026715fa63b31960869617cba39117e520eb415b0139543e325ab59"
 dependencies = [
  "cfg-if 0.1.10",
- "rand 0.7.3",
+ "rand 0.3.23",
  "static_assertions",
 ]
 
