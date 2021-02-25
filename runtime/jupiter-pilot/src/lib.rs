@@ -28,7 +28,7 @@ use sp_runtime::{
 };
 use sp_std::{collections::btree_map::BTreeMap, prelude::*};
 
-use frame_system::{EnsureOneOf, EnsureRoot};
+use frame_system::{Config, EnsureOneOf, EnsureRoot};
 use pallet_contracts::WeightInfo;
 use pallet_contracts_primitives::ContractExecResult;
 use pallet_grandpa::{
@@ -38,6 +38,7 @@ use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use pallet_transaction_payment::{CurrencyAdapter, FeeDetails};
 use pallet_transaction_payment_rpc_runtime_api::RuntimeDispatchInfo;
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
+use sp_staking::SessionIndex;
 
 #[cfg(feature = "std")]
 use sp_version::NativeVersion;
@@ -203,15 +204,14 @@ impl pallet_authorship::Config for Runtime {
     type FindAuthor = pallet_session::FindAccountFromAuthorIndex<Self, Babe>;
     type UncleGenerations = UncleGenerations;
     type FilterUncle = ();
-    // type EventHandler = (Staking, ImOnline);
-    type EventHandler = (ImOnline); // TODO use poa
+    type EventHandler = ImOnline; // do not need to note PoA module now
 }
 
 parameter_types! {
     pub const EpochDuration: u64 = EPOCH_DURATION_IN_BLOCKS as u64;
     pub const ExpectedBlockTime: Moment = MILLISECS_PER_BLOCK;
     pub const ReportLongevity: u64 =
-        BondingDuration::get() as u64 * SessionsPerEra::get() as u64 * EpochDuration::get();
+       SlashDeferDuration::get() as u64 * SessionsPerEra::get() as u64 * EpochDuration::get(); // TODO change this in future
 }
 
 impl pallet_babe::Config for Runtime {
@@ -305,7 +305,7 @@ parameter_types! {
 impl pallet_offences::Config for Runtime {
     type Event = Event;
     type IdentificationTuple = pallet_session::historical::IdentificationTuple<Self>;
-    type OnOffenceHandler = PoA; // TODO replace Staking;
+    type OnOffenceHandler = PoA;
     type WeightSoftLimit = OffencesWeightSoftLimit;
 }
 
@@ -359,12 +359,12 @@ parameter_types! {
 impl pallet_session::Config for Runtime {
     type Event = Event;
     type ValidatorId = AccountId;
-    type ValidatorIdOf = AccountId; //TODO check this pallet_staking::StashOf<Self>;
+    type ValidatorIdOf = pallet_poa::SimpleValidatorIdConverter<AccountId>;
     type ShouldEndSession = Babe;
     type NextSessionRotation = Babe;
     type SessionManager = pallet_randomness_provider::NoteHistoricalRandomness<
         Self,
-        pallet_session::historical::NoteHistoricalRoot<Self, Staking>, // TODO replace this
+        pallet_session::historical::NoteHistoricalRoot<Self, PoA>,
     >;
     type SessionHandler = <SessionKeys as OpaqueKeys>::KeyTypeIdProviders;
     type Keys = SessionKeys;
@@ -373,30 +373,40 @@ impl pallet_session::Config for Runtime {
 }
 
 impl pallet_session::historical::Config for Runtime {
-    type FullIdentification = pallet_staking::Exposure<AccountId, Balance>; //
-    type FullIdentificationOf = pallet_staking::ExposureOf<Runtime>; // TODO
+    type FullIdentification = AccountId;
+    type FullIdentificationOf = pallet_poa::SimpleValidatorIdConverter<AccountId>; // the identification is AccountId for PoA
 }
 
-// parameter_types! {
-//     // Six sessions in an era (6 hours).
-//     pub const SessionsPerEra: SessionIndex = 6;
-//     // 28 eras for unbonding (7 days).
-//     pub const BondingDuration: pallet_staking::EraIndex = 28;
-//     // 27 eras in which slashes can be cancelled (slightly less than 7 days).
-//     pub const SlashDeferDuration: pallet_staking::EraIndex = 27;
-//     pub const RewardCurve: &'static PiecewiseLinear<'static> = &REWARD_CURVE;
-//     pub const MaxNominatorRewardedPerValidator: u32 = 128;
-//     // quarter of the last session will be for election.
-//     pub const ElectionLookahead: BlockNumber = EPOCH_DURATION_IN_BLOCKS / 4;
-//     pub const MaxIterations: u32 = 10;
-//     pub MinSolutionScoreBump: Perbill = Perbill::from_rational_approximation(5u32, 10_000);
-// }
+parameter_types! {
+    pub const MinimumAuthorities: u32 = 4;
+    // One sessions in an era (1 hours).
+    pub const SessionsPerEra: SessionIndex = 1;
+    // 7 days.
+    pub const SlashDeferDuration: pallet_poa::EraIndex = 24 * SessionsPerEra::get() * 7;
+}
 
+type CouncilOrigin = EnsureOneOf<
+    AccountId,
+    EnsureRoot<AccountId>,
+    pallet_collective::EnsureProportionAtLeast<_2, _3, AccountId, CouncilCollective>,
+>;
 type SlashCancelOrigin = EnsureOneOf<
     AccountId,
     EnsureRoot<AccountId>,
     pallet_collective::EnsureProportionAtLeast<_1, _2, AccountId, CouncilCollective>,
 >;
+
+impl pallet_poa::Config for Runtime {
+    type MinimumAuthorities = MinimumAuthorities;
+    type SessionsPerEra = SessionsPerEra;
+    type SlashDeferDuration = SlashDeferDuration;
+    type UnixTime = Timestamp;
+    type CouncilOrigin = CouncilOrigin;
+    type SlashCancelOrigin = SlashCancelOrigin;
+    type SessionInterface = Self;
+    type Event = Event;
+    type WeightInfo = (); //TODO change this
+}
 
 parameter_types! {
     pub const LaunchPeriod: BlockNumber = 1 * DAYS;
@@ -819,17 +829,6 @@ impl pallet_sudo::Config for Runtime {
 
 impl pallet_randomness_provider::Config for Runtime {
     type ValidatorId = AccountId;
-}
-
-parameter_types! {
-    pub const MinimumAuthorities: u32 = 4;
-}
-
-impl pallet_poa::Config for Runtime {
-    type MinimumAuthorities = MinimumAuthorities;
-    type CouncilOrigin = MoreThanHalfCouncil;
-    type Event = Event;
-    type WeightInfo = ();
 }
 
 pub struct Authorities;

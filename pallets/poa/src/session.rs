@@ -5,6 +5,7 @@ use frame_support::{
 use pallet_session::historical;
 use sp_runtime::traits::Convert;
 use sp_staking::SessionIndex;
+use sp_std::prelude::*;
 
 use crate::slashing;
 

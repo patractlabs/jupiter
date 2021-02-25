@@ -13,6 +13,7 @@ use sp_runtime::{traits::StaticLookup, RuntimeDebug, SaturatedConversion};
 use sp_std::{collections::btree_map::BTreeMap, prelude::*};
 
 pub use pallet::*;
+pub use session::SimpleValidatorIdConverter;
 pub use weights::WeightInfo;
 
 pub type EraIndex = u32;
