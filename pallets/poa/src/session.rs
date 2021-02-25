@@ -110,7 +110,9 @@ impl<T: Config> Pallet<T> {
         });
 
         // TODO set clean up scope in future
-        T::SessionInterface::prune_historical_up_to(start_session - 24 * 7);
+        if start_session > 24 * 7 {
+            T::SessionInterface::prune_historical_up_to(start_session - 24 * 7);
+        }
 
         Self::apply_unapplied_slashes(active_era);
     }
