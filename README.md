@@ -90,7 +90,8 @@ Patract **current** "extending types" is (This may be changed for different Patr
 ```json
 {
   "LookupSource": "MultiAddress",
-  "Address": "MultiAddress"
+  "Address": "MultiAddress",
+  "FullIdentification": "AccountId"
 }
 ```
 
