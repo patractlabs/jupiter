@@ -16,9 +16,7 @@ use sp_core::{
     OpaqueMetadata,
 };
 use sp_runtime::{
-    create_runtime_str,
-    curve::PiecewiseLinear,
-    generic, impl_opaque_keys,
+    create_runtime_str, generic, impl_opaque_keys,
     traits::{
         AccountIdLookup, BlakeTwo256, Block as BlockT, Extrinsic as ExtrinsicT, OpaqueKeys,
         SaturatedConversion, StaticLookup, Verify,
@@ -28,7 +26,7 @@ use sp_runtime::{
 };
 use sp_std::{collections::btree_map::BTreeMap, prelude::*};
 
-use frame_system::{Config, EnsureOneOf, EnsureRoot};
+use frame_system::{EnsureOneOf, EnsureRoot};
 use pallet_contracts::WeightInfo;
 use pallet_contracts_primitives::ContractExecResult;
 use pallet_grandpa::{
@@ -70,8 +68,7 @@ pub use patract_primitives::{
 };
 use patract_runtime_common::{
     constants::{currency::*, fee::WeightToFee, time::*},
-    impls, weights, BlockHashCount, BlockLength, BlockWeights, OffchainSolutionWeightLimit,
-    AVERAGE_ON_INITIALIZE_RATIO,
+    impls, weights, BlockHashCount, BlockLength, BlockWeights, AVERAGE_ON_INITIALIZE_RATIO,
 };
 
 impl_opaque_keys! {
@@ -576,10 +573,28 @@ impl pallet_bounties::Config for Runtime {
     type WeightInfo = weights::pallet_bounties::WeightInfo<Runtime>;
 }
 
+pub struct CouncilMembers;
+impl Contains<AccountId> for CouncilMembers {
+    fn sorted_members() -> Vec<AccountId> {
+        let mut v = Council::members();
+        v.sort();
+        v
+    }
+}
+impl ContainsLengthBound for CouncilMembers {
+    fn min_len() -> usize {
+        0
+    }
+
+    fn max_len() -> usize {
+        CouncilMaxMembers::get() as usize
+    }
+}
+
 impl pallet_tips::Config for Runtime {
     type MaximumReasonLength = MaximumReasonLength;
     type DataDepositPerByte = DataDepositPerByte;
-    type Tippers = Authorities;
+    type Tippers = CouncilMembers;
     type TipCountdown = TipCountdown;
     type TipFindersFee = TipFindersFee;
     type TipReportDepositBase = TipReportDepositBase;
@@ -829,22 +844,6 @@ impl pallet_sudo::Config for Runtime {
 
 impl pallet_randomness_provider::Config for Runtime {
     type ValidatorId = AccountId;
-}
-
-pub struct Authorities;
-impl Contains<AccountId> for Authorities {
-    fn sorted_members() -> Vec<AccountId> {
-        vec![]
-    }
-}
-impl ContainsLengthBound for Authorities {
-    fn min_len() -> usize {
-        0
-    }
-
-    fn max_len() -> usize {
-        0
-    }
 }
 
 // Create the runtime by composing the FRAME pallets that were previously configured.
