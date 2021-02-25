@@ -4875,7 +4875,6 @@ dependencies = [
  "pallet-authority-discovery",
  "pallet-contracts",
  "pallet-im-online",
- "pallet-staking",
  "parking_lot 0.10.2",
  "patract-executor",
  "patract-primitives",

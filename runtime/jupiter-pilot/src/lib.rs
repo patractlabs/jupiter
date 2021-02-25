@@ -63,6 +63,8 @@ pub use pallet_balances::Call as BalancesCall;
 pub use pallet_session::historical as pallet_session_historical;
 pub use pallet_timestamp::Call as TimestampCall;
 
+pub use pallet_poa::Forcing;
+
 pub use patract_primitives::{
     AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Signature,
 };
@@ -375,7 +377,7 @@ impl pallet_session::historical::Config for Runtime {
 }
 
 parameter_types! {
-    pub const MinimumAuthorities: u32 = 4;
+    pub MinimumAuthorities: u32 = PoA::minimum_authority_count();
     // One sessions in an era (1 hours).
     pub const SessionsPerEra: SessionIndex = 1;
     // 7 days.

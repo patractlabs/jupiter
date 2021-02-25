@@ -50,10 +50,8 @@ pub mod pallet {
         type CouncilOrigin: EnsureOrigin<Self::Origin>;
         /// The origin which can cancel a deferred slash. Root can always do this.
         type SlashCancelOrigin: EnsureOrigin<Self::Origin>;
-
         /// Interface for interacting with a session module.
         type SessionInterface: crate::session::SessionInterface<Self::AccountId>;
-
         /// The overarching event type.
         type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
         /// Weight information for extrinsics in this pallet.
@@ -97,6 +95,15 @@ pub mod pallet {
     #[pallet::getter(fn authorities)]
     pub type Authorities<T: Config> =
         StorageMap<_, Blake2_128Concat, T::AccountId, AuthorityState, OptionQuery>;
+    #[pallet::storage]
+    #[pallet::getter(fn minimum_authority_count)]
+    pub type MinimumAuthorityCount<T: Config> =
+        StorageValue<_, u32, ValueQuery, MinimumAuthorityCountDefault>;
+    #[pallet::type_value]
+    pub fn MinimumAuthorityCountDefault() -> u32 {
+        1
+    }
+
     /// Number of eras to keep in history.
     ///
     /// Information is kept for eras in `[current_era - history_depth; current_era]`.
@@ -160,14 +167,18 @@ pub mod pallet {
 
     #[pallet::genesis_config]
     pub struct GenesisConfig<T: Config> {
+        pub minimum_authority_count: u32,
         pub init_authorities: Vec<T::AccountId>,
+        pub init_invulnerables: Vec<T::AccountId>,
         pub force_era: Forcing,
     }
     #[cfg(feature = "std")]
     impl<T: Config> Default for GenesisConfig<T> {
         fn default() -> Self {
             Self {
+                minimum_authority_count: 1,
                 init_authorities: Default::default(),
+                init_invulnerables: Default::default(),
                 force_era: Default::default(),
             }
         }
@@ -175,6 +186,7 @@ pub mod pallet {
     #[pallet::genesis_build]
     impl<T: Config> GenesisBuild<T> for GenesisConfig<T> {
         fn build(&self) {
+            MinimumAuthorityCount::<T>::put(self.minimum_authority_count);
             if (self.init_authorities.len() as u32) < T::MinimumAuthorities::get() {
                 panic!("poa init authorities must larger than `MinimumAuthorities` requirement");
             }
