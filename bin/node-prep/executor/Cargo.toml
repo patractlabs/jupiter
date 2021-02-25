@@ -10,7 +10,7 @@ sc-executor = { version = "0.9.0", git = "https://github.com/paritytech/substrat
 
 patract-io = { path = "../../../primitives/io" }
 
-jupiter-runtime = { package = "jupiter-pilot-runtime", path = "../../../runtime/jupiter-pilot" }
+jupiter-runtime = { package = "jupiter-prep-runtime", path = "../../../runtime/jupiter-prep" }
 
 [features]
 wasmtime = [
