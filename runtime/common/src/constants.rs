@@ -1,7 +1,8 @@
 //! A set of constant values used in substrate runtime.
 
 /// Money matters.
-pub mod currency {
+pub mod jupiter_currency {
+    use super::fee::{Weight2FeeNumerator, WeightToFee};
     use patract_primitives::Balance;
 
     pub const DOTS: Balance = 1_000_000_000_000; // old dot, one Dot is 100 Dot(new) now
@@ -16,6 +17,12 @@ pub mod currency {
     pub const fn tombstone_deposit(items: u32, bytes: u32) -> Balance {
         items as Balance * 10 * CENTS + (bytes as Balance) * 10 * MILLICENTS
     }
+
+    pub struct JupiterNumerator;
+    impl Weight2FeeNumerator for JupiterNumerator {
+        const NUMERATOR: u128 = CENTS;
+    }
+    pub type JupiterWeight2Fee = WeightToFee<JupiterNumerator>;
 }
 
 /// Time.
@@ -60,12 +67,16 @@ pub mod fee {
     /// Yet, it can be used for any other sort of change to weight-fee. Some examples being:
     ///   - Setting it to `0` will essentially disable the weight fee.
     ///   - Setting it to `1` will cause the literal `#[weight = x]` values to be charged.
-    pub struct WeightToFee;
-    impl WeightToFeePolynomial for WeightToFee {
+    pub struct WeightToFee<A: Weight2FeeNumerator>(sp_std::marker::PhantomData<A>);
+    pub trait Weight2FeeNumerator {
+        const NUMERATOR: u128;
+    }
+    impl<A: Weight2FeeNumerator> WeightToFeePolynomial for WeightToFee<A> {
         type Balance = Balance;
         fn polynomial() -> WeightToFeeCoefficients<Self::Balance> {
             // in Polkadot, extrinsic base weight (smallest non-zero weight) is mapped to 1/10 CENT:
-            let p = super::currency::CENTS;
+            // let p = super::jupiter_currency::CENTS;
+            let p = A::NUMERATOR;
             let q = 10 * Balance::from(ExtrinsicBaseWeight::get());
             smallvec![WeightToFeeCoefficient {
                 degree: 1,

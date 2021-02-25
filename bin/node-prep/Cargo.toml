@@ -1,10 +1,10 @@
 [package]
-name = "patract-pilot"
+name = "patract-prep"
 version = "0.1.0"
 authors = ["Patract <https://github.com/patractlabs/patract>"]
 edition = "2018"
 description = ""
-default-run = "patract-pilot"
+default-run = "patract-prep"
 
 [dependencies]
 cli = { package = "patract-cli", path = "cli" }

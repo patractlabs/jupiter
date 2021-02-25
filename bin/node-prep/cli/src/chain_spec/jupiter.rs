@@ -16,7 +16,7 @@ use jupiter_runtime::{
     PoAConfig, SessionConfig, SudoConfig, SystemConfig, TechnicalCommitteeConfig, WASM_BINARY,
 };
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
-use patract_runtime_common::constants::currency::DOTS;
+use patract_runtime_common::constants::jupiter_currency::DOTS;
 
 // The URL for the telemetry server.
 const PATRACT_TELEMETRY_URL: &str = "wss://telemetry.patract.io/submit";

@@ -69,7 +69,7 @@ pub use patract_primitives::{
     AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Signature,
 };
 use patract_runtime_common::{
-    constants::{currency::*, fee::WeightToFee, time::*},
+    constants::{jupiter_currency::*, time::*},
     impls, weights, BlockHashCount, BlockLength, BlockWeights, AVERAGE_ON_INITIALIZE_RATIO,
 };
 
@@ -94,8 +94,8 @@ pub fn wasm_binary_unwrap() -> &'static [u8] {
 
 /// Runtime version.
 pub const VERSION: RuntimeVersion = RuntimeVersion {
-    spec_name: create_runtime_str!("jupiter-pilot"),
-    impl_name: create_runtime_str!("patract-jupiter-pilot"),
+    spec_name: create_runtime_str!("jupiter-prep"),
+    impl_name: create_runtime_str!("patract-jupiter-prep"),
     authoring_version: 1,
     spec_version: 1,
     impl_version: 1,
@@ -642,7 +642,7 @@ parameter_types! {
 impl pallet_transaction_payment::Config for Runtime {
     type OnChargeTransaction = CurrencyAdapter<Balances, impls::ToAuthor<Self>>;
     type TransactionByteFee = TransactionByteFee;
-    type WeightToFee = WeightToFee;
+    type WeightToFee = JupiterWeight2Fee;
     type FeeMultiplierUpdate = impls::SlowAdjustingFeeUpdate<Self>;
 }
 
@@ -671,14 +671,11 @@ impl pallet_identity::Config for Runtime {
 }
 
 parameter_types! {
-    pub const TombstoneDeposit: Balance = tombstone_deposit(
-        1,
-        sp_std::mem::size_of::<pallet_contracts::ContractInfo<Runtime>>() as u32
-    );
-    pub const DepositPerContract: Balance = TombstoneDeposit::get();
-    pub const DepositPerStorageByte: Balance = 1 * MILLICENTS;
-    pub const DepositPerStorageItem: Balance = 10 * MILLICENTS;
-    pub RentFraction: Perbill = Perbill::from_rational_approximation(1u32, 60 * DAYS);
+    pub const TombstoneDeposit: Balance = 0;
+    pub const DepositPerContract: Balance = 0;
+    pub const DepositPerStorageByte: Balance = TombstoneDeposit::get();
+    pub const DepositPerStorageItem: Balance = 0;
+    pub RentFraction: Perbill = Perbill::zero();
     pub const SurchargeReward: Balance = 0;
     pub const SignedClaimHandicap: u32 = 0;
     pub const MaxDepth: u32 = 100;
