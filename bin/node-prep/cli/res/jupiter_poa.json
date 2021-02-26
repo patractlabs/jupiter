@@ -1,6 +1,6 @@
 {
   "name": "Jupiter A1",
-  "id": "jupiter_a1",
+  "id": "jupiter_poa",
   "chainType": "Live",
   "bootNodes": [
     "/dns/1.p2p.jupiter-poa.patract.cn/tcp/30333/p2p/12D3KooWA8LCSwvSvrsVL5ANMzY5z23NDKrnSqLtyNq3geRmUsRT",
@@ -14,7 +14,7 @@
       0
     ]
   ],
-  "protocolId": "jupiter_a1",
+  "protocolId": "jupiter_poa",
   "properties": {
     "ss58Format": 42,
     "tokenDecimals": 10,
