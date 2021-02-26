@@ -20,7 +20,7 @@ use sp_std::prelude::*;
 use sp_version::NativeVersion;
 use sp_version::RuntimeVersion;
 
-use pallet_contracts::WeightInfo;
+use pallet_contracts::weights::WeightInfo;
 use pallet_contracts_primitives::ContractExecResult;
 use pallet_transaction_payment_rpc_runtime_api::RuntimeDispatchInfo;
 

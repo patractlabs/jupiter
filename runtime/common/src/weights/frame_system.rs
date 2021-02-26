@@ -51,7 +51,4 @@ impl frame_system::WeightInfo for WeightInfo {
             .saturating_add((838000 as Weight).saturating_mul(p as Weight))
             .saturating_add(DbWeight::get().writes((1 as Weight).saturating_mul(p as Weight)))
     }
-    fn suicide() -> Weight {
-        (29247000 as Weight)
-    }
 }

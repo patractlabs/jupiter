@@ -1,7 +1,5 @@
 use crate::Config;
-use frame_support::{
-    impl_outer_event, impl_outer_origin, parameter_types, traits::Currency, weights::Weight,
-};
+use frame_support::{parameter_types, traits::Currency, traits::GenesisBuild, weights::Weight};
 use frame_system as system;
 use sp_runtime::{
     testing::{Header, H256},
@@ -9,17 +7,28 @@ use sp_runtime::{
     AccountId32, Perbill,
 };
 
-impl_outer_origin! {
-    pub enum Origin for Test {}
-}
+type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
+type Block = frame_system::mocking::MockBlock<Test>;
 
+use crate as pallet_template;
+
+frame_support::construct_runtime!(
+    pub enum Test where
+        Block = Block,
+        NodeBlock = Block,
+        UncheckedExtrinsic = UncheckedExtrinsic,
+    {
+        System: frame_system::{Module, Call, Config, Storage, Event<T>},
+        Balances: pallet_balances::{Module, Call, Storage, Config<T>, Event<T>},
+        Timestamp: pallet_timestamp::{Module, Call, Storage, Inherent},
+        Randomness: pallet_randomness_collective_flip::{Module, Call, Storage},
+        Contracts: pallet_contracts::{Module, Call, Config<T>, Storage, Event<T>},
+        Template: pallet_template::{Module, Call, Storage, Event<T>},
+    }
+);
 // Configure a mock runtime to test the pallet.
-
-#[derive(Clone, Eq, PartialEq, Debug)]
-pub struct Test;
-
-impl Convert<Weight, contract::BalanceOf<Self>> for Test {
-    fn convert(w: Weight) -> contract::BalanceOf<Self> {
+impl Convert<Weight, pallet_contracts::BalanceOf<Self>> for Test {
+    fn convert(w: Weight) -> pallet_contracts::BalanceOf<Self> {
         w as u128
     }
 }
@@ -34,7 +43,7 @@ parameter_types! {
 impl system::Config for Test {
     type BaseCallFilter = ();
     type Origin = Origin;
-    type Call = ();
+    type Call = Call;
     type Index = u64;
     type BlockNumber = u64;
     type Hash = H256;
@@ -42,11 +51,11 @@ impl system::Config for Test {
     type AccountId = AccountId32;
     type Lookup = IdentityLookup<Self::AccountId>;
     type Header = Header;
-    type Event = ();
+    type Event = Event;
     type BlockHashCount = BlockHashCount;
     type DbWeight = ();
     type Version = ();
-    type PalletInfo = ();
+    type PalletInfo = PalletInfo;
     type AccountData = pallet_balances::AccountData<u128>;
     type OnNewAccount = ();
     type OnKilledAccount = ();
@@ -68,33 +77,19 @@ impl pallet_timestamp::Config for Test {
     type WeightInfo = ();
 }
 
-impl_outer_event! {
-    pub enum MetaEvent for Test {
-        frame_system<T>,
-        pallet_balances<T>,
-        contract<T>,
-    }
-}
-
 impl Config for Test {
-    type Event = ();
+    type Event = Event;
 }
-
-type System = system::Module<Test>;
 
 impl pallet_balances::Config for Test {
     type MaxLocks = ();
     type Balance = u128;
-    type Event = ();
+    type Event = Event;
     type DustRemoval = ();
     type ExistentialDeposit = ExistentialDeposit;
     type AccountStore = System;
     type WeightInfo = ();
 }
-
-pub type Balances = pallet_balances::Module<Test>;
-type Timestamp = pallet_timestamp::Module<Test>;
-type Randomness = pallet_randomness_collective_flip::Module<Test>;
 
 parameter_types! {
     pub const SignedClaimHandicap: u64 = 2;
@@ -108,13 +103,14 @@ parameter_types! {
     pub const MaxValueSize: u32 = 16_384;
     pub const DeletionQueueDepth: u32 = 1024;
     pub const DeletionWeightLimit: Weight = 500_000_000_000;
+    pub const MaxCodeSize: u32 = 128 * 1024;
 }
 
-impl contract::Config for Test {
+impl pallet_contracts::Config for Test {
     type Time = Timestamp;
     type Randomness = Randomness;
     type Currency = Balances;
-    type Event = ();
+    type Event = Event;
     type RentPayment = ();
     type SignedClaimHandicap = SignedClaimHandicap;
     type TombstoneDeposit = TombstoneDeposit;
@@ -130,9 +126,8 @@ impl contract::Config for Test {
     type ChainExtension = patract_chain_extension::PatractExt;
     type DeletionQueueDepth = DeletionQueueDepth;
     type DeletionWeightLimit = DeletionWeightLimit;
+    type MaxCodeSize = MaxCodeSize;
 }
-
-pub type Contracts = contract::Module<Test>;
 
 pub const ALICE: AccountId32 = AccountId32::new([1u8; 32]);
 
@@ -166,9 +161,9 @@ impl ExtBuilder {
             .assimilate_storage(&mut t)
             .unwrap();
 
-        let mut current_schedule = contract::Schedule::<Test>::default();
+        let mut current_schedule = pallet_contracts::Schedule::<Test>::default();
         current_schedule.enable_println = true;
-        contract::GenesisConfig::<Test> { current_schedule }
+        pallet_contracts::GenesisConfig::<Test> { current_schedule }
             .assimilate_storage(&mut t)
             .unwrap();
         let mut ext = sp_io::TestExternalities::new(t);
@@ -182,12 +177,11 @@ pub fn groth16_addr(caller: AccountId32) -> AccountId32 {
     let module = include_bytes!("../res/groth16.wasm").to_vec();
     let hash = <Test as frame_system::Config>::Hashing::hash(&module);
     let _ = crate::mock::Balances::deposit_creating(&caller, 100_000_000_000_000);
-    Contracts::put_code(Origin::signed(caller.clone()), module).unwrap();
-    Contracts::instantiate(
+    Contracts::instantiate_with_code(
         Origin::signed(ALICE.clone()),
         1_000_000,                   // endowment
         Weight::max_value(),         // gas_limit
-        hash.clone(),                // code_hash
+        module,                      // code
         [106, 55, 18, 226].to_vec(), // flip
         b"".to_vec(),                // salt
     )

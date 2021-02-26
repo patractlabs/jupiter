@@ -1,11 +1,13 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 #![recursion_limit = "256"]
 
-use contract::{BalanceOf, CodeHash, Gas, Module as Contracts};
 /// Edit this file to define custom logic or remove it if it is not needed.
 /// Learn more about FRAME and the core library of Substrate FRAME pallets:
 /// https://substrate.dev/docs/en/knowledgebase/runtime/frame
-use frame_support::{decl_error, decl_event, decl_module, decl_storage, dispatch, traits::Get};
+use frame_support::{
+    decl_error, decl_event, decl_module, decl_storage, dispatch, traits::Get, weights::Weight,
+};
+use pallet_contracts::{BalanceOf, CodeHash, Module as Contracts};
 use sp_core::crypto::UncheckedFrom;
 use sp_runtime::traits::StaticLookup;
 use sp_std::vec::Vec;
@@ -18,10 +20,9 @@ mod mock;
 mod tests;
 
 /// Configure the pallet by specifying the parameters and types on which it depends.
-pub trait Config: frame_system::Config + contract::Config {
+pub trait Config: frame_system::Config + pallet_contracts::Config {
     /// Because this pallet emits events, it depends on the runtime's definition of an event.
     type Event: From<Event<Self>> + Into<<Self as frame_system::Config>::Event>;
-    // type AccountId: contract::Config::AccountId;
 }
 
 // The pallet's runtime storage items.
@@ -62,7 +63,7 @@ decl_error! {
     {
         /// Error names should be descriptive.
         NoneValue,
-        /// The contract we just put disappeared
+        /// The pallet_contracts we just put disappeared
         ContractDisappeared,
         /// Failed
         InstantiateContractFailed
@@ -85,18 +86,18 @@ decl_module! {
         // Events must be initialized if they are used by the pallet.
         fn deposit_event() = default;
 
-        /// Call the contract
+        /// Call the pallet_contracts
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn call(
             origin,
             dest: <T::Lookup as StaticLookup>::Source,
             value: BalanceOf<T>,
-            gas: Gas,
+            gas: Weight,
             data: Vec<u8>,
         ) -> dispatch::DispatchResultWithPostInfo {
             <Contracts<T>>::call(
                 origin,
-                dest,  // contract address
+                dest,  // pallet_contracts address
                 value, // T::Currency::minimum_balance() * 100u32.into(), // value
                 gas,   // gas_limit
                 data   // fn
