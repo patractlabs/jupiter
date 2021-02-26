@@ -27,7 +27,7 @@ use sp_runtime::{
 use sp_std::{collections::btree_map::BTreeMap, prelude::*};
 
 use frame_system::{EnsureOneOf, EnsureRoot};
-use pallet_contracts::WeightInfo;
+use pallet_contracts::weights::WeightInfo;
 use pallet_contracts_primitives::ContractExecResult;
 use pallet_grandpa::{
     fg_primitives, AuthorityId as GrandpaId, AuthorityList as GrandpaAuthorityList,
@@ -87,8 +87,8 @@ impl_opaque_keys! {
 pub fn wasm_binary_unwrap() -> &'static [u8] {
     WASM_BINARY.expect(
         "Development wasm binary is not available. This means the client is \
-		 built with `BUILD_DUMMY_WASM_BINARY` flag and it is only usable for \
-		 production chains. Please rebuild with the flag disabled.",
+         built with `BUILD_DUMMY_WASM_BINARY` flag and it is only usable for \
+         production chains. Please rebuild with the flag disabled.",
     )
 }
 
@@ -689,6 +689,7 @@ parameter_types! {
             <Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(1) -
             <Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(0)
         )) / 5) as u32;
+    pub const MaxCodeSize: u32 = 256 * 1024;
 }
 
 impl pallet_contracts::Config for Runtime {
@@ -711,6 +712,7 @@ impl pallet_contracts::Config for Runtime {
     type ChainExtension = chain_extension::JupiterExtension<Self>;
     type DeletionQueueDepth = DeletionQueueDepth;
     type DeletionWeightLimit = DeletionWeightLimit;
+    type MaxCodeSize = MaxCodeSize;
 }
 
 impl pallet_utility::Config for Runtime {
@@ -769,27 +771,27 @@ impl InstanceFilter<Call> for ProxyType {
             ProxyType::NonTransfer => matches!(
                 c,
                 Call::System(..) |
-				Call::Babe(..) |
-				Call::Timestamp(..) |
-				// Specifically omitting the entire Balances pallet
-				Call::Authorship(..) |
-				// Call::Staking(..) |
-				Call::PoA(..) |
-				Call::Offences(..) |
-				Call::Session(..) |
-				Call::Grandpa(..) |
-				Call::ImOnline(..) |
-				Call::AuthorityDiscovery(..) |
-				Call::Democracy(..) |
-				Call::Council(..) |
-				Call::TechnicalCommittee(..) |
-				Call::TechnicalMembership(..) |
-				Call::Treasury(..) |
-				Call::Utility(..) |
-				// Specifically omitting Vesting `vested_transfer`, and `force_vested_transfer`
-				Call::Scheduler(..) |
-				Call::Proxy(..) |
-				Call::Multisig(..)
+                Call::Babe(..) |
+                Call::Timestamp(..) |
+                // Specifically omitting the entire Balances pallet
+                Call::Authorship(..) |
+                // Call::Staking(..) |
+                Call::PoA(..) |
+                Call::Offences(..) |
+                Call::Session(..) |
+                Call::Grandpa(..) |
+                Call::ImOnline(..) |
+                Call::AuthorityDiscovery(..) |
+                Call::Democracy(..) |
+                Call::Council(..) |
+                Call::TechnicalCommittee(..) |
+                Call::TechnicalMembership(..) |
+                Call::Treasury(..) |
+                Call::Utility(..) |
+                // Specifically omitting Vesting `vested_transfer`, and `force_vested_transfer`
+                Call::Scheduler(..) |
+                Call::Proxy(..) |
+                Call::Multisig(..)
             ),
             ProxyType::Governance => matches!(
                 c,

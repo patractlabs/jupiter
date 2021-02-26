@@ -43,8 +43,8 @@ pallet-transaction-payment-rpc-runtime-api = { version = "3.0.0", git = "https:/
 
 # vendor modules
 pallet-contracts = { path = "../../vendor/substrate/frame/contracts", default-features = false }
-pallet-contracts-primitives = { version = "2.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
-pallet-contracts-rpc-runtime-api = { version = "0.8.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-contracts-primitives = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+pallet-contracts-rpc-runtime-api = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 
 # local pallet define
 pallet-template = { path = "../../pallets/template", default-features = false }

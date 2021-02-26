@@ -34,13 +34,14 @@ git = "https://github.com/patractlabs/megaclite.git"
 features = ["tests"]
 default-features = false
 
-[dependencies.contract]
+[dependencies.pallet-contracts]
 package = "pallet-contracts"
 path = "../../vendor/substrate/frame/contracts"
 default-features = false
 
 [dev-dependencies]
 hex = "0.4.2"
+serde = { version = "1.0.101", features = ["derive"] }
 assert_matches = "1.3.0"
 pallet-timestamp = { git = "https://github.com/paritytech/substrate", branch = "master" }
 pallet-balances = { git = "https://github.com/paritytech/substrate", branch = "master" }
@@ -53,7 +54,7 @@ patract-chain-extension = { path = "../../primitives/chain-extension" }
 default = ['std']
 std = [
 	'codec/std',
-    'contract/std',
+    'pallet-contracts/std',
 	'frame-support/std',
 	'frame-system/std',
     'frame-benchmarking/std',
@@ -65,5 +66,5 @@ runtime-benchmarks = [
     "frame-benchmarking",
     'frame-system/runtime-benchmarks',
     'frame-support/runtime-benchmarks',
-    'contract/runtime-benchmarks',
+    'pallet-contracts/runtime-benchmarks',
 ]
