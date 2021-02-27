@@ -22,7 +22,7 @@
 
 use super::*;
 
-use contract::{BalanceOf, Module as Contracts};
+use pallet_contracts::{BalanceOf, Module as Contracts};
 use frame_benchmarking::{benchmarks, whitelisted_caller};
 use frame_support::{traits::Currency, weights::Weight};
 use frame_system::RawOrigin;

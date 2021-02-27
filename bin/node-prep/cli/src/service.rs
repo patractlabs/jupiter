@@ -52,7 +52,8 @@ pub fn new_partial(
 
     let transaction_pool = sc_transaction_pool::BasicPool::new_full(
         config.transaction_pool.clone(),
-        config.role.is_authority().into(),
+        //config.role.is_authority().into(),
+        false.into(), // TODO this is so strange, if this is validator, do not broadcast tx
         config.prometheus_registry(),
         task_manager.spawn_handle(),
         client.clone(),
@@ -176,6 +177,16 @@ pub fn new_full_base(mut config: Configuration) -> Result<NewFullBase, ServiceEr
         .extra_sets
         .push(sc_finality_grandpa::grandpa_peers_set_config());
 
+    #[cfg(feature = "cli")]
+    config.network.request_response_protocols.push(
+        sc_finality_grandpa_warp_sync::request_response_config_for_chain(
+            &config,
+            task_manager.spawn_handle(),
+            backend.clone(),
+            import_setup.1.shared_authority_set().clone(),
+        ),
+    );
+
     let (network, network_status_sinks, system_rpc_tx, network_starter) =
         sc_service::build_network(sc_service::BuildNetworkParams {
             config: &config,
@@ -199,7 +210,8 @@ pub fn new_full_base(mut config: Configuration) -> Result<NewFullBase, ServiceEr
 
     let role = config.role.clone();
     let force_authoring = config.force_authoring;
-    let backoff_authoring_blocks: Option<()> = None;
+    let backoff_authoring_blocks =
+        Some(sc_consensus_slots::BackoffAuthoringOnFinalizedHeadLagging::default());
     let name = config.network.node_name.clone();
     let enable_grandpa = !config.disable_grandpa;
     let prometheus_registry = config.prometheus_registry().cloned();
@@ -226,7 +238,7 @@ pub fn new_full_base(mut config: Configuration) -> Result<NewFullBase, ServiceEr
 
     let (block_import, grandpa_link, babe_link) = import_setup;
 
-    if role.is_authority() {
+    if let sc_service::config::Role::Authority { .. } = &role {
         let proposer = sc_basic_authorship::ProposerFactory::new(
             task_manager.spawn_handle(),
             client.clone(),
@@ -251,13 +263,14 @@ pub fn new_full_base(mut config: Configuration) -> Result<NewFullBase, ServiceEr
             can_author_with,
         };
 
-        // the BABE authoring task is considered essential, i.e. if it
-        // fails we take down the service with it.
         let babe = sc_consensus_babe::start_babe(babe_config)?;
         task_manager
             .spawn_essential_handle()
-            .spawn_blocking("babe", babe);
+            .spawn_blocking("babe-proposer", babe);
+    }
 
+    // Spawn authority discovery module.
+    if role.is_authority() {
         let authority_discovery_role =
             sc_authority_discovery::Role::PublishAndDiscover(keystore_container.keystore());
         let dht_event_stream =
