@@ -135,7 +135,7 @@ master as dependencies, and in Patract `substrate-v2.0.0` branch, we use Substra
 (`substrate-v2.0.0` branch only contains jupiter part.)
 
 Thus, Patract has two main branch. In different branch, we provide different `pallet-contracts` features:
-* master: we track newest master, currently we use substrate commit:[`56c64cf728278ca9f16308f7ffb1959dd89332af`](https://github.com/paritytech/substrate/commit/56c64cf728278ca9f16308f7ffb1959dd89332af).
+* master: we track newest master, currently we use substrate commit:[contracts: Release as v3.0.0 and add reserved field to `ContractInfoOf` (#8175)(`debec916`)](https://github.com/paritytech/substrate/commit/debec916998233a287fb9e5a099c08d5e4a23db2).
     * In master, we use `src pallet-contract` or `modified pallet-contract`
     * `src pallet-contract` is belong to substrate commit version.
     * `modified pallet-contract` is belong to the forked substrate in vendor directory. We usually track the newest substrate version.
