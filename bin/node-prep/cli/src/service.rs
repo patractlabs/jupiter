@@ -52,8 +52,7 @@ pub fn new_partial(
 
     let transaction_pool = sc_transaction_pool::BasicPool::new_full(
         config.transaction_pool.clone(),
-        //config.role.is_authority().into(),
-        false.into(), // TODO this is so strange, if this is validator, do not broadcast tx
+        config.role.is_authority().into(),
         config.prometheus_registry(),
         task_manager.spawn_handle(),
         client.clone(),
