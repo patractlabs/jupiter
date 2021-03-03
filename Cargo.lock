@@ -4306,12 +4306,19 @@ version = "0.1.0"
 dependencies = [
  "frame-support",
  "frame-system",
+ "pallet-balances",
+ "pallet-collective",
  "pallet-session",
+ "pallet-timestamp",
  "parity-scale-codec 2.0.0",
  "serde",
+ "sp-core",
+ "sp-io",
  "sp-runtime",
  "sp-staking",
  "sp-std",
+ "sp-storage",
+ "sp-tracing",
 ]
 
 [[package]]

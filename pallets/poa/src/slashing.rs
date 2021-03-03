@@ -5,7 +5,6 @@ use crate::{Config, EraIndex, Event, Pallet, UnappliedSlash};
 
 pub(crate) fn apply_slash<T: Config>(unapplied_slash: T::AccountId) {
     Pallet::<T>::remove_from_authorities(&unapplied_slash);
-    Pallet::<T>::deposit_event(Event::<T>::Slash(unapplied_slash));
 }
 
 /// Parameters for performing a slash.

@@ -5,10 +5,7 @@ use sp_staking::{
     SessionIndex,
 };
 
-use crate::{
-    session::SimpleValidatorIdConverter, slashing, Config, EarliestUnappliedSlash, Pallet,
-    UnappliedSlashes, LOG_TARGET,
-};
+use crate::{session::SimpleValidatorIdConverter, slashing, Config, EarliestUnappliedSlash, Pallet, UnappliedSlashes, LOG_TARGET, WaitingSlashes};
 
 /// This is intended to be used with `FilterHistoricalOffences`.
 impl<T: Config>
@@ -85,7 +82,6 @@ where
         let invulnerables = Self::invulnerables();
         add_db_reads_writes(1, 0);
 
-        // TODO need to limit minimal validators
         for (details, _) in offenders.iter().zip(slash_fraction) {
             let (stash, _) = &details.offender;
 
@@ -113,6 +109,9 @@ where
                     add_db_reads_writes(1, 1);
                 } else {
                     // defer to end of some `slash_defer_duration` from now.
+                    WaitingSlashes::<T>::mutate(unapplied.validator.clone(), |waiting_slash|
+                        *waiting_slash = *waiting_slash + 1
+                    );
                     UnappliedSlashes::<T>::mutate(active_era, move |for_later| {
                         for_later.push(unapplied)
                     });
@@ -127,8 +126,6 @@ where
     }
 
     fn can_report() -> bool {
-        // TODO current set false until test all case
-        // true
-        false
+        true
     }
 }
