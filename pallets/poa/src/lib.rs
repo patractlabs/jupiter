@@ -500,7 +500,7 @@ impl<T: Config> Pallet<T> {
         if Self::authorities_map().len() as u32 == MinimumAuthorityCount::<T>::get() {
             debug::warn!(
                 target: LOG_TARGET,
-                "Can not remove {} due to minimal authority count.", who
+                "Can not remove authority due to minimal authority count."
             );
             Self::deposit_event(Event::TooLowAuthorities);
         } else if Authorities::<T>::contains_key(who) {
