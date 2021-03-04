@@ -4881,7 +4881,7 @@ dependencies = [
 
 [[package]]
 name = "patract-cli"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "futures 0.3.9",
  "hex-literal 0.2.1",
@@ -5029,7 +5029,7 @@ dependencies = [
 
 [[package]]
 name = "patract-prep"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "patract-cli",
 ]

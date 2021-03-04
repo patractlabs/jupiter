@@ -58,6 +58,8 @@ Now, Patract has launched following network:
     same with Polkadot network. This testnet blockchain uses Babe as consensus algorithm,
     and **provide Babe VRF random number for contract module.**
   
+    **Jupiter PoA's SS58 Address Prefix changes from 42 (address: `5xxxx`) to 26 (address: `3xxxx`) in 1.0.1 version.**
+  
     For this network, the Extending types is:
 
     ```json
