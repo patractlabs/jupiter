@@ -97,7 +97,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
     spec_name: create_runtime_str!("jupiter-prep"),
     impl_name: create_runtime_str!("patract-jupiter-prep"),
     authoring_version: 1,
-    spec_version: 1,
+    spec_version: 2,
     impl_version: 1,
     apis: RUNTIME_API_VERSIONS,
     transaction_version: 1,
@@ -127,7 +127,7 @@ type MoreThanHalfCouncil = EnsureOneOf<
 
 parameter_types! {
     pub const Version: RuntimeVersion = VERSION;
-    pub const SS58Prefix: u8 = 42;
+    pub const SS58Prefix: u8 = 26;
 }
 impl frame_system::Config for Runtime {
     /// The basic call filter to use in dispatchable.
