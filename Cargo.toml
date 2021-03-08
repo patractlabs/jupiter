@@ -5,7 +5,7 @@ members = [
 #    "bin/node-pilot/executor",
 #    "bin/node-dev",
 
-    "runtime/jupiter-para",
+    "runtime/jupiter",
 #    "runtime/jupiter-pilot",
 #    "runtime/patract-dev",
 
@@ -14,7 +14,10 @@ members = [
     "primitives/chain-extension",
 #    "pallets/template",
 #    "pallets/randomness-provider",
-#    "pallets/randomness_collect",
+    "pallets/randomness_collect",
+#    "pallets/poa",
+#    "pallets/poa/rpc",
+#    "pallets/poa/rpc/runtime-api",
     "rpc",
 ]
 exclude = ["vendor/substrate"]

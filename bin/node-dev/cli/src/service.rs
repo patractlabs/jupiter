@@ -63,7 +63,7 @@ pub fn new_partial(
 
     let import_queue = sc_consensus_manual_seal::import_queue(
         Box::new(client.clone()),
-        &task_manager.spawn_handle(),
+        &task_manager.spawn_essential_handle(),
         config.prometheus_registry(),
     );
 
@@ -215,7 +215,7 @@ pub fn new_light(config: Configuration) -> Result<TaskManager, ServiceError> {
 
     let import_queue = sc_consensus_manual_seal::import_queue(
         Box::new(client.clone()),
-        &task_manager.spawn_handle(),
+        &task_manager.spawn_essential_handle(),
         config.prometheus_registry(),
     );
 

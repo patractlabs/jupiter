@@ -16,7 +16,7 @@ use sc_executor::native_executor_instance;
 pub use sc_executor::NativeExecutor;
 use sc_service::{error::Error as ServiceError, Configuration, TaskManager, Role, PartialComponents};
 
-use jupiter_para_runtime::{self, RuntimeApi, OCW_DB_RANDOM, RpcPort};
+use jupiter_runtime::{self, RuntimeApi, OCW_DB_RANDOM, RpcPort};
 use patract_primitives::Block;
 
 use sc_client_api::Backend;
@@ -27,8 +27,8 @@ use codec::Encode;
 // equivalent wasm code.
 native_executor_instance!(
     pub Executor,
-    jupiter_para_runtime::api::dispatch,
-    jupiter_para_runtime::native_version,
+    jupiter_runtime::api::dispatch,
+    jupiter_runtime::native_version,
     (frame_benchmarking::benchmarking::HostFunctions, patract_io::pairing::HostFunctions),
 );
 
@@ -68,7 +68,7 @@ pub fn new_partial(
         client.clone(),
         client.clone(),
         inherent_data_providers.clone(),
-        &task_manager.spawn_handle(),
+        &task_manager.spawn_essential_handle(),
         registry.clone(),
     )?;
 
@@ -185,7 +185,7 @@ async fn start_node_impl<RB>(
     };
 
     if validator {
-        let proposer_factory = sc_basic_authorship::ProposerFactory::new(
+        let proposer_factory = sc_basic_authorship::ProposerFactory::with_proof_recording(
             task_manager.spawn_handle(),
             client.clone(),
             transaction_pool,

@@ -30,6 +30,6 @@ sc-finality-grandpa-rpc = { version = "0.9.0", git = "https://github.com/parityt
 
 substrate-frame-rpc-system = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "rococo-v1" }
 pallet-transaction-payment-rpc = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "rococo-v1" }
-pallet-contracts-rpc = { version = "0.8.1", git = "https://github.com/paritytech/substrate", branch = "rococo-v1" }
+pallet-contracts-rpc = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "rococo-v1" }
 
 patract-primitives = { path = "../primitives" }

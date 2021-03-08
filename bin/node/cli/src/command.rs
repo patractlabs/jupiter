@@ -6,7 +6,7 @@ use codec::Encode;
 use cumulus_primitives_core::ParaId;
 use cumulus_client_service::genesis::generate_genesis_block;
 use log::info;
-use jupiter_para_runtime::Block;
+use jupiter_runtime::Block;
 use polkadot_parachain::primitives::AccountIdConversion;
 use sc_cli::{
     ChainSpec, CliConfiguration, DefaultConfigurationValues, ImportParams, KeystoreParams,
@@ -61,7 +61,7 @@ impl SubstrateCli for Cli {
     }
 
     fn native_runtime_version(_: &Box<dyn ChainSpec>) -> &'static RuntimeVersion {
-        &jupiter_para_runtime::VERSION
+        &jupiter_runtime::VERSION
     }
 }
 

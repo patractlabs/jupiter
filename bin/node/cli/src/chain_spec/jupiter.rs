@@ -7,8 +7,8 @@ use sc_service::ChainType;
 use sp_core::{sr25519, Pair, Public};
 use sp_runtime::traits::{IdentifyAccount, Verify};
 
-use jupiter_para_runtime::{AccountId, Signature};
-use jupiter_para_runtime::{
+use jupiter_runtime::{AccountId, Signature};
+use jupiter_runtime::{
     BalancesConfig, ContractsConfig, GenesisConfig, IndicesConfig,
     SudoConfig, SystemConfig, ParachainInfoConfig
 };
@@ -86,7 +86,7 @@ pub fn development_config(id: ParaId) -> Result<ChainSpec, String> {
         // Properties
         Some(
             json!({
-                "ss58Format": jupiter_para_runtime::SS58Prefix::get(),
+                "ss58Format": jupiter_runtime::SS58Prefix::get(),
                 "tokenDecimals": 10,
                 "tokenSymbol": "DOT"
             })
@@ -125,7 +125,7 @@ pub fn staging_config(id: ParaId) -> Result<ChainSpec, String> {
         Some("jupiter_pc1_staging"),
         Some(
             json!({
-                "ss58Format": jupiter_para_runtime::SS58Prefix::get(),
+                "ss58Format": jupiter_runtime::SS58Prefix::get(),
                 "tokenDecimals": 10,
                 "tokenSymbol": "DOT"
             })
@@ -154,7 +154,7 @@ fn testnet_genesis(
     GenesisConfig {
         frame_system: Some(SystemConfig {
             // Add Wasm runtime to storage.
-            code: jupiter_para_runtime::WASM_BINARY
+            code: jupiter_runtime::WASM_BINARY
                 .expect("WASM binary was not build, please build it!")
                 .to_vec(),
             changes_trie_config: Default::default(),
