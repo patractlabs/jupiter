@@ -1,21 +1,46 @@
-name: Build
+name: CI
 
 on:
   push:
-    branches: [master]
+    branches: [ master ]
   pull_request:
-    branches: [master]
+    branches: [ master ]
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
+  format:
+    name: Format
     strategy:
       fail-fast: false
       matrix:
-        platform: [ubuntu-latest]
-        toolchain: [nightly-2020-10-05]
+        platform: [ ubuntu-latest ]
+        toolchain: [ stable ]
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v2
+
+      - name: Install Rust Toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          components: rustfmt
+          override: true
+
+      - name: Check Code Format
+        run: cargo fmt -- --check
+
+  build:
+    name: Build
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [ ubuntu-latest ]
+        toolchain: [ nightly-2020-10-05 ]
     runs-on: ${{ matrix.platform }}
 
     steps:
@@ -28,7 +53,7 @@ jobs:
           profile: minimal
           toolchain: ${{ matrix.toolchain }}
           target: wasm32-unknown-unknown
-          components: rustfmt, clippy
+          components: clippy
           override: true
 
       - name: Cache Dependencies & Build Outputs
@@ -41,9 +66,6 @@ jobs:
 
       - name: Fetch Git Submodule
         run: git submodule update --init --remote
-
-      - name: Check Code Format
-        run: cargo fmt -- --check
 
       - name: Code Lint
         run: cargo clippy -- -D warnings
