@@ -53,7 +53,7 @@ jobs:
           profile: minimal
           toolchain: ${{ matrix.toolchain }}
           target: wasm32-unknown-unknown
-          components: clippy
+#          components: clippy
           override: true
 
       - name: Cache Dependencies & Build Outputs
@@ -67,8 +67,8 @@ jobs:
       - name: Fetch Git Submodule
         run: git submodule update --init --remote
 
-      - name: Code Lint
-        run: cargo clippy -- -D warnings
+#      - name: Code Lint
+#        run: cargo clippy -- -D warnings
 
       - name: Build
         run: cargo build --all -vv
