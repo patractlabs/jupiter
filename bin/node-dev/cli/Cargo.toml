@@ -30,7 +30,8 @@ sp-timestamp = { version = "3.0.0", git = "https://github.com/paritytech/substra
 sc-basic-authorship = { version = "0.9.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 sc-telemetry = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 
-pallet-contracts = { package = "pallet-contracts", path = "../../../vendor/substrate/frame/contracts" }
+#pallet-contracts = { package = "pallet-contracts", path = "../../../vendor/substrate/frame/contracts" }
+pallet-contracts = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 
 frame-benchmarking = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 frame-benchmarking-cli = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }

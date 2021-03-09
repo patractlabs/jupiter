@@ -44,8 +44,8 @@ pallet-authority-discovery = { version = "3.0.0", git = "https://github.com/pari
 pallet-im-online = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 
 # vendor
-# pallet-contracts = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
-pallet-contracts = { path = "../../../vendor/substrate/frame/contracts" }
+pallet-contracts = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+#pallet-contracts = { path = "../../../vendor/substrate/frame/contracts" }
 
 patract-primitives = { path = "../../../primitives" }
 patract-runtime-common = { path = "../../../runtime/common" }

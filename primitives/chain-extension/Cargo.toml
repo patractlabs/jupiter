@@ -12,7 +12,8 @@ sp-runtime = { version = "3.0.0", git = "https://github.com/paritytech/substrate
 sp-std = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 
 frame-support = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
-pallet-contracts = { path = "../../vendor/substrate/frame/contracts", default-features = false }
+pallet-contracts = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+#pallet-contracts = { path = "../../vendor/substrate/frame/contracts", default-features = false }
 
 patract-io = { path = "../io", default-features = false, optional = true }
 

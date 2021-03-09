@@ -36,7 +36,9 @@ default-features = false
 
 [dependencies.pallet-contracts]
 package = "pallet-contracts"
-path = "../../vendor/substrate/frame/contracts"
+git = "https://github.com/paritytech/substrate.git"
+branch = "master"
+#path = "../../vendor/substrate/frame/contracts"
 default-features = false
 
 [dev-dependencies]
