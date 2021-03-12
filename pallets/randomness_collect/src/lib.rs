@@ -14,7 +14,7 @@ use frame_support::sp_runtime::{
     RuntimeAppPublic, RuntimeDebug,
 };
 use frame_support::{
-    debug, decl_module, decl_storage,
+    decl_module, decl_storage,
     dispatch::DispatchResult,
     traits::{Get, Randomness as RandomnessT},
     Parameter,
@@ -162,12 +162,12 @@ decl_module! {
                         let signer: T::AuthorityId = local_key.clone();
                         let res = Self::fetch_epoch_and_send_signed(signer, index as u32);
                         if let Err(e) = res {
-                            debug::error!("Error: {}", e);
+                            log::error!("Error: {}", e);
                         }
                     });
                 }
             } else {
-                debug::warn!(
+                log::warn!(
                     target: "randomness_collect",
                     "Skipping collect. Not a validator.",
                 )
@@ -205,13 +205,13 @@ impl<T: Config> Module<T> {
             .try_wait(deadline)
             .map_err(|_| http::Error::DeadlineReached)??;
         if response.code != 200 {
-            debug::warn!("Unexpected status code: {}", response.code);
+            log::warn!("Unexpected status code: {}", response.code);
             return Err(http::Error::Unknown);
         }
 
         *response_body = response.body().collect::<Vec<u8>>();
         sp_std::str::from_utf8(response_body).map_err(|_| {
-            debug::warn!("No UTF8 body");
+            log::warn!("No UTF8 body");
             http::Error::Unknown
         })
     }
@@ -260,7 +260,7 @@ impl<T: Config> Module<T> {
                 randomness: epoch.randomness,
             }),
             None => {
-                debug::warn!(
+                log::warn!(
                     "Unable to extract epoch from the response: {:?}",
                     epoch_response
                 );

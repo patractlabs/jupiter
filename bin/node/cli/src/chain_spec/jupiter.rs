@@ -55,6 +55,7 @@ pub fn get_account_id_from_seed<TPublic: Public>(seed: &str) -> AccountId
     AccountPublic::from(get_from_seed::<TPublic>(seed)).into_account()
 }
 
+/// Jupiter Development Chain Config
 pub fn development_config(id: ParaId) -> Result<ChainSpec, String> {
     Ok(ChainSpec::from_genesis(
         // Name
@@ -102,6 +103,7 @@ pub fn development_config(id: ParaId) -> Result<ChainSpec, String> {
     ))
 }
 
+/// Jupiter PC1 Staging Chain Config
 pub fn staging_config(id: ParaId) -> Result<ChainSpec, String> {
     Ok(ChainSpec::from_genesis(
         "Jupiter PC1 Staging",
@@ -140,6 +142,7 @@ pub fn staging_config(id: ParaId) -> Result<ChainSpec, String> {
     ))
 }
 
+/// Jupiter Chain Config
 pub fn jupiter_config() -> Result<ChainSpec, String> {
     ChainSpec::from_json_bytes(&include_bytes!("../../res/jupiter_rococo.json")[..])
 }
@@ -152,32 +155,32 @@ fn testnet_genesis(
     id: ParaId,
 ) -> GenesisConfig {
     GenesisConfig {
-        frame_system: Some(SystemConfig {
+        frame_system: SystemConfig {
             // Add Wasm runtime to storage.
             code: jupiter_runtime::WASM_BINARY
                 .expect("WASM binary was not build, please build it!")
                 .to_vec(),
             changes_trie_config: Default::default(),
-        }),
-        pallet_balances: Some(BalancesConfig {
+        },
+        pallet_balances: BalancesConfig {
             // Configure endowed accounts with initial balance of 1 << 60.
             balances: endowed_accounts
                 .iter()
                 .cloned()
                 .map(|k| (k, 1 << 60))
                 .collect(),
-        }),
-        pallet_indices: Some(IndicesConfig { indices: vec![] }),
-        pallet_contracts: Some(ContractsConfig {
+        },
+        pallet_indices: IndicesConfig { indices: vec![] },
+        pallet_contracts: ContractsConfig {
             current_schedule: pallet_contracts::Schedule {
                 enable_println, // this should only be enabled on development chains
                 ..Default::default()
             },
-        }),
-        pallet_sudo: Some(SudoConfig {
+        },
+        pallet_sudo: SudoConfig {
             // Assign network admin rights.
             key: root_key,
-        }),
-        parachain_info: Some(ParachainInfoConfig { parachain_id: id }),
+        },
+        parachain_info: ParachainInfoConfig { parachain_id: id },
     }
 }

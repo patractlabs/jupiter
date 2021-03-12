@@ -6,8 +6,7 @@ use pallet_contracts::chain_extension::{
 use parity_scale_codec::Encode;
 use sp_runtime::DispatchError;
 use sp_std::vec::Vec;
-
-use frame_support::debug::{error, native};
+use hex;
 
 /// The chain Extension of Patract
 pub struct PatractExt;
@@ -44,13 +43,13 @@ impl<C: pallet_contracts::Config> ChainExtension<C> for PatractExt {
                         16_000_000 * k
                     }
                     _ => {
-                        error!("[PIP-101]call an unregistered `func_id` in Patract ZKP field, func_id:{:}", func_id);
+                        log::error!("[PIP-101]call an unregistered `func_id` in Patract ZKP field, func_id:{:}", func_id);
                         return Err(DispatchError::Other("Unimplemented Patract ZKP func_id"));
                     }
                 };
                 env.charge_weight(simple_weight)?;
 
-                native::trace!(
+                log::trace!(
                     target: "runtime",
                     "[ChainExtension]|call|func_id:{:}|charge-weight:{:}|input:{:}",
                     func_id,
@@ -83,7 +82,7 @@ impl<C: pallet_contracts::Config> ChainExtension<C> for PatractExt {
                 env.write(&output, false, None)?;
             }
             _ => {
-                error!("call an unregistered `func_id`, func_id:{:}", func_id);
+                log::error!("call an unregistered `func_id`, func_id:{:}", func_id);
                 return Err(DispatchError::Other("Unimplemented func_id"));
             }
         }
