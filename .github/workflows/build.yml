@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  format:
+    name: Format
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [ ubuntu-latest ]
+        toolchain: [ stable ]
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v2
+
+      - name: Install Rust Toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          components: rustfmt
+          override: true
+
+      - name: Check Code Format
+        run: cargo fmt -- --check
+
+  build:
+    name: Build
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [ ubuntu-latest ]
+        toolchain: [ nightly-2021-02-10 ]
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v2
+
+      - name: Install Rust Toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.toolchain }}
+          target: wasm32-unknown-unknown
+#          components: clippy
+          override: true
+
+#      - name: Cache Dependencies & Build Outputs
+#        uses: actions/cache@v2
+#        with:
+#          path: |
+#            ~/.cargo
+#            ./target
+#          key: ${{ runner.os }}-cargo-${{ hashFiles('./Cargo.lock') }}
+
+      - name: Fetch Git Submodule
+        run: git submodule update --init --remote
+
+#      - name: Code Lint
+#        run: cargo clippy -- -D warnings
+
+      - name: Build
+        run: cargo build --all -vv
+
+      - name: Test Benchmark Feature
+        run: cargo build -p patract-dev --all-features
+
+      - name: Test
+        run: cargo test --all -vv
