@@ -1,5 +1,5 @@
 [package]
-name = "patract-para-cli"
+name = "jupiter-para-cli"
 version = "0.1.0"
 authors = ["Patract <https://github.com/patractlabs/patract>"]
 edition = "2018"
@@ -53,8 +53,8 @@ sc-tracing = { git = "https://github.com/paritytech/substrate", branch = "master
 #pallet-contracts = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master"}
 pallet-contracts = { path = "../../../vendor/substrate/frame/contracts" }
 
-patract-primitives = { path = "../../../primitives" }
-patract-rpc = { path = "../../../rpc" }
+jupiter-primitives = { path = "../../../primitives" }
+jupiter-rpc = { path = "../../../rpc" }
 
 jupiter-para-runtime = { path = "../../../runtime/jupiter" }
 

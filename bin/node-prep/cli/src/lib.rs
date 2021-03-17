@@ -1,8 +1,9 @@
-//! Patract CLI library.
+//! Jupiter CLI library.
 
 #![warn(missing_docs)]
 #![warn(unused_extern_crates)]
 
+/// Jupiter chain configurations.
 pub mod chain_spec;
 #[macro_use]
 mod service;

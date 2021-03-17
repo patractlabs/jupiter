@@ -31,7 +31,7 @@ fn load_spec(
 
 impl SubstrateCli for Cli {
     fn impl_name() -> String {
-        "Patract Parachain Node".into()
+        "Jupiter Parachain Node".into()
     }
 
     fn impl_version() -> String {

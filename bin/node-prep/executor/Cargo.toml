@@ -1,5 +1,5 @@
 [package]
-name = "patract-executor"
+name = "jupiter-executor"
 version = "0.1.0"
 authors = ["Patract <https://github.com/patractlabs/patract>"]
 edition = "2018"
@@ -8,7 +8,7 @@ edition = "2018"
 frame-benchmarking = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 sc-executor = { version = "0.9.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 
-patract-io = { path = "../../../primitives/io" }
+jupiter-io = { path = "../../../primitives/io" }
 
 jupiter-runtime = { package = "jupiter-prep-runtime", path = "../../../runtime/jupiter-prep" }
 

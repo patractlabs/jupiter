@@ -65,10 +65,10 @@ pub use pallet_timestamp::Call as TimestampCall;
 
 pub use pallet_poa::Forcing;
 
-pub use patract_primitives::{
+pub use jupiter_primitives::{
     AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Signature,
 };
-use patract_runtime_common::{
+use jupiter_runtime_common::{
     constants::{jupiter_currency::*, time::*},
     impls, weights, BlockHashCount, BlockLength, BlockWeights, AVERAGE_ON_INITIALIZE_RATIO,
 };
@@ -851,7 +851,7 @@ impl pallet_randomness_provider::Config for Runtime {
 construct_runtime!(
     pub enum Runtime where
         Block = Block,
-        NodeBlock = patract_primitives::Block,
+        NodeBlock = jupiter_primitives::Block,
         UncheckedExtrinsic = UncheckedExtrinsic
     {
         // Basic stuff;

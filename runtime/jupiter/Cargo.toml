@@ -63,9 +63,9 @@ xcm-builder = { git = "https://github.com/paritytech/polkadot", default-features
 xcm-executor = { git = "https://github.com/paritytech/polkadot", default-features = false , branch = "master" }
 
 # local runtime module
-patract-primitives = { path = "../../primitives", default-features = false }
-patract-runtime-common = { path = "../common", default-features = false }
-patract-chain-extension = { path = "../../primitives/chain-extension", default-features = false }
+jupiter-primitives = { path = "../../primitives", default-features = false }
+jupiter-runtime-common = { path = "../common", default-features = false }
+jupiter-chain-extension = { path = "../../primitives/chain-extension", default-features = false }
 
 [build-dependencies]
 substrate-wasm-builder = { version = "4.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
@@ -109,8 +109,8 @@ std = [
     "pallet-contracts-primitives/std",
     "pallet-contracts-rpc-runtime-api/std",
 
-    "patract-primitives/std",
-    "patract-runtime-common/std",
+    "jupiter-primitives/std",
+    "jupiter-runtime-common/std",
 
     "cumulus-parachain-upgrade/std",
     "cumulus-primitives/std",

@@ -1,3 +1,5 @@
+//! Jupiter chain configurations.
+
 use serde_json::json;
 
 use hex_literal::hex;
@@ -15,11 +17,11 @@ use jupiter_runtime::{
     AuthorityDiscoveryConfig, BalancesConfig, ContractsConfig, CouncilConfig, GenesisConfig,
     PoAConfig, SessionConfig, SudoConfig, SystemConfig, TechnicalCommitteeConfig, WASM_BINARY,
 };
+use jupiter_runtime_common::constants::jupiter_currency::DOTS;
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
-use patract_runtime_common::constants::jupiter_currency::DOTS;
 
 // The URL for the telemetry server.
-const PATRACT_TELEMETRY_URL: &str = "wss://telemetry.patract.io/submit";
+const JUPITER_TELEMETRY_URL: &str = "wss://telemetry.patract.io/submit";
 
 /// Specialized `ChainSpec`. This is a specialization of the general Substrate ChainSpec type.
 pub type ChainSpec = sc_service::GenericChainSpec<GenesisConfig>;
@@ -76,6 +78,7 @@ fn session_keys(
     }
 }
 
+/// PoA development testnet config.
 pub fn poa_development_config() -> Result<ChainSpec, String> {
     let wasm_binary = WASM_BINARY.ok_or("Development wasm binary not available".to_string())?;
 
@@ -124,6 +127,7 @@ pub fn poa_development_config() -> Result<ChainSpec, String> {
     ))
 }
 
+/// PoA local testnet config.
 pub fn poa_local_config() -> Result<ChainSpec, String> {
     let wasm_binary = WASM_BINARY.ok_or("Development wasm binary not available".to_string())?;
 
@@ -183,6 +187,7 @@ pub fn poa_local_config() -> Result<ChainSpec, String> {
     ))
 }
 
+/// PoA staging testnet config.
 pub fn poa_staging_config() -> Result<ChainSpec, String> {
     let wasm_binary = WASM_BINARY.ok_or("Testnet wasm binary not available".to_string())?;
 
@@ -341,7 +346,7 @@ pub fn poa_staging_config() -> Result<ChainSpec, String> {
         vec![],
         // Telemetry
         Some(
-            TelemetryEndpoints::new(vec![(PATRACT_TELEMETRY_URL.to_string(), 0)])
+            TelemetryEndpoints::new(vec![(JUPITER_TELEMETRY_URL.to_string(), 0)])
                 .expect("Polkadot Staging telemetry url is valid; qed"),
         ),
         // Protocol ID
@@ -362,6 +367,7 @@ pub fn poa_staging_config() -> Result<ChainSpec, String> {
     ))
 }
 
+/// PoA config
 pub fn poa_config() -> Result<ChainSpec, String> {
     ChainSpec::from_json_bytes(&include_bytes!("../../res/jupiter_poa.json")[..])
 }

@@ -9,10 +9,10 @@ use sp_std::vec::Vec;
 
 use frame_support::debug::{error, native};
 
-/// The chain Extension of Patract
-pub struct PatractExt;
+/// The chain Extension of Jupiter
+pub struct JupiterExt;
 
-impl<C: pallet_contracts::Config> ChainExtension<C> for PatractExt {
+impl<C: pallet_contracts::Config> ChainExtension<C> for JupiterExt {
     fn call<E>(func_id: u32, env: Environment<E, InitState>) -> Result<RetVal, DispatchError>
     where
         E: Ext<T = C>,
@@ -22,7 +22,7 @@ impl<C: pallet_contracts::Config> ChainExtension<C> for PatractExt {
 
         // func_id refer to https://github.com/patractlabs/PIPs/blob/main/PIPs/pip-100.md
         match func_id {
-            // 0x01000000-0x010000ff Patract ZKP Support
+            // 0x01000000-0x010000ff Jupiter ZKP Support
             0x01000000..=0x010000ff => {
                 // The memory of the vm stores buf in scale-codec
                 let input: Vec<u8> = env.read_as()?;
@@ -44,8 +44,8 @@ impl<C: pallet_contracts::Config> ChainExtension<C> for PatractExt {
                         16_000_000 * k
                     }
                     _ => {
-                        error!("[PIP-101]call an unregistered `func_id` in Patract ZKP field, func_id:{:}", func_id);
-                        return Err(DispatchError::Other("Unimplemented Patract ZKP func_id"));
+                        error!("[PIP-101]call an unregistered `func_id` in Jupiter ZKP field, func_id:{:}", func_id);
+                        return Err(DispatchError::Other("Unimplemented Jupiter ZKP func_id"));
                     }
                 };
                 env.charge_weight(simple_weight)?;
@@ -63,8 +63,8 @@ impl<C: pallet_contracts::Config> ChainExtension<C> for PatractExt {
                 #[cfg(feature = "native-support")]
                 {
                     raw_output =
-                        patract_io::pairing::call(func_id, &input).ok_or(DispatchError::Other(
-                            "ChainExtension failed to call native `patract_io::pairing`",
+                        jupiter_io::pairing::call(func_id, &input).ok_or(DispatchError::Other(
+                            "ChainExtension failed to call native `jupiter_io::pairing`",
                         ))?;
                 }
                 #[cfg(not(feature = "native-support"))]

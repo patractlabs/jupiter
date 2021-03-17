@@ -1,5 +1,5 @@
 [package]
-name = "patract-io"
+name = "jupiter-io"
 version = "0.2.0"
 authors = ["Patract <https://github.com/patractlabs/patract>"]
 edition = "2018"
@@ -12,8 +12,8 @@ sp-runtime-interface = { git = "https://github.com/paritytech/substrate.git", br
 sp-std = { git = "https://github.com/paritytech/substrate.git", branch = "master", default-features = false }
 
 [dependencies.curve]
-git = "https://github.com/patractlabs/megaclite.git"
-package = "megaclite-arkworks"
+git = "https://github.com/patractlabs/zkmega.git"
+package = "zkmega-arkworks"
 features = [ "tests" ]
 default-features = false
 

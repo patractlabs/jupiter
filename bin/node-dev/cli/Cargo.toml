@@ -1,5 +1,5 @@
 [package]
-name = "patract-dev-cli"
+name = "jupiter-dev-cli"
 version = "1.0.0"
 authors = ["Patract <https://github.com/patractlabs/patract>"]
 edition = "2018"
@@ -35,16 +35,16 @@ pallet-contracts = { package = "pallet-contracts", path = "../../../vendor/subst
 frame-benchmarking = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 frame-benchmarking-cli = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 
-patract-primitives = { path = "../../../primitives" }
-patract-io = { path = "../../../primitives/io" }
-patract-rpc = { path = "../../../rpc" }
+jupiter-primitives = { path = "../../../primitives" }
+jupiter-io = { path = "../../../primitives/io" }
+jupiter-rpc = { path = "../../../rpc" }
 
-patract-dev-runtime = { path = "../../../runtime/patract-dev" }
+jupiter-dev-runtime = { path = "../../../runtime/jupiter-dev" }
 
 [build-dependencies]
 substrate-build-script-utils = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 
 [features]
 runtime-benchmarks = [
-	"patract-dev-runtime/runtime-benchmarks",
+	"jupiter-dev-runtime/runtime-benchmarks",
 ]
