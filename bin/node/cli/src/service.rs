@@ -11,7 +11,7 @@ pub use sc_executor::NativeExecutor;
 use sc_service::{error::Error as ServiceError, Configuration, Role, TaskManager};
 
 use jupiter_para_runtime::{self, RuntimeApi};
-use patract_primitives::Block;
+use jupiter_primitives::Block;
 
 // Declare an instance of the native executor named `Executor`. Include the wasm binary as the
 // equivalent wasm code.
@@ -87,7 +87,7 @@ async fn start_node_impl<RB>(
     rpc_ext_builder: RB,
 ) -> sc_service::error::Result<(TaskManager, Arc<FullClient>)>
 where
-    RB: Fn(Arc<FullClient>) -> patract_rpc::IoHandler + Send + 'static,
+    RB: Fn(Arc<FullClient>) -> jupiter_rpc::IoHandler + Send + 'static,
 {
     if matches!(parachain_config.role, Role::Light) {
         return Err("Light client not supported!".into());

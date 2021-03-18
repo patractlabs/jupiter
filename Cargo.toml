@@ -7,7 +7,7 @@ members = [
 
 #    "runtime/jupiter-para",
     "runtime/jupiter-prep",
-    "runtime/patract-dev",
+    "runtime/jupiter-dev",
 
     "primitives",
     "primitives/io",

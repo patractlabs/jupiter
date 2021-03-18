@@ -1,12 +1,12 @@
 [package]
-name = "patract-dev"
+name = "jupiter-dev"
 version = "1.0.0"
 authors = ["Patract <https://github.com/patractlabs/patract>"]
 edition = "2018"
 description = ""
 
 [dependencies]
-cli = { package = "patract-dev-cli", path = "cli" }
+cli = { package = "jupiter-dev-cli", path = "cli" }
 
 [features]
 runtime-benchmarks = [

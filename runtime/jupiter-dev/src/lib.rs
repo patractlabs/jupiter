@@ -44,10 +44,10 @@ pub use pallet_balances::Call as BalancesCall;
 pub use pallet_template::Call as TemplateCall;
 pub use pallet_timestamp::Call as TimestampCall;
 
-pub use patract_primitives::{
+pub use jupiter_primitives::{
     AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Signature,
 };
-use patract_runtime_common::{
+use jupiter_runtime_common::{
     constants::{jupiter_currency::*, time::*},
     impls, weights, BlockHashCount, BlockLength, BlockWeights, AVERAGE_ON_INITIALIZE_RATIO,
 };
@@ -64,8 +64,8 @@ pub fn wasm_binary_unwrap() -> &'static [u8] {
 
 /// Runtime version.
 pub const VERSION: RuntimeVersion = RuntimeVersion {
-    spec_name: create_runtime_str!("patract-dev"),
-    impl_name: create_runtime_str!("patract-dev"),
+    spec_name: create_runtime_str!("Jupiter-dev"),
+    impl_name: create_runtime_str!("Jupiter-dev"),
     authoring_version: 1,
     spec_version: 1,
     impl_version: 1,
@@ -131,7 +131,7 @@ impl frame_system::Config for Runtime {
     type OnKilledAccount = ();
     /// Weight information for the extrinsics of this pallet.
     type SystemWeightInfo = weights::frame_system::WeightInfo;
-    /// This is used as an identifier of the chain. patract-dev use default 42 as prefix.
+    /// This is used as an identifier of the chain. Jupiter-dev use default 42 as prefix.
     type SS58Prefix = ();
 }
 
@@ -262,7 +262,7 @@ impl pallet_template::Config for Runtime {
 construct_runtime!(
     pub enum Runtime where
         Block = Block,
-        NodeBlock = patract_primitives::Block,
+        NodeBlock = jupiter_primitives::Block,
         UncheckedExtrinsic = UncheckedExtrinsic
     {
         // Basic stuff; balances is uncallable initially.

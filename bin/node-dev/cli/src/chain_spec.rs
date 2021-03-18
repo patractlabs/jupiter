@@ -1,11 +1,13 @@
+//! Jupiter chain configurations.
+
 use serde_json::json;
 
 use sc_service::ChainType;
 use sp_core::{sr25519, Pair, Public};
 use sp_runtime::traits::{IdentifyAccount, Verify};
 
-use patract_dev_runtime::{AccountId, Signature};
-use patract_dev_runtime::{
+use jupiter_dev_runtime::{AccountId, Signature};
+use jupiter_dev_runtime::{
     BalancesConfig, ContractsConfig, GenesisConfig, IndicesConfig, SudoConfig, SystemConfig,
     WASM_BINARY,
 };
@@ -33,6 +35,7 @@ where
     AccountPublic::from(get_from_seed::<TPublic>(seed)).into_account()
 }
 
+/// Development testnet config.
 pub fn development_config() -> Result<ChainSpec, String> {
     let wasm_binary =
         WASM_BINARY.ok_or_else(|| "Development wasm binary not available".to_string())?;
@@ -41,7 +44,7 @@ pub fn development_config() -> Result<ChainSpec, String> {
         // Name
         "Development",
         // ID
-        "patract-dev",
+        "Jupiter-dev",
         ChainType::Development,
         move || {
             testnet_genesis(

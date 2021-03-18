@@ -40,10 +40,10 @@ pub use frame_support::{
 pub use pallet_balances::Call as BalancesCall;
 pub use pallet_timestamp::Call as TimestampCall;
 
-pub use patract_primitives::{
+pub use jupiter_primitives::{
     AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Signature,
 };
-use patract_runtime_common::{
+use jupiter_runtime_common::{
     constants::{currency::*, fee::WeightToFee, time::*},
     impls, weights, BlockHashCount, BlockLength, BlockWeights, AVERAGE_ON_INITIALIZE_RATIO,
 };
@@ -243,7 +243,7 @@ impl pallet_contracts::Config for Runtime {
     type MaxValueSize = MaxValueSize;
     type WeightPrice = pallet_transaction_payment::Module<Self>;
     type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
-    type ChainExtension = patract_chain_extension::PatractExt;
+    type ChainExtension = jupiter_chain_extension::JupiterExt;
     type DeletionQueueDepth = DeletionQueueDepth;
     type DeletionWeightLimit = DeletionWeightLimit;
 }
@@ -321,7 +321,7 @@ impl xcm_handler::Config for Runtime {
 construct_runtime!(
     pub enum Runtime where
         Block = Block,
-        NodeBlock = patract_primitives::Block,
+        NodeBlock = jupiter_primitives::Block,
         UncheckedExtrinsic = UncheckedExtrinsic
     {
         // Basic stuff; balances is uncallable initially.

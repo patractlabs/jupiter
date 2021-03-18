@@ -9,9 +9,9 @@ use sc_service::{error::Error as ServiceError, Configuration, TaskManager};
 use sc_telemetry::TelemetrySpan;
 use sp_inherents::InherentDataProviders;
 
-use patract_primitives::Block;
+use jupiter_primitives::Block;
 
-use patract_dev_runtime::{self, RuntimeApi};
+use jupiter_dev_runtime::{self, RuntimeApi};
 
 type FullClient = sc_service::TFullClient<Block, RuntimeApi, Executor>;
 type FullBackend = sc_service::TFullBackend<Block>;
@@ -21,9 +21,9 @@ type FullSelectChain = sc_consensus::LongestChain<FullBackend, Block>;
 // equivalent wasm code.
 native_executor_instance!(
     pub Executor,
-    patract_dev_runtime::api::dispatch,
-    patract_dev_runtime::native_version,
-    (frame_benchmarking::benchmarking::HostFunctions, patract_io::pairing::HostFunctions),
+    jupiter_dev_runtime::api::dispatch,
+    jupiter_dev_runtime::native_version,
+    (frame_benchmarking::benchmarking::HostFunctions, jupiter_io::pairing::HostFunctions),
 );
 
 /// Returns most parts of a service. Not enough to run a full chain,
@@ -143,13 +143,13 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
         let pool = transaction_pool.clone();
 
         Box::new(move |deny_unsafe, _| {
-            let deps = patract_rpc::BasicDeps {
+            let deps = jupiter_rpc::BasicDeps {
                 client: client.clone(),
                 pool: pool.clone(),
                 deny_unsafe,
             };
 
-            patract_rpc::create_basic(deps)
+            jupiter_rpc::create_basic(deps)
         })
     };
 
