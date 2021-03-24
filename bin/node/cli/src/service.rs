@@ -17,7 +17,7 @@ pub use sc_executor::NativeExecutor;
 use sc_service::{error::Error as ServiceError, Configuration, TaskManager, Role, PartialComponents};
 
 use jupiter_runtime::{self, RuntimeApi, OCW_DB_RANDOM, RpcPort};
-use patract_primitives::Block;
+use jupiter_primitives::Block;
 
 use sc_client_api::Backend;
 use sp_core::offchain::OffchainStorage;
@@ -29,7 +29,7 @@ native_executor_instance!(
     pub Executor,
     jupiter_runtime::api::dispatch,
     jupiter_runtime::native_version,
-    (frame_benchmarking::benchmarking::HostFunctions, patract_io::pairing::HostFunctions),
+    (frame_benchmarking::benchmarking::HostFunctions, jupiter_io::pairing::HostFunctions),
 );
 
 type FullClient = sc_service::TFullClient<Block, RuntimeApi, Executor>;
@@ -99,12 +99,8 @@ async fn start_node_impl<RB>(
     validator: bool,
     rpc_ext_builder: RB,
 ) -> sc_service::error::Result<(TaskManager, Arc<FullClient>)>
-    where
-        RB: Fn(
-            Arc<FullClient>,
-        ) -> patract_rpc::IoHandler
-        + Send
-        + 'static,
+where
+    RB: Fn(Arc<FullClient>) -> jupiter_rpc::IoHandler + Send + 'static,
 {
     if matches!(parachain_config.role, Role::Light) {
         return Err("Light client not supported!".into());

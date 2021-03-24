@@ -1,5 +1,5 @@
 [package]
-name = "patract-chain-extension"
+name = "jupiter-chain-extension"
 version = "0.1.0"
 authors = ["Patract <https://github.com/patractlabs/patract>"]
 edition = "2018"
@@ -15,11 +15,11 @@ sp-std = { version = "3.0.0", git = "https://github.com/paritytech/substrate", b
 frame-support = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "rococo-v1", default-features = false }
 pallet-contracts = { path = "../../vendor/substrate/frame/contracts", default-features = false }
 
-patract-io = { path = "../io", default-features = false, optional = true }
+jupiter-io = { path = "../io", default-features = false, optional = true }
 
 [dependencies.curve]
-git = "https://github.com/patractlabs/megaclite.git"
-package = "megaclite-arkworks"
+git = "https://github.com/patractlabs/zkmega.git"
+package = "zkmega-arkworks"
 default-features = false
 
 [features]
@@ -35,8 +35,8 @@ std = [
   "frame-support/std",
   "pallet-contracts/std",
 
-  "patract-io/std",
+  "jupiter-io/std",
 ]
 native-support = [
-  "patract-io"
+  "jupiter-io"
 ]

@@ -2552,9 +2552,9 @@ dependencies = [
 
 [[package]]
 name = "hex"
-version = "0.4.2"
+version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "644f9158b2f133fd50f5fb3242878846d9eb792e445c893805ff0e3824006e35"
+checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
 name = "hex-literal"
@@ -3141,6 +3141,140 @@ dependencies = [
 ]
 
 [[package]]
+name = "jupiter"
+version = "0.1.0"
+dependencies = [
+ "jupiter-para-cli",
+]
+
+[[package]]
+name = "jupiter-chain-extension"
+version = "0.1.0"
+dependencies = [
+ "frame-support",
+ "hex",
+ "jupiter-io",
+ "log",
+ "pallet-contracts",
+ "parity-scale-codec 2.0.0",
+ "sp-runtime",
+ "sp-std",
+ "zkmega-arkworks",
+]
+
+[[package]]
+name = "jupiter-io"
+version = "0.2.0"
+dependencies = [
+ "num-bigint 0.3.1",
+ "num-traits",
+ "sp-runtime-interface",
+ "sp-std",
+ "zkmega-arkworks",
+]
+
+[[package]]
+name = "jupiter-para-cli"
+version = "0.1.0"
+dependencies = [
+ "ansi_term 0.12.1",
+ "cumulus-cli",
+ "cumulus-client-collator",
+ "cumulus-client-consensus-relay-chain",
+ "cumulus-client-network",
+ "cumulus-client-service",
+ "cumulus-primitives-core",
+ "frame-benchmarking",
+ "futures 0.3.12",
+ "hex-literal 0.2.1",
+ "jupiter-io",
+ "jupiter-primitives",
+ "jupiter-rpc",
+ "jupiter-runtime",
+ "log",
+ "pallet-contracts",
+ "parity-scale-codec 2.0.0",
+ "parking_lot 0.10.2",
+ "polkadot-cli",
+ "polkadot-parachain",
+ "polkadot-primitives",
+ "polkadot-service",
+ "sc-authority-discovery",
+ "sc-basic-authorship",
+ "sc-chain-spec",
+ "sc-cli",
+ "sc-client-api",
+ "sc-consensus",
+ "sc-consensus-aura",
+ "sc-executor",
+ "sc-finality-grandpa",
+ "sc-informant",
+ "sc-network",
+ "sc-rpc",
+ "sc-service",
+ "sc-telemetry",
+ "sc-tracing",
+ "sc-transaction-pool",
+ "serde",
+ "serde_json",
+ "sp-api",
+ "sp-block-builder",
+ "sp-blockchain",
+ "sp-consensus",
+ "sp-consensus-aura",
+ "sp-core",
+ "sp-finality-grandpa",
+ "sp-inherents",
+ "sp-offchain",
+ "sp-runtime",
+ "sp-session",
+ "sp-timestamp",
+ "sp-transaction-pool",
+ "structopt",
+ "substrate-build-script-utils",
+]
+
+[[package]]
+name = "jupiter-primitives"
+version = "0.1.0"
+dependencies = [
+ "frame-system",
+ "parity-scale-codec 2.0.0",
+ "serde",
+ "sp-application-crypto",
+ "sp-core",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
+name = "jupiter-rpc"
+version = "0.1.0"
+dependencies = [
+ "jsonrpc-core",
+ "jupiter-primitives",
+ "pallet-contracts-rpc",
+ "pallet-transaction-payment-rpc",
+ "sc-client-api",
+ "sc-consensus-babe",
+ "sc-consensus-babe-rpc",
+ "sc-consensus-epochs",
+ "sc-finality-grandpa",
+ "sc-finality-grandpa-rpc",
+ "sc-rpc",
+ "sc-rpc-api",
+ "sp-api",
+ "sp-block-builder",
+ "sp-blockchain",
+ "sp-consensus",
+ "sp-consensus-babe",
+ "sp-keystore",
+ "sp-runtime",
+ "sp-transaction-pool",
+ "substrate-frame-rpc-system",
+]
+
+[[package]]
 name = "jupiter-runtime"
 version = "0.1.0"
 dependencies = [
@@ -3152,6 +3286,9 @@ dependencies = [
  "frame-system",
  "frame-system-rpc-runtime-api",
  "hex",
+ "jupiter-chain-extension",
+ "jupiter-primitives",
+ "jupiter-runtime-common",
  "megaclite-arkworks",
  "pallet-authorship",
  "pallet-balances",
@@ -3169,9 +3306,6 @@ dependencies = [
  "pallet-utility",
  "parachain-info",
  "parity-scale-codec 2.0.0",
- "patract-chain-extension",
- "patract-primitives",
- "patract-runtime-common",
  "polkadot-parachain",
  "randomness_collect",
  "serde",
@@ -3192,6 +3326,38 @@ dependencies = [
  "xcm",
  "xcm-builder",
  "xcm-executor",
+]
+
+[[package]]
+name = "jupiter-runtime-common"
+version = "0.1.0"
+dependencies = [
+ "frame-support",
+ "frame-system",
+ "jupiter-primitives",
+ "pallet-authorship",
+ "pallet-balances",
+ "pallet-bounties",
+ "pallet-collective",
+ "pallet-democracy",
+ "pallet-elections-phragmen",
+ "pallet-identity",
+ "pallet-im-online",
+ "pallet-indices",
+ "pallet-multisig",
+ "pallet-proxy",
+ "pallet-scheduler",
+ "pallet-session",
+ "pallet-staking",
+ "pallet-timestamp",
+ "pallet-tips",
+ "pallet-transaction-payment",
+ "pallet-treasury",
+ "pallet-utility",
+ "smallvec 1.6.1",
+ "sp-runtime",
+ "sp-std",
+ "static_assertions",
 ]
 
 [[package]]
@@ -3962,8 +4128,6 @@ dependencies = [
  "ark-cp6-782",
  "ark-ec",
  "ark-ff",
- "ark-groth16",
- "ark-relations",
  "ark-serialize",
  "ark-std",
  "cfg-if 1.0.0",
@@ -5368,172 +5532,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d95a7db200b97ef370c8e6de0088252f7e0dfff7d047a28528e47456c0fc98b6"
 dependencies = [
  "proc-macro-hack",
-]
-
-[[package]]
-name = "patract"
-version = "0.1.0"
-dependencies = [
- "patract-para-cli",
-]
-
-[[package]]
-name = "patract-chain-extension"
-version = "0.1.0"
-dependencies = [
- "frame-support",
- "hex",
- "log",
- "megaclite-arkworks",
- "pallet-contracts",
- "parity-scale-codec 2.0.0",
- "patract-io",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
-name = "patract-io"
-version = "0.2.0"
-dependencies = [
- "megaclite-arkworks",
- "num-bigint 0.3.1",
- "num-traits",
- "sp-runtime-interface",
- "sp-std",
-]
-
-[[package]]
-name = "patract-para-cli"
-version = "0.1.0"
-dependencies = [
- "ansi_term 0.12.1",
- "cumulus-cli",
- "cumulus-client-collator",
- "cumulus-client-consensus-relay-chain",
- "cumulus-client-network",
- "cumulus-client-service",
- "cumulus-primitives-core",
- "frame-benchmarking",
- "futures 0.3.12",
- "hex-literal 0.2.1",
- "jupiter-runtime",
- "log",
- "pallet-contracts",
- "parity-scale-codec 2.0.0",
- "parking_lot 0.10.2",
- "patract-io",
- "patract-primitives",
- "patract-rpc",
- "polkadot-cli",
- "polkadot-parachain",
- "polkadot-primitives",
- "polkadot-service",
- "sc-authority-discovery",
- "sc-basic-authorship",
- "sc-chain-spec",
- "sc-cli",
- "sc-client-api",
- "sc-consensus",
- "sc-consensus-aura",
- "sc-executor",
- "sc-finality-grandpa",
- "sc-informant",
- "sc-network",
- "sc-rpc",
- "sc-service",
- "sc-telemetry",
- "sc-tracing",
- "sc-transaction-pool",
- "serde",
- "serde_json",
- "sp-api",
- "sp-block-builder",
- "sp-blockchain",
- "sp-consensus",
- "sp-consensus-aura",
- "sp-core",
- "sp-finality-grandpa",
- "sp-inherents",
- "sp-offchain",
- "sp-runtime",
- "sp-session",
- "sp-timestamp",
- "sp-transaction-pool",
- "structopt",
- "substrate-build-script-utils",
-]
-
-[[package]]
-name = "patract-primitives"
-version = "0.1.0"
-dependencies = [
- "frame-system",
- "parity-scale-codec 2.0.0",
- "serde",
- "sp-application-crypto",
- "sp-core",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
-name = "patract-rpc"
-version = "0.1.0"
-dependencies = [
- "jsonrpc-core",
- "pallet-contracts-rpc",
- "pallet-transaction-payment-rpc",
- "patract-primitives",
- "sc-client-api",
- "sc-consensus-babe",
- "sc-consensus-babe-rpc",
- "sc-consensus-epochs",
- "sc-finality-grandpa",
- "sc-finality-grandpa-rpc",
- "sc-rpc",
- "sc-rpc-api",
- "sp-api",
- "sp-block-builder",
- "sp-blockchain",
- "sp-consensus",
- "sp-consensus-babe",
- "sp-keystore",
- "sp-runtime",
- "sp-transaction-pool",
- "substrate-frame-rpc-system",
-]
-
-[[package]]
-name = "patract-runtime-common"
-version = "0.1.0"
-dependencies = [
- "frame-support",
- "frame-system",
- "pallet-authorship",
- "pallet-balances",
- "pallet-bounties",
- "pallet-collective",
- "pallet-democracy",
- "pallet-elections-phragmen",
- "pallet-identity",
- "pallet-im-online",
- "pallet-indices",
- "pallet-multisig",
- "pallet-proxy",
- "pallet-scheduler",
- "pallet-session",
- "pallet-staking",
- "pallet-timestamp",
- "pallet-tips",
- "pallet-transaction-payment",
- "pallet-treasury",
- "pallet-utility",
- "patract-primitives",
- "smallvec 1.6.1",
- "sp-runtime",
- "sp-std",
- "static_assertions",
 ]
 
 [[package]]
@@ -6985,7 +6983,7 @@ dependencies = [
  "cfg-if 0.1.10",
  "libc",
  "nix",
- "rand 0.3.23",
+ "rand 0.8.3",
  "winapi 0.3.9",
 ]
 
@@ -8652,7 +8650,7 @@ dependencies = [
  "libc",
  "nix",
  "quick-error 2.0.0",
- "rand 0.3.23",
+ "rand 0.8.3",
  "winapi 0.3.9",
 ]
 
@@ -10242,7 +10240,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "04f8ab788026715fa63b31960869617cba39117e520eb415b0139543e325ab59"
 dependencies = [
  "cfg-if 0.1.10",
- "rand 0.3.23",
+ "rand 0.7.3",
  "static_assertions",
 ]
 
@@ -11069,6 +11067,29 @@ dependencies = [
  "quote",
  "syn",
  "synstructure",
+]
+
+[[package]]
+name = "zkmega-arkworks"
+version = "0.1.0"
+source = "git+https://github.com/patractlabs/zkmega.git#9b3104e5a71ee01245463dce8af18adfba354f2d"
+dependencies = [
+ "ark-bls12-377",
+ "ark-bls12-381",
+ "ark-bn254",
+ "ark-bw6-761",
+ "ark-cp6-782",
+ "ark-ec",
+ "ark-ff",
+ "ark-groth16",
+ "ark-relations",
+ "ark-serialize",
+ "ark-std",
+ "hex",
+ "num-bigint 0.3.1",
+ "parity-scale-codec 2.0.0",
+ "rand 0.7.3",
+ "rustc-hex",
 ]
 
 [[package]]

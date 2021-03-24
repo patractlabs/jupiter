@@ -1,5 +1,5 @@
 [package]
-name = "patract-rpc"
+name = "jupiter-rpc"
 version = "0.1.0"
 authors = ["Patract <https://github.com/patractlabs/patract>"]
 edition = "2018"
@@ -32,4 +32,4 @@ substrate-frame-rpc-system = { version = "3.0.0", git = "https://github.com/pari
 pallet-transaction-payment-rpc = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "rococo-v1" }
 pallet-contracts-rpc = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "rococo-v1" }
 
-patract-primitives = { path = "../primitives" }
+jupiter-primitives = { path = "../primitives" }

@@ -1,5 +1,5 @@
 [package]
-name = "patract-runtime-common"
+name = "jupiter-runtime-common"
 version = "0.1.0"
 authors = ["Patract <https://github.com/patractlabs/patract>"]
 edition = "2018"
@@ -33,7 +33,7 @@ pallet-bounties = { version = "3.0.0", git = "https://github.com/paritytech/subs
 pallet-tips = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "rococo-v1", default-features = false }
 pallet-utility = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "rococo-v1", default-features = false }
 
-patract-primitives = { path = "../../primitives", default-features = false }
+jupiter-primitives = { path = "../../primitives", default-features = false }
 
 [features]
 default = ["std"]
@@ -63,7 +63,7 @@ std = [
     "pallet-tips/std",
     "pallet-utility/std",
 
-    "patract-primitives/std",
+    "jupiter-primitives/std",
 ]
 
 runtime-benchmarks = [
