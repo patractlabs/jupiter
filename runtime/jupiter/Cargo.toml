@@ -16,7 +16,6 @@ hex = { version = "0.4.3", optional = true }
 # Substrate primitives
 sp-api = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "rococo-v1", default-features = false }
 sp-block-builder = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "rococo-v1", default-features = false }
-sp-consensus-aura = { version = "0.9.0", git = "https://github.com/paritytech/substrate", branch = "rococo-v1", default-features = false }
 sp-core = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "rococo-v1", default-features = false }
 sp-inherents = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "rococo-v1", default-features = false }
 sp-io = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "rococo-v1", default-features = false }
@@ -82,7 +81,6 @@ std = [
 
     "sp-api/std",
     "sp-block-builder/std",
-    "sp-consensus-aura/std",
     "sp-core/std",
     "sp-inherents/std",
     "sp-io/std",

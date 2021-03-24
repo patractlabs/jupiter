@@ -216,7 +216,7 @@ parameter_types! {
 	pub const DepositPerContract: Balance = TombstoneDeposit::get();
 	pub const DepositPerStorageByte: Balance = deposit(0, 1);
 	pub const DepositPerStorageItem: Balance = deposit(1, 0);
-	pub RentFraction: Perbill = Perbill::from_rational_approximation(1u32, 30 * DAYS);
+	pub RentFraction: Perbill = Perbill::from_rational(1u32, 30 * DAYS);
 	pub const SurchargeReward: Balance = 150 * MILLICENTS;
 	pub const SignedClaimHandicap: u32 = 2;
 	pub const MaxDepth: u32 = 32;
@@ -349,23 +349,23 @@ construct_runtime!(
         NodeBlock = jupiter_primitives::Block,
         UncheckedExtrinsic = UncheckedExtrinsic
     {
-        System: frame_system::{Module, Call, Config, Storage, Event<T>} = 0,
-        RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Module, Call, Storage} = 7,
+        System: frame_system::{Pallet, Call, Config, Storage, Event<T>} = 0,
+        RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Pallet, Call, Storage} = 7,
 
-        Timestamp: pallet_timestamp::{Module, Call, Storage, Inherent} = 1,
-        Balances: pallet_balances::{Module, Call, Storage, Config<T>, Event<T>} = 2,
-        Indices: pallet_indices::{Module, Call, Storage, Config<T>, Event<T>} = 3,
-        TransactionPayment: pallet_transaction_payment::{Module, Storage} = 4,
+        Timestamp: pallet_timestamp::{Pallet, Call, Storage, Inherent} = 1,
+        Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>} = 2,
+        Indices: pallet_indices::{Pallet, Call, Storage, Config<T>, Event<T>} = 3,
+        TransactionPayment: pallet_transaction_payment::{Pallet, Storage} = 4,
 
-        Contracts: pallet_contracts::{Module, Call, Config<T>, Storage, Event<T>} = 5,
+        Contracts: pallet_contracts::{Pallet, Call, Config<T>, Storage, Event<T>} = 5,
 
-        Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>} = 6,
+        Sudo: pallet_sudo::{Pallet, Call, Config<T>, Storage, Event<T>} = 6,
 
-        ParachainSystem: cumulus_pallet_parachain_system::{Module, Call, Storage, Inherent, Event} = 8,
-		ParachainInfo: parachain_info::{Module, Storage, Config} = 9,
-		XcmHandler: cumulus_pallet_xcm_handler::{Module, Call, Event<T>, Origin} = 10,
+        ParachainSystem: cumulus_pallet_parachain_system::{Pallet, Call, Storage, Inherent, Event} = 8,
+		ParachainInfo: parachain_info::{Pallet, Storage, Config} = 9,
+		XcmHandler: cumulus_pallet_xcm_handler::{Pallet, Call, Event<T>, Origin} = 10,
 
-		RandomnessCollect: randomness_collect::{Module, Call, Storage, ValidateUnsigned} = 11,
+		RandomnessCollect: randomness_collect::{Pallet, Call, Storage, ValidateUnsigned} = 11,
     }
 );
 
@@ -401,7 +401,7 @@ pub type Executive = frame_executive::Executive<
     Block,
     frame_system::ChainContext<Runtime>,
     Runtime,
-    AllModules,
+    AllPallets,
 >;
 
 impl_runtime_apis! {
@@ -446,7 +446,7 @@ impl_runtime_apis! {
         }
 
         fn random_seed() -> <Block as BlockT>::Hash {
-            RandomnessCollectiveFlip::random_seed()
+            RandomnessCollectiveFlip::random_seed().0
         }
     }
 

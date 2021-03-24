@@ -215,7 +215,6 @@ pub fn run() -> Result<()> {
                     &polkadot_cli,
                     &polkadot_cli,
                     config.task_executor.clone(),
-                    None,
                 )
                     .map_err(|err| format!("Relay chain argument error: {}", err))?;
 
@@ -310,7 +309,6 @@ pub fn run() -> Result<()> {
                     &polkadot_cli,
                     &polkadot_cli,
                     task_executor,
-                    None,
                 ).map_err(|err| format!("Relay chain argument error: {}", err))?;
                 let collator = cli.run.base.validator || cli.collator;
 
@@ -444,7 +442,7 @@ impl CliConfiguration<Self> for RelayChainCli {
         self.base.base.announce_block()
     }
 
-    fn init<C: SubstrateCli>(&self) -> Result<sc_telemetry::TelemetryWorker> {
+    fn init<C: SubstrateCli>(&self) -> Result<()> {
         unreachable!("PolkadotCli is never initialized; qed");
     }
 }

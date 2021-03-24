@@ -327,18 +327,21 @@ impl<T: Config> Module<T> {
         <HistoricalRandomness>::get(&epoch)
     }
 
-    pub fn random(subject: &[u8]) -> T::Hash {
-        let mut subject = subject.to_vec();
-        subject.reserve(VRF_OUTPUT_LENGTH);
-        subject
-            .extend_from_slice(&Self::historical_randomness(&Self::relay_chain_epoch_index())[..]);
+    pub fn random(subject: &[u8]) -> (T::Hash, T::BlockNumber) {
+        let random = {
+            let mut subject = subject.to_vec();
+            subject.reserve(VRF_OUTPUT_LENGTH);
+            subject
+                .extend_from_slice(&Self::historical_randomness(&Self::relay_chain_epoch_index())[..]);
+            <T as frame_system::Config>::Hashing::hash(&subject[..])
+        };
 
-        <T as frame_system::Config>::Hashing::hash(&subject[..])
+        (random, <frame_system::Pallet<T>>::block_number())
     }
 }
 
-impl<T: Config> RandomnessT<<T as frame_system::Config>::Hash> for Module<T> {
-    fn random(subject: &[u8]) -> T::Hash {
+impl<T: Config> RandomnessT<T::Hash, T::BlockNumber> for Module<T> {
+    fn random(subject: &[u8]) -> (T::Hash, T::BlockNumber) {
         Self::random(subject)
     }
 }
