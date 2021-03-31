@@ -19,3 +19,4 @@ log/
 
 # need to inclue wasm src file
 !/pallets/template/res/*
+!/bin/node/cli/res/*
