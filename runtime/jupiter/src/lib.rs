@@ -152,6 +152,7 @@ impl frame_system::Config for Runtime {
     /// Weight information for the extrinsics of this pallet.
     type SystemWeightInfo = weights::frame_system::WeightInfo;
     type SS58Prefix = SS58Prefix;
+    type OnSetCode = cumulus_pallet_parachain_system::ParachainSetCode<Self>;
 }
 
 parameter_types! {
@@ -265,8 +266,8 @@ impl cumulus_pallet_parachain_system::Config for Runtime {
     type Event = Event;
     type OnValidationData = ();
     type SelfParaId = parachain_info::Module<Runtime>;
-    type DownwardMessageHandlers = ();
-    type HrmpMessageHandlers = ();
+    type DownwardMessageHandlers = XcmHandler;
+    type XcmpMessageHandlers = XcmHandler;
 }
 
 impl parachain_info::Config for Runtime {}
@@ -321,7 +322,7 @@ impl cumulus_pallet_xcm_handler::Config for Runtime {
     type Event = Event;
     type XcmExecutor = XcmExecutor<XcmConfig>;
     type UpwardMessageSender = ParachainSystem;
-    type HrmpMessageSender = ParachainSystem;
+    type XcmpMessageSender = ParachainSystem;
     type SendXcmOrigin = EnsureRoot<AccountId>;
     type AccountIdConverter = LocationConverter;
 }
