@@ -17,10 +17,10 @@ pallet-contracts = { path = "../../vendor/substrate/frame/contracts", default-fe
 
 jupiter-io = { path = "../io", default-features = false, optional = true }
 
-[dependencies.curve]
-git = "https://github.com/patractlabs/zkmega.git"
-package = "zkmega-arkworks"
-default-features = false
+#[dependencies.curve]
+#git = "https://github.com/patractlabs/zkmega.git"
+#package = "zkmega-arkworks"
+#default-features = false
 
 [features]
 default = ["std"]

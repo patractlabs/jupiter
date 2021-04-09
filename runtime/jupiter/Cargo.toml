@@ -67,7 +67,6 @@ jupiter-chain-extension = { path = "../../primitives/chain-extension", default-f
 
 # Jupiter Pallets
 randomness_collect = { path = "../../pallets/randomness_collect", default-features = false }
-curve = { git = "https://github.com/patractlabs/megaclite.git", package = "megaclite-arkworks", default-features = false }
 
 [build-dependencies]
 substrate-wasm-builder = { version = "4.0.0", git = "https://github.com/paritytech/substrate", branch = "rococo-v1" }

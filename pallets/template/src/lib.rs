@@ -108,69 +108,69 @@ decl_module! {
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn wasm_bls12_377_add(origin) {
-            curve::tests::add(0x2a);
+            // curve::tests::add(0x2a);
         }
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn wasm_bls12_377_mul(origin) {
-            curve::tests::mul(0x2a);
+            // curve::tests::mul(0x2a);
         }
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn wasm_bls12_377_pairing_two(origin) {
-            curve::tests::pairing(0x2a);
+            // curve::tests::pairing(0x2a);
         }
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn wasm_bls12_377_pairing_six(origin) {
-            curve::tests::pairing_six(0x2a);
+            // curve::tests::pairing_six(0x2a);
         }
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn wasm_bls12_377_verify(origin) {
-            curve::tests::verify(0x2a);
+            // curve::tests::verify(0x2a);
         }
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn native_bls12_377_add(origin) {
-            jupiter_io::pairing::bls12_377_add();
+            // jupiter_io::pairing::bls12_377_add();
         }
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn native_bls12_377_mul(origin) {
-            jupiter_io::pairing::bls12_377_mul();
+            // jupiter_io::pairing::bls12_377_mul();
         }
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn native_bls12_377_pairing_two(origin) {
-            jupiter_io::pairing::bls12_377_pairing_two();
+            // jupiter_io::pairing::bls12_377_pairing_two();
         }
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn native_bls12_377_pairing_six(origin) {
-            jupiter_io::pairing::bls12_377_pairing_six();
+            // jupiter_io::pairing::bls12_377_pairing_six();
         }
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn native_bls12_377_verify(origin) {
-            jupiter_io::pairing::bls12_377_verify();
+            // jupiter_io::pairing::bls12_377_verify();
         }
 
         // bls12_381
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn wasm_bls12_381_add(origin) {
-            curve::tests::add(0x2b);
+            // curve::tests::add(0x2b);
         }
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn wasm_bls12_381_mul(origin) {
-            curve::tests::mul(0x2b);
+            // curve::tests::mul(0x2b);
         }
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn wasm_bls12_381_pairing_two(origin) {
-            curve::tests::pairing(0x2b);
+            // curve::tests::pairing(0x2b);
         }
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
@@ -180,136 +180,136 @@ decl_module! {
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn wasm_bls12_381_verify(origin) {
-            curve::tests::verify(0x2b);
+            // curve::tests::verify(0x2b);
         }
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn native_bls12_381_add(origin) {
-            jupiter_io::pairing::bls12_381_add();
+            // jupiter_io::pairing::bls12_381_add();
         }
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn native_bls12_381_mul(origin) {
-            jupiter_io::pairing::bls12_381_mul();
+            // jupiter_io::pairing::bls12_381_mul();
         }
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn native_bls12_381_pairing_two(origin) {
-            jupiter_io::pairing::bls12_381_pairing_two();
+            // jupiter_io::pairing::bls12_381_pairing_two();
         }
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn native_bls12_381_pairing_six(origin) {
-            jupiter_io::pairing::bls12_381_pairing_six();
+            // jupiter_io::pairing::bls12_381_pairing_six();
         }
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn native_bls12_381_verify(origin) {
-            jupiter_io::pairing::bls12_381_verify();
+            // jupiter_io::pairing::bls12_381_verify();
         }
 
         // bn254
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn wasm_bn254_add(origin) {
-            curve::tests::add(0x2c);
+            // curve::tests::add(0x2c);
         }
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn wasm_bn254_mul(origin) {
-            curve::tests::mul(0x2c);
+            // curve::tests::mul(0x2c);
         }
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn wasm_bn254_pairing_two(origin) {
-            curve::tests::pairing(0x2c);
+            // curve::tests::pairing(0x2c);
         }
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn wasm_bn254_pairing_six(origin) {
-            curve::tests::pairing_six(0x2c);
+            // curve::tests::pairing_six(0x2c);
         }
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn wasm_bn254_verify(origin) {
-            curve::tests::verify(0x2c);
+            // curve::tests::verify(0x2c);
         }
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn native_bn254_add(origin) {
-            jupiter_io::pairing::bn254_add();
+            // jupiter_io::pairing::bn254_add();
         }
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn native_bn254_mul(origin) {
-            jupiter_io::pairing::bn254_mul();
+            // jupiter_io::pairing::bn254_mul();
         }
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn native_bn254_pairing_two(origin) {
-            jupiter_io::pairing::bn254_pairing_two();
+            // jupiter_io::pairing::bn254_pairing_two();
         }
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn native_bn254_pairing_six(origin) {
-            jupiter_io::pairing::bn254_pairing_six();
+            // jupiter_io::pairing::bn254_pairing_six();
         }
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn native_bn254_verify(origin) {
-            jupiter_io::pairing::bn254_verify();
+            // jupiter_io::pairing::bn254_verify();
         }
 
         // bw6_781
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn wasm_bw6_761_add(origin) {
-            curve::tests::add(0x2d);
+            // curve::tests::add(0x2d);
         }
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn wasm_bw6_761_mul(origin) {
-            curve::tests::mul(0x2d);
+            // curve::tests::mul(0x2d);
         }
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn wasm_bw6_761_pairing_two(origin) {
-            curve::tests::pairing(0x2d);
+            // curve::tests::pairing(0x2d);
         }
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn wasm_bw6_761_pairing_six(origin) {
-            curve::tests::pairing_six(0x2d);
+            // curve::tests::pairing_six(0x2d);
         }
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn wasm_bw6_761_verify(origin) {
-            curve::tests::verify(0x2d);
+            // curve::tests::verify(0x2d);
         }
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn native_bw6_761_add(origin) {
-            jupiter_io::pairing::bw6_761_add();
+            // jupiter_io::pairing::bw6_761_add();
         }
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn native_bw6_761_mul(origin) {
-            jupiter_io::pairing::bw6_761_mul();
+            // jupiter_io::pairing::bw6_761_mul();
         }
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn native_bw6_761_pairing_two(origin) {
-            jupiter_io::pairing::bw6_761_pairing_two();
+            // jupiter_io::pairing::bw6_761_pairing_two();
         }
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn native_bw6_761_pairing_six(origin) {
-            jupiter_io::pairing::bw6_761_pairing_six();
+            // jupiter_io::pairing::bw6_761_pairing_six();
         }
 
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn native_bw6_761_verify(origin) {
-            jupiter_io::pairing::bw6_761_verify();
+            // jupiter_io::pairing::bw6_761_verify();
         }
     }
 }

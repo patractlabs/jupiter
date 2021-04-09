@@ -28,11 +28,11 @@ package = "jupiter-io"
 path = "../../primitives/io"
 default-features = false
 
-[dependencies.curve]
-package = "zkmega-arkworks"
-git = "https://github.com/patractlabs/zkmega.git"
-features = ["tests"]
-default-features = false
+#[dependencies.curve]
+#package = "zkmega-arkworks"
+#git = "https://github.com/patractlabs/zkmega.git"
+#features = ["tests"]
+#default-features = false
 
 [dependencies.pallet-contracts]
 package = "pallet-contracts"
