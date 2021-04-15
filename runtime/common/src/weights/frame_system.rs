@@ -27,7 +27,7 @@ impl frame_system::WeightInfo for WeightInfo {
     fn remark(_b: u32) -> Weight {
         (1305000 as Weight)
     }
-    fn remark_with_event(b: u32, ) -> Weight {
+    fn remark_with_event(b: u32) -> Weight {
         (9_697_000 as Weight)
             // Standard Error: 0
             .saturating_add((1_000 as Weight).saturating_mul(b as Weight))

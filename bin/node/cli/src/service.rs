@@ -1,26 +1,28 @@
 //! Service and ServiceFactory implementation. Specialized wrapper over substrate service.
-use std::sync::Arc;
 use cumulus_client_consensus_relay_chain::{
     build_relay_chain_consensus, BuildRelayChainConsensusParams,
 };
 use cumulus_client_network::build_block_announce_validator;
-use cumulus_primitives_core::ParaId;
 use cumulus_client_service::{
     prepare_node_config, start_collator, start_full_node, StartCollatorParams, StartFullNodeParams,
 };
-use sc_telemetry::{Telemetry, TelemetryWorker, TelemetryWorkerHandle};
+use cumulus_primitives_core::ParaId;
 use polkadot_primitives::v0::CollatorPair;
+use sc_telemetry::{Telemetry, TelemetryWorker, TelemetryWorkerHandle};
+use std::sync::Arc;
 
 use sc_executor::native_executor_instance;
 pub use sc_executor::NativeExecutor;
-use sc_service::{error::Error as ServiceError, Configuration, TaskManager, Role, PartialComponents};
+use sc_service::{
+    error::Error as ServiceError, Configuration, PartialComponents, Role, TaskManager,
+};
 
-use jupiter_runtime::{self, RuntimeApi, OCW_DB_RANDOM, RpcPort};
 use jupiter_primitives::Block;
+use jupiter_runtime::{self, RpcPort, RuntimeApi, OCW_DB_RANDOM};
 
+use codec::Encode;
 use sc_client_api::Backend;
 use sp_core::offchain::OffchainStorage;
-use codec::Encode;
 
 // Declare an instance of the native executor named `Executor`. Include the wasm binary as the
 // equivalent wasm code.
@@ -49,7 +51,9 @@ pub fn new_partial(
 > {
     let inherent_data_providers = sp_inherents::InherentDataProviders::new();
 
-    let telemetry = config.telemetry_endpoints.clone()
+    let telemetry = config
+        .telemetry_endpoints
+        .clone()
         .filter(|x| !x.is_empty())
         .map(|endpoints| -> Result<_, sc_telemetry::Error> {
             let worker = TelemetryWorker::new(16)?;
@@ -65,15 +69,12 @@ pub fn new_partial(
         )?;
     let client = Arc::new(client);
 
-    let telemetry_worker_handle = telemetry
-        .as_ref()
-        .map(|(worker, _)| worker.handle());
+    let telemetry_worker_handle = telemetry.as_ref().map(|(worker, _)| worker.handle());
 
-    let telemetry = telemetry
-        .map(|(worker, telemetry)| {
-            task_manager.spawn_handle().spawn("telemetry", worker.run());
-            telemetry
-        });
+    let telemetry = telemetry.map(|(worker, telemetry)| {
+        task_manager.spawn_handle().spawn("telemetry", worker.run());
+        telemetry
+    });
 
     let registry = config.prometheus_registry();
 
@@ -138,15 +139,15 @@ where
         .unwrap();
     let (mut telemetry, telemetry_worker_handle) = params.other;
 
-    let polkadot_full_node =
-        cumulus_client_service::build_polkadot_full_node(
-            polkadot_config,
-            collator_key.clone(),
-            telemetry_worker_handle,
-        ).map_err(|e| match e {
-            polkadot_service::Error::Sub(x) => x,
-            s => format!("{}", s).into(),
-        })?;
+    let polkadot_full_node = cumulus_client_service::build_polkadot_full_node(
+        polkadot_config,
+        collator_key.clone(),
+        telemetry_worker_handle,
+    )
+    .map_err(|e| match e {
+        polkadot_service::Error::Sub(x) => x,
+        s => format!("{}", s).into(),
+    })?;
 
     let client = params.client.clone();
     let backend = params.backend.clone();
@@ -174,7 +175,10 @@ where
 
     if parachain_config.offchain_worker.enabled {
         sc_service::build_offchain_workers(
-            &parachain_config,  task_manager.spawn_handle(), client.clone(), network.clone(),
+            &parachain_config,
+            task_manager.spawn_handle(),
+            client.clone(),
+            network.clone(),
         );
     }
 
@@ -213,10 +217,16 @@ where
         let spawner = task_manager.spawn_handle();
 
         if let Some(rpc_port_addr) = rpc_port {
-            let rpc_port = RpcPort{ 0: rpc_port_addr.to_string().into() };
+            let rpc_port = RpcPort {
+                0: rpc_port_addr.to_string().into(),
+            };
             let offchain_storage = backend.offchain_storage();
             if let Some(mut offchain_storage) = offchain_storage {
-                offchain_storage.set(sp_offchain::STORAGE_PREFIX, OCW_DB_RANDOM, &rpc_port.encode());
+                offchain_storage.set(
+                    sp_offchain::STORAGE_PREFIX,
+                    OCW_DB_RANDOM,
+                    &rpc_port.encode(),
+                );
             }
         }
 
@@ -276,5 +286,5 @@ pub async fn start_node(
         validator,
         |_| Default::default(),
     )
-        .await
+    .await
 }

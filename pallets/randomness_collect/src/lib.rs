@@ -270,10 +270,7 @@ impl<T: Config> Module<T> {
         res
     }
 
-    fn fetch_epoch_and_send_signed(
-        signer: T::AuthorityId,
-        index: u32,
-    ) -> Result<(), &'static str> {
+    fn fetch_epoch_and_send_signed(signer: T::AuthorityId, index: u32) -> Result<(), &'static str> {
         let rpc_port = Self::get_rpc_port();
         if let Some(rpc_port) = rpc_port {
             match sp_std::str::from_utf8(&[b"http://", rpc_port.0.as_slice()].concat()) {
@@ -310,7 +307,7 @@ impl<T: Config> Module<T> {
                             SubmitTransaction::<T, Call<T>>::submit_unsigned_transaction(
                                 call.into(),
                             )
-                                .map_err(|_| "Failed to submit unsigned transaction")?;
+                            .map_err(|_| "Failed to submit unsigned transaction")?;
                         } else {
                             Err("Get next epoch wrong")?;
                         }
@@ -331,8 +328,9 @@ impl<T: Config> Module<T> {
         let random = {
             let mut subject = subject.to_vec();
             subject.reserve(VRF_OUTPUT_LENGTH);
-            subject
-                .extend_from_slice(&Self::historical_randomness(&Self::relay_chain_epoch_index())[..]);
+            subject.extend_from_slice(
+                &Self::historical_randomness(&Self::relay_chain_epoch_index())[..],
+            );
             <T as frame_system::Config>::Hashing::hash(&subject[..])
         };
 

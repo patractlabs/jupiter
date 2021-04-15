@@ -3,10 +3,10 @@ use crate::{
     cli::{Cli, RelayChainCli, Subcommand},
 };
 use codec::Encode;
-use cumulus_primitives_core::ParaId;
 use cumulus_client_service::genesis::generate_genesis_block;
-use log::info;
+use cumulus_primitives_core::ParaId;
 use jupiter_runtime::Block;
+use log::info;
 use polkadot_parachain::primitives::AccountIdConversion;
 use sc_cli::{
     ChainSpec, CliConfiguration, DefaultConfigurationValues, ImportParams, KeystoreParams,
@@ -20,14 +20,15 @@ use sp_core::hexdisplay::HexDisplay;
 use sp_runtime::traits::{Block as BlockT, Hash as HashT, Header as HeaderT, Zero};
 use std::{io::Write, net::SocketAddr};
 
-fn load_spec(id: &str, para_id: ParaId) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
+fn load_spec(
+    id: &str,
+    para_id: ParaId,
+) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
     Ok(match id {
         "jupiter-dev" => Box::new(chain_spec::jupiter::development_config(para_id)?),
         "jupiter-staging" => Box::new(chain_spec::jupiter::staging_config(para_id)?),
         "" | "jupiter" => Box::new(chain_spec::jupiter::jupiter_config()?),
-        path => Box::new(chain_spec::jupiter::ChainSpec::from_json_file(
-            path.into(),
-        )?),
+        path => Box::new(chain_spec::jupiter::ChainSpec::from_json_file(path.into())?),
     })
 }
 
@@ -216,7 +217,7 @@ pub fn run() -> Result<()> {
                     &polkadot_cli,
                     config.task_executor.clone(),
                 )
-                    .map_err(|err| format!("Relay chain argument error: {}", err))?;
+                .map_err(|err| format!("Relay chain argument error: {}", err))?;
 
                 cmd.run(config, polkadot_config)
             })
@@ -285,8 +286,8 @@ pub fn run() -> Result<()> {
                 // TODO
                 let key = sp_core::Pair::generate().0;
 
-                let para_id =
-                    chain_spec::jupiter::Extensions::try_get(&*config.chain_spec).map(|e| e.para_id);
+                let para_id = chain_spec::jupiter::Extensions::try_get(&*config.chain_spec)
+                    .map(|e| e.para_id);
 
                 let polkadot_cli = RelayChainCli::new(
                     &config,
@@ -305,11 +306,9 @@ pub fn run() -> Result<()> {
                 let genesis_state = format!("0x{:?}", HexDisplay::from(&block.header().encode()));
 
                 let task_executor = config.task_executor.clone();
-                let polkadot_config = SubstrateCli::create_configuration(
-                    &polkadot_cli,
-                    &polkadot_cli,
-                    task_executor,
-                ).map_err(|err| format!("Relay chain argument error: {}", err))?;
+                let polkadot_config =
+                    SubstrateCli::create_configuration(&polkadot_cli, &polkadot_cli, task_executor)
+                        .map_err(|err| format!("Relay chain argument error: {}", err))?;
                 let collator = cli.run.base.validator || cli.collator;
 
                 info!("Parachain id: {:?}", id);

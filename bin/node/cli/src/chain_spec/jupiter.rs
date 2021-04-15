@@ -1,18 +1,18 @@
-use serde_json::json;
-use serde::{Deserialize, Serialize};
 use hex_literal::hex;
+use serde::{Deserialize, Serialize};
+use serde_json::json;
 
-use sc_chain_spec::{ChainSpecExtension, ChainSpecGroup};
+use sc_chain_spec::ChainSpecExtension;
 use sc_service::ChainType;
 use sp_core::{sr25519, Pair, Public};
 use sp_runtime::traits::{IdentifyAccount, Verify};
 
+use cumulus_primitives_core::ParaId;
 use jupiter_runtime::{AccountId, Signature};
 use jupiter_runtime::{
-    BalancesConfig, ContractsConfig, GenesisConfig, IndicesConfig,
-    SudoConfig, SystemConfig, ParachainInfoConfig
+    BalancesConfig, ContractsConfig, GenesisConfig, IndicesConfig, ParachainInfoConfig, SudoConfig,
+    SystemConfig,
 };
-use cumulus_primitives_core::ParaId;
 use sc_service::config::TelemetryEndpoints;
 
 // The URL for the telemetry server.
@@ -29,7 +29,7 @@ pub fn get_from_seed<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Pu
 }
 
 /// The extensions for the [`ChainSpec`].
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, ChainSpecGroup, ChainSpecExtension)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, ChainSpecExtension)]
 #[serde(deny_unknown_fields)]
 pub struct Extensions {
     /// The relay chain of the Parachain.
@@ -49,8 +49,8 @@ type AccountPublic = <Signature as Verify>::Signer;
 
 /// Generate an account ID from seed.
 pub fn get_account_id_from_seed<TPublic: Public>(seed: &str) -> AccountId
-    where
-        AccountPublic: From<<TPublic::Pair as Pair>::Public>,
+where
+    AccountPublic: From<<TPublic::Pair as Pair>::Public>,
 {
     AccountPublic::from(get_from_seed::<TPublic>(seed)).into_account()
 }
@@ -91,9 +91,9 @@ pub fn development_config(id: ParaId) -> Result<ChainSpec, String> {
                 "tokenDecimals": 10,
                 "tokenSymbol": "DOT"
             })
-                .as_object()
-                .expect("network properties generation can not fail; qed")
-                .to_owned(),
+            .as_object()
+            .expect("network properties generation can not fail; qed")
+            .to_owned(),
         ),
         // Extensions
         Extensions {
@@ -131,9 +131,9 @@ pub fn staging_config(id: ParaId) -> Result<ChainSpec, String> {
                 "tokenDecimals": 10,
                 "tokenSymbol": "DOT"
             })
-                .as_object()
-                .expect("network properties generation can not fail; qed")
-                .to_owned(),
+            .as_object()
+            .expect("network properties generation can not fail; qed")
+            .to_owned(),
         ),
         Extensions {
             relay_chain: "rococo".into(),
@@ -172,10 +172,8 @@ fn testnet_genesis(
         },
         pallet_indices: IndicesConfig { indices: vec![] },
         pallet_contracts: ContractsConfig {
-            current_schedule: pallet_contracts::Schedule {
-                enable_println, // this should only be enabled on development chains
-                ..Default::default()
-            },
+            // println should only be enabled on development chains
+            current_schedule: pallet_contracts::Schedule::default().enable_println(enable_println),
         },
         pallet_sudo: SudoConfig {
             // Assign network admin rights.

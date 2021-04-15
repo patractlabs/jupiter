@@ -52,13 +52,17 @@ pallet-contracts-rpc-runtime-api = { version = "3.0.0", git = "https://github.co
 parachain-info = { git = "https://github.com/paritytech/cumulus", branch = "rococo-v1", default-features = false }
 cumulus-pallet-parachain-system = { git = "https://github.com/paritytech/cumulus", branch = "rococo-v1", default-features = false }
 cumulus-primitives-core = { git = "https://github.com/paritytech/cumulus", branch = "rococo-v1", default-features = false }
-cumulus-pallet-xcm-handler = { git = "https://github.com/paritytech/cumulus", branch = "rococo-v1", default-features = false }
+cumulus-primitives-utility = { git = "https://github.com/paritytech/cumulus", branch = "rococo-v1", default-features = false }
+cumulus-pallet-xcmp-queue = { git = "https://github.com/paritytech/cumulus", branch = "rococo-v1", default-features = false }
+cumulus-pallet-xcm = { git = "https://github.com/paritytech/cumulus", branch = "rococo-v1", default-features = false }
+cumulus-ping = { git = "https://github.com/paritytech/cumulus", branch = "rococo-v1", default-features = false }
 
 # Polkadot dependencies
 polkadot-parachain = { git = "https://github.com/paritytech/polkadot", branch = "rococo-v1", default-features = false }
 xcm = { git = "https://github.com/paritytech/polkadot", branch = "rococo-v1", default-features = false }
 xcm-builder = { git = "https://github.com/paritytech/polkadot", branch = "rococo-v1", default-features = false }
 xcm-executor = { git = "https://github.com/paritytech/polkadot", branch = "rococo-v1", default-features = false }
+pallet-xcm = { git = "https://github.com/paritytech/polkadot", branch = "rococo-v1", default-features = false }
 
 # local runtime module
 jupiter-primitives = { path = "../../primitives", default-features = false }
@@ -114,12 +118,16 @@ std = [
     "parachain-info/std",
     "cumulus-pallet-parachain-system/std",
     "cumulus-primitives-core/std",
-    "cumulus-pallet-xcm-handler/std",
+    "cumulus-primitives-utility/std",
+    "cumulus-pallet-xcmp-queue/std",
+    "cumulus-pallet-xcm/std",
+    "cumulus-ping/std",
 
     "polkadot-parachain/std",
     "xcm/std",
     "xcm-builder/std",
     "xcm-executor/std",
+    "pallet-xcm/std",
 
     "jupiter-primitives/std",
     "jupiter-runtime-common/std",
