@@ -10,6 +10,39 @@ use sp_runtime::traits::Member;
 use sp_staking::SessionIndex;
 use sp_std::prelude::*;
 
+// SBP-M1 review: I would like to better understand the rationale and design decisions
+// that guided for implementing the NoteHistoricalRandomness runtime logic.
+// I think this should be well documented, and that any security-related caveats should
+// be clearly highlighted for contract developers (as the randomness is exposed to them
+// via a contract primitive & chain extension).
+//
+// I want to point out that in the BABE pallet, there is specific warning about exposing
+// or using BABE consensus randomness from higer-level code (e.g. contracts) for things
+// like gambling (or any application-specific randomness), as malicious attackers could
+// take advantage of the fact that previous & current epoch randomness are publicly available.
+//
+// See https://github.com/paritytech/substrate/blob/982df173190685bb18b7ed46b860e36387b9a7a9/frame/babe/src/lib.rs#L198
+// ---------
+// The epoch randomness for the *current* epoch.
+//
+// # Security
+//
+// This MUST NOT be used for gambling, as it can be influenced by a
+// malicious validator in the short term. It MAY be used in many
+// cryptographic protocols, however, so long as one remembers that this
+// (like everything else on-chain) it is public.
+// ---------
+//
+// FYI, some changes have happened on Substrate's master branch re.
+// BABE randomness and how it is exposed & used by some pallets, notably the contracts pallet.
+// 
+// You might find the following issues & PRs relevant.
+// - https://github.com/paritytech/substrate/pull/8180
+// - https://github.com/paritytech/substrate/commit/b24c43af1a77168feed445136ea4569f1d132c3a#diff-445c7596b2aa45b11dd9e9e3013e3747b5c5dfec7ba012c690252fa41ebb8678
+// - https://github.com/paritytech/substrate/pull/8180/commits/1ce1e9d7b020208f3bb6f8318ac24bea90519b83
+// - https://github.com/paritytech/substrate/issues/8297
+// - https://github.com/paritytech/substrate/pull/8329
+
 #[derive(Debug, PartialEq, Encode)]
 pub struct BabeRandomness {
     pub epoch: u64,
