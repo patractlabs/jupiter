@@ -19,6 +19,10 @@ mod mock;
 #[cfg(test)]
 mod tests;
 
+// SBP-M1 review: I understand this pallet's purpose is mainly for integration tests
+// and benchmarking ? This was not obvious at first ... maybe you could be make it
+// more explicit (doc, comments, renaming the pallet etc).
+
 /// Configure the pallet by specifying the parameters and types on which it depends.
 pub trait Config: frame_system::Config + pallet_contracts::Config {
     /// Because this pallet emits events, it depends on the runtime's definition of an event.

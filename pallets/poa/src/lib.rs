@@ -19,6 +19,11 @@ pub use weights::WeightInfo;
 pub type EraIndex = u32;
 pub(crate) const LOG_TARGET: &'static str = "poa";
 
+// SBP-M1 review: This pallet's purpose should be clearly documented, 
+// and relevant tests should be implemented. This would greatly help external
+// developers in understanding the logic & overal design ;)
+// If some existing code from FRAME was re-used, please retain the license header.
+
 #[frame_support::pallet]
 pub mod pallet {
     use frame_support::pallet_prelude::*;
