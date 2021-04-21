@@ -19,7 +19,7 @@
     "tokenSymbol": "DOT"
   },
   "relay_chain": "rococo",
-  "para_id": 1024,
+  "para_id": 1010,
   "consensusEngine": null,
   "lightSyncState": null,
   "genesis": {
