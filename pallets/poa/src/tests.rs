@@ -1,9 +1,7 @@
-use super::*;
-use frame_support::{
-    assert_noop, assert_ok,
-};
-use mock::*;
 use super::Event;
+use super::*;
+use frame_support::{assert_noop, assert_ok};
+use mock::*;
 
 #[test]
 fn basic_setup_works() {
@@ -134,10 +132,7 @@ fn remove_deferred() {
         // slash processed now.
         assert_eq!(PoA::authorities(3), None);
         assert_eq!(PoA::authorities_map().len(), 2);
-        assert_eq!(
-            *mock::poa_events().last().unwrap(),
-            Event::Slash(3)
-        );
+        assert_eq!(*mock::poa_events().last().unwrap(), Event::Slash(3));
     })
 }
 
@@ -168,7 +163,7 @@ fn keep_minimum_authority_count() {
                 *mock::poa_events().last().unwrap(),
                 Event::TooLowAuthorities
             );
-    });
+        });
 }
 
 #[test]
@@ -197,10 +192,7 @@ fn slash_multiple_fails_by_limit() {
             mock::start_active_era(4);
             assert_eq!(PoA::authorities(3), None);
             assert_eq!(PoA::authorities_map().len(), 2);
-            assert_eq!(
-                *mock::poa_events().last().unwrap(),
-                Event::Slash(3)
-            );
+            assert_eq!(*mock::poa_events().last().unwrap(), Event::Slash(3));
 
             // second slash, but limit minimal authority count
             mock::start_active_era(6);
@@ -239,19 +231,13 @@ fn slash_multiple_should_work() {
             mock::start_active_era(4);
             assert_eq!(PoA::authorities(3), None);
             assert_eq!(PoA::authorities_map().len(), 3);
-            assert_eq!(
-                *mock::poa_events().last().unwrap(),
-                Event::Slash(3)
-            );
+            assert_eq!(*mock::poa_events().last().unwrap(), Event::Slash(3));
 
             // second slash
             mock::start_active_era(6);
             assert_eq!(PoA::authorities(3), None);
             assert_eq!(PoA::authorities_map().len(), 3);
-            assert_eq!(
-                *mock::poa_events().last().unwrap(),
-                Event::Slash(3)
-            );
+            assert_eq!(*mock::poa_events().last().unwrap(), Event::Slash(3));
         });
 }
 
@@ -270,7 +256,10 @@ fn slash_multiple_state_check() {
             assert_eq!(PoA::authorities_map().len(), 3);
             assert_eq!(
                 PoA::unapplied_slashes(1),
-                vec![UnappliedSlash{ validator: 3u64, reporters: vec![] }]
+                vec![UnappliedSlash {
+                    validator: 3u64,
+                    reporters: vec![]
+                }]
             );
 
             mock::start_active_era(2);
@@ -282,7 +271,10 @@ fn slash_multiple_state_check() {
             assert_eq!(PoA::authorities_map().len(), 3);
             assert_eq!(
                 PoA::unapplied_slashes(2),
-                vec![UnappliedSlash{ validator: 3u64, reporters: vec![] }]
+                vec![UnappliedSlash {
+                    validator: 3u64,
+                    reporters: vec![]
+                }]
             );
 
             // cancel first slash

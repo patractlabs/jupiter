@@ -8,7 +8,7 @@ pub trait WeightInfo {
     fn force_no_eras() -> Weight;
     fn force_new_era() -> Weight;
     fn force_new_era_always() -> Weight;
-    fn set_history_depth(e: u32, ) -> Weight;
+    fn set_history_depth(e: u32) -> Weight;
 }
 impl WeightInfo for () {
     fn add_authority() -> Weight {
@@ -39,7 +39,7 @@ impl WeightInfo for () {
         0
     }
 
-    fn set_history_depth(_e: u32, ) -> Weight {
+    fn set_history_depth(_e: u32) -> Weight {
         0
     }
 }

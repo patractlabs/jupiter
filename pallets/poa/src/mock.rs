@@ -5,11 +5,9 @@ use crate::*;
 use frame_support::{
     parameter_types,
     traits::{FindAuthor, Get, OnFinalize, OnInitialize, OneSessionHandler},
-    weights::{constants::RocksDbWeight},
+    weights::constants::RocksDbWeight,
 };
-use sp_core::{
-    H256,
-};
+use sp_core::H256;
 use sp_io;
 use sp_runtime::{
     testing::{Header, TestXt, UintAuthorityId},
@@ -305,7 +303,6 @@ impl ExtBuilder {
     }
 }
 
-
 pub(crate) fn active_era() -> EraIndex {
     PoA::active_era().unwrap().index
 }
@@ -371,7 +368,8 @@ pub(crate) fn on_offence_in_era(
             offenders,
             slash_fraction,
             PoA::eras_start_session_index(era).unwrap(),
-        ).unwrap();
+        )
+        .unwrap();
     } else {
         panic!("cannot slash in era {}", era);
     }
@@ -391,10 +389,7 @@ pub(crate) fn on_offence_now(
 pub(crate) fn add_slash(who: &AccountId) {
     on_offence_now(
         &[OffenceDetails {
-            offender: (
-                who.clone(),
-                who.clone(),
-            ),
+            offender: (who.clone(), who.clone()),
             reporters: vec![],
         }],
         &[Perbill::default()],
@@ -402,11 +397,15 @@ pub(crate) fn add_slash(who: &AccountId) {
 }
 
 pub(crate) fn poa_events() -> Vec<poa::Event<Test>> {
-    System::events().into_iter().map(|r| r.event).filter_map(|e| {
-        if let Event::poa(inner) = e {
-            Some(inner)
-        } else {
-            None
-        }
-    }).collect()
+    System::events()
+        .into_iter()
+        .map(|r| r.event)
+        .filter_map(|e| {
+            if let Event::poa(inner) = e {
+                Some(inner)
+            } else {
+                None
+            }
+        })
+        .collect()
 }

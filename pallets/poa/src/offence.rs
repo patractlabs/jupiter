@@ -5,7 +5,10 @@ use sp_staking::{
     SessionIndex,
 };
 
-use crate::{session::SimpleValidatorIdConverter, slashing, Config, EarliestUnappliedSlash, Pallet, UnappliedSlashes, LOG_TARGET, WaitingSlashes};
+use crate::{
+    session::SimpleValidatorIdConverter, slashing, Config, EarliestUnappliedSlash, Pallet,
+    UnappliedSlashes, WaitingSlashes, LOG_TARGET,
+};
 
 /// This is intended to be used with `FilterHistoricalOffences`.
 impl<T: Config>
@@ -109,9 +112,9 @@ where
                     add_db_reads_writes(1, 1);
                 } else {
                     // defer to end of some `slash_defer_duration` from now.
-                    WaitingSlashes::<T>::mutate(unapplied.validator.clone(), |waiting_slash|
+                    WaitingSlashes::<T>::mutate(unapplied.validator.clone(), |waiting_slash| {
                         *waiting_slash = *waiting_slash + 1
-                    );
+                    });
                     UnappliedSlashes::<T>::mutate(active_era, move |for_later| {
                         for_later.push(unapplied)
                     });

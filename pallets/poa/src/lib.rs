@@ -324,15 +324,15 @@ pub mod pallet {
         }
 
         /// Force there to be no new eras indefinitely.
-		///
-		/// The dispatch origin must be Root.
-		///
-		/// # <weight>
-		/// - No arguments.
-		/// - Weight: O(1)
-		/// - Write: ForceEra
-		/// # </weight>
-		#[pallet::weight(T::WeightInfo::force_no_eras())]
+        ///
+        /// The dispatch origin must be Root.
+        ///
+        /// # <weight>
+        /// - No arguments.
+        /// - Weight: O(1)
+        /// - Write: ForceEra
+        /// # </weight>
+        #[pallet::weight(T::WeightInfo::force_no_eras())]
         pub fn force_no_eras(origin: OriginFor<T>) -> DispatchResultWithPostInfo {
             ensure_root(origin)?;
             ForceEra::<T>::put(Forcing::ForceNone);
@@ -340,15 +340,15 @@ pub mod pallet {
         }
 
         /// Force there to be a new era at the end of the next session. After this, it will be
-		/// reset to normal (non-forced) behaviour.
-		///
-		/// The dispatch origin must be Root.
-		///
-		/// # <weight>
-		/// - No arguments.
-		/// - Weight: O(1)
-		/// - Write ForceEra
-		/// # </weight>
+        /// reset to normal (non-forced) behaviour.
+        ///
+        /// The dispatch origin must be Root.
+        ///
+        /// # <weight>
+        /// - No arguments.
+        /// - Weight: O(1)
+        /// - Write ForceEra
+        /// # </weight>
         #[pallet::weight(T::WeightInfo::force_new_era())]
         pub fn force_new_era(origin: OriginFor<T>) -> DispatchResultWithPostInfo {
             ensure_root(origin)?;
@@ -357,13 +357,13 @@ pub mod pallet {
         }
 
         /// Force there to be a new era at the end of sessions indefinitely.
-		///
-		/// The dispatch origin must be Root.
-		///
-		/// # <weight>
-		/// - Weight: O(1)
-		/// - Write: ForceEra
-		/// # </weight>
+        ///
+        /// The dispatch origin must be Root.
+        ///
+        /// # <weight>
+        /// - Weight: O(1)
+        /// - Write: ForceEra
+        /// # </weight>
         #[pallet::weight(T::WeightInfo::force_new_era_always())]
         pub fn force_new_era_always(origin: OriginFor<T>) -> DispatchResultWithPostInfo {
             ensure_root(origin)?;
@@ -372,30 +372,31 @@ pub mod pallet {
         }
 
         /// Set `HistoryDepth` value. This function will delete any history information
-		/// when `HistoryDepth` is reduced.
-		///
-		/// Parameters:
-		/// - `new_history_depth`: The new history depth you would like to set.
-		/// - `era_items_deleted`: The number of items that will be deleted by this dispatch.
-		///    This should report all the storage items that will be deleted by clearing old
-		///    era history. Needed to report an accurate weight for the dispatch. Trusted by
-		///    `Root` to report an accurate number.
-		///
-		/// Origin must be root.
-		///
-		/// # <weight>
-		/// - E: Number of history depths removed, i.e. 10 -> 7 = 3
-		/// - Weight: O(E)
-		/// - DB Weight:
-		///     - Reads: Current Era, History Depth
-		///     - Writes: History Depth
-		///     - Clear Prefix Each: Era Stakers, EraStakersClipped, ErasValidatorPrefs
-		///     - Writes Each: ErasValidatorReward, ErasRewardPoints, ErasTotalStake, ErasStartSessionIndex
-		/// # </weight>
+        /// when `HistoryDepth` is reduced.
+        ///
+        /// Parameters:
+        /// - `new_history_depth`: The new history depth you would like to set.
+        /// - `era_items_deleted`: The number of items that will be deleted by this dispatch.
+        ///    This should report all the storage items that will be deleted by clearing old
+        ///    era history. Needed to report an accurate weight for the dispatch. Trusted by
+        ///    `Root` to report an accurate number.
+        ///
+        /// Origin must be root.
+        ///
+        /// # <weight>
+        /// - E: Number of history depths removed, i.e. 10 -> 7 = 3
+        /// - Weight: O(E)
+        /// - DB Weight:
+        ///     - Reads: Current Era, History Depth
+        ///     - Writes: History Depth
+        ///     - Clear Prefix Each: Era Stakers, EraStakersClipped, ErasValidatorPrefs
+        ///     - Writes Each: ErasValidatorReward, ErasRewardPoints, ErasTotalStake, ErasStartSessionIndex
+        /// # </weight>
         #[pallet::weight(T::WeightInfo::set_history_depth(*_era_items_deleted))]
-        pub fn set_history_depth(origin: OriginFor<T>,
-                             new_history_depth: EraIndex,
-                             _era_items_deleted: u32,
+        pub fn set_history_depth(
+            origin: OriginFor<T>,
+            new_history_depth: EraIndex,
+            _era_items_deleted: u32,
         ) -> DispatchResultWithPostInfo {
             ensure_root(origin)?;
             if let Some(current_era) = Self::current_era() {
