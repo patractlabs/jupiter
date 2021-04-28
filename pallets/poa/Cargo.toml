@@ -17,6 +17,15 @@ frame-system = { version = "3.0.0", git = "https://github.com/paritytech/substra
 
 pallet-session = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false, features = ["historical"] }
 
+[dev-dependencies]
+sp-storage = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master"}
+sp-tracing = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master"}
+sp-core = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master"}
+sp-io = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master"}
+pallet-balances = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master"}
+pallet-timestamp = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master"}
+pallet-collective = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master"}
+
 [features]
 default = ["std"]
 std = [

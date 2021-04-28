@@ -1,5 +1,10 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
+#[cfg(test)]
+mod mock;
+#[cfg(test)]
+mod tests;
+
 mod offence;
 mod session;
 mod slashing;
@@ -154,8 +159,13 @@ pub mod pallet {
     pub type ForceEra<T: Config> = StorageValue<_, Forcing, ValueQuery>;
     /// All unapplied slashes that are queued for later.
     #[pallet::storage]
+    #[pallet::getter(fn unapplied_slashes)]
     pub type UnappliedSlashes<T: Config> =
         StorageMap<_, Twox64Concat, EraIndex, Vec<UnappliedSlash<T::AccountId>>, ValueQuery>;
+    /// helper for record waiting slashes
+    #[pallet::storage]
+    #[pallet::getter(fn waiting_slashes)]
+    pub type WaitingSlashes<T: Config> = StorageMap<_, Twox64Concat, T::AccountId, u8, ValueQuery>;
 
     /// The earliest era for which we have a pending, unapplied slash.
     #[pallet::storage]
@@ -193,6 +203,13 @@ pub mod pallet {
             for a in self.init_authorities.iter() {
                 Authorities::<T>::insert(a.clone(), AuthorityState::Working);
             }
+
+            let mut invulnerables_list = Vec::new();
+            for a in self.init_invulnerables.iter() {
+                invulnerables_list.push(a.clone());
+            }
+            Invulnerables::<T>::put(invulnerables_list);
+
             ForceEra::<T>::put(self.force_era)
         }
     }
@@ -265,7 +282,7 @@ pub mod pallet {
         }
 
         #[pallet::weight(T::WeightInfo::cancel_deferred_slash(slash_indices.len() as u32))]
-        fn cancel_deferred_slash(
+        pub fn cancel_deferred_slash(
             origin: OriginFor<T>,
             era: EraIndex,
             slash_indices: Vec<u32>,
@@ -287,13 +304,115 @@ pub mod pallet {
 
             for (removed, index) in slash_indices.into_iter().enumerate() {
                 let index = (index as usize) - removed;
+                let validator = unapplied[index].validator.clone();
+                WaitingSlashes::<T>::mutate(validator.clone(), |waiting_slash| {
+                    *waiting_slash = *waiting_slash - 1;
+                    if *waiting_slash == 0 {
+                        Authorities::<T>::mutate(validator, |state| {
+                            if let Some(ref mut state) = state {
+                                *state = AuthorityState::Working;
+                            }
+                        })
+                    }
+                });
+
                 unapplied.remove(index);
             }
 
             UnappliedSlashes::<T>::insert(&era, &unapplied);
             Ok(().into())
         }
+
+        /// Force there to be no new eras indefinitely.
+        ///
+        /// The dispatch origin must be Root.
+        ///
+        /// # <weight>
+        /// - No arguments.
+        /// - Weight: O(1)
+        /// - Write: ForceEra
+        /// # </weight>
+        #[pallet::weight(T::WeightInfo::force_no_eras())]
+        pub fn force_no_eras(origin: OriginFor<T>) -> DispatchResultWithPostInfo {
+            ensure_root(origin)?;
+            ForceEra::<T>::put(Forcing::ForceNone);
+            Ok(().into())
+        }
+
+        /// Force there to be a new era at the end of the next session. After this, it will be
+        /// reset to normal (non-forced) behaviour.
+        ///
+        /// The dispatch origin must be Root.
+        ///
+        /// # <weight>
+        /// - No arguments.
+        /// - Weight: O(1)
+        /// - Write ForceEra
+        /// # </weight>
+        #[pallet::weight(T::WeightInfo::force_new_era())]
+        pub fn force_new_era(origin: OriginFor<T>) -> DispatchResultWithPostInfo {
+            ensure_root(origin)?;
+            ForceEra::<T>::put(Forcing::ForceNew);
+            Ok(().into())
+        }
+
+        /// Force there to be a new era at the end of sessions indefinitely.
+        ///
+        /// The dispatch origin must be Root.
+        ///
+        /// # <weight>
+        /// - Weight: O(1)
+        /// - Write: ForceEra
+        /// # </weight>
+        #[pallet::weight(T::WeightInfo::force_new_era_always())]
+        pub fn force_new_era_always(origin: OriginFor<T>) -> DispatchResultWithPostInfo {
+            ensure_root(origin)?;
+            ForceEra::<T>::put(Forcing::ForceAlways);
+            Ok(().into())
+        }
+
+        /// Set `HistoryDepth` value. This function will delete any history information
+        /// when `HistoryDepth` is reduced.
+        ///
+        /// Parameters:
+        /// - `new_history_depth`: The new history depth you would like to set.
+        /// - `era_items_deleted`: The number of items that will be deleted by this dispatch.
+        ///    This should report all the storage items that will be deleted by clearing old
+        ///    era history. Needed to report an accurate weight for the dispatch. Trusted by
+        ///    `Root` to report an accurate number.
+        ///
+        /// Origin must be root.
+        ///
+        /// # <weight>
+        /// - E: Number of history depths removed, i.e. 10 -> 7 = 3
+        /// - Weight: O(E)
+        /// - DB Weight:
+        ///     - Reads: Current Era, History Depth
+        ///     - Writes: History Depth
+        ///     - Clear Prefix Each: Era Stakers, EraStakersClipped, ErasValidatorPrefs
+        ///     - Writes Each: ErasValidatorReward, ErasRewardPoints, ErasTotalStake, ErasStartSessionIndex
+        /// # </weight>
+        #[pallet::weight(T::WeightInfo::set_history_depth(*_era_items_deleted))]
+        pub fn set_history_depth(
+            origin: OriginFor<T>,
+            new_history_depth: EraIndex,
+            _era_items_deleted: u32,
+        ) -> DispatchResultWithPostInfo {
+            ensure_root(origin)?;
+            if let Some(current_era) = Self::current_era() {
+                HistoryDepth::<T>::mutate(|history_depth| {
+                    let last_kept = current_era.checked_sub(*history_depth).unwrap_or(0);
+                    let new_last_kept = current_era.checked_sub(new_history_depth).unwrap_or(0);
+                    for era_index in last_kept..new_last_kept {
+                        ErasStartSessionIndex::<T>::remove(era_index);
+                    }
+                    *history_depth = new_history_depth
+                })
+            }
+            Ok(().into())
+        }
     }
+
     /// Check that list is sorted and has no duplicates.
     fn is_sorted_and_unique(list: &[u32]) -> bool {
         list.windows(2).all(|w| w[0] < w[1])
@@ -328,7 +447,7 @@ pub enum AuthorityState {
 }
 
 /// Information regarding the active era (era in used in session).
-#[derive(Encode, Decode, RuntimeDebug)]
+#[derive(Encode, Decode, RuntimeDebug, PartialEq)]
 pub struct ActiveEraInfo {
     /// Index of era.
     pub index: EraIndex,
@@ -341,7 +460,7 @@ pub struct ActiveEraInfo {
 
 /// A pending slash record. The value of the slash has been computed but not applied yet,
 /// rather deferred for several eras.
-#[derive(Encode, Decode, Default, RuntimeDebug)]
+#[derive(Encode, Decode, Default, RuntimeDebug, PartialEq)]
 pub struct UnappliedSlash<AccountId> {
     /// The stash ID of the offending validator.
     validator: AccountId,
@@ -377,8 +496,19 @@ impl<T: Config> Pallet<T> {
         })
     }
 
+    /// limit minimal validators
     fn remove_from_authorities(who: &T::AccountId) {
-        Authorities::<T>::remove(who)
+        if Self::authorities_map().len() as u32 == MinimumAuthorityCount::<T>::get() {
+            debug::warn!(
+                target: LOG_TARGET,
+                "Can not remove authority due to minimal authority count."
+            );
+            Self::deposit_event(Event::TooLowAuthorities);
+        } else if Authorities::<T>::contains_key(who) {
+            Authorities::<T>::remove(who);
+            WaitingSlashes::<T>::remove(who);
+            Self::deposit_event(Event::<T>::Slash(who.clone()));
+        }
     }
 
     /// Ensures that at the end of the current session there will be a new era.
