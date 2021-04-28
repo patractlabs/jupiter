@@ -47,7 +47,7 @@ use sp_consensus::SelectChain;
 use sp_consensus_babe::BabeApi;
 use sp_transaction_pool::TransactionPool;
 
-use patract_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Index};
+use jupiter_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Index};
 
 /// Light client extra dependencies.
 pub struct LightDeps<C, F, P> {

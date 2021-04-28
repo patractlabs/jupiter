@@ -12,7 +12,7 @@ use pallet_contracts::chain_extension::{
 };
 use pallet_randomness_provider::BabeRandomness;
 
-use patract_chain_extension::PatractExt;
+use jupiter_chain_extension::JupiterExt;
 
 use crate::Runtime;
 
@@ -40,7 +40,7 @@ impl<C: pallet_contracts::Config> ChainExtension<C> for DevExtension<C> {
                 let mut env = env.buf_in_buf_out();
 
                 env.charge_weight(randomness_gas())?;
-                // mock for patract-dev
+                // mock for Jupiter-dev
                 let cur_epoch: u64 = 1;
                 env.write(&cur_epoch.encode(), false, None)?;
                 Ok(RetVal::Converging(0))
@@ -51,7 +51,7 @@ impl<C: pallet_contracts::Config> ChainExtension<C> for DevExtension<C> {
 
                 env.charge_weight(randomness_gas())?;
 
-                // mock for patract-dev
+                // mock for Jupiter-dev
                 let next_epoch = BabeRandomness {
                     epoch: 1,
                     start_slot: 1,
@@ -68,7 +68,7 @@ impl<C: pallet_contracts::Config> ChainExtension<C> for DevExtension<C> {
                 env.charge_weight(randomness_gas())?;
 
                 let _: u64 = env.read_as()?;
-                // mock for patract-dev
+                // mock for Jupiter-dev
                 let randomness: H256 = Default::default();
                 env.write(&randomness.encode(), false, None)?;
                 Ok(RetVal::Converging(0))
@@ -86,7 +86,7 @@ impl<C: pallet_contracts::Config> ChainExtension<C> for DevExtension<C> {
                 env.write(&randomness.encode(), false, None)?;
                 Ok(RetVal::Converging(0))
             }
-            _ => PatractExt::call(func_id, env),
+            _ => JupiterExt::call(func_id, env),
         }
     }
 

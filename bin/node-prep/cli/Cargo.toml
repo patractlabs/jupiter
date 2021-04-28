@@ -1,6 +1,6 @@
 [package]
-name = "patract-cli"
-version = "1.0.0"
+name = "jupiter-cli"
+version = "1.0.1"
 authors = ["Patract <https://github.com/patractlabs/patract>"]
 edition = "2018"
 
@@ -47,10 +47,10 @@ pallet-im-online = { version = "3.0.0", git = "https://github.com/paritytech/sub
 # pallet-contracts = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
 pallet-contracts = { path = "../../../vendor/substrate/frame/contracts" }
 
-patract-primitives = { path = "../../../primitives" }
-patract-runtime-common = { path = "../../../runtime/common" }
-patract-executor = { path = "../executor" }
-patract-rpc = { path = "../../../rpc" }
+jupiter-primitives = { path = "../../../primitives" }
+jupiter-runtime-common = { path = "../../../runtime/common" }
+jupiter-executor = { path = "../executor" }
+jupiter-rpc = { path = "../../../rpc" }
 
 jupiter-runtime = { package = "jupiter-prep-runtime", path = "../../../runtime/jupiter-prep" }
 
@@ -63,10 +63,10 @@ cli = [
     "sc-cli",
     "sc-service/db",
     "sc-finality-grandpa-warp-sync",
-    "patract-executor/wasmi-errno",
+    "jupiter-executor/wasmi-errno",
 ]
 wasmtime = [
     "sc-cli/wasmtime",
     "sc-service/wasmtime",
-    "patract-executor/wasmtime",
+    "jupiter-executor/wasmtime",
 ]

@@ -70,9 +70,9 @@ pallet-poa = { path = "../../pallets/poa", default-features = false }
 pallet-poa-rpc-runtime-api = { path = "../../pallets/poa/rpc/runtime-api", default-features = false }
 
 # local runtime module
-patract-primitives = { path = "../../primitives", default-features = false }
-patract-runtime-common = { path = "../common", default-features = false }
-patract-chain-extension = { path = "../../primitives/chain-extension", default-features = false, features = [ "native-support" ] }
+jupiter-primitives = { path = "../../primitives", default-features = false }
+jupiter-runtime-common = { path = "../common", default-features = false }
+jupiter-chain-extension = { path = "../../primitives/chain-extension", default-features = false, features = [ "native-support" ] }
 
 [build-dependencies]
 substrate-wasm-builder = { version = "4.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
@@ -135,7 +135,7 @@ std = [
     "pallet-poa/std",
     "pallet-poa-rpc-runtime-api/std",
 
-    "patract-primitives/std",
-    "patract-runtime-common/std",
-    "patract-chain-extension/std",
+    "jupiter-primitives/std",
+    "jupiter-runtime-common/std",
+    "jupiter-chain-extension/std",
 ]

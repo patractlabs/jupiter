@@ -1,38 +1,34 @@
-# Patract
-WASM smart contract networks powered by Substrate `FRAME Contracts pallet` in Polkadot ecosystem.
+# Jupiter
+Wasm smart contract networks powered by Substrate `FRAME Contracts pallet` in Polkadot ecosystem.
 
-Patract aims to be the **system parachain** (aka common-good parachain) in Polkadot ecosystem, supporting contract developers to use [ink!](https://github.com/paritytech/ink), [Ask!](https://github.com/patractlabs/ask), [Solang](https://github.com/hyperledger-labs/solang) and other language frameworks which can run on `FRAME Contracts pallet`. We will directly use KSM/DOT as native token for gas fee, staking and governance.
+Jupiter aims to be an open blockchain network, which supports contract developers to use [ink!](https://github.com/paritytech/ink), [Ask!](https://github.com/patractlabs/ask) and other language frameworks which can run on `FRAME Contracts pallet` contract model. We will directly use DOT(test coin)/ROC(rococo coin) as native token for gas fee and governance.
 
 For different requirements, this repo contains different runtime for different situations (The content in following parentheses is the name of the executable file):
 
 * Jupiter Testnets (already running):
-    * Jupiter PoA (patract-prep): The independent blockchain matained by PoA validators only for deploying test contracts and issuing test assets with no value. This blockchain network contains newest features.
-    * Jupiter Rococo (patract): Almost the same position of Jupiter PoA , excepted the consensus algorithm switched from PoA to Rococo shared security, and can simulate cross-chain messaging functions.
+    * Jupiter PoA (jupiter-prep): The independent blockchain maintained by PoA validators is only for deploying test contracts and issuing test assets with no value. This blockchain network contains newest features.
+    * Jupiter Rococo (jupiter): Almost the same position of Jupiter PoA, excepted the consensus algorithm switched from PoA to Rococo shared security, and can simulate cross-chain messaging functions.
 
-* Patract Mainnets  (not yet released):
-    * Patract PoA (patract-prep): Patract's early released independent blockchain secured by centralized selected validators through PoA (Proof of Authority) consensus algorithm. This is only necessary if Kusama need long time to really support system parachain deployment and the Jupiter testnet and WASM contract technology is ready. If we release this network as mainnet and support developers to deploy contracts and issue assets in production environment, we will migrate all the state into Patract K1 or support contracts to migrate into other parachains.
-    * Patract K1 (patract): Patract's 1st system parachain on Kusama Network.
-    * Patract P1 (patract): Patract's 1st system parachain on Polkadot Network.
-    
 * Development Node:
   
-    * Patract Dev Node (patract-dev): Local development node with pure `FRAME contracts pallet`. Contract developers could test contracts quickly **without waiting block interval**.
+    * Jupiter Dev Node (jupiter-dev): Local development node with pure `FRAME contracts pallet`. Contract developers could test contracts quickly **without waiting block interval**.
 
 > Currently, Polkadot & Kusama have not released the parachain feature, thus we use branch `rococo-v1` to track the newest Rococo.
-> And the executable file `patract` just could be compiled in `rococo-v1` branch. `master` branch does not provide `patract` now.
+> And the executable file `jupiter` just could be compiled in `rococo-v1` branch. `master` branch does not provide `jupiter` now.
 
 *In following, we name `FRAME contracts pallet` as `pallet-contracts`*
 
-## Patract's `FRAME contracts pallet`
+## Patract's `FRAME contracts pallet` (We will name it as `pallet-patracts` in future)
 
 Patract `FRAME contracts pallet` contains our `ChainExtension` to provide many particular features for contracts, and contains some compatible modifications.
+
 * ChainExtension
     - [ ] Contract Logger support
     - [x] Zero-Knowledge support, refer to this link [PIP-101](https://github.com/patractlabs/PIPs/blob/main/PIPs/pip-101.md)
         
         *Currently we use a simple static way to charge weight for ZKP, we would change this part with benchmarks result in future.*
     
-* Patract modifications
+* Patract modifications (`pallet-patracts`)
     * // No features for now.
     
 Thus we call "`src pallet-contract`" for the `pallet-contract` module which comes from substrate directly, and call "`modified pallet-contracts`" for 
@@ -42,12 +38,12 @@ Inside:
 * `src pallet-contract`: support Patract `ChainExtension`
 * `modified pallet-contract`: support Patract `ChainExtension` and Patract modifications
 
-## Patract living network
+## Jupiter living network
 When using [Substrate Portal](https://polkadot.js.org/apps), [@polkadot/api](https://github.com/polkadot-js/api) and [Redspot](https://github.com/patractlabs/redspot)
-or other 3rd parties client to connect Patract node, please remember to add ["extending types"](https://polkadot.js.org/docs/api/start/types.extend/) for Patract requirements.
+or other 3rd parties client to connect Jupiter node, please remember to add ["extending types"](https://polkadot.js.org/docs/api/start/types.extend/) for Jupiter requirements.
 Notice different network may have different Extending types.
 
-Now, Patract has launched following network:
+Now, Jupiter has launched following network:
 
 * Jupiter PoA V1 (Jupiter A1):
 
@@ -57,6 +53,8 @@ Now, Patract has launched following network:
     contract to this network for test. The token decimals and time interval for producing block are
     same with Polkadot network. This testnet blockchain uses Babe as consensus algorithm,
     and **provide Babe VRF random number for contract module.**
+  
+    **Jupiter PoA's SS58 Address Prefix changes from 42 (address: `5xxxx`) to 26 (address: `3xxxx`) in 1.0.1 version.**
   
     For this network, the Extending types is:
 
@@ -112,7 +110,7 @@ Now, Patract has launched following network:
       - `wss://jupiter.elara.patract.io/`
       - `wss://ws.jupiter.patract.cn/`
 
-* Patract Dev node: 
+* Jupiter Dev node: 
     
     It's a local develop node for testing contract easily. This node could run in single, and **do not have time interval
     for producing block**, which would produce block only when receiving an extrinsic. This feature let developers do not 
@@ -130,11 +128,11 @@ Now, Patract has launched following network:
     ```
 
 ## Substrate newest master and Substrate v2.0.0 version
-Note: Substrate newest master is very different with Substrate v2.0.0 version. In Patract `master` branch, we use Substrate newest
-master as dependencies, and in Patract `substrate-v2.0.0` branch, we use Substrate v2.0.0 from "crates.io" as dependencies. 
+Note: Substrate newest master is very different with Substrate v2.0.0 version. In Jupiter `master` branch, we use Substrate newest
+master as dependencies, and in Jupiter `substrate-v2.0.0` branch, we use Substrate v2.0.0 from "crates.io" as dependencies. 
 (`substrate-v2.0.0` branch only contains jupiter part.)
 
-Thus, Patract has two main branch. In different branch, we provide different `pallet-contracts` features:
+Thus, Jupiter has two main branch. In different branch, we provide different `pallet-contracts` features:
 * master: we track newest master, currently we use substrate commit:[contracts: Release as v3.0.0 and add reserved field to `ContractInfoOf` (#8175)(`debec916`)](https://github.com/paritytech/substrate/commit/debec916998233a287fb9e5a099c08d5e4a23db2).
     * In master, we use `src pallet-contract` or `modified pallet-contract`
     * `src pallet-contract` is belong to substrate commit version.
@@ -159,17 +157,17 @@ Thus, Patract has two main branch. In different branch, we provide different `pa
 ## compile and run
 ### 1. clone this repo
 ```bash
-> git clone --recurse-submodules https://github.com/patractlabs/patract.git
+> git clone --recurse-submodules https://github.com/patractlabs/jupiter.git
 ## or do following commands
-> git clone https://github.com/patractlabs/patract.git
-> cd patract/vendor
+> git clone https://github.com/patractlabs/jupiter.git
+> cd jupiter/vendor
 > git submodule update --init --recursive
 ```
 If you want to use `substrate-v2.0.0` branch, do following commands:
 ```bash
-> git clone --branch substrate-v2.0.0 https://github.com/patractlabs/patract.git
+> git clone --branch substrate-v2.0.0 https://github.com/patractlabs/jupiter.git
 ## or do following commands:
-> git clone https://github.com/patractlabs/patract.git
+> git clone https://github.com/patractlabs/jupiter.git
 > git checkout -t origin/substrate-v2.0.0
 ```
 
@@ -181,7 +179,7 @@ downland rust and install it.
  
 then:
 ```bash
-> cd patract/scripts
+> cd jupiter/scripts
 > bash init.sh
 ```
 
@@ -219,9 +217,9 @@ All people could join this testnet as a sync node.
 **Welcome use this link [https://patrastore.io/](https://patrastore.io/) to claim some DOT from our faucet**
 
 ##### 4.1.1 join Jupiter PoA testnet
-Moving the execution file `patract-prep` to other place and launch the node by following steps:
+Moving the execution file `jupiter-prep` to other place and launch the node by following steps:
 ```bash
-./patract-prep --chain=jupiter-poa --name=<set you custom name> --pruning=archive --execution=NativeElseWasm
+./jupiter-prep --chain=jupiter-poa --name=<set you custom name> --pruning=archive --execution=NativeElseWasm
 ```
 Those steps is same to any other substrate node, just should notice this parameter `--chain` should use `jupiter`.
 
@@ -229,35 +227,35 @@ You could lookup your node in [https://telemetry.patract.io/](https://telemetry.
 
 ##### 4.1.2 start dev mode Jupiter PoA blockchain
 Notice this dev mode just means Jupiter PoA start with `--dev`, which is using dev config to start Jupiter PoA, not the 
-`patract-dev` node.
+`jupiter-dev` node.
 ```bash
-./patract-prep --dev --execution=NativeElseWasm -d <database path for you>
+./jupiter-prep --dev --execution=NativeElseWasm -d <database path for you>
 ```
 
 ##### 4.1.2 start local test mode Jupiter PoA blockchain
 Local test is a mode which is used to start a private blockchain network.
 ```bash
 # start first node
-./patract-prep --chain=jupiter-poa-local --alice --execution=NativeElseWasm -d <database path for you>
+./jupiter-prep --chain=jupiter-poa-local --alice --execution=NativeElseWasm -d <database path for you>
 # start second node
-./patract-prep --chain=jupiter-poa-local --bob --execution=NativeElseWasm -d <database path for you>
+./jupiter-prep --chain=jupiter-poa-local --bob --execution=NativeElseWasm -d <database path for you>
 ```
 Note if you start those two nodes in a machine, there could connect to each other directly. If you start in different 
 but in same network, you should add `--bootnodes` parameter when start second node. More details please lookup [https://substrate.dev/](https://substrate.dev/)
 
 #### 4.2 Jupiter Rococo (in `rococo-v1` branch)
-`patract` use for join parachain collector.
+`jupiter` use for join parachain collector.
 ```bash
-./patract --parachain-id=1000 --collator -d .sub -- --chain=rococo.json
+./jupiter --parachain-id=1000 --collator -d .sub -- --chain=rococo.json
 ```
 
-#### 4.3 Patract Dev Node
-`patract-dev` just use for local development, it providers a nice and quick experience for contract developing for developers 
+#### 4.3 Jupiter Dev Node
+`jupiter-dev` just use for local development, it providers a nice and quick experience for contract developing for developers 
 do not need wait for producing block time, which is very wasting time in testing.
 
-running patract-dev node in your machine:
+running jupiter-dev node in your machine:
 ```bash
-./patract-dev --dev -d .sub --execution=Native
+./jupiter-dev --dev -d .sub --execution=Native
 ```
 
 ### 5. https://polkadot.js.org/apps/ or https://github.com/polkadot-js/apps or using for `polkadot-js` sdk

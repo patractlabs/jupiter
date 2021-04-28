@@ -7,7 +7,7 @@ use crate::service::{self, new_partial};
 
 impl SubstrateCli for Cli {
     fn impl_name() -> String {
-        "Patract Node".into()
+        "Jupiter Node".into()
     }
 
     fn impl_version() -> String {
@@ -36,8 +36,8 @@ impl SubstrateCli for Cli {
             "jupiter-poa-local" => Box::new(chain_spec::jupiter::poa_local_config()?),
             "jupiter-poa-staging" => Box::new(chain_spec::jupiter::poa_staging_config()?),
             "jupiter-poa" => Box::new(chain_spec::jupiter::poa_config()?),
-            // TODO add patract spec
-            "" | "patract" => return Err("Not implement patract spec know".to_string()),
+            // TODO add jupiter spec
+            "" | "jupiter" => return Err("Not implement jupiter spec know".to_string()),
             path => {
                 let path = std::path::PathBuf::from(path);
 
@@ -52,7 +52,7 @@ impl SubstrateCli for Cli {
                         std::path::PathBuf::from(path),
                     )?)
                 } else {
-                    return Err("Not implement patract spec know".to_string());
+                    return Err("Not implement jupiter spec know".to_string());
                 }
             }
         })

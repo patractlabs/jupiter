@@ -65,10 +65,10 @@ pub use pallet_timestamp::Call as TimestampCall;
 
 pub use pallet_poa::Forcing;
 
-pub use patract_primitives::{
+pub use jupiter_primitives::{
     AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Signature,
 };
-use patract_runtime_common::{
+use jupiter_runtime_common::{
     constants::{jupiter_currency::*, time::*},
     impls, weights, BlockHashCount, BlockLength, BlockWeights, AVERAGE_ON_INITIALIZE_RATIO,
 };
@@ -97,7 +97,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
     spec_name: create_runtime_str!("jupiter-prep"),
     impl_name: create_runtime_str!("patract-jupiter-prep"),
     authoring_version: 1,
-    spec_version: 1,
+    spec_version: 2,
     impl_version: 1,
     apis: RUNTIME_API_VERSIONS,
     transaction_version: 1,
@@ -127,7 +127,7 @@ type MoreThanHalfCouncil = EnsureOneOf<
 
 parameter_types! {
     pub const Version: RuntimeVersion = VERSION;
-    pub const SS58Prefix: u8 = 42;
+    pub const SS58Prefix: u8 = 26;
 }
 impl frame_system::Config for Runtime {
     /// The basic call filter to use in dispatchable.
@@ -851,7 +851,7 @@ impl pallet_randomness_provider::Config for Runtime {
 construct_runtime!(
     pub enum Runtime where
         Block = Block,
-        NodeBlock = patract_primitives::Block,
+        NodeBlock = jupiter_primitives::Block,
         UncheckedExtrinsic = UncheckedExtrinsic
     {
         // Basic stuff;

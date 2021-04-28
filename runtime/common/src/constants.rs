@@ -3,7 +3,7 @@
 /// Money matters.
 pub mod jupiter_currency {
     use super::fee::{Weight2FeeNumerator, WeightToFee};
-    use patract_primitives::Balance;
+    use jupiter_primitives::Balance;
 
     pub const DOTS: Balance = 1_000_000_000_000; // old dot, one Dot is 100 Dot(new) now
     pub const DOLLARS: Balance = DOTS / 100; // 10_000_000_000 // one Dollar is 1 Dot(new) now
@@ -27,7 +27,7 @@ pub mod jupiter_currency {
 
 /// Time.
 pub mod time {
-    use patract_primitives::{BlockNumber, Moment};
+    use jupiter_primitives::{BlockNumber, Moment};
 
     pub const MILLISECS_PER_BLOCK: Moment = 6000;
     pub const SECS_PER_BLOCK: Moment = MILLISECS_PER_BLOCK / 1000;
@@ -50,7 +50,7 @@ pub mod fee {
         constants::ExtrinsicBaseWeight, WeightToFeeCoefficient, WeightToFeeCoefficients,
         WeightToFeePolynomial,
     };
-    use patract_primitives::Balance;
+    use jupiter_primitives::Balance;
     use smallvec::smallvec;
     pub use sp_runtime::Perbill;
 
