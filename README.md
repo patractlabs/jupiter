@@ -62,6 +62,17 @@ Now, Jupiter has launched following network:
     {
       "LookupSource": "MultiAddress",
       "Address": "MultiAddress",
+      "AliveContractInfo": {
+        "trieId": "TrieId",
+        "storageSize": "u32",
+        "pairCount": "u32",
+        "codeHash": "CodeHash",
+        "rentAllowance": "Balance",
+        "rentPayed": "Balance",
+        "deductBlock": "BlockNumber",
+        "lastWrite": "Option<BlockNumber>",
+        "_reserved": "Option<Null>"
+      },
       "FullIdentification": "AccountId",
       "AuthorityState": {
         "_enum": [
