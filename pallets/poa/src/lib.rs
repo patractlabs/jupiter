@@ -10,6 +10,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//! # Poa module
+//!
+//! The Poa module is used to manage authorities by council.
+//!
+//! ## Overview
+//! The council (known as _authorities_ in some contexts and _validators_ in others) can be set up by config. Members of
+//! the council can be added or removed by vote, but there is a minimum quantity limit.
+
 #![cfg_attr(not(feature = "std"), no_std)]
 
 #[cfg(test)]
