@@ -37,8 +37,6 @@
 //!
 //! ## Interface
 //!
-//! ### Permissionless Functions
-//!
 //! * `current_epoch`: Get babe randomness info for current epoch.
 //! * `next_epoch`: Get babe randomness info for next epoch.
 //! * `randomness_of`: Get babe randomness for historical epoch that before current epoch.
