@@ -1,3 +1,55 @@
+// This file is part of jupiter.
+
+// Copyright (C) 2020-2021 Patract Labs Ltd.
+// SPDX-License-Identifier: Apache-2.0
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// 	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+//! # Randomness Module
+//!
+//! Store the babe randomness of each epoch and provide the babe randomness query by epoch id.
+//!
+//! ## Overview
+//!
+//! The Randomness module provide the historical babe randomness query by epoch id,
+//! get the latest babe randomness, and the user input an additional value, hashing it with the
+//! babe randomness to improve security.
+//!
+//! To use it in your runtime, you need to binding with pallet_session::SessionManager to trigger
+//! the storage behavior of babe randomness when the session is changed.
+//!
+//! ### Goals
+//!
+//! The randomness module is designed to Provide a source of randomness for the ink! contract,
+//! and expand this function through the chain extension mode of pallet contract.
+//! We think that babe randomness are more secure than randomness-collective-flip.
+//!
+//!
+//! ## Interface
+//!
+//! ### Permissionless Functions
+//!
+//! * `current_epoch`: Get babe randomness info for current epoch.
+//! * `next_epoch`: Get babe randomness info for next epoch.
+//! * `randomness_of`: Get babe randomness for historical epoch that before current epoch.
+//! * `random`: Get randomness hashing with provider subject.
+//!
+//!
+//! ## Related Modules
+//!
+//! * [`System`](../frame_system/index.html)
+//! * [`Babe`](../pallet_babe/index.html)
+
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use codec::Encode;
