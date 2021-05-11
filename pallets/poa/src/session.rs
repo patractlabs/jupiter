@@ -1,3 +1,5 @@
+// Copyright (C) 2021-2021 Patract Labs Ltd.
+
 use frame_support::{
     debug::{info, warn},
     traits::Get,
