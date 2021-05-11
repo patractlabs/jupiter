@@ -1,4 +1,4 @@
-//! This is a template pallet with zkMega intergration which contains:
+//! This is a template and benchmarks pallet with zkMega integration which contains:
 //!
 //!  * `add`
 //!  * `mul`
@@ -14,7 +14,12 @@
 //!
 //! with both `native` and `wasm` executing environments.
 //!
-//! For more details aboout zkMega, please check:
+//! In this crate, the benchmark is run the benchmark code in benchmarking.rs file to get result.
+//! And the call function is `decl_module` is only used for benchmarks.
+//! Same to Ethereum zkp, we provide `add`, `mul` and `paring` 3 type for zkp benchmarks. Besides,
+//! the `verify` represents the a wide range of scenarios benchmarks.
+//!
+//! For more details about zkMega, please check:
 //! https://github.com/patractlabs/zkmega
 
 #![cfg_attr(not(feature = "std"), no_std)]
