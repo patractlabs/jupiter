@@ -1,3 +1,6 @@
+// Copyright (C) 2021-2021 Patract Labs Ltd.
+// SPDX-License-Identifier: Apache-2.0
+
 use frame_support::weights::Weight;
 
 pub trait WeightInfo {

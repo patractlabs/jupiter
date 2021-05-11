@@ -1,3 +1,6 @@
+// Copyright (C) 2021-2021 Patract Labs Ltd.
+// SPDX-License-Identifier: Apache-2.0
+
 use super::Event;
 use super::*;
 use frame_support::{assert_noop, assert_ok};
