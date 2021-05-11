@@ -1,13 +1,12 @@
 [package]
-authors = ['Anonymous']
+authors = ["Patract <https://github.com/patractlabs/patract>"]
 edition = '2018'
 name = 'pallet-template'
 version = "2.0.0"
 license = "Apache-2.0"
 homepage = "https://substrate.dev"
 repository = "https://github.com/paritytech/substrate/"
-description = "FRAME pallet template for defining custom runtime logic."
-readme = "README.md"
+description = "FRAME pallet template for benchmarking zkMega lib."
 
 [package.metadata.docs.rs]
 targets = [ "x86_64-unknown-linux-gnu" ]
