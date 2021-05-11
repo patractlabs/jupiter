@@ -1,4 +1,8 @@
+// This file is part of Substrate. In frame/staking/src/lib.rs
+
+// Copyright (C) 2019-2021 Parity Technologies (UK) Ltd.
 // Copyright (C) 2021-2021 Patract Labs Ltd.
+// SPDX-License-Identifier: Apache-2.0
 
 use frame_support::{
     debug::{info, warn},

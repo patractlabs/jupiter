@@ -18,7 +18,8 @@
 
 //! # Poa module
 //!
-//! The Poa module is used to manage authorities by council.
+//! The Poa module is used to manage authorities by council. This module is used to replace Staking.
+//! It has the concept of session to manage different group of authorities, and add/remove by `CouncilOrigin`.
 //!
 //! ## Overview
 //! The council (known as _authorities_ in some contexts and _validators_ in others) can be set up by config. Members of
