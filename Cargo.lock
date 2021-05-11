@@ -2848,6 +2848,7 @@ dependencies = [
  "sp-transaction-pool",
  "structopt",
  "substrate-build-script-utils",
+ "substrate-prometheus-endpoint",
 ]
 
 [[package]]

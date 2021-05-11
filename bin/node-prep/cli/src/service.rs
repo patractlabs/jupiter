@@ -7,10 +7,11 @@ use futures::prelude::*;
 use sc_client_api::{ExecutorProvider, RemoteBackend};
 use sc_finality_grandpa::FinalityProofProvider as GrandpaFinalityProofProvider;
 use sc_network::{Event, NetworkService};
-use sc_service::{error::Error as ServiceError, Configuration, TaskManager};
+use sc_service::{error::Error as ServiceError, Configuration, TaskManager, config::PrometheusConfig};
 use sc_telemetry::TelemetrySpan;
 use sp_inherents::InherentDataProviders;
 use sp_runtime::traits::Block as BlockT;
+use prometheus_endpoint::Registry;
 
 use jupiter_executor::Executor;
 use jupiter_primitives::Block;
@@ -23,8 +24,17 @@ type FullSelectChain = sc_consensus::LongestChain<FullBackend, Block>;
 type FullGrandpaBlockImport =
     sc_finality_grandpa::GrandpaBlockImport<FullBackend, Block, FullClient, FullSelectChain>;
 
+// If we're using prometheus, use a registry with a prefix of `polkadot`.
+fn set_prometheus_registry(config: &mut Configuration) -> Result<(), ServiceError> {
+    if let Some(PrometheusConfig { registry, .. }) = config.prometheus_config.as_mut() {
+        *registry = Registry::new_custom(Some("jupiter".into()), None)?;
+    }
+
+    Ok(())
+}
+
 pub fn new_partial(
-    config: &Configuration,
+    config: &mut Configuration,
 ) -> Result<
     sc_service::PartialComponents<
         FullClient,
@@ -44,6 +54,8 @@ pub fn new_partial(
     >,
     ServiceError,
 > {
+    set_prometheus_registry(config)?;
+
     let (client, backend, keystore_container, task_manager) =
         sc_service::new_full_parts::<Block, RuntimeApi, Executor>(&config)?;
     let client = Arc::new(client);
@@ -167,7 +179,7 @@ pub fn new_full_base(mut config: Configuration) -> Result<NewFullBase, ServiceEr
         transaction_pool,
         inherent_data_providers,
         other: (rpc_extensions_builder, import_setup, rpc_setup),
-    } = new_partial(&config)?;
+    } = new_partial(&mut config)?;
 
     let shared_voter_state = rpc_setup;
 
