@@ -1,9 +1,46 @@
+// This file is part of Jupiter.
+
+// Copyright (C) 2021-2021 Patract Labs Ltd.
+// SPDX-License-Identifier: Apache-2.0
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// 	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+//! This is a template and benchmarks pallet with zkMega integration which contains:
+//!
+//!  * `add`
+//!  * `mul`
+//!  * `pairing`
+//!  * `verify`
+//!
+//! methods for curves:
+//!
+//!  * bls12_377
+//!  * bls12_381
+//!  * bn254
+//!  * bw6_781
+//!
+//! with both `native` and `wasm` executing environments.
+//!
+//! In this crate, the benchmark is run the benchmark code in benchmarking.rs file to get result.
+//! And the call function is `decl_module` is only used for benchmarks.
+//! Same to Ethereum zkp, we provide `add`, `mul` and `paring` 3 type for zkp benchmarks. Besides,
+//! the `verify` represents the a wide range of scenarios benchmarks.
+//!
+//! For more details about zkMega, please check:
+//! https://github.com/patractlabs/zkmega
+
 #![cfg_attr(not(feature = "std"), no_std)]
 #![recursion_limit = "256"]
-
-/// Edit this file to define custom logic or remove it if it is not needed.
-/// Learn more about FRAME and the core library of Substrate FRAME pallets:
-/// https://substrate.dev/docs/en/knowledgebase/runtime/frame
 use frame_support::{
     decl_error, decl_event, decl_module, decl_storage, dispatch, traits::Get, weights::Weight,
 };
@@ -19,60 +56,6 @@ mod mock;
 #[cfg(test)]
 mod tests;
 
-/// Configure the pallet by specifying the parameters and types on which it depends.
-pub trait Config: frame_system::Config + pallet_contracts::Config {
-    /// Because this pallet emits events, it depends on the runtime's definition of an event.
-    type Event: From<Event<Self>> + Into<<Self as frame_system::Config>::Event>;
-}
-
-// The pallet's runtime storage items.
-// https://substrate.dev/docs/en/knowledgebase/runtime/storage
-decl_storage! {
-    // A unique name is used to ensure that the pallet's storage items are isolated.
-    // This name may be updated, but each pallet in the runtime must use a unique name.
-    // ---------------------------------vvvvvvvvvvvvvv
-    trait Store for Module<T: Config> as TemplateModule
-    where
-        T::AccountId: AsRef<[u8]>,
-        T::AccountId: UncheckedFrom<T::Hash>,
-    {
-        // The Contract
-        pub Contract: CodeHash<T>;
-    }
-}
-
-// Pallets use events to inform users when important changes are made.
-// https://substrate.dev/docs/en/knowledgebase/runtime/events
-decl_event!(
-    pub enum Event<T>
-    where
-        AccountId = <T as frame_system::Config>::AccountId,
-    {
-        /// Event documentation should end with an array that provides descriptive names for event
-        /// parameters. [something, who]
-        SomethingStored(u32, AccountId),
-    }
-);
-
-// Errors inform users that something went wrong.
-decl_error! {
-    pub enum Error for Module<T: Config>
-    where
-        T::AccountId: AsRef<[u8]>,
-        T::AccountId: UncheckedFrom<T::Hash>,
-    {
-        /// Error names should be descriptive.
-        NoneValue,
-        /// The pallet_contracts we just put disappeared
-        ContractDisappeared,
-        /// Failed
-        InstantiateContractFailed
-    }
-}
-
-// Dispatchable functions allows users to interact with the pallet and invoke state changes.
-// These functions materialize as "extrinsics", which are often compared to transactions.
-// Dispatchable functions must be annotated with a weight and must return a DispatchResult.
 decl_module! {
     pub struct Module<T: Config> for enum Call
     where
@@ -80,13 +63,10 @@ decl_module! {
         T::AccountId: AsRef<[u8]>,
         T::AccountId: UncheckedFrom<T::Hash>,
     {
-        // Errors must be initialized if they are used by the pallet.
         type Error = Error<T>;
-
-        // Events must be initialized if they are used by the pallet.
         fn deposit_event() = default;
 
-        /// Call the pallet_contracts
+        /// Proxy the call method of `pallet_contracts` for tests
         #[weight = 10_000 + T::DbWeight::get().writes(1)]
         pub fn call(
             origin,
@@ -311,5 +291,44 @@ decl_module! {
         pub fn native_bw6_761_verify(origin) {
             jupiter_io::pairing::bw6_761_verify();
         }
+    }
+}
+
+//
+// Custom stuffs for a pallet below
+//
+
+pub trait Config: frame_system::Config + pallet_contracts::Config {
+    type Event: From<Event<Self>> + Into<<Self as frame_system::Config>::Event>;
+}
+
+decl_storage! {
+    trait Store for Module<T: Config> as TemplateModule
+    where
+        T::AccountId: AsRef<[u8]>,
+        T::AccountId: UncheckedFrom<T::Hash>,
+    {
+        pub Contract: CodeHash<T>;
+    }
+}
+
+decl_event!(
+    pub enum Event<T>
+    where
+        AccountId = <T as frame_system::Config>::AccountId,
+    {
+        SomethingStored(u32, AccountId),
+    }
+);
+
+decl_error! {
+    pub enum Error for Module<T: Config>
+    where
+        T::AccountId: AsRef<[u8]>,
+        T::AccountId: UncheckedFrom<T::Hash>,
+    {
+        NoneValue,
+        ContractDisappeared,
+        InstantiateContractFailed
     }
 }

@@ -1,3 +1,30 @@
+// This file is part of Substrate.
+
+// Copyright (C) 2019-2021 Parity Technologies (UK) Ltd.
+// Copyright (C) 2021-2021 Patract Labs Ltd.
+// SPDX-License-Identifier: Apache-2.0
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// 	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+//! # Poa module
+//!
+//! The Poa module is used to manage authorities by council. This module is used to replace Staking.
+//! It has the concept of session to manage different group of authorities, and add/remove by `CouncilOrigin`.
+//!
+//! ## Overview
+//! The council (known as _authorities_ in some contexts and _validators_ in others) can be set up by config. Members of
+//! the council can be added or removed by vote, but there is a minimum quantity limit.
+
 #![cfg_attr(not(feature = "std"), no_std)]
 
 #[cfg(test)]
