@@ -38,6 +38,10 @@
 //! and expand this function through the chain extension mode of pallet contract.
 //! We think that babe randomness are more secure than randomness-collective-flip.
 //!
+//! In some Dapps, historical babe randomness may be required, for example: lottery draws are not timely,
+//! if lottery draws based on randomness require user operations instead of robots.
+//!
+//! There is no blockNumber in the previous random function return result，now it has.
 //!
 //! ## Security
 //!
