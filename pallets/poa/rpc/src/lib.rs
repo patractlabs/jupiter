@@ -22,6 +22,7 @@ pub trait PoaApi<BlockHash, AccountId>
 where
     AccountId: Ord,
 {
+    /// Return current PoA authorities AccountId and AuthorityState.
     #[rpc(name = "poa_authorities")]
     fn authorities(&self, at: Option<BlockHash>) -> Result<BTreeMap<AccountId, AuthorityState>>;
 }
@@ -33,7 +34,7 @@ pub struct PoA<C, B> {
 }
 
 impl<C, B> PoA<C, B> {
-    /// Create new `Contracts` with the given reference to the client.
+    /// Create new `PoA` with the given reference to the client.
     pub fn new(client: Arc<C>) -> Self {
         PoA {
             client,
