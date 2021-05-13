@@ -17,16 +17,20 @@
 
 //! # Randomness Module
 //!
-//! Store the babe randomness of each epoch and provide the babe randomness query by epoch id.
+//! Store the babe randomness of historical epochs and provide the babe randomness query by epoch id.
 //!
 //! ## Overview
 //!
-//! The Randomness module provide the historical babe randomness query by epoch id,
-//! get the latest babe randomness, and the user input an additional value, hashing it with the
-//! babe randomness to improve security.
+//! The Randomness module provide the previous & current & next(latest) babe randomness query,
+//! and the user input an additional value, hashing it with the babe randomness to improve security.
 //!
-//! To use it in your runtime, you need to binding with pallet_session::SessionManager to trigger
-//! the storage behavior of babe randomness when the session is changed.
+//!
+//! ### Implement
+//!
+//! The storage of historical babe randomness is triggered by pallet_session::SessionManager.
+//!
+//! So when you use it in your runtime, you need to binding with pallet_session::SessionManager
+//! to trigger the storage behavior of babe randomness when the session is changed.
 //!
 //! ### Goals
 //!
@@ -35,12 +39,29 @@
 //! We think that babe randomness are more secure than randomness-collective-flip.
 //!
 //!
+//! ## Security
+//!
+//! Babe randomness MUST NOT be used for gambling, as it can be influenced by a
+//! malicious validator in the short term. It MAY be used in many
+//! cryptographic protocols, however, so long as one remembers that this
+//! (like everything else on-chain) it is public. For example, it can be
+//! used where a number is needed that cannot have been chosen by an
+//! adversary, for purposes such as public-coin zero-knowledge proofs.
+//! NOTE: the following fields don't use the constants to define the
+//! array size because the metadata API currently doesn't resolve the
+//! variable to its underlying value.
+//!
+//!
 //! ## Interface
 //!
 //! * `current_epoch`: Get babe randomness info for current epoch.
 //! * `next_epoch`: Get babe randomness info for next epoch.
 //! * `randomness_of`: Get babe randomness for historical epoch that before current epoch.
 //! * `random`: Get randomness hashing with provider subject.
+//!
+//! ### ink! contract call
+//!
+//! example: https://github.com/patractlabs/store-contracts/blob/master/contracts/patralottery/lib.rs#L392
 //!
 //!
 //! ## Related Modules
