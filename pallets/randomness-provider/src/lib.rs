@@ -1,6 +1,6 @@
-// This file is part of Jupiter.
+// This file is part of jupiter.
 
-// Copyright (C) 2021-2021 Patract Labs Ltd.
+// Copyright (C) 2020-2021 Patract Labs Ltd.
 // SPDX-License-Identifier: Apache-2.0
 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +14,64 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+//! # Randomness Module
+//!
+//! Store the babe randomness of historical epochs and provide the babe randomness query by epoch id.
+//!
+//! ## Overview
+//!
+//! The Randomness module provide the previous & current & next(latest) babe randomness query,
+//! and the user input an additional value, hashing it with the babe randomness to improve security.
+//!
+//!
+//! ### Implement
+//!
+//! The storage of historical babe randomness is triggered by pallet_session::SessionManager.
+//!
+//! So when you use it in your runtime, you need to binding with pallet_session::SessionManager
+//! to trigger the storage behavior of babe randomness when the session is changed.
+//!
+//! ### Goals
+//!
+//! The randomness module is designed to Provide a source of randomness for the ink! contract,
+//! and expand this function through the chain extension mode of pallet contract.
+//! We think that babe randomness are more secure than randomness-collective-flip.
+//!
+//! In some Dapps, historical babe randomness may be required, for example: lottery draws are not timely,
+//! if lottery draws based on randomness require user operations instead of robots.
+//!
+//! There is no blockNumber in the previous random function return result，now it has.
+//!
+//! ## Security
+//!
+//! Babe randomness MUST NOT be used for gambling, as it can be influenced by a
+//! malicious validator in the short term. It MAY be used in many
+//! cryptographic protocols, however, so long as one remembers that this
+//! (like everything else on-chain) it is public. For example, it can be
+//! used where a number is needed that cannot have been chosen by an
+//! adversary, for purposes such as public-coin zero-knowledge proofs.
+//! NOTE: the following fields don't use the constants to define the
+//! array size because the metadata API currently doesn't resolve the
+//! variable to its underlying value.
+//!
+//!
+//! ## Interface
+//!
+//! * `current_epoch`: Get babe randomness info for current epoch.
+//! * `next_epoch`: Get babe randomness info for next epoch.
+//! * `randomness_of`: Get babe randomness for historical epoch that before current epoch.
+//! * `random`: Get randomness hashing with provider subject.
+//!
+//! ### ink! contract call
+//!
+//! example: https://github.com/patractlabs/store-contracts/blob/master/contracts/patralottery/lib.rs#L392
+//!
+//!
+//! ## Related Modules
+//!
+//! * [`System`](../frame_system/index.html)
+//! * [`Babe`](../pallet_babe/index.html)
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
