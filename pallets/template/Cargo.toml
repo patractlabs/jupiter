@@ -26,7 +26,7 @@ sp-std = { git = "https://github.com/paritytech/substrate", branch = "master", d
 frame-benchmarking = { git = "https://github.com/paritytech/substrate", branch = "master", default-features = false, optional = true }
 frame-support = { git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 frame-system = { git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
-pallet-contracts = { path = "../../vendor/substrate/frame/contracts", default-features = false }
+pallet-contracts = { git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 
 # Jupiter primitives
 jupiter-io = { path = "../../primitives/io", default-features = false }

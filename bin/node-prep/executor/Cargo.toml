@@ -5,8 +5,8 @@ authors = ["Patract <https://github.com/patractlabs>"]
 edition = "2018"
 
 [dependencies]
-frame-benchmarking = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master" }
-sc-executor = { version = "0.9.0", git = "https://github.com/paritytech/substrate", branch = "master" }
+frame-benchmarking = { git = "https://github.com/paritytech/substrate", branch = "master" }
+sc-executor = { git = "https://github.com/paritytech/substrate", branch = "master" }
 
 jupiter-io = { path = "../../../primitives/io" }
 
@@ -14,8 +14,8 @@ jupiter-runtime = { package = "jupiter-prep-runtime", path = "../../../runtime/j
 
 [features]
 wasmtime = [
-    "sc-executor/wasmtime",
+  "sc-executor/wasmtime",
 ]
 wasmi-errno = [
-    "sc-executor/wasmi-errno",
+  "sc-executor/wasmi-errno",
 ]

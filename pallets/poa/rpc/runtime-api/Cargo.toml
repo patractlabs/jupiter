@@ -7,20 +7,22 @@ edition = "2018"
 [dependencies]
 codec = { package = "parity-scale-codec", version = "2.1.0", default-features = false }
 
-sp-api = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
-sp-std = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
-sp-runtime = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+# Substrate primitives
+sp-api = { git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+sp-std = { git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 
-pallet-poa = { path = "../../", default-features = false }
+# Jupiter pallets
+pallet-poa = { path = "../../../poa", default-features = false }
 
 [features]
 default = ["std"]
 std = [
-	"codec/std",
+  "codec/std",
 
-	"sp-api/std",
-	"sp-std/std",
-	"sp-runtime/std",
+  "sp-api/std",
+  "sp-runtime/std",
+  "sp-std/std",
 
-	"pallet-poa/std",
+  "pallet-poa/std",
 ]

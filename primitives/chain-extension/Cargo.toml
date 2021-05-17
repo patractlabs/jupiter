@@ -14,7 +14,7 @@ sp-std = { git = "https://github.com/paritytech/substrate", branch = "master", d
 
 # Substrate pallets
 frame-support = { git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
-pallet-contracts = { path = "../../vendor/substrate/frame/contracts", default-features = false }
+pallet-contracts = { git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 
 # zkMega
 curve = { package = "zkmega-arkworks", git = "https://github.com/patractlabs/zkmega.git", branch = "master", default-features = false }

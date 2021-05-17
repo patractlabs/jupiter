@@ -1,23 +1,23 @@
 [workspace]
 members = [
-#    "bin/node",
-    "bin/node-prep",
-    "bin/node-prep/executor",
-    "bin/node-dev",
+#  "bin/node",
+  "bin/node-prep",
+  "bin/node-prep/executor",
+  "bin/node-dev",
+  
+#  "runtime/jupiter-para",
+  "runtime/jupiter-prep",
+  "runtime/jupiter-dev",
 
-#    "runtime/jupiter-para",
-    "runtime/jupiter-prep",
-    "runtime/jupiter-dev",
-
-    "primitives",
-    "primitives/io",
-    "primitives/chain-extension",
-    "pallets/template",
-    "pallets/randomness-provider",
-    "pallets/poa",
-    "pallets/poa/rpc",
-    "pallets/poa/rpc/runtime-api",
-    "rpc",
+  "primitives",
+  "primitives/io",
+  "primitives/chain-extension",
+  "pallets/template",
+  "pallets/randomness-provider",
+  "pallets/poa",
+  "pallets/poa/rpc",
+  "pallets/poa/rpc/runtime-api",
+  "rpc",
 ]
 exclude = ["vendor/substrate"]
 
