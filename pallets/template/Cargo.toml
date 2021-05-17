@@ -52,10 +52,10 @@ jupiter-chain-extension = { path = "../../primitives/chain-extension" }
 [features]
 default = ["std"]
 std = [
-	"codec/std",
+    "codec/std",
     "pallet-contracts/std",
-	"frame-support/std",
-	"frame-system/std",
+    "frame-support/std",
+    "frame-system/std",
     "frame-benchmarking/std",
     "jupiter-io/std",
     "sp-std/std",
