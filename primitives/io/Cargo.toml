@@ -8,20 +8,20 @@ edition = "2018"
 targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
-num-bigint = { version = "0.4", default-features = false }
-num-traits = { version = "0.2", default-features = false }
-
+# Substrate primitives
 sp-runtime-interface = { git = "https://github.com/paritytech/substrate.git", branch = "master", default-features = false }
 sp-std = { git = "https://github.com/paritytech/substrate.git", branch = "master", default-features = false }
 
 [dependencies.curve]
-git = "https://github.com/patractlabs/zkmega.git"
 package = "zkmega-arkworks"
+git = "https://github.com/patractlabs/zkmega.git"
+branch = "master"
 default-features = false
 features = ["tests"]
 
 [features]
 default = ["std"]
 std = [
-  "sp-runtime-interface/std"
+  "sp-runtime-interface/std",
+  "sp-std/std",
 ]

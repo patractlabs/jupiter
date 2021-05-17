@@ -2,7 +2,7 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use parity_scale_codec::Encode;
+use codec::Encode;
 use sp_runtime::DispatchError;
 use sp_std::vec::Vec;
 

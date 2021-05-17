@@ -2955,8 +2955,6 @@ dependencies = [
 name = "jupiter-io"
 version = "0.2.0"
 dependencies = [
- "num-bigint 0.4.0",
- "num-traits",
  "sp-runtime-interface",
  "sp-std",
  "zkmega-arkworks",
@@ -3036,7 +3034,6 @@ version = "0.1.0"
 dependencies = [
  "frame-system",
  "parity-scale-codec",
- "serde",
  "sp-application-crypto",
  "sp-core",
  "sp-runtime",
@@ -4603,7 +4600,6 @@ dependencies = [
  "pallet-babe",
  "pallet-session",
  "parity-scale-codec",
- "serde",
  "sp-consensus-vrf",
  "sp-runtime",
  "sp-staking",
@@ -4693,12 +4689,10 @@ dependencies = [
  "hex",
  "jupiter-chain-extension",
  "jupiter-io",
- "jupiter-runtime-common",
  "pallet-balances",
  "pallet-contracts",
  "pallet-randomness-collective-flip",
  "pallet-timestamp",
- "pallet-transaction-payment",
  "parity-scale-codec",
  "serde",
  "sp-core",
