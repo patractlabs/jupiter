@@ -1,5 +1,5 @@
 [package]
-authors = ["Patract <https://github.com/patractlabs/patract>"]
+authors = ["Patract <https://github.com/patractlabs>"]
 edition = '2018'
 name = 'pallet-template'
 version = "2.0.0"
@@ -20,7 +20,7 @@ sp-core = { git = "https://github.com/paritytech/substrate", branch = "master", 
 sp-io = { git = "https://github.com/paritytech/substrate", branch = "master", default-features = false}
 sp-std = { git = "https://github.com/paritytech/substrate", branch = "master", default-features = false}
 sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "master", default-features = false}
-hex = { version = "0.4.3", optional = true, default-features = false, features = ["alloc"] }
+hex = { version = "0.4.3", default-features = false, features = ["alloc"], optional = true }
 
 [dependencies.jupiter-io]
 package = "jupiter-io"
@@ -30,8 +30,8 @@ default-features = false
 [dependencies.curve]
 package = "zkmega-arkworks"
 git = "https://github.com/patractlabs/zkmega.git"
-features = ["tests"]
 default-features = false
+features = ["tests"]
 
 [dependencies.pallet-contracts]
 package = "pallet-contracts"
@@ -50,20 +50,20 @@ jupiter-runtime-common = { path = "../../runtime/common" }
 jupiter-chain-extension = { path = "../../primitives/chain-extension" }
 
 [features]
-default = ['std']
+default = ["std"]
 std = [
-	'codec/std',
-    'pallet-contracts/std',
-	'frame-support/std',
-	'frame-system/std',
-    'frame-benchmarking/std',
-    'jupiter-io/std',
-    'sp-std/std',
+	"codec/std",
+    "pallet-contracts/std",
+	"frame-support/std",
+	"frame-system/std",
+    "frame-benchmarking/std",
+    "jupiter-io/std",
+    "sp-std/std",
 ]
 runtime-benchmarks = [
     "hex",
     "frame-benchmarking",
-    'frame-system/runtime-benchmarks',
-    'frame-support/runtime-benchmarks',
-    'pallet-contracts/runtime-benchmarks',
+    "frame-system/runtime-benchmarks",
+    "frame-support/runtime-benchmarks",
+    "pallet-contracts/runtime-benchmarks",
 ]

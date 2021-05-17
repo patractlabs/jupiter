@@ -1,12 +1,12 @@
 [package]
 name = "jupiter-chain-extension"
 version = "0.1.0"
-authors = ["Patract <https://github.com/patractlabs/patract>"]
+authors = ["Patract <https://github.com/patractlabs>"]
 edition = "2018"
 
 [dependencies]
 parity-scale-codec = { version = "2.0.0", features = ["derive"], default-features = false }
-hex = { version = "0.4.2", optional = true }
+hex = { version = "0.4.3", optional = true }
 
 sp-runtime = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 sp-std = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
