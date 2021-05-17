@@ -9,11 +9,11 @@ codec = { package = "parity-scale-codec", version = "2.1.0", features = ["derive
 hex = { version = "0.4.3", default-features = false, features = ["alloc"], optional = true }
 
 # Substrate primitives
-sp-runtime = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
-sp-std = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+sp-std = { git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 
 # Substrate pallets
-frame-support = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+frame-support = { git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-contracts = { path = "../../vendor/substrate/frame/contracts", default-features = false }
 
 # zkMega
