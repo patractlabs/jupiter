@@ -1,30 +1,31 @@
 [package]
 name = "jupiter-chain-extension"
 version = "0.1.0"
-authors = ["Patract <https://github.com/patractlabs/patract>"]
+authors = ["Patract <https://github.com/patractlabs>"]
 edition = "2018"
 
 [dependencies]
-parity-scale-codec = { version = "2.0.0", features = ["derive"], default-features = false }
-hex = { version = "0.4.2", optional = true }
+codec = { package = "parity-scale-codec", version = "2.1.0", features = ["derive"], default-features = false }
+hex = { version = "0.4.3", default-features = false, features = ["alloc"], optional = true }
 
-sp-runtime = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
-sp-std = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+# Substrate primitives
+sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+sp-std = { git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 
-frame-support = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
+# Substrate pallets
+frame-support = { git = "https://github.com/paritytech/substrate", branch = "master", default-features = false }
 pallet-contracts = { path = "../../vendor/substrate/frame/contracts", default-features = false }
 
-jupiter-io = { path = "../io", default-features = false, optional = true }
+# zkMega
+curve = { package = "zkmega-arkworks", git = "https://github.com/patractlabs/zkmega.git", branch = "master", default-features = false }
 
-[dependencies.curve]
-git = "https://github.com/patractlabs/zkmega.git"
-package = "zkmega-arkworks"
-default-features = false
+# Jupiter primitives
+jupiter-io = { path = "../io", default-features = false, optional = true }
 
 [features]
 default = ["std"]
 std = [
-  "parity-scale-codec/std",
+  "codec/std",
   "hex",
 
   "sp-runtime/std",

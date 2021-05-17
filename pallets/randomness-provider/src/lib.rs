@@ -76,14 +76,14 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use codec::Encode;
-use frame_support::{decl_module, decl_storage, traits::Randomness as RandomnessT, Parameter};
-
-use pallet_session::SessionManager;
 
 use sp_consensus_vrf::schnorrkel;
 use sp_runtime::traits::Member;
 use sp_staking::SessionIndex;
 use sp_std::prelude::*;
+
+use frame_support::{decl_module, decl_storage, traits::Randomness as RandomnessT, Parameter};
+use pallet_session::SessionManager;
 
 #[derive(Debug, PartialEq, Encode)]
 pub struct BabeRandomness {

@@ -1,32 +1,27 @@
 [package]
 name = "jupiter-io"
 version = "0.2.0"
-authors = ["Patract <https://github.com/patractlabs/patract>"]
+authors = ["Patract <https://github.com/patractlabs>"]
 edition = "2018"
 
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
+# Substrate primitives
 sp-runtime-interface = { git = "https://github.com/paritytech/substrate.git", branch = "master", default-features = false }
 sp-std = { git = "https://github.com/paritytech/substrate.git", branch = "master", default-features = false }
 
 [dependencies.curve]
-git = "https://github.com/patractlabs/zkmega.git"
 package = "zkmega-arkworks"
-features = [ "tests" ]
+git = "https://github.com/patractlabs/zkmega.git"
+branch = "master"
 default-features = false
-
-[dependencies.num-bigint]
-version = "0.3.1"
-default-features = false
-
-[dependencies.num-traits]
-version = "0.2.14"
-default-features = false
+features = ["tests"]
 
 [features]
 default = ["std"]
 std = [
-  "sp-runtime-interface/std"
+  "sp-runtime-interface/std",
+  "sp-std/std",
 ]

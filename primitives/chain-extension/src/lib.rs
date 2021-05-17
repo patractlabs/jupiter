@@ -1,13 +1,15 @@
 //! Jupiter Chain Extension
+
 #![cfg_attr(not(feature = "std"), no_std)]
-use pallet_contracts::chain_extension::{
-    ChainExtension, Environment, Ext, InitState, RetVal, SysConfig, UncheckedFrom,
-};
-use parity_scale_codec::Encode;
+
+use codec::Encode;
 use sp_runtime::DispatchError;
 use sp_std::vec::Vec;
 
 use frame_support::debug::{error, native};
+use pallet_contracts::chain_extension::{
+    ChainExtension, Environment, Ext, InitState, RetVal, SysConfig, UncheckedFrom,
+};
 
 /// The chain Extension of Jupiter
 pub struct JupiterExt;
