@@ -3,13 +3,8 @@
 
 //! Test utilities
 
-use crate as poa;
-use crate::*;
-use frame_support::{
-    parameter_types,
-    traits::{FindAuthor, Get, OnFinalize, OnInitialize, OneSessionHandler},
-    weights::constants::RocksDbWeight,
-};
+use std::{cell::RefCell, collections::HashSet};
+
 use sp_core::H256;
 use sp_io;
 use sp_runtime::{
@@ -19,7 +14,15 @@ use sp_runtime::{
 };
 use sp_staking::offence::{OffenceDetails, OnOffenceHandler};
 use sp_staking::SessionIndex;
-use std::{cell::RefCell, collections::HashSet};
+
+use frame_support::{
+    parameter_types,
+    traits::{FindAuthor, Get, OnFinalize, OnInitialize, OneSessionHandler},
+    weights::constants::RocksDbWeight,
+};
+
+use crate as poa;
+use crate::*;
 
 pub const INIT_TIMESTAMP: u64 = 30_000;
 pub const BLOCK_TIME: u64 = 1000;
@@ -79,11 +82,11 @@ frame_support::construct_runtime!(
         NodeBlock = Block,
         UncheckedExtrinsic = UncheckedExtrinsic,
     {
-        System: frame_system::{Module, Call, Config, Storage, Event<T>},
-        Timestamp: pallet_timestamp::{Module, Call, Storage, Inherent},
-        Balances: pallet_balances::{Module, Call, Storage, Config<T>, Event<T>},
-        PoA: poa::{Module, Call, Config<T>, Storage, Event<T>},
-        Session: pallet_session::{Module, Call, Storage, Event, Config<T>},
+        System: frame_system::{Pallet, Call, Config, Storage, Event<T>},
+        Timestamp: pallet_timestamp::{Pallet, Call, Storage, Inherent},
+        Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>},
+        PoA: poa::{Pallet, Call, Config<T>, Storage, Event<T>},
+        Session: pallet_session::{Pallet, Call, Storage, Event, Config<T>},
     }
 );
 
@@ -133,7 +136,9 @@ impl frame_system::Config for Test {
     type OnKilledAccount = ();
     type SystemWeightInfo = ();
     type SS58Prefix = ();
+    type OnSetCode = ();
 }
+
 impl pallet_balances::Config for Test {
     type MaxLocks = MaxLocks;
     type Balance = Balance;
@@ -143,15 +148,18 @@ impl pallet_balances::Config for Test {
     type AccountStore = System;
     type WeightInfo = ();
 }
+
 parameter_types! {
     pub const UncleGenerations: u64 = 0;
     pub const DisabledValidatorsThreshold: Perbill = Perbill::from_percent(25);
 }
+
 sp_runtime::impl_opaque_keys! {
     pub struct SessionKeys {
         pub other: OtherSessionHandler,
     }
 }
+
 impl pallet_session::Config for Test {
     type SessionManager = pallet_session::historical::NoteHistoricalRoot<Test, PoA>;
     type Keys = SessionKeys;
@@ -173,6 +181,7 @@ impl pallet_session::historical::Config for Test {
 parameter_types! {
     pub const MinimumPeriod: u64 = 5;
 }
+
 impl pallet_timestamp::Config for Test {
     type Moment = u64;
     type OnTimestampSet = ();
@@ -371,8 +380,7 @@ pub(crate) fn on_offence_in_era(
             offenders,
             slash_fraction,
             PoA::eras_start_session_index(era).unwrap(),
-        )
-        .unwrap();
+        );
     } else {
         panic!("cannot slash in era {}", era);
     }
