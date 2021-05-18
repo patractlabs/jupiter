@@ -44,9 +44,9 @@ use frame_support::pallet_prelude::*;
 use sp_runtime::{traits::StaticLookup, RuntimeDebug, SaturatedConversion};
 use sp_std::{collections::btree_map::BTreeMap, prelude::*};
 
-pub use pallet::*;
-pub use session::SimpleValidatorIdConverter;
-pub use weights::WeightInfo;
+pub use self::pallet::*;
+pub use self::session::SimpleValidatorIdConverter;
+pub use self::weights::WeightInfo;
 
 pub type EraIndex = u32;
 pub(crate) const LOG_TARGET: &'static str = "poa";
@@ -526,7 +526,7 @@ impl<T: Config> Pallet<T> {
     /// limit minimal validators
     fn remove_from_authorities(who: &T::AccountId) {
         if Self::authorities_map().len() as u32 == MinimumAuthorityCount::<T>::get() {
-            debug::warn!(
+            log::warn!(
                 target: LOG_TARGET,
                 "Can not remove authority due to minimal authority count."
             );

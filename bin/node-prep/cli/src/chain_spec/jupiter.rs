@@ -390,22 +390,23 @@ fn testnet_genesis(
     });
 
     GenesisConfig {
-        frame_system: Some(SystemConfig {
+        frame_system: SystemConfig {
             // Add Wasm runtime to storage.
             code: wasm_binary.to_vec(),
             changes_trie_config: Default::default(),
-        }),
-        pallet_balances: Some(BalancesConfig {
+        },
+        pallet_balances: BalancesConfig {
             balances: endowed_accounts
                 .iter()
-                .map(|k: &AccountId| (k.clone(), ENDOWMENT))
+                .cloned()
+                .map(|x| (x, ENDOWMENT))
                 .collect(),
-        }),
-        pallet_babe: Some(Default::default()),
-        pallet_grandpa: Some(Default::default()),
-        pallet_im_online: Some(Default::default()),
-        pallet_authority_discovery: Some(AuthorityDiscoveryConfig { keys: vec![] }),
-        pallet_session: Some(SessionConfig {
+        },
+        pallet_babe: Default::default(),
+        pallet_grandpa: Default::default(),
+        pallet_im_online: Default::default(),
+        pallet_authority_discovery: AuthorityDiscoveryConfig { keys: vec![] },
+        pallet_session: SessionConfig {
             keys: initial_authorities
                 .iter()
                 .map(|x| {
@@ -416,25 +417,23 @@ fn testnet_genesis(
                     )
                 })
                 .collect::<Vec<_>>(),
-        }),
-        pallet_contracts: Some(ContractsConfig {
-            current_schedule: pallet_contracts::Schedule {
-                enable_println, // this should only be enabled on development chains
-                ..Default::default()
-            },
-        }),
-        pallet_democracy: Some(Default::default()),
-        pallet_collective_Instance1: Some(CouncilConfig {
+        },
+        pallet_contracts: ContractsConfig {
+            // this should only be enabled on development chains
+            current_schedule: pallet_contracts::Schedule::default().enable_println(enable_println),
+        },
+        pallet_democracy: Default::default(),
+        pallet_collective_Instance1: CouncilConfig {
             members: vec![],
             phantom: Default::default(),
-        }),
-        pallet_collective_Instance2: Some(TechnicalCommitteeConfig {
+        },
+        pallet_collective_Instance2: TechnicalCommitteeConfig {
             members: vec![],
             phantom: Default::default(),
-        }),
-        pallet_membership_Instance1: Some(Default::default()),
-        pallet_sudo: Some(SudoConfig { key: root_key }),
-        pallet_poa: Some(PoAConfig {
+        },
+        pallet_membership_Instance1: Default::default(),
+        pallet_sudo: SudoConfig { key: root_key },
+        pallet_poa: PoAConfig {
             minimum_authority_count: initial_authorities.len() as u32,
             init_authorities: initial_authorities
                 .iter()
@@ -445,6 +444,6 @@ fn testnet_genesis(
                 .map(|x| x.0.clone())
                 .collect::<Vec<_>>(),
             force_era: Forcing::ForceNone,
-        }),
+        },
     }
 }

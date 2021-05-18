@@ -5,11 +5,10 @@ authors = ["Patract <https://github.com/patractlabs>"]
 edition = "2018"
 
 [dependencies]
-frame-benchmarking = { git = "https://github.com/paritytech/substrate", branch = "master" }
-sc-executor = { git = "https://github.com/paritytech/substrate", branch = "master" }
+frame-benchmarking = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
+sc-executor = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
 
 jupiter-io = { path = "../../../primitives/io" }
-
 jupiter-runtime = { package = "jupiter-prep-runtime", path = "../../../runtime/jupiter-prep" }
 
 [features]

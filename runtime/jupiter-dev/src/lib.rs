@@ -17,12 +17,12 @@ use sp_runtime::{
     ApplyExtrinsicResult, KeyTypeId,
 };
 use sp_std::prelude::*;
-
 #[cfg(feature = "std")]
 use sp_version::NativeVersion;
 use sp_version::RuntimeVersion;
 
 use pallet_contracts::weights::WeightInfo;
+use pallet_contracts::Frame;
 use pallet_transaction_payment::{CurrencyAdapter, FeeDetails};
 use pallet_transaction_payment_rpc_runtime_api::RuntimeDispatchInfo;
 
@@ -130,9 +130,12 @@ impl frame_system::Config for Runtime {
     /// What to do if an account is fully reaped from the system.
     type OnKilledAccount = ();
     /// Weight information for the extrinsics of this pallet.
-    type SystemWeightInfo = weights::frame_system::WeightInfo;
+    type SystemWeightInfo = weights::frame_system::WeightInfo<Runtime>;
     /// This is used as an identifier of the chain. Jupiter-dev use default 42 as prefix.
     type SS58Prefix = ();
+    /// What to do if the user wants the code set to something. Just use `()` unless you are in
+    /// cumulus.
+    type OnSetCode = ();
 }
 
 parameter_types! {
@@ -156,7 +159,7 @@ impl pallet_timestamp::Config for Runtime {
     type Moment = u64;
     type OnTimestampSet = ();
     type MinimumPeriod = MinimumPeriod;
-    type WeightInfo = weights::pallet_timestamp::WeightInfo;
+    type WeightInfo = pallet_timestamp::weights::SubstrateWeight<Runtime>;
 }
 
 parameter_types! {
@@ -168,7 +171,7 @@ impl pallet_indices::Config for Runtime {
     type Currency = Balances;
     type Deposit = IndexDeposit;
     type Event = Event;
-    type WeightInfo = ();
+    type WeightInfo = pallet_indices::weights::SubstrateWeight<Runtime>;
 }
 
 parameter_types! {
@@ -187,7 +190,7 @@ impl pallet_balances::Config for Runtime {
     type Event = Event;
     type ExistentialDeposit = ExistentialDeposit;
     type AccountStore = System;
-    type WeightInfo = weights::pallet_balances::WeightInfo;
+    type WeightInfo = pallet_balances::weights::SubstrateWeight<Runtime>;
 }
 
 parameter_types! {
@@ -202,14 +205,14 @@ impl pallet_transaction_payment::Config for Runtime {
 }
 
 parameter_types! {
-    pub const TombstoneDeposit: Balance = tombstone_deposit(
+    pub TombstoneDeposit: Balance = tombstone_deposit(
         1,
-        sp_std::mem::size_of::<pallet_contracts::ContractInfo<Runtime>>() as u32
+        <pallet_contracts::Pallet<Runtime>>::contract_info_size(),
     );
-    pub const DepositPerContract: Balance = TombstoneDeposit::get();
+    pub DepositPerContract: Balance = TombstoneDeposit::get();
     pub const DepositPerStorageByte: Balance = 1 * MILLICENTS;
     pub const DepositPerStorageItem: Balance = 10 * MILLICENTS;
-    pub RentFraction: Perbill = Perbill::from_rational_approximation(1u32, 60 * DAYS);
+    pub RentFraction: Perbill = Perbill::from_rational(1u32, 60 * DAYS);
     pub const SurchargeReward: Balance = 0;
     pub const SignedClaimHandicap: u32 = 0;
     pub const MaxDepth: u32 = 100;
@@ -239,7 +242,7 @@ impl pallet_contracts::Config for Runtime {
     type DepositPerStorageItem = DepositPerStorageItem;
     type RentFraction = RentFraction;
     type SurchargeReward = SurchargeReward;
-    type MaxDepth = MaxDepth;
+    type CallStack = [Frame<Self>; 31];
     type MaxValueSize = MaxValueSize;
     type WeightPrice = pallet_transaction_payment::Module<Self>;
     type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
@@ -266,23 +269,23 @@ construct_runtime!(
         UncheckedExtrinsic = UncheckedExtrinsic
     {
         // Basic stuff; balances is uncallable initially.
-        System: frame_system::{Module, Call, Config, Storage, Event<T>},
-        RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Module, Call, Storage},
+        System: frame_system::{Pallet, Call, Config, Storage, Event<T>},
+        RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Pallet, Call, Storage},
 
         // Consensus support.
-        Authorship: pallet_authorship::{Module, Call, Storage},
+        Authorship: pallet_authorship::{Pallet, Call, Storage},
 
-        Timestamp: pallet_timestamp::{Module, Call, Storage, Inherent},
-        Balances: pallet_balances::{Module, Call, Storage, Config<T>, Event<T>},
-        Indices: pallet_indices::{Module, Call, Storage, Config<T>, Event<T>},
-        TransactionPayment: pallet_transaction_payment::{Module, Storage},
+        Timestamp: pallet_timestamp::{Pallet, Call, Storage, Inherent},
+        Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>},
+        Indices: pallet_indices::{Pallet, Call, Storage, Config<T>, Event<T>},
+        TransactionPayment: pallet_transaction_payment::{Pallet, Storage},
 
-        Contracts: pallet_contracts::{Module, Call, Config<T>, Storage, Event<T>},
+        Contracts: pallet_contracts::{Pallet, Call, Config<T>, Storage, Event<T>},
 
-        Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>},
+        Sudo: pallet_sudo::{Pallet, Call, Config<T>, Storage, Event<T>},
 
         // Test
-        Template: pallet_template::{Module, Call, Storage, Event<T>},
+        Template: pallet_template::{Pallet, Call, Storage, Event<T>},
     }
 );
 
@@ -316,7 +319,7 @@ pub type Executive = frame_executive::Executive<
     Block,
     frame_system::ChainContext<Runtime>,
     Runtime,
-    AllModules,
+    AllPallets,
 >;
 
 impl_runtime_apis! {
@@ -359,10 +362,6 @@ impl_runtime_apis! {
         ) -> sp_inherents::CheckInherentsResult {
             data.check_extrinsics(&block)
         }
-
-        fn random_seed() -> <Block as BlockT>::Hash {
-            RandomnessCollectiveFlip::random_seed()
-        }
     }
 
     impl sp_transaction_pool::runtime_api::TaggedTransactionQueue<Block> for Runtime {
@@ -398,7 +397,7 @@ impl_runtime_apis! {
         }
     }
 
-    impl pallet_contracts_rpc_runtime_api::ContractsApi<Block, AccountId, Balance, BlockNumber>
+    impl pallet_contracts_rpc_runtime_api::ContractsApi<Block, AccountId, Balance, BlockNumber, Hash>
         for Runtime
     {
         fn call(
@@ -409,6 +408,18 @@ impl_runtime_apis! {
             input_data: Vec<u8>,
         ) -> pallet_contracts_primitives::ContractExecResult {
             Contracts::bare_call(origin, dest, value, gas_limit, input_data)
+        }
+
+        fn instantiate(
+            origin: AccountId,
+            endowment: Balance,
+            gas_limit: u64,
+            code: pallet_contracts_primitives::Code<Hash>,
+            data: Vec<u8>,
+            salt: Vec<u8>,
+        ) -> pallet_contracts_primitives::ContractInstantiateResult<AccountId, BlockNumber>
+        {
+            Contracts::bare_instantiate(origin, endowment, gas_limit, code, data, salt, true)
         }
 
         fn get_storage(
