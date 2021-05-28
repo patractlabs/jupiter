@@ -19,44 +19,44 @@ ansi_term = "0.12.1"
 serde = { version = "1.0.101", features = ["derive"] }
 
 # Substrate dependencies
-sc-authority-discovery = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sc-basic-authorship = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sc-transaction-pool = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sc-network = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sc-consensus-aura = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sc-consensus = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sc-finality-grandpa = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sc-client-api = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sc-rpc = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sc-informant = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sc-chain-spec = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
+sc-authority-discovery = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3" }
+sc-basic-authorship = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3" }
+sc-transaction-pool = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3" }
+sc-network = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3" }
+sc-consensus-aura = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3" }
+sc-consensus = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3" }
+sc-finality-grandpa = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3" }
+sc-client-api = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3" }
+sc-rpc = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3" }
+sc-informant = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3" }
+sc-chain-spec = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3" }
 
-sp-core = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sp-inherents = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sp-transaction-pool = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sp-consensus-aura = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sp-consensus = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sp-finality-grandpa = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sp-api = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sc-cli = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1", optional = true }
-sc-service = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1", optional = true }
-sc-executor = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-frame-benchmarking = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sp-session = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sp-blockchain = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sp-block-builder = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sp-offchain = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sp-timestamp = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-sc-tracing = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
-pallet-contracts = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
+sp-core = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3" }
+sp-inherents = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3" }
+sp-transaction-pool = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3" }
+sp-consensus-aura = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3" }
+sp-consensus = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3" }
+sp-finality-grandpa = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3" }
+sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3" }
+sp-api = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3" }
+sc-cli = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3", optional = true }
+sc-service = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3", optional = true }
+sc-executor = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3" }
+frame-benchmarking = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3" }
+sp-session = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3" }
+sp-blockchain = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3" }
+sp-block-builder = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3" }
+sp-offchain = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3" }
+sp-timestamp = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3" }
+sc-tracing = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3" }
+pallet-contracts = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3" }
 
 # Cumulus dependencies
-cumulus-consensus = { git = "https://github.com/paritytech/cumulus", branch = "polkadot-v0.9.1"}
-cumulus-collator = { git = "https://github.com/paritytech/cumulus", branch = "polkadot-v0.9.1"}
-cumulus-network = { git = "https://github.com/paritytech/cumulus", branch = "polkadot-v0.9.1"}
-cumulus-primitives = { git = "https://github.com/paritytech/cumulus", branch = "polkadot-v0.9.1"}
-cumulus-service = { git = "https://github.com/paritytech/cumulus", branch = "polkadot-v0.9.1"}
+cumulus-consensus = { git = "https://github.com/paritytech/cumulus", branch = "polkadot-v0.9.3"}
+cumulus-collator = { git = "https://github.com/paritytech/cumulus", branch = "polkadot-v0.9.3"}
+cumulus-network = { git = "https://github.com/paritytech/cumulus", branch = "polkadot-v0.9.3"}
+cumulus-primitives = { git = "https://github.com/paritytech/cumulus", branch = "polkadot-v0.9.3"}
+cumulus-service = { git = "https://github.com/paritytech/cumulus", branch = "polkadot-v0.9.3"}
 
 # Polkadot dependencies
 polkadot-primitives = { git = "https://github.com/paritytech/polkadot", tag = "v0.9.1"}
@@ -70,7 +70,7 @@ jupiter-rpc = { path = "../../../rpc" }
 jupiter-para-runtime = { path = "../../../runtime/jupiter" }
 
 [build-dependencies]
-substrate-build-script-utils = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.1" }
+substrate-build-script-utils = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3" }
 
 [features]
 default = ["cli"]
