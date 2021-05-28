@@ -25,10 +25,10 @@ fn load_spec(
     para_id: ParaId,
 ) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
     Ok(match id {
-        "jupiter-dev" => Box::new(chain_spec::jupiter::development_config(para_id)?),
-        "jupiter-staging" => Box::new(chain_spec::jupiter::staging_config(para_id)?),
-        "" | "jupiter" => Box::new(chain_spec::jupiter::jupiter_config()?),
-        path => Box::new(chain_spec::jupiter::ChainSpec::from_json_file(path.into())?),
+        "jupiter-dev" => Box::new(chain_spec::development_config(para_id)?),
+        "jupiter-staging" => Box::new(chain_spec::staging_config(para_id)?),
+        "" | "jupiter" => Box::new(chain_spec::jupiter_config()?),
+        path => Box::new(chain_spec::ChainSpec::from_json_file(path.into())?),
     })
 }
 
@@ -286,7 +286,7 @@ pub fn run() -> Result<()> {
                 // TODO
                 let key = sp_core::Pair::generate().0;
 
-                let para_id = chain_spec::jupiter::Extensions::try_get(&*config.chain_spec)
+                let para_id = chain_spec::Extensions::try_get(&*config.chain_spec)
                     .map(|e| e.para_id);
 
                 let polkadot_cli = RelayChainCli::new(
