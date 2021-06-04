@@ -14,8 +14,9 @@ use sp_runtime::traits::{IdentifyAccount, Verify};
 use jupiter_runtime::Forcing;
 use jupiter_runtime::{AccountId, SessionKeys, Signature};
 use jupiter_runtime::{
-    AuthorityDiscoveryConfig, BalancesConfig, ContractsConfig, CouncilConfig, GenesisConfig,
-    PoAConfig, SessionConfig, SudoConfig, SystemConfig, TechnicalCommitteeConfig, WASM_BINARY, BabeConfig
+    AuthorityDiscoveryConfig, BabeConfig, BalancesConfig, ContractsConfig, CouncilConfig,
+    GenesisConfig, PoAConfig, SessionConfig, SudoConfig, SystemConfig, TechnicalCommitteeConfig,
+    WASM_BINARY,
 };
 use jupiter_runtime_common::constants::jupiter_currency::DOTS;
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
@@ -82,7 +83,7 @@ fn session_keys(
 pub const BABE_GENESIS_EPOCH_CONFIG: sp_consensus_babe::BabeEpochConfiguration =
     sp_consensus_babe::BabeEpochConfiguration {
         c: (1, 4),
-        allowed_slots: sp_consensus_babe::AllowedSlots::PrimaryAndSecondaryPlainSlots
+        allowed_slots: sp_consensus_babe::AllowedSlots::PrimaryAndSecondaryPlainSlots,
     };
 
 /// PoA development testnet config.
