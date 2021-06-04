@@ -62,7 +62,7 @@ Now, Jupiter has launched following network:
     {
       "LookupSource": "MultiAddress",
       "Address": "MultiAddress",
-      "AccountInfo": "AccountInfoWithProviders",
+      "AccountInfo": "AccountInfoWithTripleRefCount",
       "AliveContractInfo": {
         "trieId": "TrieId",
         "storageSize": "u32",
