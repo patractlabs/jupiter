@@ -276,7 +276,7 @@ construct_runtime!(
         Indices: pallet_indices::{Pallet, Call, Storage, Config<T>, Event<T>},
         TransactionPayment: pallet_transaction_payment::{Pallet, Storage},
 
-        Contracts: pallet_contracts::{Pallet, Call, Config<T>, Storage, Event<T>},
+        Contracts: pallet_contracts::{Pallet, Call, Storage, Event<T>},
 
         Sudo: pallet_sudo::{Pallet, Call, Config<T>, Storage, Event<T>},
 

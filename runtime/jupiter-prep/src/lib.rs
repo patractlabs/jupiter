@@ -63,7 +63,6 @@ pub use pallet_poa::Forcing;
 pub use pallet_session::historical as pallet_session_historical;
 pub use pallet_timestamp::Call as TimestampCall;
 
-use frame_support::pallet_prelude::Get;
 pub use jupiter_primitives::{
     AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Signature,
 };
@@ -900,7 +899,7 @@ construct_runtime!(
 
         Sudo: pallet_sudo::{Pallet, Call, Config<T>, Storage, Event<T>} = 27,
         // Contracts module
-        Contracts: pallet_contracts::{Pallet, Call, Config<T>, Storage, Event<T>} = 30,
+        Contracts: pallet_contracts::{Pallet, Call, Storage, Event<T>} = 30,
 
         RandomnessProvider: pallet_randomness_provider::{Pallet, Storage} = 31,
     }

@@ -8,8 +8,7 @@ use sp_runtime::traits::{IdentifyAccount, Verify};
 
 use jupiter_dev_runtime::{AccountId, Signature};
 use jupiter_dev_runtime::{
-    BalancesConfig, ContractsConfig, GenesisConfig, IndicesConfig, SudoConfig, SystemConfig,
-    WASM_BINARY,
+    BalancesConfig, GenesisConfig, IndicesConfig, SudoConfig, SystemConfig, WASM_BINARY,
 };
 
 // The URL for the telemetry server.
@@ -58,7 +57,6 @@ pub fn development_config() -> Result<ChainSpec, String> {
                     get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
                     get_account_id_from_seed::<sr25519::Public>("Bob//stash"),
                 ],
-                true,
             )
         },
         // Bootnodes
@@ -88,7 +86,6 @@ fn testnet_genesis(
     wasm_binary: &[u8],
     root_key: AccountId,
     endowed_accounts: Vec<AccountId>,
-    enable_println: bool,
 ) -> GenesisConfig {
     GenesisConfig {
         frame_system: SystemConfig {
@@ -105,9 +102,6 @@ fn testnet_genesis(
                 .collect(),
         },
         pallet_indices: IndicesConfig { indices: vec![] },
-        pallet_contracts: ContractsConfig {
-            current_schedule: pallet_contracts::Schedule::default().enable_println(enable_println),
-        },
         pallet_sudo: SudoConfig {
             // Assign network admin rights.
             key: root_key,

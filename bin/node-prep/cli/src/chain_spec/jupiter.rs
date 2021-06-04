@@ -14,9 +14,8 @@ use sp_runtime::traits::{IdentifyAccount, Verify};
 use jupiter_runtime::Forcing;
 use jupiter_runtime::{AccountId, SessionKeys, Signature};
 use jupiter_runtime::{
-    AuthorityDiscoveryConfig, BabeConfig, BalancesConfig, ContractsConfig, CouncilConfig,
-    GenesisConfig, PoAConfig, SessionConfig, SudoConfig, SystemConfig, TechnicalCommitteeConfig,
-    WASM_BINARY,
+    AuthorityDiscoveryConfig, BabeConfig, BalancesConfig, CouncilConfig, GenesisConfig, PoAConfig,
+    SessionConfig, SudoConfig, SystemConfig, TechnicalCommitteeConfig, WASM_BINARY,
 };
 use jupiter_runtime_common::constants::jupiter_currency::DOTS;
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
@@ -110,7 +109,6 @@ pub fn poa_development_config() -> Result<ChainSpec, String> {
                     get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
                     get_account_id_from_seed::<sr25519::Public>("Bob//stash"),
                 ],
-                true,
             )
         },
         // Bootnodes
@@ -170,7 +168,6 @@ pub fn poa_local_config() -> Result<ChainSpec, String> {
                     get_account_id_from_seed::<sr25519::Public>("Eve//stash"),
                     get_account_id_from_seed::<sr25519::Public>("Ferdie//stash"),
                 ],
-                true,
             )
         },
         // Bootnodes
@@ -347,7 +344,6 @@ pub fn poa_staging_config() -> Result<ChainSpec, String> {
                     controller4.clone(),
                     stash4.clone(),
                 ],
-                true,
             )
         },
         // Bootnodes
@@ -386,7 +382,6 @@ fn testnet_genesis(
     initial_authorities: Vec<AuthorityKeysTuple>,
     root_key: AccountId,
     endowed_accounts: Vec<AccountId>,
-    enable_println: bool,
 ) -> GenesisConfig {
     const ENDOWMENT: u128 = 1_000_000 * DOTS;
 
@@ -428,10 +423,6 @@ fn testnet_genesis(
                     )
                 })
                 .collect::<Vec<_>>(),
-        },
-        pallet_contracts: ContractsConfig {
-            // this should only be enabled on development chains
-            current_schedule: pallet_contracts::Schedule::default().enable_println(enable_println),
         },
         pallet_democracy: Default::default(),
         pallet_collective_Instance1: CouncilConfig {
