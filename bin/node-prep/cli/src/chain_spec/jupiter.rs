@@ -15,7 +15,7 @@ use jupiter_runtime::Forcing;
 use jupiter_runtime::{AccountId, SessionKeys, Signature};
 use jupiter_runtime::{
     AuthorityDiscoveryConfig, BalancesConfig, ContractsConfig, CouncilConfig, GenesisConfig,
-    PoAConfig, SessionConfig, SudoConfig, SystemConfig, TechnicalCommitteeConfig, WASM_BINARY,
+    PoAConfig, SessionConfig, SudoConfig, SystemConfig, TechnicalCommitteeConfig, WASM_BINARY, BabeConfig
 };
 use jupiter_runtime_common::constants::jupiter_currency::DOTS;
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
@@ -77,6 +77,13 @@ fn session_keys(
         authority_discovery,
     }
 }
+
+/// The BABE epoch configuration at genesis.
+pub const BABE_GENESIS_EPOCH_CONFIG: sp_consensus_babe::BabeEpochConfiguration =
+    sp_consensus_babe::BabeEpochConfiguration {
+        c: (1, 4),
+        allowed_slots: sp_consensus_babe::AllowedSlots::PrimaryAndSecondaryPlainSlots
+    };
 
 /// PoA development testnet config.
 pub fn poa_development_config() -> Result<ChainSpec, String> {
@@ -402,7 +409,10 @@ fn testnet_genesis(
                 .map(|x| (x, ENDOWMENT))
                 .collect(),
         },
-        pallet_babe: Default::default(),
+        pallet_babe: BabeConfig {
+            authorities: vec![],
+            epoch_config: Some(BABE_GENESIS_EPOCH_CONFIG),
+        },
         pallet_grandpa: Default::default(),
         pallet_im_online: Default::default(),
         pallet_authority_discovery: AuthorityDiscoveryConfig { keys: vec![] },

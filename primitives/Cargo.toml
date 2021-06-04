@@ -14,7 +14,7 @@ sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "polkad
 sp-std = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3", default-features = false }
 
 # Substrate pallets
-frame-system = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3", default-features = false }
+frame-system = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3", default-features = false }
 
 [features]
 default = ["std"]
