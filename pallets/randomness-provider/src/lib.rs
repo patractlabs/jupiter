@@ -123,7 +123,7 @@ where
 
     fn end_session(end_index: SessionIndex) {
         <I as SessionManager<_>>::end_session(end_index);
-        let epoch = <pallet_babe::Module<T>>::current_epoch();
+        let epoch = <pallet_babe::Pallet<T>>::current_epoch();
         <HistoricalRandomness>::insert(epoch.epoch_index, epoch.randomness);
     }
 
@@ -135,7 +135,7 @@ where
 impl<T: Config> Module<T> {
     // Return babe randomness info for current epoch
     pub fn current_epoch() -> BabeRandomness {
-        let epoch = <pallet_babe::Module<T>>::current_epoch();
+        let epoch = <pallet_babe::Pallet<T>>::current_epoch();
         BabeRandomness {
             epoch: epoch.epoch_index,
             start_slot: *epoch.start_slot,
@@ -146,7 +146,7 @@ impl<T: Config> Module<T> {
 
     // Return babe randomness info for next epoch
     pub fn next_epoch() -> BabeRandomness {
-        let epoch = <pallet_babe::Module<T>>::next_epoch();
+        let epoch = <pallet_babe::Pallet<T>>::next_epoch();
         BabeRandomness {
             epoch: epoch.epoch_index,
             start_slot: *epoch.start_slot,
@@ -161,7 +161,7 @@ impl<T: Config> Module<T> {
     }
 
     /// Return randomness with provider subject
-    pub fn random(subject: &[u8]) -> T::Hash {
-        <pallet_babe::Module<T>>::random(subject)
+    pub fn random(subject: &[u8]) -> (T::Hash, T::BlockNumber) {
+        pallet_babe::RandomnessFromTwoEpochsAgo::<T>::random(subject)
     }
 }

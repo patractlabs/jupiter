@@ -10,5 +10,5 @@ cli = { package = "jupiter-dev-cli", path = "cli" }
 
 [features]
 runtime-benchmarks = [
-    "cli/runtime-benchmarks"
+  "cli/runtime-benchmarks"
 ]

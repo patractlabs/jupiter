@@ -42,21 +42,28 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 #![recursion_limit = "256"]
 
-use sp_core::crypto::UncheckedFrom;
-use sp_runtime::traits::StaticLookup;
-use sp_std::vec::Vec;
-
-use frame_support::{
-    decl_error, decl_event, decl_module, decl_storage, dispatch, traits::Get, weights::Weight,
-};
-use pallet_contracts::{BalanceOf, CodeHash, Module as Contracts};
-
 #[cfg(feature = "runtime-benchmarks")]
 mod benchmarking;
 #[cfg(test)]
 mod mock;
 #[cfg(test)]
 mod tests;
+
+use sp_core::crypto::UncheckedFrom;
+use sp_runtime::traits::StaticLookup;
+use sp_std::vec::Vec;
+
+use frame_support::{
+    decl_error, decl_event, decl_module, decl_storage, dispatch,
+    traits::{Currency, Get},
+    weights::Weight,
+};
+use pallet_contracts::Pallet as Contracts;
+
+type CodeHash<T> = <T as frame_system::Config>::Hash;
+type BalanceOf<T> = <<T as pallet_contracts::Config>::Currency as Currency<
+    <T as frame_system::Config>::AccountId,
+>>::Balance;
 
 decl_module! {
     pub struct Module<T: Config> for enum Call

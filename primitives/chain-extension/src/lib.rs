@@ -6,7 +6,6 @@ use codec::Encode;
 use sp_runtime::DispatchError;
 use sp_std::vec::Vec;
 
-use frame_support::debug::{error, native};
 use pallet_contracts::chain_extension::{
     ChainExtension, Environment, Ext, InitState, RetVal, SysConfig, UncheckedFrom,
 };
@@ -46,13 +45,13 @@ impl<C: pallet_contracts::Config> ChainExtension<C> for JupiterExt {
                         16_000_000 * k
                     }
                     _ => {
-                        error!("[PIP-101]call an unregistered `func_id` in Jupiter ZKP field, func_id:{:}", func_id);
+                        log::error!("[PIP-101]call an unregistered `func_id` in Jupiter ZKP field, func_id:{:}", func_id);
                         return Err(DispatchError::Other("Unimplemented Jupiter ZKP func_id"));
                     }
                 };
                 env.charge_weight(simple_weight)?;
 
-                native::trace!(
+                log::trace!(
                     target: "runtime",
                     "[ChainExtension]|call|func_id:{:}|charge-weight:{:}|input:{:}",
                     func_id,
@@ -72,9 +71,10 @@ impl<C: pallet_contracts::Config> ChainExtension<C> for JupiterExt {
                 #[cfg(not(feature = "native-support"))]
                 {
                     raw_output = curve::call(func_id, &input).map_err(|e| {
-                        error!(
+                        log::error!(
                             "call zkp lib `curve::call` meet an error|func_id:{:}|err:{:?}",
-                            func_id, e
+                            func_id,
+                            e
                         );
                         DispatchError::Other("ChainExtension failed to call `curve::call`")
                     })?;
@@ -85,7 +85,7 @@ impl<C: pallet_contracts::Config> ChainExtension<C> for JupiterExt {
                 env.write(&output, false, None)?;
             }
             _ => {
-                error!("call an unregistered `func_id`, func_id:{:}", func_id);
+                log::error!("call an unregistered `func_id`, func_id:{:}", func_id);
                 return Err(DispatchError::Other("Unimplemented func_id"));
             }
         }

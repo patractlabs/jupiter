@@ -4,17 +4,13 @@
 // Copyright (C) 2021-2021 Patract Labs Ltd.
 // SPDX-License-Identifier: Apache-2.0
 
-use frame_support::{
-    debug::{info, warn},
-    traits::Get,
-};
+use frame_support::traits::Get;
 use pallet_session::historical;
 use sp_runtime::traits::Convert;
 use sp_staking::SessionIndex;
 use sp_std::prelude::*;
 
 use crate::slashing;
-
 use crate::{
     ActiveEra, ActiveEraInfo, Config, CurrentEra, EarliestUnappliedSlash, EraIndex,
     ErasStartSessionIndex, Event, ForceEra, Forcing, Pallet, UnappliedSlashes, LOG_TARGET,
@@ -157,10 +153,10 @@ impl<T: Config> Pallet<T> {
         new_validators.sort();
 
         if validators == new_validators {
-            info!(target: LOG_TARGET, "same validators, do nothing");
+            log::info!(target: LOG_TARGET, "same validators, do nothing");
             None
         } else if (new_validators.len() as u32) < T::MinimumAuthorities::get() {
-            warn!(
+            log::warn!(
                 target: LOG_TARGET,
                 "new validator collection is less then required count|new_validator:{:?}|required:{:}",
                 new_validators,
@@ -171,7 +167,7 @@ impl<T: Config> Pallet<T> {
         } else {
             // emit event
             Self::deposit_event(Event::<T>::NewAuthorities);
-            info!(
+            log::info!(
                 target: LOG_TARGET,
                 "💸 new validator set of size {:?} has been selected for era {:?}",
                 new_validators.len(),
@@ -184,28 +180,28 @@ impl<T: Config> Pallet<T> {
 
 impl<T: Config> pallet_session::SessionManager<T::AccountId> for Pallet<T> {
     fn new_session(new_index: SessionIndex) -> Option<Vec<T::AccountId>> {
-        frame_support::debug::native::trace!(
+        log::trace!(
             target: LOG_TARGET,
-            "[{}] planning new_session({})",
-            <frame_system::Module<T>>::block_number(),
+            "[{:?}] planning new_session({})",
+            <frame_system::Pallet<T>>::block_number(),
             new_index
         );
         Self::new_session(new_index)
     }
     fn end_session(end_index: SessionIndex) {
-        frame_support::debug::native::trace!(
+        log::trace!(
             target: LOG_TARGET,
-            "[{}] ending end_session({})",
-            <frame_system::Module<T>>::block_number(),
+            "[{:?}] ending end_session({})",
+            <frame_system::Pallet<T>>::block_number(),
             end_index
         );
         Self::end_session(end_index)
     }
     fn start_session(start_index: SessionIndex) {
-        frame_support::debug::native::trace!(
+        log::trace!(
             target: LOG_TARGET,
-            "[{}] starting start_session({})",
-            <frame_system::Module<T>>::block_number(),
+            "[{:?}] starting start_session({})",
+            <frame_system::Pallet<T>>::block_number(),
             start_index
         );
         Self::start_session(start_index)

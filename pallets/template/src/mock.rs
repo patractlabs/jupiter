@@ -1,16 +1,17 @@
-use crate::Config;
-use frame_support::{parameter_types, traits::Currency, traits::GenesisBuild, weights::Weight};
-use frame_system as system;
 use sp_runtime::{
     testing::{Header, H256},
     traits::{BlakeTwo256, Convert, Hash, IdentityLookup},
     AccountId32, Perbill,
 };
 
+use frame_support::{parameter_types, traits::Currency, traits::GenesisBuild, weights::Weight};
+use pallet_contracts::Frame;
+
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 type Block = frame_system::mocking::MockBlock<Test>;
 
 use crate as pallet_template;
+use crate::BalanceOf;
 
 frame_support::construct_runtime!(
     pub enum Test where
@@ -18,17 +19,17 @@ frame_support::construct_runtime!(
         NodeBlock = Block,
         UncheckedExtrinsic = UncheckedExtrinsic,
     {
-        System: frame_system::{Module, Call, Config, Storage, Event<T>},
-        Balances: pallet_balances::{Module, Call, Storage, Config<T>, Event<T>},
-        Timestamp: pallet_timestamp::{Module, Call, Storage, Inherent},
-        Randomness: pallet_randomness_collective_flip::{Module, Call, Storage},
-        Contracts: pallet_contracts::{Module, Call, Config<T>, Storage, Event<T>},
-        Template: pallet_template::{Module, Call, Storage, Event<T>},
+        System: frame_system::{Pallet, Call, Config, Storage, Event<T>},
+        Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>},
+        Timestamp: pallet_timestamp::{Pallet, Call, Storage, Inherent},
+        Randomness: pallet_randomness_collective_flip::{Pallet, Call, Storage},
+        Contracts: pallet_contracts::{Pallet, Call, Config<T>, Storage, Event<T>},
+        Template: pallet_template::{Pallet, Call, Storage, Event<T>},
     }
 );
 // Configure a mock runtime to test the pallet.
-impl Convert<Weight, pallet_contracts::BalanceOf<Self>> for Test {
-    fn convert(w: Weight) -> pallet_contracts::BalanceOf<Self> {
+impl Convert<Weight, BalanceOf<Self>> for Test {
+    fn convert(w: Weight) -> BalanceOf<Self> {
         w as u128
     }
 }
@@ -40,7 +41,7 @@ parameter_types! {
     pub const AvailableBlockRatio: Perbill = Perbill::from_percent(75);
 }
 
-impl system::Config for Test {
+impl frame_system::Config for Test {
     type BaseCallFilter = ();
     type Origin = Origin;
     type Call = Call;
@@ -63,6 +64,7 @@ impl system::Config for Test {
     type BlockWeights = ();
     type BlockLength = ();
     type SS58Prefix = ();
+    type OnSetCode = ();
 }
 
 parameter_types! {
@@ -75,10 +77,6 @@ impl pallet_timestamp::Config for Test {
     type OnTimestampSet = ();
     type MinimumPeriod = MinimumPeriod;
     type WeightInfo = ();
-}
-
-impl Config for Test {
-    type Event = Event;
 }
 
 impl pallet_balances::Config for Test {
@@ -97,7 +95,7 @@ parameter_types! {
     pub const DepositPerContract: u64 = 8 * DepositPerStorageByte::get();
     pub const DepositPerStorageByte: u64 = 10_000;
     pub const DepositPerStorageItem: u64 = 10_000;
-    pub RentFraction: Perbill = Perbill::from_rational_approximation(4u32, 10_000u32);
+    pub RentFraction: Perbill = Perbill::from_rational(4u32, 10_000u32);
     pub const SurchargeReward: u64 = 150;
     pub const MaxDepth: u32 = 100;
     pub const MaxValueSize: u32 = 16_384;
@@ -119,7 +117,7 @@ impl pallet_contracts::Config for Test {
     type DepositPerStorageItem = DepositPerStorageItem;
     type RentFraction = RentFraction;
     type SurchargeReward = SurchargeReward;
-    type MaxDepth = MaxDepth;
+    type CallStack = [Frame<Self>; 31];
     type MaxValueSize = MaxValueSize;
     type WeightPrice = Self;
     type WeightInfo = ();
@@ -127,6 +125,10 @@ impl pallet_contracts::Config for Test {
     type DeletionQueueDepth = DeletionQueueDepth;
     type DeletionWeightLimit = DeletionWeightLimit;
     type MaxCodeSize = MaxCodeSize;
+}
+
+impl pallet_template::Config for Test {
+    type Event = Event;
 }
 
 pub const ALICE: AccountId32 = AccountId32::new([1u8; 32]);
@@ -161,8 +163,7 @@ impl ExtBuilder {
             .assimilate_storage(&mut t)
             .unwrap();
 
-        let mut current_schedule = pallet_contracts::Schedule::<Test>::default();
-        current_schedule.enable_println = true;
+        let current_schedule = pallet_contracts::Schedule::<Test>::default().enable_println(true);
         pallet_contracts::GenesisConfig::<Test> { current_schedule }
             .assimilate_storage(&mut t)
             .unwrap();

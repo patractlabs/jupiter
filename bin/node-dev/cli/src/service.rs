@@ -6,8 +6,7 @@ use sc_client_api::RemoteBackend;
 use sc_executor::native_executor_instance;
 pub use sc_executor::NativeExecutor;
 use sc_service::{error::Error as ServiceError, Configuration, TaskManager};
-use sc_telemetry::TelemetrySpan;
-use sp_inherents::InherentDataProviders;
+use sc_telemetry::{Telemetry, TelemetryWorker};
 
 use jupiter_primitives::Block;
 
@@ -37,21 +36,40 @@ pub fn new_partial(
         FullSelectChain,
         sp_consensus::DefaultImportQueue<Block, FullClient>,
         sc_transaction_pool::FullPool<Block, FullClient>,
-        (),
+        (Option<Telemetry>,),
     >,
     ServiceError,
 > {
-    let inherent_data_providers = InherentDataProviders::new();
-    inherent_data_providers
-        .register_provider(sp_timestamp::InherentDataProvider)
-        .map_err(Into::into)
-        .map_err(sp_consensus::error::Error::InherentData)?;
+    let telemetry = config
+        .telemetry_endpoints
+        .clone()
+        .filter(|x| !x.is_empty())
+        .map(|endpoints| -> Result<_, sc_telemetry::Error> {
+            let worker = TelemetryWorker::new(16)?;
+            let telemetry = worker.handle().new_telemetry(endpoints);
+            Ok((worker, telemetry))
+        })
+        .transpose()?;
 
     let (client, backend, keystore_container, task_manager) =
-        sc_service::new_full_parts::<Block, RuntimeApi, Executor>(&config)?;
+        sc_service::new_full_parts::<Block, RuntimeApi, Executor>(
+            &config,
+            telemetry.as_ref().map(|(_, telemetry)| telemetry.handle()),
+        )?;
     let client = Arc::new(client);
 
     let select_chain = sc_consensus::LongestChain::new(backend.clone());
+
+    let telemetry = telemetry.map(|(worker, telemetry)| {
+        task_manager.spawn_handle().spawn("telemetry", worker.run());
+        telemetry
+    });
+
+    let import_queue = sc_consensus_manual_seal::import_queue(
+        Box::new(client.clone()),
+        &task_manager.spawn_essential_handle(),
+        config.prometheus_registry(),
+    );
 
     let transaction_pool = sc_transaction_pool::BasicPool::new_full(
         config.transaction_pool.clone(),
@@ -61,22 +79,15 @@ pub fn new_partial(
         client.clone(),
     );
 
-    let import_queue = sc_consensus_manual_seal::import_queue(
-        Box::new(client.clone()),
-        &task_manager.spawn_essential_handle(),
-        config.prometheus_registry(),
-    );
-
     Ok(sc_service::PartialComponents {
         client,
         backend,
         task_manager,
-        import_queue,
         keystore_container,
         select_chain,
+        import_queue,
         transaction_pool,
-        inherent_data_providers,
-        other: (),
+        other: (telemetry,),
     })
 }
 
@@ -95,8 +106,7 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
         keystore_container,
         select_chain,
         transaction_pool,
-        inherent_data_providers,
-        other: (),
+        other: (mut telemetry,),
     } = new_partial(&config)?;
 
     // Initialize seed for signing transaction using off-chain workers
@@ -128,7 +138,6 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
     if config.offchain_worker.enabled {
         sc_service::build_offchain_workers(
             &config,
-            backend.clone(),
             task_manager.spawn_handle(),
             client.clone(),
             network.clone(),
@@ -153,9 +162,6 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
         })
     };
 
-    let telemetry_span = TelemetrySpan::new();
-    let _telemetry_span_entered = telemetry_span.enter();
-
     sc_service::spawn_tasks(sc_service::SpawnTasksParams {
         config,
         network: network.clone(),
@@ -169,7 +175,7 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
         backend,
         network_status_sinks,
         system_rpc_tx,
-        telemetry_span: Some(telemetry_span.clone()),
+        telemetry: telemetry.as_mut(),
     })?;
 
     if role.is_authority() {
@@ -178,6 +184,7 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
             client.clone(),
             transaction_pool.clone(),
             prometheus_registry.as_ref(),
+            telemetry.as_ref().map(|x| x.handle()),
         );
 
         let params = sc_consensus_manual_seal::InstantSealParams {
@@ -187,7 +194,10 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
             pool: transaction_pool.pool().clone(),
             select_chain,
             consensus_data_provider: None,
-            inherent_data_providers,
+            create_inherent_data_providers: move |_, ()| async move {
+                let timestamp = sp_timestamp::InherentDataProvider::from_system_time();
+                Ok((timestamp, ()))
+            },
         };
         let authorship_future = sc_consensus_manual_seal::run_instant_seal(params);
 
@@ -202,8 +212,27 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
 
 /// Builds a new service for a light client.
 pub fn new_light(config: Configuration) -> Result<TaskManager, ServiceError> {
+    let telemetry = config
+        .telemetry_endpoints
+        .clone()
+        .filter(|x| !x.is_empty())
+        .map(|endpoints| -> Result<_, sc_telemetry::Error> {
+            let worker = TelemetryWorker::new(16)?;
+            let telemetry = worker.handle().new_telemetry(endpoints);
+            Ok((worker, telemetry))
+        })
+        .transpose()?;
+
     let (client, backend, keystore_container, mut task_manager, on_demand) =
-        sc_service::new_light_parts::<Block, RuntimeApi, Executor>(&config)?;
+        sc_service::new_light_parts::<Block, RuntimeApi, Executor>(
+            &config,
+            telemetry.as_ref().map(|(_, telemetry)| telemetry.handle()),
+        )?;
+
+    let mut telemetry = telemetry.map(|(worker, telemetry)| {
+        task_manager.spawn_handle().spawn("telemetry", worker.run());
+        telemetry
+    });
 
     let transaction_pool = Arc::new(sc_transaction_pool::BasicPool::new_light(
         config.transaction_pool.clone(),
@@ -233,15 +262,11 @@ pub fn new_light(config: Configuration) -> Result<TaskManager, ServiceError> {
     if config.offchain_worker.enabled {
         sc_service::build_offchain_workers(
             &config,
-            backend.clone(),
             task_manager.spawn_handle(),
             client.clone(),
             network.clone(),
         );
     }
-
-    let telemetry_span = TelemetrySpan::new();
-    let _telemetry_span_entered = telemetry_span.enter();
 
     sc_service::spawn_tasks(sc_service::SpawnTasksParams {
         remote_blockchain: Some(backend.remote_blockchain()),
@@ -256,7 +281,7 @@ pub fn new_light(config: Configuration) -> Result<TaskManager, ServiceError> {
         network,
         network_status_sinks,
         system_rpc_tx,
-        telemetry_span: Some(telemetry_span.clone()),
+        telemetry: telemetry.as_mut(),
     })?;
 
     network_starter.start_network();

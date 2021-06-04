@@ -4,7 +4,7 @@
 // Copyright (C) 2021-2021 Patract Labs Ltd.
 // SPDX-License-Identifier: Apache-2.0
 
-use frame_support::{debug::warn, traits::Get, weights::Weight};
+use frame_support::{traits::Get, weights::Weight};
 use sp_runtime::{traits::Convert, Perbill};
 use sp_staking::{
     offence::{OffenceDetails, OnOffenceHandler},
@@ -40,11 +40,7 @@ where
         >],
         slash_fraction: &[Perbill],
         slash_session: SessionIndex,
-    ) -> Result<Weight, ()> {
-        if !Self::can_report() {
-            return Err(());
-        }
-
+    ) -> Weight {
         // let reward_proportion = SlashRewardFraction::get();
         let mut consumed_weight: Weight = 0;
         let mut add_db_reads_writes = |reads, writes| {
@@ -56,7 +52,7 @@ where
             add_db_reads_writes(1, 0);
             if active_era.is_none() {
                 // this offence need not be re-submitted.
-                return Ok(consumed_weight);
+                return consumed_weight;
             }
             active_era
                 .expect("value checked not to be `None`; qed")
@@ -76,7 +72,7 @@ where
         } else {
             // TODO may change this
             // before current Era. defensive - should be filtered out.
-            return Ok(consumed_weight);
+            return consumed_weight;
         };
 
         EarliestUnappliedSlash::<T>::mutate(|earliest| {
@@ -96,9 +92,10 @@ where
 
             // Skip if the validator is invulnerable.
             if invulnerables.contains(stash) {
-                warn!(
+                log::warn!(
                     target: LOG_TARGET,
-                    "receive offence, but in invulnerables list:{:?}", stash
+                    "receive offence, but in invulnerables list:{:?}",
+                    stash
                 );
                 continue;
             }
@@ -131,10 +128,6 @@ where
             }
         }
 
-        Ok(consumed_weight)
-    }
-
-    fn can_report() -> bool {
-        true
+        consumed_weight
     }
 }
