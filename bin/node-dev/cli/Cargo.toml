@@ -1,6 +1,6 @@
 [package]
 name = "jupiter-dev-cli"
-version = "1.0.0"
+version = "1.0.2"
 authors = ["Patract <https://github.com/patractlabs>"]
 edition = "2018"
 
