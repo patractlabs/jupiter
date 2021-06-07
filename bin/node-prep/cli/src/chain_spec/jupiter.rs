@@ -373,7 +373,7 @@ pub fn poa_staging_config() -> Result<ChainSpec, String> {
 
 /// PoA config
 pub fn poa_config() -> Result<ChainSpec, String> {
-    ChainSpec::from_json_bytes(&include_bytes!("../../res/jupiter_poa.json")[..])
+    ChainSpec::from_json_bytes(&include_bytes!("../../res/jupiter_poa_v2.json")[..])
 }
 
 /// Configure initial storage state for FRAME modules.
