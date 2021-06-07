@@ -23,7 +23,7 @@ frame_support::construct_runtime!(
         Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>},
         Timestamp: pallet_timestamp::{Pallet, Call, Storage, Inherent},
         Randomness: pallet_randomness_collective_flip::{Pallet, Call, Storage},
-        Contracts: pallet_contracts::{Pallet, Call, Config<T>, Storage, Event<T>},
+        Contracts: pallet_contracts::{Pallet, Call, Storage, Event<T>},
         Template: pallet_template::{Pallet, Call, Storage, Event<T>},
     }
 );
@@ -98,10 +98,9 @@ parameter_types! {
     pub RentFraction: Perbill = Perbill::from_rational(4u32, 10_000u32);
     pub const SurchargeReward: u64 = 150;
     pub const MaxDepth: u32 = 100;
-    pub const MaxValueSize: u32 = 16_384;
     pub const DeletionQueueDepth: u32 = 1024;
     pub const DeletionWeightLimit: Weight = 500_000_000_000;
-    pub const MaxCodeSize: u32 = 128 * 1024;
+    pub Schedule: pallet_contracts::Schedule<Test> = Default::default();
 }
 
 impl pallet_contracts::Config for Test {
@@ -118,13 +117,12 @@ impl pallet_contracts::Config for Test {
     type RentFraction = RentFraction;
     type SurchargeReward = SurchargeReward;
     type CallStack = [Frame<Self>; 31];
-    type MaxValueSize = MaxValueSize;
     type WeightPrice = Self;
     type WeightInfo = ();
     type ChainExtension = jupiter_chain_extension::JupiterExt;
     type DeletionQueueDepth = DeletionQueueDepth;
     type DeletionWeightLimit = DeletionWeightLimit;
-    type MaxCodeSize = MaxCodeSize;
+    type Schedule = Schedule;
 }
 
 impl pallet_template::Config for Test {
@@ -163,10 +161,6 @@ impl ExtBuilder {
             .assimilate_storage(&mut t)
             .unwrap();
 
-        let current_schedule = pallet_contracts::Schedule::<Test>::default().enable_println(true);
-        pallet_contracts::GenesisConfig::<Test> { current_schedule }
-            .assimilate_storage(&mut t)
-            .unwrap();
         let mut ext = sp_io::TestExternalities::new(t);
         ext.execute_with(|| System::set_block_number(1));
         ext
