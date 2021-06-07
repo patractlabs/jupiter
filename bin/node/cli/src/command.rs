@@ -3,13 +3,14 @@ use crate::{
     cli::{Cli, RelayChainCli, Subcommand},
 };
 use codec::Encode;
-use cumulus_primitives::{genesis::generate_genesis_block, ParaId};
-use jupiter_para_runtime::Block;
+use cumulus_client_service::genesis::generate_genesis_block;
+use cumulus_primitives_core::ParaId;
+use jupiter_runtime::Block;
 use log::info;
 use polkadot_parachain::primitives::AccountIdConversion;
 use sc_cli::{
-    ChainSpec, CliConfiguration, DefaultConfigurationValues, ImportParams, InitLoggerParams,
-    KeystoreParams, NetworkParams, Result, RuntimeVersion, SharedParams, SubstrateCli,
+    ChainSpec, CliConfiguration, DefaultConfigurationValues, ImportParams, KeystoreParams,
+    NetworkParams, Result, RuntimeVersion, SharedParams, SubstrateCli,
 };
 use sc_service::{
     config::{BasePath, PrometheusConfig},
@@ -24,8 +25,10 @@ fn load_spec(
     para_id: ParaId,
 ) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
     Ok(match id {
-        "" | "dev" => Box::new(chain_spec::development_config(para_id)?),
-        path => Box::new(chain_spec::ChainSpec::from_json_file(path.into())?),
+        "jupiter-dev" => Box::new(chain_spec::jupiter::development_config(para_id)?),
+        "jupiter-staging" => Box::new(chain_spec::jupiter::staging_config(para_id)?),
+        "" | "jupiter" => Box::new(chain_spec::jupiter::jupiter_config()?),
+        path => Box::new(chain_spec::jupiter::ChainSpec::from_json_file(path.into())?),
     })
 }
 
@@ -47,7 +50,7 @@ impl SubstrateCli for Cli {
     }
 
     fn support_url() -> String {
-        "https://github.com/patractlabs/patract".into()
+        "https://github.com/patractlabs/jupiter".into()
     }
 
     fn copyright_start_year() -> i32 {
@@ -55,17 +58,17 @@ impl SubstrateCli for Cli {
     }
 
     fn load_spec(&self, id: &str) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
-        load_spec(id, self.run.parachain_id.unwrap_or(200).into())
+        load_spec(id, self.run.parachain_id.unwrap_or(24).into())
     }
 
     fn native_runtime_version(_: &Box<dyn ChainSpec>) -> &'static RuntimeVersion {
-        &jupiter_para_runtime::VERSION
+        &jupiter_runtime::VERSION
     }
 }
 
 impl SubstrateCli for RelayChainCli {
     fn impl_name() -> String {
-        "Parachain Collator".into()
+        "Patract Parachain Collator".into()
     }
 
     fn impl_version() -> String {
@@ -73,10 +76,10 @@ impl SubstrateCli for RelayChainCli {
     }
 
     fn description() -> String {
-        "Parachain Collator Template\n\nThe command-line arguments provided first will be \
+        "Patract parachain collator\n\nThe command-line arguments provided first will be \
 		passed to the parachain node, while the arguments provided after -- will be passed \
 		to the relaychain node.\n\n\
-		parachain-collator [parachain-args] -- [relaychain-args]"
+		patract [parachain-args] -- [relaychain-args]"
             .into()
     }
 
@@ -89,7 +92,7 @@ impl SubstrateCli for RelayChainCli {
     }
 
     fn copyright_start_year() -> i32 {
-        2017
+        2020
     }
 
     fn load_spec(&self, id: &str) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
@@ -200,7 +203,24 @@ pub fn run() -> Result<()> {
         }
         Some(Subcommand::PurgeChain(cmd)) => {
             let runner = cli.create_runner(cmd)?;
-            runner.sync_run(|config| cmd.run(config.database))
+
+            runner.sync_run(|config| {
+                let polkadot_cli = RelayChainCli::new(
+                    &config,
+                    [RelayChainCli::executable_name().to_string()]
+                        .iter()
+                        .chain(cli.relaychain_args.iter()),
+                );
+
+                let polkadot_config = SubstrateCli::create_configuration(
+                    &polkadot_cli,
+                    &polkadot_cli,
+                    config.task_executor.clone(),
+                )
+                .map_err(|err| format!("Relay chain argument error: {}", err))?;
+
+                cmd.run(config, polkadot_config)
+            })
         }
         Some(Subcommand::Revert(cmd)) => {
             let runner = cli.create_runner(cmd)?;
@@ -215,10 +235,9 @@ pub fn run() -> Result<()> {
             })
         }
         Some(Subcommand::ExportGenesisState(params)) => {
-            sc_cli::init_logger(InitLoggerParams {
-                tracing_receiver: sc_tracing::TracingReceiver::Log,
-                ..Default::default()
-            })?;
+            let mut builder = sc_cli::LoggerBuilder::new("");
+            builder.with_profiling(sc_tracing::TracingReceiver::Log, "");
+            let _ = builder.init();
 
             let block: Block = generate_genesis_block(&load_spec(
                 &params.chain.clone().unwrap_or_default(),
@@ -240,10 +259,9 @@ pub fn run() -> Result<()> {
             Ok(())
         }
         Some(Subcommand::ExportGenesisWasm(params)) => {
-            sc_cli::init_logger(InitLoggerParams {
-                tracing_receiver: sc_tracing::TracingReceiver::Log,
-                ..Default::default()
-            })?;
+            let mut builder = sc_cli::LoggerBuilder::new("");
+            builder.with_profiling(sc_tracing::TracingReceiver::Log, "");
+            let _ = builder.init();
 
             let raw_wasm_blob =
                 extract_genesis_wasm(&cli.load_spec(&params.chain.clone().unwrap_or_default())?)?;
@@ -268,19 +286,17 @@ pub fn run() -> Result<()> {
                 // TODO
                 let key = sp_core::Pair::generate().0;
 
-                let extension = chain_spec::Extensions::try_get(&config.chain_spec);
-                let relay_chain_id = extension.map(|e| e.relay_chain.clone());
-                let para_id = extension.map(|e| e.para_id);
+                let para_id = chain_spec::jupiter::Extensions::try_get(&*config.chain_spec)
+                    .map(|e| e.para_id);
 
                 let polkadot_cli = RelayChainCli::new(
-                    config.base_path.as_ref().map(|x| x.path().join("polkadot")),
-                    relay_chain_id,
+                    &config,
                     [RelayChainCli::executable_name().to_string()]
                         .iter()
                         .chain(cli.relaychain_args.iter()),
                 );
 
-                let id = ParaId::from(cli.run.parachain_id.or(para_id).unwrap_or(100));
+                let id = ParaId::from(cli.run.parachain_id.or(para_id).unwrap_or(1));
 
                 let parachain_account =
                     AccountIdConversion::<polkadot_primitives::v0::AccountId>::into_account(&id);
@@ -303,6 +319,7 @@ pub fn run() -> Result<()> {
                 crate::service::start_node(config, key, polkadot_config, id, collator)
                     .await
                     .map(|r| r.0)
+                    .map_err(Into::into)
             })
         }
     }

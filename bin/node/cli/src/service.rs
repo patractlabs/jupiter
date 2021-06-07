@@ -1,25 +1,36 @@
 //! Service and ServiceFactory implementation. Specialized wrapper over substrate service.
-use cumulus_service::{
+use cumulus_client_consensus_relay_chain::{
+    build_relay_chain_consensus, BuildRelayChainConsensusParams,
+};
+use cumulus_client_network::build_block_announce_validator;
+use cumulus_client_service::{
     prepare_node_config, start_collator, start_full_node, StartCollatorParams, StartFullNodeParams,
 };
+use cumulus_primitives_core::ParaId;
 use polkadot_primitives::v0::CollatorPair;
-use sp_core::Pair;
+use sc_telemetry::{Telemetry, TelemetryWorker, TelemetryWorkerHandle};
 use std::sync::Arc;
 
 use sc_executor::native_executor_instance;
 pub use sc_executor::NativeExecutor;
-use sc_service::{error::Error as ServiceError, Configuration, Role, TaskManager};
+use sc_service::{
+    error::Error as ServiceError, Configuration, PartialComponents, Role, TaskManager,
+};
 
-use jupiter_para_runtime::{self, RuntimeApi};
 use jupiter_primitives::Block;
+use jupiter_runtime::{self, RpcPort, RuntimeApi, OCW_DB_RANDOM};
+
+use codec::Encode;
+use sc_client_api::Backend;
+use sp_core::offchain::OffchainStorage;
 
 // Declare an instance of the native executor named `Executor`. Include the wasm binary as the
 // equivalent wasm code.
 native_executor_instance!(
     pub Executor,
-    jupiter_para_runtime::api::dispatch,
-    jupiter_para_runtime::native_version,
-    frame_benchmarking::benchmarking::HostFunctions,
+    jupiter_runtime::api::dispatch,
+    jupiter_runtime::native_version,
+    (frame_benchmarking::benchmarking::HostFunctions, jupiter_io::pairing::HostFunctions),
 );
 
 type FullClient = sc_service::TFullClient<Block, RuntimeApi, Executor>;
@@ -34,55 +45,79 @@ pub fn new_partial(
         (),
         sp_consensus::DefaultImportQueue<Block, FullClient>,
         sc_transaction_pool::FullPool<Block, FullClient>,
-        (),
+        (Option<Telemetry>, Option<TelemetryWorkerHandle>),
     >,
     ServiceError,
 > {
+    let inherent_data_providers = sp_inherents::InherentDataProviders::new();
+
+    let telemetry = config
+        .telemetry_endpoints
+        .clone()
+        .filter(|x| !x.is_empty())
+        .map(|endpoints| -> Result<_, sc_telemetry::Error> {
+            let worker = TelemetryWorker::new(16)?;
+            let telemetry = worker.handle().new_telemetry(endpoints);
+            Ok((worker, telemetry))
+        })
+        .transpose()?;
+
     let (client, backend, keystore_container, task_manager) =
-        sc_service::new_full_parts::<Block, RuntimeApi, Executor>(&config)?;
+        sc_service::new_full_parts::<Block, RuntimeApi, Executor>(
+            &config,
+            telemetry.as_ref().map(|(_, telemetry)| telemetry.handle()),
+        )?;
     let client = Arc::new(client);
+
+    let telemetry_worker_handle = telemetry.as_ref().map(|(worker, _)| worker.handle());
+
+    let telemetry = telemetry.map(|(worker, telemetry)| {
+        task_manager.spawn_handle().spawn("telemetry", worker.run());
+        telemetry
+    });
+
+    let registry = config.prometheus_registry();
 
     let transaction_pool = sc_transaction_pool::BasicPool::new_full(
         config.transaction_pool.clone(),
+        config.role.is_authority().into(),
         config.prometheus_registry(),
         task_manager.spawn_handle(),
         client.clone(),
     );
 
-    let inherent_data_providers = sp_inherents::InherentDataProviders::new();
-
-    let registry = config.prometheus_registry();
-
-    let import_queue = cumulus_consensus::import_queue::import_queue(
+    let import_queue = cumulus_client_consensus_relay_chain::import_queue(
         client.clone(),
         client.clone(),
         inherent_data_providers.clone(),
-        &task_manager.spawn_handle(),
+        &task_manager.spawn_essential_handle(),
         registry.clone(),
     )?;
 
-    Ok(sc_service::PartialComponents {
-        client,
+    let params = PartialComponents {
         backend,
-        task_manager,
-        keystore_container,
-        select_chain: (),
+        client,
         import_queue,
+        keystore_container,
+        task_manager,
         transaction_pool,
         inherent_data_providers,
-        other: (),
-    })
+        select_chain: (),
+        other: (telemetry, telemetry_worker_handle),
+    };
+
+    Ok(params)
 }
 
 /// Start a node with the given parachain `Configuration` and relay chain `Configuration`.
 ///
 /// This is the actual implementation that is abstract over the executor and the runtime api.
-#[sc_cli::prefix_logs_with("Parachain")]
+#[sc_tracing::logging::prefix_logs_with("Parachain")]
 async fn start_node_impl<RB>(
     parachain_config: Configuration,
     collator_key: CollatorPair,
     polkadot_config: Configuration,
-    id: polkadot_primitives::v0::Id,
+    id: ParaId,
     validator: bool,
     rpc_ext_builder: RB,
 ) -> sc_service::error::Result<(TaskManager, Arc<FullClient>)>
@@ -95,23 +130,28 @@ where
 
     let parachain_config = prepare_node_config(parachain_config);
 
-    let polkadot_full_node =
-        cumulus_service::build_polkadot_full_node(polkadot_config, collator_key.public()).map_err(
-            |e| match e {
-                polkadot_service::Error::Sub(x) => x,
-                s => format!("{}", s).into(),
-            },
-        )?;
+    let rpc_port = polkadot_config.rpc_http.clone();
 
     let params = new_partial(&parachain_config)?;
     params
         .inherent_data_providers
         .register_provider(sp_timestamp::InherentDataProvider)
         .unwrap();
+    let (mut telemetry, telemetry_worker_handle) = params.other;
+
+    let polkadot_full_node = cumulus_client_service::build_polkadot_full_node(
+        polkadot_config,
+        collator_key.clone(),
+        telemetry_worker_handle,
+    )
+    .map_err(|e| match e {
+        polkadot_service::Error::Sub(x) => x,
+        s => format!("{}", s).into(),
+    })?;
 
     let client = params.client.clone();
     let backend = params.backend.clone();
-    let block_announce_validator = cumulus_network::build_block_announce_validator(
+    let block_announce_validator = build_block_announce_validator(
         polkadot_full_node.client.clone(),
         id,
         Box::new(polkadot_full_node.network.clone()),
@@ -133,6 +173,15 @@ where
             block_announce_validator_builder: Some(Box::new(|_| block_announce_validator)),
         })?;
 
+    if parachain_config.offchain_worker.enabled {
+        sc_service::build_offchain_workers(
+            &parachain_config,
+            task_manager.spawn_handle(),
+            client.clone(),
+            network.clone(),
+        );
+    }
+
     let rpc_client = client.clone();
     let rpc_extensions_builder = Box::new(move |_, _| rpc_ext_builder(rpc_client.clone()));
 
@@ -143,13 +192,13 @@ where
         client: client.clone(),
         transaction_pool: transaction_pool.clone(),
         task_manager: &mut task_manager,
-        telemetry_connection_sinks: Default::default(),
         config: parachain_config,
         keystore: params.keystore_container.sync_keystore(),
         backend: backend.clone(),
         network: network.clone(),
         network_status_sinks,
         system_rpc_tx,
+        telemetry: telemetry.as_mut(),
     })?;
 
     let announce_block = {
@@ -158,30 +207,49 @@ where
     };
 
     if validator {
-        let proposer_factory = sc_basic_authorship::ProposerFactory::new(
+        let proposer_factory = sc_basic_authorship::ProposerFactory::with_proof_recording(
             task_manager.spawn_handle(),
             client.clone(),
             transaction_pool,
             prometheus_registry.as_ref(),
+            telemetry.as_ref().map(|x| x.handle()),
         );
         let spawner = task_manager.spawn_handle();
 
-        let polkadot_backend = polkadot_full_node.backend.clone();
+        if let Some(rpc_port_addr) = rpc_port {
+            let rpc_port = RpcPort {
+                0: rpc_port_addr.to_string().into(),
+            };
+            let offchain_storage = backend.offchain_storage();
+            if let Some(mut offchain_storage) = offchain_storage {
+                offchain_storage.set(
+                    sp_offchain::STORAGE_PREFIX,
+                    OCW_DB_RANDOM,
+                    &rpc_port.encode(),
+                );
+            }
+        }
+
+        let parachain_consensus = build_relay_chain_consensus(BuildRelayChainConsensusParams {
+            para_id: id,
+            proposer_factory,
+            inherent_data_providers: params.inherent_data_providers,
+            block_import: client.clone(),
+            relay_chain_client: polkadot_full_node.client.clone(),
+            relay_chain_backend: polkadot_full_node.backend.clone(),
+        });
 
         let params = StartCollatorParams {
             para_id: id,
-            block_import: client.clone(),
-            proposer_factory,
-            inherent_data_providers: params.inherent_data_providers,
             block_status: client.clone(),
             announce_block,
             client: client.clone(),
             task_manager: &mut task_manager,
             collator_key,
-            polkadot_full_node,
+            relay_chain_full_node: polkadot_full_node,
             spawner,
             backend,
-            polkadot_backend,
+            parachain_consensus,
         };
 
         start_collator(params).await?;
@@ -207,7 +275,7 @@ pub async fn start_node(
     parachain_config: Configuration,
     collator_key: CollatorPair,
     polkadot_config: Configuration,
-    id: polkadot_primitives::v0::Id,
+    id: ParaId,
     validator: bool,
 ) -> sc_service::error::Result<(TaskManager, Arc<FullClient>)> {
     start_node_impl(
