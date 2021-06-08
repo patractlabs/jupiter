@@ -91,6 +91,7 @@ impl<C: pallet_contracts::Config> ChainExtension<C> for JupiterExt {
         }
 
         Ok(RetVal::Converging(0))
+        // Err(DispatchError::Other("Unimplemented func_id"))
     }
 
     fn enabled() -> bool {

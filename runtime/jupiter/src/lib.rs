@@ -38,6 +38,7 @@ pub use frame_support::{
         IdentityFee, Weight,
     },
     StorageValue,
+    // GenesisConfig
 };
 pub use pallet_balances::Call as BalancesCall;
 pub use pallet_timestamp::Call as TimestampCall;
@@ -53,7 +54,7 @@ use jupiter_runtime_common::{
 
 // XCM imports
 use polkadot_parachain::primitives::Sibling;
-use xcm::v0::{Junction, MultiLocation, NetworkId};
+use xcm::v0::{Junction, MultiLocation, NetworkId, MultiAsset};
 use xcm_builder::{
     AccountId32Aliases, AllowTopLevelPaidExecutionFrom, AllowUnpaidExecutionFrom, CurrencyAdapter,
     EnsureXcmOrigin, FixedRateOfConcreteFungible, FixedWeightBounds, IsConcrete, LocationInverter,
@@ -62,6 +63,7 @@ use xcm_builder::{
     TakeWeightCredit,
 };
 use xcm_executor::{Config, XcmExecutor};
+use xcm::v0::Xcm;
 
 use frame_support::traits::{All, IsInVec};
 use randomness_collect::sr25519::AuthorityId as RandomCollectId;
@@ -150,7 +152,7 @@ impl frame_system::Config for Runtime {
     /// What to do if an account is fully reaped from the system.
     type OnKilledAccount = ();
     /// Weight information for the extrinsics of this pallet.
-    type SystemWeightInfo = weights::frame_system::WeightInfo;
+    type SystemWeightInfo = weights::frame_system::WeightInfo<Runtime>;
     type SS58Prefix = SS58Prefix;
     type OnSetCode = cumulus_pallet_parachain_system::ParachainSetCode<Self>;
 }
@@ -164,7 +166,7 @@ impl pallet_timestamp::Config for Runtime {
     type Moment = u64;
     type OnTimestampSet = ();
     type MinimumPeriod = MinimumPeriod;
-    type WeightInfo = weights::pallet_timestamp::WeightInfo;
+    type WeightInfo = weights::pallet_timestamp::WeightInfo<Runtime>;
 }
 
 parameter_types! {
@@ -176,7 +178,7 @@ impl pallet_indices::Config for Runtime {
     type Currency = Balances;
     type Deposit = IndexDeposit;
     type Event = Event;
-    type WeightInfo = weights::pallet_indices::WeightInfo;
+    type WeightInfo = weights::pallet_indices::WeightInfo<Runtime>;
 }
 
 parameter_types! {
@@ -195,7 +197,7 @@ impl pallet_balances::Config for Runtime {
     type Event = Event;
     type ExistentialDeposit = ExistentialDeposit;
     type AccountStore = System;
-    type WeightInfo = weights::pallet_balances::WeightInfo;
+    type WeightInfo = weights::pallet_balances::WeightInfo<Runtime>;
 }
 
 parameter_types! {
@@ -211,14 +213,12 @@ impl pallet_transaction_payment::Config for Runtime {
 
 parameter_types! {
     pub const TombstoneDeposit: Balance = 0;
-    pub const DepositPerContract: Balance = TombstoneDeposit::get();
-    pub const DepositPerStorageByte: Balance = 0;
+    pub const DepositPerContract: Balance = 0;
+    pub const DepositPerStorageByte: Balance = TombstoneDeposit::get();
     pub const DepositPerStorageItem: Balance = 0;
     pub RentFraction: Perbill = Perbill::zero();
     pub const SurchargeReward: Balance = 0;
-    pub const SignedClaimHandicap: u32 = 2;
-    pub const MaxDepth: u32 = 32;
-    pub const MaxValueSize: u32 = 16 * 1024;
+    pub const SignedClaimHandicap: u32 = 0;
     // The lazy deletion runs inside on_initialize.
     pub DeletionWeightLimit: Weight = AVERAGE_ON_INITIALIZE_RATIO *
         BlockWeights::get().max_block;
@@ -228,7 +228,7 @@ parameter_types! {
             <Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(1) -
             <Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(0)
         )) / 5) as u32;
-    pub const MaxCodeSize: u32 = 256 * 1024;
+    pub Schedule: pallet_contracts::Schedule<Runtime> = Default::default();
 }
 
 impl pallet_contracts::Config for Runtime {
@@ -244,14 +244,13 @@ impl pallet_contracts::Config for Runtime {
     type DepositPerStorageItem = DepositPerStorageItem;
     type RentFraction = RentFraction;
     type SurchargeReward = SurchargeReward;
-    type MaxDepth = MaxDepth;
-    type MaxValueSize = MaxValueSize;
+    type CallStack = [pallet_contracts::Frame<Self>; 31];
     type WeightPrice = pallet_transaction_payment::Module<Self>;
     type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
     type ChainExtension = jupiter_chain_extension::JupiterExt;
     type DeletionQueueDepth = DeletionQueueDepth;
     type DeletionWeightLimit = DeletionWeightLimit;
-    type MaxCodeSize = MaxCodeSize;
+    type Schedule = Schedule;
 }
 
 impl pallet_sudo::Config for Runtime {
@@ -261,19 +260,22 @@ impl pallet_sudo::Config for Runtime {
 
 parameter_types! {
     pub const ReservedXcmpWeight: Weight = MAXIMUM_BLOCK_WEIGHT / 4;
+    pub const ReservedDmpWeight: Weight = MAXIMUM_BLOCK_WEIGHT / 2;
 }
 
 impl cumulus_pallet_parachain_system::Config for Runtime {
     type Event = Event;
     type OnValidationData = ();
-    type SelfParaId = parachain_info::Module<Runtime>;
-    type DownwardMessageHandlers = cumulus_primitives_utility::UnqueuedDmpAsParent<
-        MaxDownwardMessageWeight,
-        XcmExecutor<XcmConfig>,
-        Call,
-    >;
+    type SelfParaId = parachain_info::Pallet<Runtime>;
+    // type DmpMessageHandler = cumulus_primitives_utility::UnqueuedDmpAsParent<
+    //     MaxDownwardMessageWeight,
+    //     XcmExecutor<XcmConfig>,
+    //     Call,
+    // >;
+    type DmpMessageHandler = ();
     type OutboundXcmpMessageSource = XcmpQueue;
     type XcmpMessageHandler = XcmpQueue;
+    type ReservedDmpWeight = ReservedDmpWeight;
     type ReservedXcmpWeight = ReservedXcmpWeight;
 }
 
@@ -283,9 +285,11 @@ parameter_types! {
     pub const RococoLocation: MultiLocation = MultiLocation::X1(Junction::Parent);
     pub const RococoNetwork: NetworkId = NetworkId::Polkadot;
     pub RelayChainOrigin: Origin = cumulus_pallet_xcm::Origin::Relay.into();
-    pub Ancestry: MultiLocation = Junction::Parachain {
-        id: ParachainInfo::parachain_id().into()
-    }.into();
+    // pub Ancestry: MultiLocation = Junction::Parachain {
+    //     ParachainInfo::parachain_id().into()
+    // }.into();
+    pub Ancestry: MultiLocation = MultiLocation::X1(Junction::Parachain(ParachainInfo::parachain_id().into()));
+    pub CheckAccount: AccountId = PolkadotXcm::check_account();
 }
 
 /// Type for specifying how a `MultiLocation` can be converted into an `AccountId`. This is used
@@ -309,6 +313,7 @@ type LocalAssetTransactor = CurrencyAdapter<
     LocationToAccountId,
     // Our chain's account ID type (we can't get away without mentioning it explicitly):
     AccountId,
+    CheckAccount
 >;
 
 /// This is the type we use to convert an (incoming) XCM origin into a local `Origin` instance,
@@ -361,7 +366,7 @@ impl Config for XcmConfig {
     type LocationInverter = LocationInverter<Ancestry>;
     type Barrier = Barrier;
     type Weigher = FixedWeightBounds<UnitWeightCost, Call>;
-    type Trader = FixedRateOfConcreteFungible<WeightPrice>;
+    type Trader = FixedRateOfConcreteFungible<WeightPrice, ()>;
     type ResponseHandler = (); // Don't handle responses for now.
 }
 parameter_types! {
@@ -385,9 +390,16 @@ impl pallet_xcm::Config for Runtime {
     type XcmRouter = XcmRouter;
     type ExecuteXcmOrigin = EnsureXcmOrigin<Origin, LocalOriginToLocation>;
     type XcmExecutor = XcmExecutor<XcmConfig>;
+    type XcmExecuteFilter = All<(MultiLocation, Xcm<Call>)>;
+    type XcmTeleportFilter = All<(MultiLocation, Vec<MultiAsset>)>;
+    type XcmReserveTransferFilter = ();
+    type Weigher = FixedWeightBounds<UnitWeightCost, Call>;
 }
 
-impl cumulus_pallet_xcm::Config for Runtime {}
+impl cumulus_pallet_xcm::Config for Runtime {
+    type Event = Event;
+    type XcmExecutor = XcmExecutor<XcmConfig>;
+}
 
 impl cumulus_pallet_xcmp_queue::Config for Runtime {
     type Event = Event;
@@ -434,7 +446,8 @@ construct_runtime!(
         Indices: pallet_indices::{Pallet, Call, Storage, Config<T>, Event<T>} = 3,
         TransactionPayment: pallet_transaction_payment::{Pallet, Storage} = 4,
 
-        Contracts: pallet_contracts::{Pallet, Call, Config<T>, Storage, Event<T>} = 5,
+        // Contracts: pallet_contracts::{Pallet, Call, Config<T>, Storage, Event<T>} = 5,
+        Contracts: pallet_contracts::{Pallet, Call, Storage, Event<T>} = 5,
 
         Sudo: pallet_sudo::{Pallet, Call, Config<T>, Storage, Event<T>} = 6,
 
@@ -442,7 +455,7 @@ construct_runtime!(
         ParachainInfo: parachain_info::{Pallet, Storage, Config} = 11,
         XcmpQueue: cumulus_pallet_xcmp_queue::{Pallet, Call, Storage, Event<T>} = 12,
         PolkadotXcm: pallet_xcm::{Pallet, Call, Event<T>, Origin} = 13,
-        CumulusXcm: cumulus_pallet_xcm::{Pallet, Origin} = 14,
+        CumulusXcm: cumulus_pallet_xcm::{Pallet, Call, Origin, Event<T>} = 14,
         Spambot: cumulus_ping::{Pallet, Call, Storage, Event<T>} = 99,
 
         RandomnessCollect: randomness_collect::{Pallet, Call, Storage, ValidateUnsigned} = 50,
@@ -524,10 +537,6 @@ impl_runtime_apis! {
         ) -> sp_inherents::CheckInherentsResult {
             data.check_extrinsics(&block)
         }
-
-        fn random_seed() -> <Block as BlockT>::Hash {
-            RandomnessCollectiveFlip::random_seed().0
-        }
     }
 
     impl sp_transaction_pool::runtime_api::TaggedTransactionQueue<Block> for Runtime {
@@ -575,7 +584,7 @@ impl_runtime_apis! {
         }
     }
 
-    impl pallet_contracts_rpc_runtime_api::ContractsApi<Block, AccountId, Balance, BlockNumber>
+    impl pallet_contracts_rpc_runtime_api::ContractsApi<Block, AccountId, Balance, BlockNumber, Hash>
         for Runtime
     {
         fn call(
@@ -585,7 +594,19 @@ impl_runtime_apis! {
             gas_limit: u64,
             input_data: Vec<u8>,
         ) -> ContractExecResult {
-            Contracts::bare_call(origin, dest.into(), value, gas_limit, input_data)
+            Contracts::bare_call(origin, dest, value, gas_limit, input_data, true)
+        }
+
+        fn instantiate(
+            origin: AccountId,
+            endowment: Balance,
+            gas_limit: u64,
+            code: pallet_contracts_primitives::Code<Hash>,
+            data: Vec<u8>,
+            salt: Vec<u8>,
+        ) -> pallet_contracts_primitives::ContractInstantiateResult<AccountId, BlockNumber>
+        {
+            Contracts::bare_instantiate(origin, endowment, gas_limit, code, data, salt, true, true)
         }
 
         fn get_storage(
@@ -601,6 +622,12 @@ impl_runtime_apis! {
             Contracts::rent_projection(address)
         }
     }
+
+    impl cumulus_primitives_core::CollectCollationInfo<Block> for Runtime {
+		fn collect_collation_info() -> cumulus_primitives_core::CollationInfo {
+			ParachainSystem::collect_collation_info()
+		}
+	}
 }
 
 cumulus_pallet_parachain_system::register_validate_block!(Runtime, Executive);

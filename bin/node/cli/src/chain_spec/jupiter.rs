@@ -10,8 +10,8 @@ use sp_runtime::traits::{IdentifyAccount, Verify};
 use cumulus_primitives_core::ParaId;
 use jupiter_runtime::{AccountId, Signature};
 use jupiter_runtime::{
-    BalancesConfig, ContractsConfig, GenesisConfig, IndicesConfig, ParachainInfoConfig, SudoConfig,
-    SystemConfig,
+    BalancesConfig, GenesisConfig, IndicesConfig, ParachainInfoConfig, SudoConfig,
+    SystemConfig, //ContractsConfig,
 };
 use sc_service::config::TelemetryEndpoints;
 
@@ -171,10 +171,10 @@ fn testnet_genesis(
                 .collect(),
         },
         pallet_indices: IndicesConfig { indices: vec![] },
-        pallet_contracts: ContractsConfig {
-            // println should only be enabled on development chains
-            current_schedule: pallet_contracts::Schedule::default().enable_println(enable_println),
-        },
+        // pallet_contracts: ContractsConfig {
+        //     // println should only be enabled on development chains
+        //     current_schedule: pallet_contracts::Schedule::default().enable_println(enable_println),
+        // },
         pallet_sudo: SudoConfig {
             // Assign network admin rights.
             key: root_key,

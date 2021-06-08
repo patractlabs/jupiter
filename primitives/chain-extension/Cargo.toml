@@ -14,6 +14,7 @@ sp-runtime = { version = "3.0.0", git = "https://github.com/paritytech/substrate
 sp-std = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3", default-features = false }
 
 # Substrate pallets
+frame-support = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3", default-features = false }
 pallet-contracts = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.3", default-features = false }
 
 # zkMega
@@ -32,6 +33,7 @@ std = [
   "sp-runtime/std",
   "sp-std/std",
 
+  "frame-support/std",
   "pallet-contracts/std",
 
   "jupiter-io/std",

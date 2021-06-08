@@ -49,7 +49,7 @@ pub fn new_partial(
     >,
     ServiceError,
 > {
-    let inherent_data_providers = sp_inherents::InherentDataProviders::new();
+    // let inherent_data_providers = sp_inherents::InherentDataProviders::new();
 
     let telemetry = config
         .telemetry_endpoints
@@ -89,7 +89,8 @@ pub fn new_partial(
     let import_queue = cumulus_client_consensus_relay_chain::import_queue(
         client.clone(),
         client.clone(),
-        inherent_data_providers.clone(),
+        // inherent_data_providers.clone(),
+        |_, _| async { Ok(sp_timestamp::InherentDataProvider::from_system_time()) },
         &task_manager.spawn_essential_handle(),
         registry.clone(),
     )?;
@@ -101,7 +102,7 @@ pub fn new_partial(
         keystore_container,
         task_manager,
         transaction_pool,
-        inherent_data_providers,
+        // inherent_data_providers,
         select_chain: (),
         other: (telemetry, telemetry_worker_handle),
     };
@@ -133,10 +134,10 @@ where
     let rpc_port = polkadot_config.rpc_http.clone();
 
     let params = new_partial(&parachain_config)?;
-    params
-        .inherent_data_providers
-        .register_provider(sp_timestamp::InherentDataProvider)
-        .unwrap();
+    // params
+    //     .inherent_data_providers
+    //     .register_provider(sp_timestamp::InherentDataProvider)
+    //     .unwrap();
     let (mut telemetry, telemetry_worker_handle) = params.other;
 
     let polkadot_full_node = cumulus_client_service::build_polkadot_full_node(
@@ -161,14 +162,16 @@ where
     let prometheus_registry = parachain_config.prometheus_registry().cloned();
     let transaction_pool = params.transaction_pool.clone();
     let mut task_manager = params.task_manager;
-    let import_queue = params.import_queue;
+    // let import_queue = params.import_queue;
+    let import_queue = cumulus_client_service::SharedImportQueue::new(params.import_queue);
+    let iq = import_queue.clone();
     let (network, network_status_sinks, system_rpc_tx, start_network) =
         sc_service::build_network(sc_service::BuildNetworkParams {
             config: &parachain_config,
             client: client.clone(),
             transaction_pool: transaction_pool.clone(),
             spawn_handle: task_manager.spawn_handle(),
-            import_queue,
+            import_queue: iq,
             on_demand: None,
             block_announce_validator_builder: Some(Box::new(|_| block_announce_validator)),
         })?;
@@ -230,10 +233,40 @@ where
             }
         }
 
-        let parachain_consensus = build_relay_chain_consensus(BuildRelayChainConsensusParams {
+        let relay_chain_backend = polkadot_full_node.backend.clone();
+        let relay_chain_client = polkadot_full_node.client.clone();
+
+        let create_inherent_data_providers = move |_, (relay_parent, validation_data)| {
+            let parachain_inherent =
+                cumulus_primitives_parachain_inherent::ParachainInherentData::create_at_with_client(
+                    relay_parent,
+                    &relay_chain_client,
+                    &*relay_chain_backend,
+                    &validation_data,
+                    id,
+                );
+            async move {
+                let timestamp = sp_timestamp::InherentDataProvider::from_system_time();
+                let parachain_inherent =
+                    parachain_inherent.ok_or_else(|| {
+                        Box::<dyn std::error::Error + Send + Sync>::from(
+                            "Failed to create parachain inherent",
+                        )
+                    })?;
+                Ok((timestamp, parachain_inherent))
+            }
+        };
+
+        // let create_inherent_data_providers = move |_, _| async {
+        //     Ok(sp_timestamp::InherentDataProvider::from_system_time())
+        // };
+
+        let parachain_consensus = build_relay_chain_consensus(
+            BuildRelayChainConsensusParams {
             para_id: id,
             proposer_factory,
-            inherent_data_providers: params.inherent_data_providers,
+            // inherent_data_providers: params.inherent_data_providers,
+            create_inherent_data_providers,
             block_import: client.clone(),
             relay_chain_client: polkadot_full_node.client.clone(),
             relay_chain_backend: polkadot_full_node.backend.clone(),
@@ -248,8 +281,9 @@ where
             collator_key,
             relay_chain_full_node: polkadot_full_node,
             spawner,
-            backend,
+            // backend,
             parachain_consensus,
+            import_queue,
         };
 
         start_collator(params).await?;
@@ -259,7 +293,7 @@ where
             announce_block,
             task_manager: &mut task_manager,
             para_id: id,
-            polkadot_full_node,
+            relay_chain_full_node: polkadot_full_node,
         };
 
         start_full_node(params)?;
