@@ -31,7 +31,9 @@ use pallet_transaction_payment::{FeeDetails, RuntimeDispatchInfo};
 pub use sp_runtime::BuildStorage;
 
 pub use frame_support::{
-    construct_runtime, debug, parameter_types,
+    construct_runtime,
+    debug,
+    parameter_types,
     traits::{KeyOwnerProofSystem, Randomness},
     weights::{
         constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_PER_SECOND},
@@ -54,7 +56,8 @@ use jupiter_runtime_common::{
 
 // XCM imports
 use polkadot_parachain::primitives::Sibling;
-use xcm::v0::{Junction, MultiLocation, NetworkId, MultiAsset};
+use xcm::v0::Xcm;
+use xcm::v0::{Junction, MultiAsset, MultiLocation, NetworkId};
 use xcm_builder::{
     AccountId32Aliases, AllowTopLevelPaidExecutionFrom, AllowUnpaidExecutionFrom, CurrencyAdapter,
     EnsureXcmOrigin, FixedRateOfConcreteFungible, FixedWeightBounds, IsConcrete, LocationInverter,
@@ -63,7 +66,6 @@ use xcm_builder::{
     TakeWeightCredit,
 };
 use xcm_executor::{Config, XcmExecutor};
-use xcm::v0::Xcm;
 
 use frame_support::traits::{All, IsInVec};
 use randomness_collect::sr25519::AuthorityId as RandomCollectId;
@@ -313,7 +315,7 @@ type LocalAssetTransactor = CurrencyAdapter<
     LocationToAccountId,
     // Our chain's account ID type (we can't get away without mentioning it explicitly):
     AccountId,
-    CheckAccount
+    CheckAccount,
 >;
 
 /// This is the type we use to convert an (incoming) XCM origin into a local `Origin` instance,
@@ -624,10 +626,10 @@ impl_runtime_apis! {
     }
 
     impl cumulus_primitives_core::CollectCollationInfo<Block> for Runtime {
-		fn collect_collation_info() -> cumulus_primitives_core::CollationInfo {
-			ParachainSystem::collect_collation_info()
-		}
-	}
+        fn collect_collation_info() -> cumulus_primitives_core::CollationInfo {
+            ParachainSystem::collect_collation_info()
+        }
+    }
 }
 
 cumulus_pallet_parachain_system::register_validate_block!(Runtime, Executive);
