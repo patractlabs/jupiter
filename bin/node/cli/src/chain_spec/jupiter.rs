@@ -97,7 +97,7 @@ pub fn development_config(id: ParaId) -> Result<ChainSpec, String> {
         ),
         // Extensions
         Extensions {
-            relay_chain: "rococo".into(),
+            relay_chain: "rococo-local".into(),
             para_id: id.into(),
         },
     ))
@@ -151,7 +151,7 @@ pub fn jupiter_config() -> Result<ChainSpec, String> {
 fn testnet_genesis(
     root_key: AccountId,
     endowed_accounts: Vec<AccountId>,
-    enable_println: bool,
+    _enable_println: bool,
     id: ParaId,
 ) -> GenesisConfig {
     GenesisConfig {

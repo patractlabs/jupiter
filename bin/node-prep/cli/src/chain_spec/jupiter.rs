@@ -424,7 +424,7 @@ fn testnet_genesis(
                 })
                 .collect::<Vec<_>>(),
         },
-        pallet_democracy: Default::default(),
+        // pallet_democracy: Default::default(),
         pallet_collective_Instance1: CouncilConfig {
             members: vec![],
             phantom: Default::default(),

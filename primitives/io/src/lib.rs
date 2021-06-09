@@ -19,7 +19,7 @@ pub trait Pairing {
         false
     }
 
-    fn call(func_id: u32, input: &[u8]) -> Option<Vec<u8>> {
+    fn call(_func_id: u32, _input: &[u8]) -> Option<Vec<u8>> {
         // curve::call(func_id, input).ok()
         None
     }

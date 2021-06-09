@@ -49,7 +49,7 @@ pub use frame_support::{
     construct_runtime, parameter_types,
     traits::{
         Contains, ContainsLengthBound, Filter, InstanceFilter, KeyOwnerProofSystem, LockIdentifier,
-        Randomness, SortedMembers, U128CurrencyToVote,
+        Randomness, SortedMembers, U128CurrencyToVote, MaxEncodedLen
     },
     weights::{
         constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_PER_SECOND},
@@ -748,7 +748,7 @@ parameter_types! {
 }
 
 /// The type used to represent the kinds of proxying allowed.
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Encode, Decode, RuntimeDebug)]
+#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Encode, Decode, RuntimeDebug, MaxEncodedLen)]
 pub enum ProxyType {
     Any,
     NonTransfer,
@@ -872,7 +872,7 @@ construct_runtime!(
         AuthorityDiscovery: pallet_authority_discovery::{Pallet, Call, Storage, Config} = 13,
 
         // Governance stuff; uncallable initially.
-        Democracy: pallet_democracy::{Pallet, Call, Storage, Config, Event<T>} = 14,
+        Democracy: pallet_democracy::{Pallet, Call, Storage, Event<T>} = 14,
         Council: pallet_collective::<Instance1>::{Pallet, Call, Storage, Origin<T>, Event<T>, Config<T>} = 15,
         TechnicalCommittee: pallet_collective::<Instance2>::{Pallet, Call, Storage, Origin<T>, Event<T>, Config<T>} = 16,
         TechnicalMembership: pallet_membership::<Instance1>::{Pallet, Call, Storage, Event<T>, Config<T>} = 18,

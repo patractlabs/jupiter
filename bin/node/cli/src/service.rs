@@ -116,7 +116,7 @@ pub fn new_partial(
 #[sc_tracing::logging::prefix_logs_with("Parachain")]
 async fn start_node_impl<RB>(
     parachain_config: Configuration,
-    collator_key: CollatorPair,
+    _collator_key: CollatorPair,
     polkadot_config: Configuration,
     id: ParaId,
     validator: bool,
@@ -142,7 +142,7 @@ where
 
     let polkadot_full_node = cumulus_client_service::build_polkadot_full_node(
         polkadot_config,
-        collator_key.clone(),
+        // collator_key.clone(),
         telemetry_worker_handle,
     )
     .map_err(|e| match e {
@@ -165,7 +165,7 @@ where
     // let import_queue = params.import_queue;
     let import_queue = cumulus_client_service::SharedImportQueue::new(params.import_queue);
     let iq = import_queue.clone();
-    let (network, network_status_sinks, system_rpc_tx, start_network) =
+    let (network, system_rpc_tx, start_network) =
         sc_service::build_network(sc_service::BuildNetworkParams {
             config: &parachain_config,
             client: client.clone(),
@@ -199,7 +199,7 @@ where
         keystore: params.keystore_container.sync_keystore(),
         backend: backend.clone(),
         network: network.clone(),
-        network_status_sinks,
+        // network_status_sinks,
         system_rpc_tx,
         telemetry: telemetry.as_mut(),
     })?;
@@ -278,7 +278,7 @@ where
             announce_block,
             client: client.clone(),
             task_manager: &mut task_manager,
-            collator_key,
+            // collator_key,
             relay_chain_full_node: polkadot_full_node,
             spawner,
             // backend,
