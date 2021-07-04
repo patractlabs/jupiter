@@ -151,7 +151,7 @@ decl_module! {
             Ok(())
         }
 
-        fn offchain_worker(block_number: T::BlockNumber) {
+        fn offchain_worker(_block_number: T::BlockNumber) {
             if sp_io::offchain::is_validator() {
                 let privileged_keys = Keys::<T>::get();
                 let local_keys = T::AuthorityId::all();

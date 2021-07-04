@@ -188,6 +188,7 @@ parameter_types! {
     // For weight estimation, we assume that the most locks on an individual account will be 50.
     // This number may need to be adjusted in the future if this assumption no longer holds true.
     pub const MaxLocks: u32 = 50;
+    pub const MaxReserves: u32 = 50;
 }
 
 impl pallet_balances::Config for Runtime {
@@ -200,6 +201,8 @@ impl pallet_balances::Config for Runtime {
     type ExistentialDeposit = ExistentialDeposit;
     type AccountStore = System;
     type WeightInfo = weights::pallet_balances::WeightInfo<Runtime>;
+    type MaxReserves = MaxReserves;
+    type ReserveIdentifier = [u8; 8];
 }
 
 parameter_types! {
@@ -433,6 +436,8 @@ impl randomness_collect::Config for Runtime {
     type UnsignedPriority = RandomCollectUnsignedPriority;
 }
 
+impl pallet_randomness_collective_flip::Config for Runtime {}
+
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
     pub enum Runtime where
@@ -448,7 +453,6 @@ construct_runtime!(
         Indices: pallet_indices::{Pallet, Call, Storage, Config<T>, Event<T>} = 3,
         TransactionPayment: pallet_transaction_payment::{Pallet, Storage} = 4,
 
-        // Contracts: pallet_contracts::{Pallet, Call, Config<T>, Storage, Event<T>} = 5,
         Contracts: pallet_contracts::{Pallet, Call, Storage, Event<T>} = 5,
 
         Sudo: pallet_sudo::{Pallet, Call, Config<T>, Storage, Event<T>} = 6,
@@ -632,4 +636,19 @@ impl_runtime_apis! {
     }
 }
 
-cumulus_pallet_parachain_system::register_validate_block!(Runtime, Executive);
+struct CheckInherents;
+
+impl cumulus_pallet_parachain_system::CheckInherents<Block> for CheckInherents {
+    fn check_inherents(
+        _: &Block,
+        _: &cumulus_pallet_parachain_system::RelayChainStateProof,
+    ) -> sp_inherents::CheckInherentsResult {
+        sp_inherents::CheckInherentsResult::new()
+    }
+}
+
+cumulus_pallet_parachain_system::register_validate_block! {
+    Runtime = Runtime,
+    BlockExecutor = Executive,
+    CheckInherents = CheckInherents,
+}

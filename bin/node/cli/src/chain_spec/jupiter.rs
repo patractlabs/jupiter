@@ -151,18 +151,18 @@ pub fn jupiter_config() -> Result<ChainSpec, String> {
 fn testnet_genesis(
     root_key: AccountId,
     endowed_accounts: Vec<AccountId>,
-    _enable_println: bool,
+    enable_println: bool,
     id: ParaId,
 ) -> GenesisConfig {
     GenesisConfig {
-        frame_system: SystemConfig {
+        system: SystemConfig {
             // Add Wasm runtime to storage.
             code: jupiter_runtime::WASM_BINARY
                 .expect("WASM binary was not build, please build it!")
                 .to_vec(),
             changes_trie_config: Default::default(),
         },
-        pallet_balances: BalancesConfig {
+        balances: BalancesConfig {
             // Configure endowed accounts with initial balance of 1 << 60.
             balances: endowed_accounts
                 .iter()
@@ -170,12 +170,11 @@ fn testnet_genesis(
                 .map(|k| (k, 1 << 60))
                 .collect(),
         },
-        pallet_indices: IndicesConfig { indices: vec![] },
-        // pallet_contracts: ContractsConfig {
-        //     // println should only be enabled on development chains
+        indices: IndicesConfig { indices: vec![] },
+        // contracts: ContractsConfig {
         //     current_schedule: pallet_contracts::Schedule::default().enable_println(enable_println),
         // },
-        pallet_sudo: SudoConfig {
+        sudo: SudoConfig {
             // Assign network admin rights.
             key: root_key,
         },
