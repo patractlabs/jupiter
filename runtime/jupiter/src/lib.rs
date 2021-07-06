@@ -73,7 +73,9 @@ use randomness_collect::sr25519::AuthorityId as RandomCollectId;
 pub use randomness_collect::{RpcPort, OCW_DB_RANDOM};
 
 impl_opaque_keys! {
-    pub struct SessionKeys {}
+    pub struct SessionKeys {
+        pub aura: Aura,
+    }
 }
 
 #[cfg(feature = "std")]
@@ -273,12 +275,7 @@ impl cumulus_pallet_parachain_system::Config for Runtime {
     type Event = Event;
     type OnValidationData = ();
     type SelfParaId = parachain_info::Pallet<Runtime>;
-    // type DmpMessageHandler = cumulus_primitives_utility::UnqueuedDmpAsParent<
-    //     MaxDownwardMessageWeight,
-    //     XcmExecutor<XcmConfig>,
-    //     Call,
-    // >;
-    type DmpMessageHandler = ();
+    type DmpMessageHandler = DmpQueue;
     type OutboundXcmpMessageSource = XcmpQueue;
     type XcmpMessageHandler = XcmpQueue;
     type ReservedDmpWeight = ReservedDmpWeight;
@@ -413,6 +410,12 @@ impl cumulus_pallet_xcmp_queue::Config for Runtime {
     type ChannelInfo = ParachainSystem;
 }
 
+impl cumulus_pallet_dmp_queue::Config for Runtime {
+    type Event = Event;
+    type XcmExecutor = XcmExecutor<XcmConfig>;
+    type ExecuteOverweightOrigin = frame_system::EnsureRoot<AccountId>;
+}
+
 impl cumulus_ping::Config for Runtime {
     type Event = Event;
     type Origin = Origin;
@@ -453,28 +456,27 @@ construct_runtime!(
         UncheckedExtrinsic = UncheckedExtrinsic
     {
         System: frame_system::{Pallet, Call, Config, Storage, Event<T>} = 0,
-        RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Pallet, Call, Storage} = 7,
-
         Timestamp: pallet_timestamp::{Pallet, Call, Storage, Inherent} = 1,
         Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>} = 2,
         Indices: pallet_indices::{Pallet, Call, Storage, Config<T>, Event<T>} = 3,
         TransactionPayment: pallet_transaction_payment::{Pallet, Storage} = 4,
-
         Contracts: pallet_contracts::{Pallet, Call, Storage, Event<T>} = 5,
         Sudo: pallet_sudo::{Pallet, Call, Config<T>, Storage, Event<T>} = 6,
+        RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Pallet, Call, Storage} = 7,
 
-        ParachainSystem: cumulus_pallet_parachain_system::{Pallet, Call, Storage, Inherent, Event<T>} = 10,
-        ParachainInfo: parachain_info::{Pallet, Storage, Config} = 11,
+        ParachainSystem: cumulus_pallet_parachain_system::{Pallet, Call, Storage, Inherent, Event<T>},
+        ParachainInfo: parachain_info::{Pallet, Storage, Config},
 
         Aura: pallet_aura::{Pallet, Config<T>},
 		AuraExt: cumulus_pallet_aura_ext::{Pallet, Config},
 
-        XcmpQueue: cumulus_pallet_xcmp_queue::{Pallet, Call, Storage, Event<T>} = 12,
-        PolkadotXcm: pallet_xcm::{Pallet, Call, Event<T>, Origin} = 13,
-        CumulusXcm: cumulus_pallet_xcm::{Pallet, Call, Origin, Event<T>} = 14,
-        Spambot: cumulus_ping::{Pallet, Call, Storage, Event<T>} = 99,
+        XcmpQueue: cumulus_pallet_xcmp_queue::{Pallet, Call, Storage, Event<T>},
+        PolkadotXcm: pallet_xcm::{Pallet, Call, Event<T>, Origin},
+        CumulusXcm: cumulus_pallet_xcm::{Pallet, Call, Origin, Event<T>},
+        DmpQueue: cumulus_pallet_dmp_queue::{Pallet, Call, Storage, Event<T>},
+        Spambot: cumulus_ping::{Pallet, Call, Storage, Event<T>},
 
-        RandomnessCollect: randomness_collect::{Pallet, Call, Storage, ValidateUnsigned} = 50,
+        RandomnessCollect: randomness_collect::{Pallet, Call, Storage, ValidateUnsigned},
     }
 );
 

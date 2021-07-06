@@ -250,11 +250,12 @@ where
     if validator {
         let client2 = client.clone();
         let relay_chain_node = &relay_chain_full_node;
+        let spawner = task_manager.spawn_handle();
 
         let slot_duration = cumulus_client_consensus_aura::slot_duration(&*client2)?;
 
         let proposer_factory = sc_basic_authorship::ProposerFactory::with_proof_recording(
-            &task_manager.spawn_handle(),
+            task_manager.spawn_handle(),
             client2.clone(),
             transaction_pool,
             prometheus_registry.as_ref(),
@@ -322,7 +323,7 @@ where
             client: client.clone(),
             task_manager: &mut task_manager,
             relay_chain_full_node,
-            spawner: task_manager.spawn_handle(),
+            spawner,
             parachain_consensus,
             import_queue,
         };
