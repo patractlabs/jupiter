@@ -17,6 +17,7 @@ use sp_runtime::{
     ApplyExtrinsicResult, Perbill,
 };
 use sp_std::prelude::*;
+// pub use sp_consensus_aura::sr25519::AuthorityId as AuraId;
 
 #[cfg(feature = "std")]
 use sp_version::NativeVersion;

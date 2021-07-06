@@ -184,7 +184,6 @@ pub struct NewFullBase {
     pub task_manager: TaskManager,
     pub client: Arc<FullClient>,
     pub network: Arc<NetworkService<Block, <Block as BlockT>::Hash>>,
-    // pub network_status_sinks: sc_service::NetworkStatusSinks<Block>,
     pub transaction_pool: Arc<sc_transaction_pool::FullPool<Block, FullClient>>,
 }
 
@@ -257,7 +256,6 @@ pub fn new_full_base(mut config: Configuration) -> Result<NewFullBase, ServiceEr
         task_manager: &mut task_manager,
         on_demand: None,
         remote_blockchain: None,
-        // network_status_sinks: network_status_sinks.clone(),
         system_rpc_tx,
         telemetry: telemetry.as_mut(),
     })?;
@@ -361,9 +359,8 @@ pub fn new_full_base(mut config: Configuration) -> Result<NewFullBase, ServiceEr
         name: Some(name),
         observer_enabled: false,
         keystore,
-        // is_authority: role.is_authority(),
+        local_role: role,
         telemetry: telemetry.as_ref().map(|x| x.handle()),
-        local_role: role
     };
 
     if enable_grandpa {
@@ -396,7 +393,6 @@ pub fn new_full_base(mut config: Configuration) -> Result<NewFullBase, ServiceEr
         task_manager,
         client,
         network,
-        // network_status_sinks,
         transaction_pool,
     })
 }
@@ -527,7 +523,6 @@ pub fn new_light(config: Configuration) -> Result<TaskManager, ServiceError> {
         keystore: keystore_container.sync_keystore(),
         backend,
         network,
-        // network_status_sinks,
         system_rpc_tx,
         telemetry: telemetry.as_mut(),
     })?;

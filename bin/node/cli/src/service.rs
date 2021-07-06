@@ -49,8 +49,6 @@ pub fn new_partial(
     >,
     ServiceError,
 > {
-    // let inherent_data_providers = sp_inherents::InherentDataProviders::new();
-
     let telemetry = config
         .telemetry_endpoints
         .clone()
@@ -86,10 +84,11 @@ pub fn new_partial(
         client.clone(),
     );
 
+    // use the cumulus consensus with relay chain, this is for rococo-v1
+    // todo: use aura related import_queue implementation for 0.9.3+, plz ref to cumulus
     let import_queue = cumulus_client_consensus_relay_chain::import_queue(
         client.clone(),
         client.clone(),
-        // inherent_data_providers.clone(),
         |_, _| async { Ok(sp_timestamp::InherentDataProvider::from_system_time()) },
         &task_manager.spawn_essential_handle(),
         registry.clone(),
@@ -102,7 +101,6 @@ pub fn new_partial(
         keystore_container,
         task_manager,
         transaction_pool,
-        // inherent_data_providers,
         select_chain: (),
         other: (telemetry, telemetry_worker_handle),
     };
@@ -134,15 +132,10 @@ where
     let rpc_port = polkadot_config.rpc_http.clone();
 
     let params = new_partial(&parachain_config)?;
-    // params
-    //     .inherent_data_providers
-    //     .register_provider(sp_timestamp::InherentDataProvider)
-    //     .unwrap();
     let (mut telemetry, telemetry_worker_handle) = params.other;
 
-    let polkadot_full_node = cumulus_client_service::build_polkadot_full_node(
+    let relay_chain_full_node = cumulus_client_service::build_polkadot_full_node(
         polkadot_config,
-        // collator_key.clone(),
         telemetry_worker_handle,
     )
     .map_err(|e| match e {
@@ -153,25 +146,24 @@ where
     let client = params.client.clone();
     let backend = params.backend.clone();
     let block_announce_validator = build_block_announce_validator(
-        polkadot_full_node.client.clone(),
+        relay_chain_full_node.client.clone(),
         id,
-        Box::new(polkadot_full_node.network.clone()),
-        polkadot_full_node.backend.clone(),
+        Box::new(relay_chain_full_node.network.clone()),
+        relay_chain_full_node.backend.clone(),
     );
 
     let prometheus_registry = parachain_config.prometheus_registry().cloned();
     let transaction_pool = params.transaction_pool.clone();
     let mut task_manager = params.task_manager;
-    // let import_queue = params.import_queue;
+    // wrapper import queue from new_partial function with SharedImportQueue
     let import_queue = cumulus_client_service::SharedImportQueue::new(params.import_queue);
-    let iq = import_queue.clone();
     let (network, system_rpc_tx, start_network) =
         sc_service::build_network(sc_service::BuildNetworkParams {
             config: &parachain_config,
             client: client.clone(),
             transaction_pool: transaction_pool.clone(),
             spawn_handle: task_manager.spawn_handle(),
-            import_queue: iq,
+            import_queue: import_queue.clone(),
             on_demand: None,
             block_announce_validator_builder: Some(Box::new(|_| block_announce_validator)),
         })?;
@@ -185,8 +177,24 @@ where
         );
     }
 
+    // the passing rpc_ext_builder current is default, should add contract and related rpc
+    // NOTICE: the node-pre module already use rpc, but here we may need some different rpc module
     let rpc_client = client.clone();
-    let rpc_extensions_builder = Box::new(move |_, _| rpc_ext_builder(rpc_client.clone()));
+    let rpc_transaction_pool = transaction_pool.clone();
+    // let rpc_extensions_builder = Box::new(move |_, _| rpc_ext_builder(rpc_client.clone()));
+    let rpc_extensions_builder = {
+        let client = rpc_client.clone();
+        let pool = rpc_transaction_pool.clone();
+
+        Box::new(move |deny_unsafe, _| {
+            let deps = jupiter_rpc::BasicDeps {
+                client: client.clone(),
+                pool: pool.clone(),
+                deny_unsafe,
+            };
+            jupiter_rpc::create_basic(deps)
+        })
+    };
 
     sc_service::spawn_tasks(sc_service::SpawnTasksParams {
         on_demand: None,
@@ -199,7 +207,6 @@ where
         keystore: params.keystore_container.sync_keystore(),
         backend: backend.clone(),
         network: network.clone(),
-        // network_status_sinks,
         system_rpc_tx,
         telemetry: telemetry.as_mut(),
     })?;
@@ -233,8 +240,14 @@ where
             }
         }
 
-        let relay_chain_backend = polkadot_full_node.backend.clone();
-        let relay_chain_client = polkadot_full_node.client.clone();
+        // this default inherent data provider should not used here.
+        // let create_inherent_data_providers = move |_, _| async {
+        //     Ok(sp_timestamp::InherentDataProvider::from_system_time())
+        // };
+
+        // the inherent data provider contains ParachainInherentData and timestamp
+        let relay_chain_backend = relay_chain_full_node.backend.clone();
+        let relay_chain_client = relay_chain_full_node.client.clone();
 
         let create_inherent_data_providers = move |_, (relay_parent, validation_data)| {
             let parachain_inherent =
@@ -257,19 +270,13 @@ where
             }
         };
 
-        // let create_inherent_data_providers = move |_, _| async {
-        //     Ok(sp_timestamp::InherentDataProvider::from_system_time())
-        // };
-
-        let parachain_consensus = build_relay_chain_consensus(
-            BuildRelayChainConsensusParams {
+        let parachain_consensus = build_relay_chain_consensus(BuildRelayChainConsensusParams {
             para_id: id,
             proposer_factory,
-            // inherent_data_providers: params.inherent_data_providers,
             create_inherent_data_providers,
             block_import: client.clone(),
-            relay_chain_client: polkadot_full_node.client.clone(),
-            relay_chain_backend: polkadot_full_node.backend.clone(),
+            relay_chain_client: relay_chain_full_node.client.clone(),
+            relay_chain_backend: relay_chain_full_node.backend.clone(),
         });
 
         let params = StartCollatorParams {
@@ -278,10 +285,8 @@ where
             announce_block,
             client: client.clone(),
             task_manager: &mut task_manager,
-            // collator_key,
-            relay_chain_full_node: polkadot_full_node,
+            relay_chain_full_node,
             spawner,
-            // backend,
             parachain_consensus,
             import_queue,
         };
@@ -293,7 +298,7 @@ where
             announce_block,
             task_manager: &mut task_manager,
             para_id: id,
-            relay_chain_full_node: polkadot_full_node,
+            relay_chain_full_node,
         };
 
         start_full_node(params)?;

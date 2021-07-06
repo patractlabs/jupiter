@@ -67,6 +67,11 @@ pub fn development_config(id: ParaId) -> Result<ChainSpec, String> {
             testnet_genesis(
                 // Sudo account
                 get_account_id_from_seed::<sr25519::Public>("Alice"),
+                // vec![
+                //     get_from_seed::<AuraId>("Alice"),
+                //     get_from_seed::<AuraId>("Bob"),
+                //     get_from_seed::<AuraId>("Charlie"),
+                // ],
                 // Pre-funded accounts
                 vec![
                     get_account_id_from_seed::<sr25519::Public>("Alice"),
@@ -112,6 +117,7 @@ pub fn staging_config(id: ParaId) -> Result<ChainSpec, String> {
         move || {
             testnet_genesis(
                 hex!["426d8def6146e8ae997b24f81401e46e8439d7f392489549b10410bcca20b64e"].into(),
+                // vec![],
                 vec![
                     hex!["426d8def6146e8ae997b24f81401e46e8439d7f392489549b10410bcca20b64e"].into(),
                 ],
@@ -150,6 +156,7 @@ pub fn jupiter_config() -> Result<ChainSpec, String> {
 /// Configure initial storage state for FRAME modules.
 fn testnet_genesis(
     root_key: AccountId,
+    // initial_authorities: Vec<AuraId>,
     endowed_accounts: Vec<AccountId>,
     enable_println: bool,
     id: ParaId,
@@ -179,5 +186,8 @@ fn testnet_genesis(
             key: root_key,
         },
         parachain_info: ParachainInfoConfig { parachain_id: id },
+        // aura: jupiter_runtime::AuraConfig {
+        //     authorities: initial_authorities,
+        // },
     }
 }
