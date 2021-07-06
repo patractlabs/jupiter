@@ -45,6 +45,7 @@ pallet-transaction-payment = { version = "3.0.0", git = "https://github.com/pari
 pallet-transaction-payment-rpc-runtime-api = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.7", default-features = false }
 pallet-utility = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.7", default-features = false }
 pallet-multisig = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.7", default-features = false }
+pallet-aura = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.7" }
 
 # contracts
 pallet-contracts = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.7", default-features = false }
@@ -55,10 +56,13 @@ pallet-contracts-rpc-runtime-api = { version = "3.0.0", git = "https://github.co
 parachain-info = { git = "https://github.com/paritytech/cumulus", branch = "polkadot-v0.9.7", default-features = false }
 cumulus-pallet-parachain-system = { git = "https://github.com/paritytech/cumulus", branch = "polkadot-v0.9.7", default-features = false }
 cumulus-primitives-core = { git = "https://github.com/paritytech/cumulus", branch = "polkadot-v0.9.7", default-features = false }
+cumulus-primitives-timestamp = { git = "https://github.com/paritytech/cumulus", branch = "polkadot-v0.9.7", default-features = false }
 cumulus-primitives-utility = { git = "https://github.com/paritytech/cumulus", branch = "polkadot-v0.9.7", default-features = false }
+cumulus-pallet-dmp-queue = { git = "https://github.com/paritytech/cumulus", branch = "polkadot-v0.9.7", default-features = false }
 cumulus-pallet-xcmp-queue = { git = "https://github.com/paritytech/cumulus", branch = "polkadot-v0.9.7", default-features = false }
 cumulus-pallet-xcm = { git = "https://github.com/paritytech/cumulus", branch = "polkadot-v0.9.7", default-features = false }
 cumulus-ping = { git = "https://github.com/paritytech/cumulus", branch = "polkadot-v0.9.7", default-features = false }
+cumulus-pallet-aura-ext = { git = "https://github.com/paritytech/cumulus", branch = "polkadot-v0.9.7", default-features = false }
 
 # Polkadot dependencies
 polkadot-parachain = { git = "https://github.com/paritytech/polkadot", branch = "release-v0.9.7", default-features = false }
@@ -118,6 +122,7 @@ std = [
     "pallet-contracts/std",
     "pallet-contracts-primitives/std",
     "pallet-contracts-rpc-runtime-api/std",
+    "pallet-aura/std",
 
     "parachain-info/std",
     "cumulus-pallet-parachain-system/std",
@@ -126,6 +131,9 @@ std = [
     "cumulus-pallet-xcmp-queue/std",
     "cumulus-pallet-xcm/std",
     "cumulus-ping/std",
+    "cumulus-primitives-timestamp/std",
+    "cumulus-pallet-dmp-queue/std",
+    "cumulus-pallet-aura-ext/std",
 
     "polkadot-parachain/std",
     "xcm/std",

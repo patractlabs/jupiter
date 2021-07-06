@@ -17,7 +17,7 @@ use sp_runtime::{
     ApplyExtrinsicResult, Perbill,
 };
 use sp_std::prelude::*;
-// pub use sp_consensus_aura::sr25519::AuthorityId as AuraId;
+pub use sp_consensus_aura::sr25519::AuthorityId as AuraId;
 
 #[cfg(feature = "std")]
 use sp_version::NativeVersion;
@@ -439,6 +439,14 @@ impl randomness_collect::Config for Runtime {
 
 impl pallet_randomness_collective_flip::Config for Runtime {}
 
+impl cumulus_pallet_aura_ext::Config for Runtime {}
+
+impl pallet_aura::Config for Runtime {
+    type AuthorityId = AuraId;
+}
+
+
+
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
     pub enum Runtime where
@@ -466,6 +474,9 @@ construct_runtime!(
         Spambot: cumulus_ping::{Pallet, Call, Storage, Event<T>} = 99,
 
         RandomnessCollect: randomness_collect::{Pallet, Call, Storage, ValidateUnsigned} = 50,
+
+        Aura: pallet_aura::{Pallet, Config<T>},
+		AuraExt: cumulus_pallet_aura_ext::{Pallet, Config},
     }
 );
 
@@ -630,6 +641,16 @@ impl_runtime_apis! {
         }
     }
 
+    impl sp_consensus_aura::AuraApi<Block, AuraId> for Runtime {
+		fn slot_duration() -> sp_consensus_aura::SlotDuration {
+			sp_consensus_aura::SlotDuration::from_millis(Aura::slot_duration())
+		}
+
+		fn authorities() -> Vec<AuraId> {
+			Aura::authorities()
+		}
+	}
+
     impl cumulus_primitives_core::CollectCollationInfo<Block> for Runtime {
         fn collect_collation_info() -> cumulus_primitives_core::CollationInfo {
             ParachainSystem::collect_collation_info()
@@ -641,15 +662,27 @@ struct CheckInherents;
 
 impl cumulus_pallet_parachain_system::CheckInherents<Block> for CheckInherents {
     fn check_inherents(
-        _: &Block,
-        _: &cumulus_pallet_parachain_system::RelayChainStateProof,
+        block: &Block,
+        relay_state_proof: &cumulus_pallet_parachain_system::RelayChainStateProof,
     ) -> sp_inherents::CheckInherentsResult {
-        sp_inherents::CheckInherentsResult::new()
+        let relay_chain_slot = relay_state_proof
+            .read_slot()
+            .expect("Could not read the relay chain slot from the proof");
+
+        let inherent_data =
+            cumulus_primitives_timestamp::InherentDataProvider::from_relay_chain_slot_and_duration(
+                relay_chain_slot,
+                sp_std::time::Duration::from_secs(6),
+            )
+                .create_inherent_data()
+                .expect("Could not create the timestamp inherent data");
+
+        inherent_data.check_extrinsics(&block)
     }
 }
 
 cumulus_pallet_parachain_system::register_validate_block! {
-    Runtime = Runtime,
-    BlockExecutor = Executive,
-    CheckInherents = CheckInherents,
+	Runtime = Runtime,
+	BlockExecutor = cumulus_pallet_aura_ext::BlockExecutor::<Runtime, Executive>,
+	CheckInherents = CheckInherents,
 }
