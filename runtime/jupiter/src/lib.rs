@@ -445,8 +445,6 @@ impl pallet_aura::Config for Runtime {
     type AuthorityId = AuraId;
 }
 
-
-
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
     pub enum Runtime where
@@ -463,20 +461,20 @@ construct_runtime!(
         TransactionPayment: pallet_transaction_payment::{Pallet, Storage} = 4,
 
         Contracts: pallet_contracts::{Pallet, Call, Storage, Event<T>} = 5,
-
         Sudo: pallet_sudo::{Pallet, Call, Config<T>, Storage, Event<T>} = 6,
 
         ParachainSystem: cumulus_pallet_parachain_system::{Pallet, Call, Storage, Inherent, Event<T>} = 10,
         ParachainInfo: parachain_info::{Pallet, Storage, Config} = 11,
+
+        Aura: pallet_aura::{Pallet, Config<T>},
+		AuraExt: cumulus_pallet_aura_ext::{Pallet, Config},
+
         XcmpQueue: cumulus_pallet_xcmp_queue::{Pallet, Call, Storage, Event<T>} = 12,
         PolkadotXcm: pallet_xcm::{Pallet, Call, Event<T>, Origin} = 13,
         CumulusXcm: cumulus_pallet_xcm::{Pallet, Call, Origin, Event<T>} = 14,
         Spambot: cumulus_ping::{Pallet, Call, Storage, Event<T>} = 99,
 
         RandomnessCollect: randomness_collect::{Pallet, Call, Storage, ValidateUnsigned} = 50,
-
-        Aura: pallet_aura::{Pallet, Config<T>},
-		AuraExt: cumulus_pallet_aura_ext::{Pallet, Config},
     }
 );
 

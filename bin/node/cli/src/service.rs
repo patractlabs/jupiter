@@ -96,11 +96,13 @@ pub fn new_partial(
     //     registry.clone(),
     // )?;
 
-    let slot_duration = cumulus_client_consensus_aura::slot_duration(&*client)?;
+    let client2 = client.clone();
+
+    let slot_duration = cumulus_client_consensus_aura::slot_duration(&*client2)?;
     let import_queue = cumulus_client_consensus_aura::import_queue::<sp_consensus_aura::sr25519::AuthorityPair, _, _, _, _, _, _>(
         cumulus_client_consensus_aura::ImportQueueParams {
-            block_import: client.clone(),
-            client: client.clone(),
+            block_import: client2.clone(),
+            client: client2.clone(),
             create_inherent_data_providers: move |_, _| async move {
                 let time = sp_timestamp::InherentDataProvider::from_system_time();
 
@@ -114,7 +116,7 @@ pub fn new_partial(
             },
             registry: config.prometheus_registry().clone(),
             can_author_with: sp_consensus::CanAuthorWithNativeVersion::new(
-                client.executor().clone(),
+                client2.executor().clone(),
             ),
             spawner: &task_manager.spawn_essential_handle(),
             telemetry: telemetry.as_ref().map(|telemetry| telemetry.handle()),
@@ -210,20 +212,20 @@ where
     // NOTICE: the node-pre module already use rpc, but here we may need some different rpc module
     let rpc_client = client.clone();
     let rpc_transaction_pool = transaction_pool.clone();
-    // let rpc_extensions_builder = Box::new(move |_, _| rpc_ext_builder(rpc_client.clone()));
-    let rpc_extensions_builder = {
-        let client = rpc_client.clone();
-        let pool = rpc_transaction_pool.clone();
-
-        Box::new(move |deny_unsafe, _| {
-            let deps = jupiter_rpc::BasicDeps {
-                client: client.clone(),
-                pool: pool.clone(),
-                deny_unsafe,
-            };
-            jupiter_rpc::create_basic(deps)
-        })
-    };
+    let rpc_extensions_builder = Box::new(move |_, _| rpc_ext_builder(rpc_client.clone()));
+    // let rpc_extensions_builder = {
+    //     let client = rpc_client.clone();
+    //     let pool = rpc_transaction_pool.clone();
+    //
+    //     Box::new(move |deny_unsafe, _| {
+    //         let deps = jupiter_rpc::BasicDeps {
+    //             client: client.clone(),
+    //             pool: pool.clone(),
+    //             deny_unsafe,
+    //         };
+    //         jupiter_rpc::create_basic(deps)
+    //     })
+    // };
 
     sc_service::spawn_tasks(sc_service::SpawnTasksParams {
         on_demand: None,
@@ -246,16 +248,18 @@ where
     };
 
     if validator {
-        let slot_duration = cumulus_client_consensus_aura::slot_duration(&*client)?;
+        let client2 = client.clone();
+        let relay_chain_node = &relay_chain_full_node;
+
+        let slot_duration = cumulus_client_consensus_aura::slot_duration(&*client2)?;
 
         let proposer_factory = sc_basic_authorship::ProposerFactory::with_proof_recording(
-            task_manager.spawn_handle(),
-            client.clone(),
+            &task_manager.spawn_handle(),
+            client2.clone(),
             transaction_pool,
             prometheus_registry.as_ref(),
             telemetry.as_ref().map(|x| x.handle()),
         );
-        let spawner = task_manager.spawn_handle();
 
         if let Some(rpc_port_addr) = rpc_port {
             let rpc_port = RpcPort {
@@ -272,8 +276,8 @@ where
         }
 
         // the inherent data provider contains ParachainInherentData and timestamp
-        let relay_chain_backend = relay_chain_full_node.backend.clone();
-        let relay_chain_client = relay_chain_full_node.client.clone();
+        let relay_chain_backend = relay_chain_node.backend.clone();
+        let relay_chain_client = relay_chain_node.client.clone();
 
         let parachain_consensus = cumulus_client_consensus_aura::build_aura_consensus::<sp_consensus_aura::sr25519::AuthorityPair,_,_,_,_,_,_,_,_,_,>(cumulus_client_consensus_aura::BuildAuraConsensusParams {
             proposer_factory,
@@ -287,7 +291,8 @@ where
                 );
                 async move {
                     let time = sp_timestamp::InherentDataProvider::from_system_time();
-                    let slot = sp_consensus_aura::inherents::InherentDataProvider::from_timestamp_and_duration(*time,slot_duration.slot_duration(),);
+                    let slot = sp_consensus_aura::inherents::InherentDataProvider::from_timestamp_and_duration(
+                        *time,slot_duration.slot_duration(),);
                     let parachain_inherent = parachain_inherent.ok_or_else(|| {
                         Box::<dyn std::error::Error + Send + Sync>::from(
                             "Failed to create parachain inherent",
@@ -296,10 +301,10 @@ where
                     Ok((time, slot, parachain_inherent))
                 }
             },
-            block_import: client.clone(),
-            relay_chain_client: relay_chain_full_node.client.clone(),
-            relay_chain_backend: relay_chain_full_node.backend.clone(),
-            para_client: client.clone(),
+            block_import: client2.clone(),
+            relay_chain_client: relay_chain_node.client.clone(),
+            relay_chain_backend: relay_chain_node.backend.clone(),
+            para_client: client2.clone(),
             backoff_authoring_blocks: Option::<()>::None,
             sync_oracle: network.clone(),
             keystore,
@@ -317,11 +322,14 @@ where
             client: client.clone(),
             task_manager: &mut task_manager,
             relay_chain_full_node,
-            spawner,
+            spawner: task_manager.spawn_handle(),
             parachain_consensus,
             import_queue,
         };
-
+        tracing::trace!(
+            target: "parachain:jupiter",
+            "start_collator with consensus",
+        );
         start_collator(params).await?;
     } else {
         let params = StartFullNodeParams {
@@ -331,7 +339,10 @@ where
             para_id: id,
             relay_chain_full_node,
         };
-
+        tracing::trace!(
+            target: "parachain:jupiter",
+            "start_collator without consensus",
+        );
         start_full_node(params)?;
     }
 

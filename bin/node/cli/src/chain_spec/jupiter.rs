@@ -69,7 +69,7 @@ pub fn development_config(id: ParaId) -> Result<ChainSpec, String> {
                 get_account_id_from_seed::<sr25519::Public>("Alice"),
                 vec![
                     get_from_seed::<AuraId>("Alice"),
-                    // get_from_seed::<AuraId>("Bob"),
+                    get_from_seed::<AuraId>("Bob"),
                     // get_from_seed::<AuraId>("Charlie"),
                 ],
                 // Pre-funded accounts
