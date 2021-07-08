@@ -143,7 +143,6 @@ pub fn new_partial(
 #[sc_tracing::logging::prefix_logs_with("Parachain")]
 async fn start_node_impl<RB>(
     parachain_config: Configuration,
-    _collator_key: CollatorPair,
     polkadot_config: Configuration,
     id: ParaId,
     validator: bool,
@@ -355,14 +354,12 @@ where
 /// Start a normal parachain node.
 pub async fn start_node(
     parachain_config: Configuration,
-    collator_key: CollatorPair,
     polkadot_config: Configuration,
     id: ParaId,
     validator: bool,
 ) -> sc_service::error::Result<(TaskManager, Arc<FullClient>)> {
     start_node_impl(
         parachain_config,
-        collator_key,
         polkadot_config,
         id,
         validator,

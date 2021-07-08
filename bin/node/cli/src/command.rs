@@ -282,12 +282,9 @@ pub fn run() -> Result<()> {
             Ok(())
         }
         None => {
-            let runner = cli.create_runner(&*cli.run)?;
+            let runner = cli.create_runner(&cli.run.normalize())?;
 
             runner.run_node_until_exit(|config| async move {
-                // TODO
-                let key = sp_core::Pair::generate().0;
-
                 let para_id = chain_spec::jupiter::Extensions::try_get(&*config.chain_spec)
                     .map(|e| e.para_id);
 
@@ -311,14 +308,15 @@ pub fn run() -> Result<()> {
                 let polkadot_config =
                     SubstrateCli::create_configuration(&polkadot_cli, &polkadot_cli, task_executor)
                         .map_err(|err| format!("Relay chain argument error: {}", err))?;
-                let collator = cli.run.base.validator || cli.collator;
+                let collator = cli.run.base.validator || cli.run.collator;
+                let _collator = config.role.is_authority();
 
                 info!("Parachain id: {:?}", id);
                 info!("Parachain Account: {}", parachain_account);
                 info!("Parachain genesis state: {}", genesis_state);
-                info!("Is collating: {}", if collator { "yes" } else { "no" });
+                info!("Is collating: {} -> {}", if collator { "yes" } else { "no" }, _collator);
 
-                crate::service::start_node(config, key, polkadot_config, id, collator)
+                crate::service::start_node(config, polkadot_config, id, collator)
                     .await
                     .map(|r| r.0)
                     .map_err(Into::into)

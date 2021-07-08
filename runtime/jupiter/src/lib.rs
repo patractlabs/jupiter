@@ -90,8 +90,8 @@ pub fn wasm_binary_unwrap() -> &'static [u8] {
 
 /// Runtime version.
 pub const VERSION: RuntimeVersion = RuntimeVersion {
-    spec_name: create_runtime_str!("jupiter-rococo"),
-    impl_name: create_runtime_str!("patract-jupiter-rococo"),
+    spec_name: create_runtime_str!("jupiter-westend"),
+    impl_name: create_runtime_str!("patract-jupiter-westend"),
     authoring_version: 0,
     spec_version: 1,
     impl_version: 0,
