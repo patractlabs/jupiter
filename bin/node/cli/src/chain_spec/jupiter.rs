@@ -120,8 +120,8 @@ pub fn staging_config(id: ParaId) -> Result<ChainSpec, String> {
                 hex!["426d8def6146e8ae997b24f81401e46e8439d7f392489549b10410bcca20b64e"].into(),
                 // for i in 1 2; do for j in aura; do subkey inspect --scheme Sr25519 "$SECRET//$i//$j"; done; done
                 vec![
-                    hex!["bef9da260be8c0a56db32cdcbc6fa9e9acde572bb1dddba6460452e86f19f64c"].unchecked_into(),
-                    hex!["64ec22fed0196f552354bcc4a6f39cbdc9441625a4276a99e8e8edec23b43008"].unchecked_into(),
+                    hex!["0a7d580f81d12479b6fd1e27af50cd67a1c95bfee8b9527d56915363d97f4618"].unchecked_into(),
+                    hex!["e8780f81d1448511c7fedc40284070042bfc422f7863d1a8291fb15e4ef0f72f"].unchecked_into(),
                 ],
                 vec![
                     hex!["426d8def6146e8ae997b24f81401e46e8439d7f392489549b10410bcca20b64e"].into(),
