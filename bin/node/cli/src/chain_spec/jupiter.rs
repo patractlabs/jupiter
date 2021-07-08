@@ -4,7 +4,7 @@ use serde_json::json;
 
 use sc_chain_spec::ChainSpecExtension;
 use sc_service::ChainType;
-use sp_core::{sr25519, Pair, Public};
+use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public};
 use sp_runtime::traits::{IdentifyAccount, Verify};
 
 use cumulus_primitives_core::ParaId;
@@ -56,7 +56,7 @@ where
 }
 
 /// Jupiter Development Chain Config
-pub fn development_config(id: ParaId) -> Result<ChainSpec, String> {
+pub fn development_config(id: ParaId, relay_chain: &str) -> Result<ChainSpec, String> {
     Ok(ChainSpec::from_genesis(
         // Name
         "Development",
@@ -102,7 +102,7 @@ pub fn development_config(id: ParaId) -> Result<ChainSpec, String> {
         ),
         // Extensions
         Extensions {
-            relay_chain: "rococo-local".into(),
+            relay_chain: relay_chain.into(),
             para_id: id.into(),
         },
     ))
@@ -116,8 +116,13 @@ pub fn staging_config(id: ParaId) -> Result<ChainSpec, String> {
         ChainType::Live,
         move || {
             testnet_genesis(
+                // subkey inspect "$SECRET"
                 hex!["426d8def6146e8ae997b24f81401e46e8439d7f392489549b10410bcca20b64e"].into(),
-                vec![],
+                // for i in 1 2; do for j in stash; do subkey inspect "$SECRET//$i//$j"; done; done
+                vec![
+                    hex!["bef9da260be8c0a56db32cdcbc6fa9e9acde572bb1dddba6460452e86f19f64c"].unchecked_into(),
+                    hex!["64ec22fed0196f552354bcc4a6f39cbdc9441625a4276a99e8e8edec23b43008"].unchecked_into(),
+                ],
                 vec![
                     hex!["426d8def6146e8ae997b24f81401e46e8439d7f392489549b10410bcca20b64e"].into(),
                 ],
@@ -142,7 +147,7 @@ pub fn staging_config(id: ParaId) -> Result<ChainSpec, String> {
             .to_owned(),
         ),
         Extensions {
-            relay_chain: "rococo".into(),
+            relay_chain: "westend".into(),
             para_id: id.into(),
         },
     ))
@@ -150,7 +155,7 @@ pub fn staging_config(id: ParaId) -> Result<ChainSpec, String> {
 
 /// Jupiter Chain Config
 pub fn jupiter_config() -> Result<ChainSpec, String> {
-    ChainSpec::from_json_bytes(&include_bytes!("../../res/jupiter_rococo.json")[..])
+    ChainSpec::from_json_bytes(&include_bytes!("../../res/jupiter-westend-097.json")[..])
 }
 
 /// Configure initial storage state for FRAME modules.

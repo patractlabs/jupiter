@@ -25,7 +25,8 @@ fn load_spec(
     para_id: ParaId,
 ) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
     Ok(match id {
-        "jupiter-dev" => Box::new(chain_spec::jupiter::development_config(para_id)?),
+        "jupiter-dev" => Box::new(chain_spec::jupiter::development_config(para_id, "rococo-local")?),
+        "jupiter-dev-westend" => Box::new(chain_spec::jupiter::development_config(para_id, "westend-local")?),
         "jupiter-staging" => Box::new(chain_spec::jupiter::staging_config(para_id)?),
         "" | "jupiter" => Box::new(chain_spec::jupiter::jupiter_config()?),
         path => Box::new(chain_spec::jupiter::ChainSpec::from_json_file(path.into())?),
@@ -58,7 +59,7 @@ impl SubstrateCli for Cli {
     }
 
     fn load_spec(&self, id: &str) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
-        load_spec(id, self.run.parachain_id.unwrap_or(24).into())
+        load_spec(id, self.run.parachain_id.unwrap_or(2000).into())
     }
 
     fn native_runtime_version(_: &Box<dyn ChainSpec>) -> &'static RuntimeVersion {
@@ -68,7 +69,7 @@ impl SubstrateCli for Cli {
 
 impl SubstrateCli for RelayChainCli {
     fn impl_name() -> String {
-        "Patract Parachain Collator".into()
+        "Patract Jupiter Collator".into()
     }
 
     fn impl_version() -> String {
@@ -76,10 +77,10 @@ impl SubstrateCli for RelayChainCli {
     }
 
     fn description() -> String {
-        "Patract parachain collator\n\nThe command-line arguments provided first will be \
+        "Patract jupiter collator\n\nThe command-line arguments provided first will be \
 		passed to the parachain node, while the arguments provided after -- will be passed \
 		to the relaychain node.\n\n\
-		patract [parachain-args] -- [relaychain-args]"
+		jupiter [parachain-args] -- [relaychain-args]"
             .into()
     }
 
@@ -88,7 +89,7 @@ impl SubstrateCli for RelayChainCli {
     }
 
     fn support_url() -> String {
-        "https://github.com/paritytech/cumulus/issues/new".into()
+        "https://github.com/patractlabs/jupiter/issues/new".into()
     }
 
     fn copyright_start_year() -> i32 {
@@ -151,6 +152,7 @@ pub fn run() -> Result<()> {
     set_default_ss58_version();
 
     match &cli.subcommand {
+        Some(Subcommand::Key(cmd)) => cmd.run(&cli),
         Some(Subcommand::BuildSpec(cmd)) => {
             let runner = cli.create_runner(cmd)?;
             runner.sync_run(|config| cmd.run(config.chain_spec, config.network))

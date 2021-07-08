@@ -424,18 +424,14 @@ fn testnet_genesis(
                 })
                 .collect::<Vec<_>>(),
         },
-        // pallet_democracy: Default::default(),
-        // collective_Instance1: CouncilConfig {
         council: CouncilConfig {
             members: vec![],
             phantom: Default::default(),
         },
-        // collective_Instance2: TechnicalCommitteeConfig {
         technical_committee: TechnicalCommitteeConfig {
             members: vec![],
             phantom: Default::default(),
         },
-        // membership_Instance1: Default::default(),
         technical_membership: Default::default(),
         sudo: SudoConfig { key: root_key },
         po_a: PoAConfig {

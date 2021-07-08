@@ -5,6 +5,9 @@ use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
 pub enum Subcommand {
+    /// Key management cli utilities
+    Key(sc_cli::KeySubcommand),
+
     /// Export the genesis state of the parachain.
     #[structopt(name = "export-genesis-state")]
     ExportGenesisState(ExportGenesisStateCommand),
