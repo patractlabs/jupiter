@@ -777,11 +777,11 @@ impl InstanceFilter<Call> for ProxyType {
                 Call::Authorship(..) |
                 // Call::Staking(..) |
                 Call::PoA(..) |
-                Call::Offences(..) |
+                // Call::Offences(..) |
                 Call::Session(..) |
                 Call::Grandpa(..) |
                 Call::ImOnline(..) |
-                Call::AuthorityDiscovery(..) |
+                // Call::AuthorityDiscovery(..) |
                 Call::Democracy(..) |
                 Call::Council(..) |
                 Call::TechnicalCommittee(..) |
@@ -867,12 +867,12 @@ construct_runtime!(
         // Consensus support.
         Authorship: pallet_authorship::{Pallet, Call, Storage} = 6,
         PoA: pallet_poa::{Pallet, Call, Config<T>, Storage, Event<T>} = 7,
-        Offences: pallet_offences::{Pallet, Call, Storage, Event} = 8,
+        Offences: pallet_offences::{Pallet, Storage, Event} = 8,
         Historical: pallet_session_historical::{Pallet} = 9,
         Session: pallet_session::{Pallet, Call, Storage, Event, Config<T>} = 10,
         Grandpa: pallet_grandpa::{Pallet, Call, Storage, Config, Event, ValidateUnsigned} = 11,
         ImOnline: pallet_im_online::{Pallet, Call, Storage, Event<T>, ValidateUnsigned, Config<T>} = 12,
-        AuthorityDiscovery: pallet_authority_discovery::{Pallet, Call, Storage, Config} = 13,
+        AuthorityDiscovery: pallet_authority_discovery::{Pallet, Storage, Config} = 13,
 
         // Governance stuff; uncallable initially.
         Democracy: pallet_democracy::{Pallet, Call, Storage, Event<T>} = 14,
@@ -989,8 +989,9 @@ impl_runtime_apis! {
         fn validate_transaction(
             source: TransactionSource,
             tx: <Block as BlockT>::Extrinsic,
+            block_hash: <Block as BlockT>::Hash,
         ) -> TransactionValidity {
-            Executive::validate_transaction(source, tx)
+            Executive::validate_transaction(source, tx, block_hash)
         }
     }
 

@@ -74,18 +74,18 @@ impl<C: pallet_contracts::Config> ChainExtension<C> for DevExtension<C> {
                 Ok(RetVal::Converging(0))
             }
             // random with subject input
-            0x00010003 => {
-                let mut env = env.buf_in_buf_out();
-
-                env.charge_weight(randomness_gas())?;
-
-                let input: Vec<u8> = env.read_as()?;
-
-                let randomness =
-                    <Runtime as frame_system::Config>::Hashing::hash_of(&input.as_slice());
-                env.write(&randomness.encode(), false, None)?;
-                Ok(RetVal::Converging(0))
-            }
+            // 0x00010003 => {
+            //     let mut env = env.buf_in_buf_out();
+            //
+            //     env.charge_weight(randomness_gas())?;
+            //
+            //     let input: Vec<u8> = env.read_as()?;
+            //
+            //     let randomness =
+            //         <Runtime as frame_system::Config>::Hashing::hash_of(&input.as_slice());
+            //     env.write(&randomness.encode(), false, None)?;
+            //     Ok(RetVal::Converging(0))
+            // }
             _ => JupiterExt::call(func_id, env),
         }
     }

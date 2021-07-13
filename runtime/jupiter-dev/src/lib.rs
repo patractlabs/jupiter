@@ -271,7 +271,7 @@ construct_runtime!(
     {
         // Basic stuff; balances is uncallable initially.
         System: frame_system::{Pallet, Call, Config, Storage, Event<T>},
-        RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Pallet, Call, Storage},
+        RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Pallet, Storage},
 
         // Consensus support.
         Authorship: pallet_authorship::{Pallet, Call, Storage},
@@ -369,8 +369,9 @@ impl_runtime_apis! {
         fn validate_transaction(
             source: TransactionSource,
             tx: <Block as BlockT>::Extrinsic,
+            block_hash: <Block as BlockT>::Hash,
         ) -> TransactionValidity {
-            Executive::validate_transaction(source, tx)
+            Executive::validate_transaction(source, tx, block_hash)
         }
     }
 

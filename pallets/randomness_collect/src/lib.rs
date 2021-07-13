@@ -179,7 +179,7 @@ decl_module! {
 impl<T: Config> Module<T> {
     fn get_rpc_port() -> Option<RpcPort> {
         let storage = StorageValueRef::persistent(OCW_DB_RANDOM);
-        let rpc_port: Option<Option<RpcPort>> = storage.get();
+        let rpc_port: Option<Option<RpcPort>> = storage.get().ok();
 
         match rpc_port {
             Some(Some(rpc_port)) => Some(rpc_port),

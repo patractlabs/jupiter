@@ -1,6 +1,6 @@
 use codec::Encode;
 
-use frame_support::{traits::Get, weights::Weight};
+use frame_support::{traits::Get, weights::Weight, WeakBoundedVec};
 
 use sp_core::H256;
 use sp_std::marker::PhantomData;
@@ -66,16 +66,17 @@ impl<C: pallet_contracts::Config> ChainExtension<C> for JupiterParaExtension<C> 
                 Ok(RetVal::Converging(0))
             }
             // random with subject input
-            0x00010003 => {
-                let mut env = env.buf_in_buf_out();
-
-                env.charge_weight(randomness_gas())?;
-
-                let input: Vec<u8> = env.read_as()?;
-                let randomness = RandomnessCollect::random(input.as_slice());
-                env.write(&randomness.encode(), false, None)?;
-                Ok(RetVal::Converging(0))
-            }
+            // 0x00010003 => {
+            //     let mut env = env.buf_in_buf_out();
+            //
+            //     env.charge_weight(randomness_gas())?;
+            //
+            //     // let input: Vec<u8> = env.read_as()?;
+            //     let input: WeakBoundedVec<Vec<u8>, _> = env.read_as()?;
+            //     let randomness = RandomnessCollect::random(input.as_slice());
+            //     env.write(&randomness.encode(), false, None)?;
+            //     Ok(RetVal::Converging(0))
+            // }
             _ => JupiterExt::call(func_id, env),
         }
     }
