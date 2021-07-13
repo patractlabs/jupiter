@@ -147,7 +147,7 @@ pub fn staging_config(id: ParaId) -> Result<ChainSpec, String> {
             .to_owned(),
         ),
         Extensions {
-            relay_chain: "westend".into(),
+            relay_chain: "westend-staging".into(),
             para_id: id.into(),
         },
     ))
