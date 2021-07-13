@@ -155,7 +155,7 @@ pub fn staging_config(id: ParaId) -> Result<ChainSpec, String> {
 
 /// Jupiter Chain Config
 pub fn jupiter_config() -> Result<ChainSpec, String> {
-    ChainSpec::from_json_bytes(&include_bytes!("../../res/jupiter-westend-097.json")[..])
+    ChainSpec::from_json_bytes(&include_bytes!("../../res/jupiter-westend-098.json")[..])
 }
 
 /// Configure initial storage state for FRAME modules.
