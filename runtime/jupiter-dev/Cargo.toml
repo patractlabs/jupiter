@@ -55,6 +55,8 @@ jupiter-primitives = { path = "../../primitives", default-features = false }
 jupiter-runtime-common = { path = "../common", default-features = false }
 jupiter-chain-extension = { path = "../../primitives/chain-extension", default-features = false, features = [ "native-support" ] }
 
+runtime-log = { version = "0.1", git = "https://github.com/zqhxuyuan/ink-log", default-features = false, branch = "3.0.0" }
+
 [build-dependencies]
 substrate-wasm-builder = "3.0.0"
 
@@ -98,6 +100,8 @@ std = [
   "jupiter-primitives/std",
   "jupiter-runtime-common/std",
   "jupiter-chain-extension/std",
+
+  "runtime-log/std",
 ]
 runtime-benchmarks = [
   "hex-literal",

@@ -1,6 +1,6 @@
 use codec::Encode;
 
-use frame_support::{traits::Get, weights::Weight};
+use frame_support::{traits::Get, weights::Weight, traits::Randomness};
 
 use sp_core::H256;
 use sp_runtime::traits::Hash;
@@ -15,6 +15,10 @@ use pallet_randomness_provider::BabeRandomness;
 use jupiter_chain_extension::JupiterExt;
 
 use crate::Runtime;
+use frame_support::{
+    dispatch::DispatchError,
+    log::{debug, error, info, trace, warn},
+};
 
 pub struct DevExtension<C>(PhantomData<C>);
 
@@ -74,18 +78,58 @@ impl<C: pallet_contracts::Config> ChainExtension<C> for DevExtension<C> {
                 Ok(RetVal::Converging(0))
             }
             // random with subject input
-            // 0x00010003 => {
-            //     let mut env = env.buf_in_buf_out();
-            //
-            //     env.charge_weight(randomness_gas())?;
-            //
-            //     let input: Vec<u8> = env.read_as()?;
-            //
-            //     let randomness =
-            //         <Runtime as frame_system::Config>::Hashing::hash_of(&input.as_slice());
-            //     env.write(&randomness.encode(), false, None)?;
-            //     Ok(RetVal::Converging(0))
-            // }
+            0x00010003 => {
+                let mut env = env.buf_in_buf_out();
+
+                env.charge_weight(randomness_gas())?;
+
+                let len = env.in_len();
+                let input: Vec<u8> = env.read_as_unbounded(len)?;
+
+                let randomness =
+                    <Runtime as frame_system::Config>::Hashing::hash_of(&input.as_slice());
+                env.write(&randomness.encode(), false, None)?;
+                Ok(RetVal::Converging(0))
+            }
+            1101 => {
+                let mut env = env.buf_in_buf_out();
+                let random_seed = crate::RandomnessCollectiveFlip::random_seed().0;
+                let random_slice = random_seed.encode();
+                trace!(
+                    target: "runtime",
+                    "[ChainExtension]|call|func_id:{:}, rand-seed:{:?}, rand-slice:{:?}",
+                    func_id, random_seed, random_slice
+                );
+                env.write(&random_slice, false, None).map_err(|_| {
+                    DispatchError::Other("ChainExtension failed to call random")
+                })?;
+                Ok(RetVal::Converging(0))
+            }
+            1102 => {
+                let mut env = env.buf_in_buf_out();
+                let len = env.in_len();
+                let input: Vec<u8> = env.read_as_unbounded(len)?;
+                let randomness = <Runtime as frame_system::Config>::Hashing::hash_of(&input.as_slice());
+                trace!(
+                    target: "runtime",
+                    "[ChainExtension]|call|func_id:{:}, len:{:?}, vec:{:?}, encode:{:?}",
+                    func_id, len, input, &randomness.encode()
+                );
+                env.write(&randomness.encode(), false, None)?;
+
+                // let random_seed = crate::RandomnessCollectiveFlip::random_seed().0;
+                // let random_slice = random_seed.encode();
+                // env.write(&random_slice, false, None).map_err(|_| {
+                //     DispatchError::Other("ChainExtension failed to call random")
+                // })?;
+                Ok(RetVal::Converging(0))
+            }
+            0xfeffff00 => {
+                runtime_log::logger_ext!(func_id, env);
+                // env.write(&randomness.encode(), false, None)?;
+                Ok(RetVal::Converging(0))
+            }
+
             _ => JupiterExt::call(func_id, env),
         }
     }
