@@ -79,7 +79,6 @@ pub fn development_config(id: ParaId, relay_chain: &str) -> Result<ChainSpec, St
                     get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
                     get_account_id_from_seed::<sr25519::Public>("Bob//stash"),
                 ],
-                true,
                 id,
             )
         },
@@ -126,7 +125,6 @@ pub fn staging_config(id: ParaId) -> Result<ChainSpec, String> {
                 vec![
                     hex!["426d8def6146e8ae997b24f81401e46e8439d7f392489549b10410bcca20b64e"].into(),
                 ],
-                false,
                 id,
             )
         },
@@ -163,7 +161,6 @@ fn testnet_genesis(
     root_key: AccountId,
     initial_authorities: Vec<AuraId>,
     endowed_accounts: Vec<AccountId>,
-    enable_println: bool,
     id: ParaId,
 ) -> GenesisConfig {
     GenesisConfig {

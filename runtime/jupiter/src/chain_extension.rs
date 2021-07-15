@@ -1,6 +1,6 @@
 use codec::Encode;
 
-use frame_support::{traits::Get, weights::Weight, BoundedVec};
+use frame_support::{traits::Get, weights::Weight};
 
 use sp_core::H256;
 use sp_std::marker::PhantomData;

@@ -1,13 +1,9 @@
 //! Service and ServiceFactory implementation. Specialized wrapper over substrate service.
-use cumulus_client_consensus_relay_chain::{
-    build_relay_chain_consensus, BuildRelayChainConsensusParams,
-};
 use cumulus_client_network::build_block_announce_validator;
 use cumulus_client_service::{
     prepare_node_config, start_collator, start_full_node, StartCollatorParams, StartFullNodeParams,
 };
 use cumulus_primitives_core::ParaId;
-use polkadot_primitives::v0::CollatorPair;
 use sc_telemetry::{Telemetry, TelemetryWorker, TelemetryWorkerHandle};
 use std::sync::Arc;
 
@@ -141,16 +137,12 @@ pub fn new_partial(
 ///
 /// This is the actual implementation that is abstract over the executor and the runtime api.
 #[sc_tracing::logging::prefix_logs_with("Parachain")]
-async fn start_node_impl<RB>(
+async fn start_node_impl(
     parachain_config: Configuration,
     polkadot_config: Configuration,
     id: ParaId,
     validator: bool,
-    rpc_ext_builder: RB,
-) -> sc_service::error::Result<(TaskManager, Arc<FullClient>)>
-where
-    RB: Fn(Arc<FullClient>) -> jupiter_rpc::IoHandler + Send + 'static,
-{
+) -> sc_service::error::Result<(TaskManager, Arc<FullClient>)> {
     if matches!(parachain_config.role, Role::Light) {
         return Err("Light client not supported!".into());
     }
@@ -211,7 +203,6 @@ where
     // NOTICE: the node-pre module already use rpc, but here we may need some different rpc module
     let rpc_client = client.clone();
     let rpc_transaction_pool = transaction_pool.clone();
-    // let rpc_extensions_builder = Box::new(move |_, _| rpc_ext_builder(rpc_client.clone()));
     let rpc_extensions_builder = {
         let client = rpc_client.clone();
         let pool = rpc_transaction_pool.clone();
@@ -365,7 +356,6 @@ pub async fn start_node(
         polkadot_config,
         id,
         validator,
-        |_| Default::default(),
     )
     .await
 }

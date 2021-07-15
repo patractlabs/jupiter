@@ -9,7 +9,6 @@ use sp_std::vec::Vec;
 use pallet_contracts::chain_extension::{
     ChainExtension, Environment, Ext, InitState, RetVal, SysConfig, UncheckedFrom,
 };
-use max_encoded_len::MaxEncodedLen;
 
 /// The chain Extension of Jupiter
 pub struct JupiterExt;
