@@ -72,8 +72,6 @@ pub fn new_partial(
         telemetry
     });
 
-    // let registry = config.prometheus_registry();
-
     let transaction_pool = sc_transaction_pool::BasicPool::new_full(
         config.transaction_pool.clone(),
         config.role.is_authority().into(),
@@ -81,16 +79,6 @@ pub fn new_partial(
         task_manager.spawn_essential_handle(),
         client.clone(),
     );
-
-    // use the cumulus consensus with relay chain, this is for rococo-v1
-    // todo: use aura related import_queue implementation for 0.9.3+, plz ref to cumulus
-    // let import_queue = cumulus_client_consensus_relay_chain::import_queue(
-    //     client.clone(),
-    //     client.clone(),
-    //     |_, _| async { Ok(sp_timestamp::InherentDataProvider::from_system_time()) },
-    //     &task_manager.spawn_essential_handle(),
-    //     registry.clone(),
-    // )?;
 
     let client2 = client.clone();
 
@@ -199,8 +187,6 @@ async fn start_node_impl(
         );
     }
 
-    // the passing rpc_ext_builder current is default, should add contract and related rpc
-    // NOTICE: the node-pre module already use rpc, but here we may need some different rpc module
     let rpc_client = client.clone();
     let rpc_transaction_pool = transaction_pool.clone();
     let rpc_extensions_builder = {
@@ -319,10 +305,6 @@ async fn start_node_impl(
             parachain_consensus,
             import_queue,
         };
-        tracing::trace!(
-            target: "parachain:jupiter",
-            "start_collator with consensus",
-        );
         start_collator(params).await?;
     } else {
         let params = StartFullNodeParams {
@@ -332,10 +314,6 @@ async fn start_node_impl(
             para_id: id,
             relay_chain_full_node,
         };
-        tracing::trace!(
-            target: "parachain:jupiter",
-            "start_collator without consensus",
-        );
         start_full_node(params)?;
     }
 
