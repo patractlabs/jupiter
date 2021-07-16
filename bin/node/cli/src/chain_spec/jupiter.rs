@@ -74,7 +74,6 @@ pub fn development_config(id: ParaId, relay_chain: &str) -> Result<ChainSpec, St
                 vec![
                     get_from_seed::<AuraId>("Alice"),
                     get_from_seed::<AuraId>("Bob"),
-                    // get_from_seed::<AuraId>("Charlie"),
                 ],
                 // Pre-funded accounts
                 vec![

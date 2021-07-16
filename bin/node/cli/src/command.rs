@@ -27,14 +27,10 @@ fn load_spec(
     Ok(match id {
         "jupiter-dev" => Box::new(chain_spec::jupiter::development_config(
             para_id,
-            "rococo-local",
-        )?),
-        "jupiter-dev-westend" => Box::new(chain_spec::jupiter::development_config(
-            para_id,
             "westend-local",
         )?),
-        "jupiter-staging" => Box::new(chain_spec::jupiter::staging_config(para_id)?),
-        "" | "jupiter" => Box::new(chain_spec::jupiter::jupiter_config()?),
+        // "jupiter-staging" => Box::new(chain_spec::jupiter::staging_config(para_id)?),
+        // "" | "jupiter" => Box::new(chain_spec::jupiter::jupiter_config()?),
         path => Box::new(chain_spec::jupiter::ChainSpec::from_json_file(path.into())?),
     })
 }
