@@ -26,7 +26,7 @@ impl<C: pallet_contracts::Config> ChainExtension<C> for JupiterExt {
             // 0x01000000-0x010000ff Jupiter ZKP Support
             0x01000000..=0x010000ff => {
                 // The memory of the vm stores buf in scale-codec
-                let input: Vec<u8> = env.read_as()?;
+                let input: Vec<u8> = env.read_as_unbounded(env.in_len())?;
                 // currently only support [PIP-101](https://github.com/patractlabs/PIPs/blob/main/PIPs/pip-101.md)
                 // TODO just charge weight in a simple way. ADD/MUL is less then SHA256's weight
                 // and Paring is more than SHA256's weight. Change this part with benchmark result in future.

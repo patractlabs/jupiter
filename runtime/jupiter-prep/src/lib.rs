@@ -49,7 +49,7 @@ pub use frame_support::{
     construct_runtime, parameter_types,
     traits::{
         Contains, ContainsLengthBound, Filter, InstanceFilter, KeyOwnerProofSystem, LockIdentifier,
-        Randomness, SortedMembers, U128CurrencyToVote,
+        MaxEncodedLen, Randomness, SortedMembers, U128CurrencyToVote,
     },
     weights::{
         constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_PER_SECOND},
@@ -621,6 +621,7 @@ parameter_types! {
     // For weight estimation, we assume that the most locks on an individual account will be 50.
     // This number may need to be adjusted in the future if this assumption no longer holds true.
     pub const MaxLocks: u32 = 50;
+       pub const MaxReserves: u32 = 50;
 }
 
 impl pallet_balances::Config for Runtime {
@@ -633,6 +634,8 @@ impl pallet_balances::Config for Runtime {
     type ExistentialDeposit = ExistentialDeposit;
     type AccountStore = System;
     type WeightInfo = weights::pallet_balances::WeightInfo<Runtime>;
+    type MaxReserves = MaxReserves;
+    type ReserveIdentifier = [u8; 8];
 }
 
 parameter_types! {
@@ -704,7 +707,7 @@ impl pallet_contracts::Config for Runtime {
     type RentFraction = RentFraction;
     type SurchargeReward = SurchargeReward;
     type CallStack = [pallet_contracts::Frame<Self>; 31];
-    type WeightPrice = pallet_transaction_payment::Module<Self>;
+    type WeightPrice = pallet_transaction_payment::Pallet<Self>;
     type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
     type ChainExtension = chain_extension::JupiterExtension<Self>;
     type DeletionQueueDepth = DeletionQueueDepth;
@@ -748,7 +751,9 @@ parameter_types! {
 }
 
 /// The type used to represent the kinds of proxying allowed.
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Encode, Decode, RuntimeDebug)]
+#[derive(
+    Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Encode, Decode, RuntimeDebug, MaxEncodedLen,
+)]
 pub enum ProxyType {
     Any,
     NonTransfer,
@@ -774,11 +779,11 @@ impl InstanceFilter<Call> for ProxyType {
                 Call::Authorship(..) |
                 // Call::Staking(..) |
                 Call::PoA(..) |
-                Call::Offences(..) |
+                // Call::Offences(..) |
                 Call::Session(..) |
                 Call::Grandpa(..) |
                 Call::ImOnline(..) |
-                Call::AuthorityDiscovery(..) |
+                // Call::AuthorityDiscovery(..) |
                 Call::Democracy(..) |
                 Call::Council(..) |
                 Call::TechnicalCommittee(..) |
@@ -864,15 +869,15 @@ construct_runtime!(
         // Consensus support.
         Authorship: pallet_authorship::{Pallet, Call, Storage} = 6,
         PoA: pallet_poa::{Pallet, Call, Config<T>, Storage, Event<T>} = 7,
-        Offences: pallet_offences::{Pallet, Call, Storage, Event} = 8,
+        Offences: pallet_offences::{Pallet, Storage, Event} = 8,
         Historical: pallet_session_historical::{Pallet} = 9,
         Session: pallet_session::{Pallet, Call, Storage, Event, Config<T>} = 10,
         Grandpa: pallet_grandpa::{Pallet, Call, Storage, Config, Event, ValidateUnsigned} = 11,
         ImOnline: pallet_im_online::{Pallet, Call, Storage, Event<T>, ValidateUnsigned, Config<T>} = 12,
-        AuthorityDiscovery: pallet_authority_discovery::{Pallet, Call, Storage, Config} = 13,
+        AuthorityDiscovery: pallet_authority_discovery::{Pallet, Storage, Config} = 13,
 
         // Governance stuff; uncallable initially.
-        Democracy: pallet_democracy::{Pallet, Call, Storage, Config, Event<T>} = 14,
+        Democracy: pallet_democracy::{Pallet, Call, Storage, Event<T>} = 14,
         Council: pallet_collective::<Instance1>::{Pallet, Call, Storage, Origin<T>, Event<T>, Config<T>} = 15,
         TechnicalCommittee: pallet_collective::<Instance2>::{Pallet, Call, Storage, Origin<T>, Event<T>, Config<T>} = 16,
         TechnicalMembership: pallet_membership::<Instance1>::{Pallet, Call, Storage, Event<T>, Config<T>} = 18,
@@ -986,8 +991,9 @@ impl_runtime_apis! {
         fn validate_transaction(
             source: TransactionSource,
             tx: <Block as BlockT>::Extrinsic,
+            block_hash: <Block as BlockT>::Hash,
         ) -> TransactionValidity {
-            Executive::validate_transaction(source, tx)
+            Executive::validate_transaction(source, tx, block_hash)
         }
     }
 

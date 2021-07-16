@@ -71,7 +71,7 @@ impl<C: pallet_contracts::Config> ChainExtension<C> for JupiterExtension<C> {
 
                 env.charge_weight(randomness_gas())?;
 
-                let input: Vec<u8> = env.read_as()?;
+                let input: Vec<u8> = env.read_as_unbounded(env.in_len())?;
                 let randomness = RandomnessProvider::random(input.as_slice());
                 env.write(&randomness.encode(), false, None)?;
                 Ok(RetVal::Converging(0))
