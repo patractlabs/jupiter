@@ -108,6 +108,7 @@ parameter_types! {
             frame_support::weights::constants::WEIGHT_PER_SECOND * 2
         );
     pub const MaxLocks: u32 = 1024;
+    pub const MaxReserves: u32 = 50;
     pub static ExistentialDeposit: Balance = 1;
     pub static Period: BlockNumber = 5;
     pub static Offset: BlockNumber = 0;
@@ -147,6 +148,8 @@ impl pallet_balances::Config for Test {
     type ExistentialDeposit = ExistentialDeposit;
     type AccountStore = System;
     type WeightInfo = ();
+    type MaxReserves = MaxReserves;
+    type ReserveIdentifier = [u8; 8];
 }
 
 parameter_types! {
@@ -412,7 +415,7 @@ pub(crate) fn poa_events() -> Vec<poa::Event<Test>> {
         .into_iter()
         .map(|r| r.event)
         .filter_map(|e| {
-            if let Event::poa(inner) = e {
+            if let Event::PoA(inner) = e {
                 Some(inner)
             } else {
                 None

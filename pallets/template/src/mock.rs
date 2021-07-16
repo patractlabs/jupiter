@@ -4,7 +4,7 @@ use sp_runtime::{
     AccountId32, Perbill,
 };
 
-use frame_support::{parameter_types, traits::Currency, traits::GenesisBuild, weights::Weight};
+use frame_support::{parameter_types, traits::Currency, weights::Weight};
 use pallet_contracts::Frame;
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
@@ -22,7 +22,7 @@ frame_support::construct_runtime!(
         System: frame_system::{Pallet, Call, Config, Storage, Event<T>},
         Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>},
         Timestamp: pallet_timestamp::{Pallet, Call, Storage, Inherent},
-        Randomness: pallet_randomness_collective_flip::{Pallet, Call, Storage},
+        Randomness: pallet_randomness_collective_flip::{Pallet, Storage},
         Contracts: pallet_contracts::{Pallet, Call, Storage, Event<T>},
         Template: pallet_template::{Pallet, Call, Storage, Event<T>},
     }
@@ -70,6 +70,7 @@ impl frame_system::Config for Test {
 parameter_types! {
     pub const MinimumPeriod: u64 = 1;
     pub static ExistentialDeposit: u128 = 0;
+    pub const MaxReserves: u32 = 50;
 }
 
 impl pallet_timestamp::Config for Test {
@@ -87,6 +88,8 @@ impl pallet_balances::Config for Test {
     type ExistentialDeposit = ExistentialDeposit;
     type AccountStore = System;
     type WeightInfo = ();
+    type MaxReserves = MaxReserves;
+    type ReserveIdentifier = [u8; 8];
 }
 
 parameter_types! {
@@ -128,6 +131,8 @@ impl pallet_contracts::Config for Test {
 impl pallet_template::Config for Test {
     type Event = Event;
 }
+
+impl pallet_randomness_collective_flip::Config for Test {}
 
 pub const ALICE: AccountId32 = AccountId32::new([1u8; 32]);
 
