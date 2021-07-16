@@ -49,7 +49,7 @@ pub use frame_support::{
     construct_runtime, parameter_types,
     traits::{
         Contains, ContainsLengthBound, Filter, InstanceFilter, KeyOwnerProofSystem, LockIdentifier,
-        Randomness, SortedMembers, U128CurrencyToVote, MaxEncodedLen
+        MaxEncodedLen, Randomness, SortedMembers, U128CurrencyToVote,
     },
     weights::{
         constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_PER_SECOND},
@@ -621,7 +621,7 @@ parameter_types! {
     // For weight estimation, we assume that the most locks on an individual account will be 50.
     // This number may need to be adjusted in the future if this assumption no longer holds true.
     pub const MaxLocks: u32 = 50;
-   	pub const MaxReserves: u32 = 50;
+       pub const MaxReserves: u32 = 50;
 }
 
 impl pallet_balances::Config for Runtime {
@@ -751,7 +751,9 @@ parameter_types! {
 }
 
 /// The type used to represent the kinds of proxying allowed.
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Encode, Decode, RuntimeDebug, MaxEncodedLen)]
+#[derive(
+    Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Encode, Decode, RuntimeDebug, MaxEncodedLen,
+)]
 pub enum ProxyType {
     Any,
     NonTransfer,

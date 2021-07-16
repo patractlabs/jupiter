@@ -1,11 +1,11 @@
 use crate::chain_spec;
 use sc_cli;
+use sc_service::config::PrometheusConfig;
+use sc_service::{BasePath, TransactionPoolOptions};
+use sc_telemetry::TelemetryEndpoints;
+use std::net::SocketAddr;
 use std::path::PathBuf;
 use structopt::StructOpt;
-use sc_telemetry::TelemetryEndpoints;
-use sc_service::config::PrometheusConfig;
-use sc_service::{TransactionPoolOptions, BasePath};
-use std::net::SocketAddr;
 
 #[derive(Debug, StructOpt)]
 pub enum Subcommand {
@@ -88,8 +88,8 @@ pub struct RunCmd {
     pub parachain_id: Option<u32>,
 
     /// Run node as collator.
-	///
-	/// Note that this is the same as running with `--validator`.
+    ///
+    /// Note that this is the same as running with `--validator`.
     #[structopt(long, conflicts_with = "validator")]
     pub collator: bool,
 }
@@ -170,7 +170,10 @@ impl sc_cli::CliConfiguration for NormalizedRunCmd {
         self.base.force_authoring()
     }
 
-    fn prometheus_config(&self, default_listen_port: u16) -> sc_cli::Result<Option<PrometheusConfig>> {
+    fn prometheus_config(
+        &self,
+        default_listen_port: u16,
+    ) -> sc_cli::Result<Option<PrometheusConfig>> {
         self.base.prometheus_config(default_listen_port)
     }
 
@@ -214,7 +217,6 @@ impl sc_cli::CliConfiguration for NormalizedRunCmd {
         self.base.base_path()
     }
 }
-
 
 #[derive(Debug, StructOpt)]
 #[structopt(settings = &[

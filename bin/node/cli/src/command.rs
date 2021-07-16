@@ -25,8 +25,14 @@ fn load_spec(
     para_id: ParaId,
 ) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
     Ok(match id {
-        "jupiter-dev" => Box::new(chain_spec::jupiter::development_config(para_id, "rococo-local")?),
-        "jupiter-dev-westend" => Box::new(chain_spec::jupiter::development_config(para_id, "westend-local")?),
+        "jupiter-dev" => Box::new(chain_spec::jupiter::development_config(
+            para_id,
+            "rococo-local",
+        )?),
+        "jupiter-dev-westend" => Box::new(chain_spec::jupiter::development_config(
+            para_id,
+            "westend-local",
+        )?),
         "jupiter-staging" => Box::new(chain_spec::jupiter::staging_config(para_id)?),
         "" | "jupiter" => Box::new(chain_spec::jupiter::jupiter_config()?),
         path => Box::new(chain_spec::jupiter::ChainSpec::from_json_file(path.into())?),
@@ -314,7 +320,11 @@ pub fn run() -> Result<()> {
                 info!("Parachain id: {:?}", id);
                 info!("Parachain Account: {}", parachain_account);
                 info!("Parachain genesis state: {}", genesis_state);
-                info!("Is collating: {} -> {}", if collator { "yes" } else { "no" }, _collator);
+                info!(
+                    "Is collating: {} -> {}",
+                    if collator { "yes" } else { "no" },
+                    _collator
+                );
 
                 crate::service::start_node(config, polkadot_config, id, collator)
                     .await

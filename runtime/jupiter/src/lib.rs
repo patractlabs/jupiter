@@ -9,6 +9,7 @@ include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 mod chain_extension;
 
 use sp_api::impl_runtime_apis;
+pub use sp_consensus_aura::sr25519::AuthorityId as AuraId;
 use sp_core::OpaqueMetadata;
 use sp_runtime::{
     create_runtime_str, generic, impl_opaque_keys,
@@ -17,7 +18,6 @@ use sp_runtime::{
     ApplyExtrinsicResult, Perbill,
 };
 use sp_std::prelude::*;
-pub use sp_consensus_aura::sr25519::AuthorityId as AuraId;
 
 #[cfg(feature = "std")]
 use sp_version::NativeVersion;
@@ -468,7 +468,7 @@ construct_runtime!(
         ParachainInfo: parachain_info::{Pallet, Storage, Config},
 
         Aura: pallet_aura::{Pallet, Config<T>},
-		AuraExt: cumulus_pallet_aura_ext::{Pallet, Config},
+        AuraExt: cumulus_pallet_aura_ext::{Pallet, Config},
 
         XcmpQueue: cumulus_pallet_xcmp_queue::{Pallet, Call, Storage, Event<T>},
         PolkadotXcm: pallet_xcm::{Pallet, Call, Event<T>, Origin},
@@ -643,14 +643,14 @@ impl_runtime_apis! {
     }
 
     impl sp_consensus_aura::AuraApi<Block, AuraId> for Runtime {
-		fn slot_duration() -> sp_consensus_aura::SlotDuration {
-			sp_consensus_aura::SlotDuration::from_millis(Aura::slot_duration())
-		}
+        fn slot_duration() -> sp_consensus_aura::SlotDuration {
+            sp_consensus_aura::SlotDuration::from_millis(Aura::slot_duration())
+        }
 
-		fn authorities() -> Vec<AuraId> {
-			Aura::authorities()
-		}
-	}
+        fn authorities() -> Vec<AuraId> {
+            Aura::authorities()
+        }
+    }
 
     impl cumulus_primitives_core::CollectCollationInfo<Block> for Runtime {
         fn collect_collation_info() -> cumulus_primitives_core::CollationInfo {
@@ -675,15 +675,15 @@ impl cumulus_pallet_parachain_system::CheckInherents<Block> for CheckInherents {
                 relay_chain_slot,
                 sp_std::time::Duration::from_secs(6),
             )
-                .create_inherent_data()
-                .expect("Could not create the timestamp inherent data");
+            .create_inherent_data()
+            .expect("Could not create the timestamp inherent data");
 
         inherent_data.check_extrinsics(&block)
     }
 }
 
 cumulus_pallet_parachain_system::register_validate_block! {
-	Runtime = Runtime,
-	BlockExecutor = cumulus_pallet_aura_ext::BlockExecutor::<Runtime, Executive>,
-	CheckInherents = CheckInherents,
+    Runtime = Runtime,
+    BlockExecutor = cumulus_pallet_aura_ext::BlockExecutor::<Runtime, Executive>,
+    CheckInherents = CheckInherents,
 }

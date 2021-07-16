@@ -8,9 +8,13 @@ use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public};
 use sp_runtime::traits::{IdentifyAccount, Verify};
 
 use cumulus_primitives_core::ParaId;
-use jupiter_runtime::{AccountId, Signature, AuraId};
+use jupiter_runtime::{AccountId, AuraId, Signature};
 use jupiter_runtime::{
-    BalancesConfig, GenesisConfig, IndicesConfig, ParachainInfoConfig, SudoConfig,
+    BalancesConfig,
+    GenesisConfig,
+    IndicesConfig,
+    ParachainInfoConfig,
+    SudoConfig,
     SystemConfig, //ContractsConfig,
 };
 use sc_service::config::TelemetryEndpoints;
@@ -119,8 +123,10 @@ pub fn staging_config(id: ParaId) -> Result<ChainSpec, String> {
                 hex!["426d8def6146e8ae997b24f81401e46e8439d7f392489549b10410bcca20b64e"].into(),
                 // for i in 1 2; do for j in aura; do subkey inspect --scheme Sr25519 "$SECRET//$i//$j"; done; done
                 vec![
-                    hex!["0a7d580f81d12479b6fd1e27af50cd67a1c95bfee8b9527d56915363d97f4618"].unchecked_into(),
-                    hex!["e8780f81d1448511c7fedc40284070042bfc422f7863d1a8291fb15e4ef0f72f"].unchecked_into(),
+                    hex!["0a7d580f81d12479b6fd1e27af50cd67a1c95bfee8b9527d56915363d97f4618"]
+                        .unchecked_into(),
+                    hex!["e8780f81d1448511c7fedc40284070042bfc422f7863d1a8291fb15e4ef0f72f"]
+                        .unchecked_into(),
                 ],
                 vec![
                     hex!["426d8def6146e8ae997b24f81401e46e8439d7f392489549b10410bcca20b64e"].into(),

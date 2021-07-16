@@ -17,10 +17,10 @@ use jupiter_primitives::Block;
 use jupiter_runtime::{self, RpcPort, RuntimeApi, OCW_DB_RANDOM};
 
 use codec::Encode;
-use sc_client_api::{Backend, ExecutorProvider};
-use sp_core::offchain::OffchainStorage;
-use sp_consensus::SlotData;
 use cumulus_client_consensus_aura::SlotProportion;
+use sc_client_api::{Backend, ExecutorProvider};
+use sp_consensus::SlotData;
+use sp_core::offchain::OffchainStorage;
 
 // Declare an instance of the native executor named `Executor`. Include the wasm binary as the
 // equivalent wasm code.
@@ -83,29 +83,33 @@ pub fn new_partial(
     let client2 = client.clone();
 
     let slot_duration = cumulus_client_consensus_aura::slot_duration(&*client2)?;
-    let import_queue = cumulus_client_consensus_aura::import_queue::<sp_consensus_aura::sr25519::AuthorityPair, _, _, _, _, _, _>(
-        cumulus_client_consensus_aura::ImportQueueParams {
-            block_import: client2.clone(),
-            client: client2.clone(),
-            create_inherent_data_providers: move |_, _| async move {
-                let time = sp_timestamp::InherentDataProvider::from_system_time();
+    let import_queue = cumulus_client_consensus_aura::import_queue::<
+        sp_consensus_aura::sr25519::AuthorityPair,
+        _,
+        _,
+        _,
+        _,
+        _,
+        _,
+    >(cumulus_client_consensus_aura::ImportQueueParams {
+        block_import: client2.clone(),
+        client: client2.clone(),
+        create_inherent_data_providers: move |_, _| async move {
+            let time = sp_timestamp::InherentDataProvider::from_system_time();
 
-                let slot =
-                    sp_consensus_aura::inherents::InherentDataProvider::from_timestamp_and_duration(
-                        *time,
-                        slot_duration.slot_duration(),
-                    );
+            let slot =
+                sp_consensus_aura::inherents::InherentDataProvider::from_timestamp_and_duration(
+                    *time,
+                    slot_duration.slot_duration(),
+                );
 
-                Ok((time, slot))
-            },
-            registry: config.prometheus_registry().clone(),
-            can_author_with: sp_consensus::CanAuthorWithNativeVersion::new(
-                client2.executor().clone(),
-            ),
-            spawner: &task_manager.spawn_essential_handle(),
-            telemetry: telemetry.as_ref().map(|telemetry| telemetry.handle()),
+            Ok((time, slot))
         },
-    )?;
+        registry: config.prometheus_registry().clone(),
+        can_author_with: sp_consensus::CanAuthorWithNativeVersion::new(client2.executor().clone()),
+        spawner: &task_manager.spawn_essential_handle(),
+        telemetry: telemetry.as_ref().map(|telemetry| telemetry.handle()),
+    })?;
 
     let params = PartialComponents {
         backend,
@@ -142,14 +146,12 @@ async fn start_node_impl(
     let params = new_partial(&parachain_config)?;
     let (mut telemetry, telemetry_worker_handle) = params.other;
 
-    let relay_chain_full_node = cumulus_client_service::build_polkadot_full_node(
-        polkadot_config,
-        telemetry_worker_handle,
-    )
-    .map_err(|e| match e {
-        polkadot_service::Error::Sub(x) => x,
-        s => format!("{}", s).into(),
-    })?;
+    let relay_chain_full_node =
+        cumulus_client_service::build_polkadot_full_node(polkadot_config, telemetry_worker_handle)
+            .map_err(|e| match e {
+                polkadot_service::Error::Sub(x) => x,
+                s => format!("{}", s).into(),
+            })?;
 
     let client = params.client.clone();
     let backend = params.backend.clone();
@@ -256,43 +258,56 @@ async fn start_node_impl(
         let relay_chain_backend = relay_chain_node.backend.clone();
         let relay_chain_client = relay_chain_node.client.clone();
 
-        let parachain_consensus = cumulus_client_consensus_aura::build_aura_consensus::<sp_consensus_aura::sr25519::AuthorityPair,_,_,_,_,_,_,_,_,_,>(cumulus_client_consensus_aura::BuildAuraConsensusParams {
-            proposer_factory,
-            create_inherent_data_providers: move |_, (relay_parent, validation_data)| {
-                let parachain_inherent = cumulus_primitives_parachain_inherent::ParachainInherentData::create_at_with_client(
+        let parachain_consensus = cumulus_client_consensus_aura::build_aura_consensus::<
+            sp_consensus_aura::sr25519::AuthorityPair,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+        >(
+            cumulus_client_consensus_aura::BuildAuraConsensusParams {
+                proposer_factory,
+                create_inherent_data_providers: move |_, (relay_parent, validation_data)| {
+                    let parachain_inherent = cumulus_primitives_parachain_inherent::ParachainInherentData::create_at_with_client(
                     relay_parent,
                     &relay_chain_client,
                     &*relay_chain_backend,
                     &validation_data,
                     id,
                 );
-                async move {
-                    let time = sp_timestamp::InherentDataProvider::from_system_time();
-                    let slot = sp_consensus_aura::inherents::InherentDataProvider::from_timestamp_and_duration(
+                    async move {
+                        let time = sp_timestamp::InherentDataProvider::from_system_time();
+                        let slot = sp_consensus_aura::inherents::InherentDataProvider::from_timestamp_and_duration(
                         *time,slot_duration.slot_duration(),);
-                    let parachain_inherent = parachain_inherent.ok_or_else(|| {
-                        Box::<dyn std::error::Error + Send + Sync>::from(
-                            "Failed to create parachain inherent",
-                        )
-                    })?;
-                    Ok((time, slot, parachain_inherent))
-                }
+                        let parachain_inherent = parachain_inherent.ok_or_else(|| {
+                            Box::<dyn std::error::Error + Send + Sync>::from(
+                                "Failed to create parachain inherent",
+                            )
+                        })?;
+                        Ok((time, slot, parachain_inherent))
+                    }
+                },
+                block_import: client2.clone(),
+                relay_chain_client: relay_chain_node.client.clone(),
+                relay_chain_backend: relay_chain_node.backend.clone(),
+                para_client: client2.clone(),
+                backoff_authoring_blocks: Option::<()>::None,
+                sync_oracle: network.clone(),
+                keystore,
+                force_authoring,
+                slot_duration,
+                // We got around 500ms for proposing
+                block_proposal_slot_portion: SlotProportion::new(1f32 / 24f32),
+                // And a maximum of 750ms if slots are skipped
+                max_block_proposal_slot_portion: Some(SlotProportion::new(1f32 / 16f32)),
+                telemetry: telemetry.as_ref().map(|x| x.handle()),
             },
-            block_import: client2.clone(),
-            relay_chain_client: relay_chain_node.client.clone(),
-            relay_chain_backend: relay_chain_node.backend.clone(),
-            para_client: client2.clone(),
-            backoff_authoring_blocks: Option::<()>::None,
-            sync_oracle: network.clone(),
-            keystore,
-            force_authoring,
-            slot_duration,
-            // We got around 500ms for proposing
-            block_proposal_slot_portion: SlotProportion::new(1f32 / 24f32),
-            // And a maximum of 750ms if slots are skipped
-            max_block_proposal_slot_portion: Some(SlotProportion::new(1f32 / 16f32)),
-            telemetry: telemetry.as_ref().map(|x| x.handle()),
-        });
+        );
 
         let params = StartCollatorParams {
             para_id: id,
@@ -329,11 +344,5 @@ pub async fn start_node(
     id: ParaId,
     validator: bool,
 ) -> sc_service::error::Result<(TaskManager, Arc<FullClient>)> {
-    start_node_impl(
-        parachain_config,
-        polkadot_config,
-        id,
-        validator,
-    )
-    .await
+    start_node_impl(parachain_config, polkadot_config, id, validator).await
 }
