@@ -66,7 +66,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
     spec_name: create_runtime_str!("jupiter-dev"),
     impl_name: create_runtime_str!("patract-jupiter-dev"),
     authoring_version: 1,
-    spec_version: 3,
+    spec_version: 4,
     impl_version: 1,
     apis: RUNTIME_API_VERSIONS,
     transaction_version: 1,

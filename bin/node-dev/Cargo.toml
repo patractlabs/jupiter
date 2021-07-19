@@ -1,6 +1,6 @@
 [package]
 name = "jupiter-dev"
-version = "1.0.2"
+version = "1.0.3"
 authors = ["Patract <https://github.com/patractlabs>"]
 edition = "2018"
 description = ""
