@@ -111,13 +111,24 @@ Now, Jupiter has launched following network:
     ```json
     {
       "LookupSource": "MultiAddress",
-      "Address": "MultiAddress"
+      "Address": "MultiAddress",
+      "AccountInfo": "AccountInfoWithTripleRefCount",
+      "AliveContractInfo": {
+        "trieId": "TrieId",
+        "storageSize": "u32",
+        "pairCount": "u32",
+        "codeHash": "CodeHash",
+        "rentAllowance": "Balance",
+        "rentPayed": "Balance",
+        "deductBlock": "BlockNumber",
+        "lastWrite": "Option<BlockNumber>",
+        "_reserved": "Option<Null>"
+      }
     }
     ```
 
     **Jupiter open provider links are:**
-      - `wss://jupiter.elara.patract.io/`
-      - `wss://ws.jupiter.patract.cn/`
+      - `wss://ws.jupiter.patract-westend.patract.cn`
 
 * Jupiter Dev node: 
     
