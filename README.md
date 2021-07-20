@@ -128,8 +128,7 @@ Now, Jupiter has launched following network:
     ```
 
     **Jupiter open provider links are:**
-      - `wss://jupiter.elara.patract.io/`
-      - `wss://ws.jupiter.patract.cn/`
+      - `wss://ws.jupiter.patract-westend.patract.cn`
 
 * Jupiter Dev node: 
     
