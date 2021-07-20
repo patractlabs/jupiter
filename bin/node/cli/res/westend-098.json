@@ -1,15 +1,15 @@
 {
-  "name": "Westend",
-  "id": "westend",
+  "name": "Westend-Patract",
+  "id": "westend-patract",
   "chainType": "Live",
   "bootNodes": [],
   "telemetryEndpoints": [
     [
-      "/dns/telemetry.polkadot.io/tcp/443/x-parity-wss/%2Fsubmit%2F",
+      "/dns/telemetry.patract.io/tcp/443/x-parity-wss/%2Fsubmit",
       0
     ]
   ],
-  "protocolId": "westend",
+  "protocolId": "patract-westend",
   "properties": {
     "ss58Format": 42,
     "tokenDecimals": 12,
