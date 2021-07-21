@@ -68,10 +68,10 @@ use xcm_builder::{
 };
 use xcm_executor::{Config, XcmExecutor};
 
+use crate::chain_extension::JupiterParaExtension;
 use frame_support::traits::{All, IsInVec};
 use randomness_collect::sr25519::AuthorityId as RandomCollectId;
 pub use randomness_collect::{RpcPort, OCW_DB_RANDOM};
-use crate::chain_extension::JupiterParaExtension;
 
 impl_opaque_keys! {
     pub struct SessionKeys {
