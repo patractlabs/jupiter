@@ -97,7 +97,7 @@ Now, Jupiter has launched following network:
     - `wss://jupiter-poa.elara.patract.io/`
     - `wss://ws.jupiter-poa.patract.cn/`
     
-    Jupiter open telemetry link is [https://telemetry.patract.io/](https://telemetry.patract.io/)
+    Jupiter open telemetry link is [https://telemetry.patract.io/](https://telemetry.patract.io/#list/Jupiter%20A1)
 
 * Jupiter:
 
@@ -123,12 +123,20 @@ Now, Jupiter has launched following network:
         "deductBlock": "BlockNumber",
         "lastWrite": "Option<BlockNumber>",
         "_reserved": "Option<Null>"
+      },
+      "BabeRandomness": {
+        "epoch": "u64",
+        "start_slot": "u64",
+        "duration": "u64",
+        "randomness": "schnorrkel::Randomness"
       }
     }
     ```
 
     **Jupiter open provider links are:**
       - `wss://ws.jupiter.patract-westend.patract.cn`
+
+    Jupiter Parachain open telemetry link is [https://telemetry.patract.io/](https://telemetry.patract.io/#list/Jupiter%20PC1)
 
 * Jupiter Dev node: 
     
@@ -257,8 +265,12 @@ After running relaychain and parachain, upload parachain genenis file to relaych
 ##### 4.2.2 join Jupiter Parachain testnet
 For now, we only running our own private parachain(collator) node use aura algorithm, outside node should running in sync mode. 
 ```bash
-./jupiter --chain ./bin/node/cli/res/jupiter-westend-098.json --execution wasm --force-authoring --parachain-id=2000 -- --chain ./bin/node/cli/res/westend-098.json --execution wasm
+./jupiter --chain ./jupiter-westend-098.json --execution wasm --wasm-execution=compiled --force-authoring --parachain-id=2000 --tmp \
+--chain ./westend-098.json --no-beefy --execution wasm --wasm-execution=compiled --tmp \
+--bootnodes /dns/ws.patract-westend.patract.cn/tcp/30333/p2p/12D3KooWHqq3p1XBrrkqzYvircGxR5R3bdq7ZXXdBynNBZ1tBcCU
 ```
+
+> Notice, currently we didn't make seed node into westend-098.json, so you have to specify our private westend bootnode.
 
 #### 4.3 Jupiter Dev Node
 `jupiter-dev` just use for local development, it providers a nice and quick experience for contract developing for developers 
