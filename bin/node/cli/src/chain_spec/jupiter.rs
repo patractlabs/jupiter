@@ -12,7 +12,6 @@ use jupiter_runtime::{AccountId, AuraId, Signature};
 use jupiter_runtime::{
     BalancesConfig,
     GenesisConfig,
-    IndicesConfig,
     ParachainInfoConfig,
     SudoConfig,
     SystemConfig, //ContractsConfig,
@@ -184,7 +183,7 @@ fn testnet_genesis(
                 .map(|k| (k, 1 << 60))
                 .collect(),
         },
-        indices: IndicesConfig { indices: vec![] },
+        // indices: IndicesConfig { indices: vec![] },
         sudo: SudoConfig {
             // Assign network admin rights.
             key: root_key,

@@ -6,7 +6,7 @@
 #[cfg(feature = "std")]
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 
-mod chain_extension;
+// mod chain_extension;
 
 use sp_api::impl_runtime_apis;
 pub use sp_consensus_aura::sr25519::AuthorityId as AuraId;
@@ -68,10 +68,10 @@ use xcm_builder::{
 };
 use xcm_executor::{Config, XcmExecutor};
 
-use crate::chain_extension::JupiterParaExtension;
-use frame_support::traits::{All, IsInVec};
-use randomness_collect::sr25519::AuthorityId as RandomCollectId;
+// use crate::chain_extension::JupiterParaExtension;
+// use randomness_collect::sr25519::AuthorityId as RandomCollectId;
 pub use randomness_collect::{RpcPort, OCW_DB_RANDOM};
+use frame_support::traits::{All, IsInVec};
 
 impl_opaque_keys! {
     pub struct SessionKeys {
@@ -94,7 +94,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
     spec_name: create_runtime_str!("jupiter-westend"),
     impl_name: create_runtime_str!("patract-jupiter-westend"),
     authoring_version: 0,
-    spec_version: 1,
+    spec_version: 2,
     impl_version: 0,
     apis: RUNTIME_API_VERSIONS,
     transaction_version: 0,
@@ -158,13 +158,13 @@ impl frame_system::Config for Runtime {
     /// What to do if an account is fully reaped from the system.
     type OnKilledAccount = ();
     /// Weight information for the extrinsics of this pallet.
-    type SystemWeightInfo = weights::frame_system::WeightInfo<Runtime>;
+    type SystemWeightInfo = ();
     type SS58Prefix = SS58Prefix;
     type OnSetCode = cumulus_pallet_parachain_system::ParachainSetCode<Self>;
 }
 
 parameter_types! {
-    pub const MinimumPeriod: u64 = SLOT_DURATION / 2;
+    pub const MinimumPeriod: u64 = SLOT_DURATION;
 }
 
 impl pallet_timestamp::Config for Runtime {
@@ -175,17 +175,17 @@ impl pallet_timestamp::Config for Runtime {
     type WeightInfo = weights::pallet_timestamp::WeightInfo<Runtime>;
 }
 
-parameter_types! {
-    pub const IndexDeposit: Balance = 10 * DOLLARS;
-}
-
-impl pallet_indices::Config for Runtime {
-    type AccountIndex = AccountIndex;
-    type Currency = Balances;
-    type Deposit = IndexDeposit;
-    type Event = Event;
-    type WeightInfo = weights::pallet_indices::WeightInfo<Runtime>;
-}
+// parameter_types! {
+//     pub const IndexDeposit: Balance = 10 * DOLLARS;
+// }
+//
+// impl pallet_indices::Config for Runtime {
+//     type AccountIndex = AccountIndex;
+//     type Currency = Balances;
+//     type Deposit = IndexDeposit;
+//     type Event = Event;
+//     type WeightInfo = weights::pallet_indices::WeightInfo<Runtime>;
+// }
 
 parameter_types! {
     pub const ExistentialDeposit: Balance = 0;
@@ -256,7 +256,8 @@ impl pallet_contracts::Config for Runtime {
     type CallStack = [pallet_contracts::Frame<Self>; 31];
     type WeightPrice = pallet_transaction_payment::Pallet<Self>;
     type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
-    type ChainExtension = JupiterParaExtension<Self>;
+    // type ChainExtension = JupiterParaExtension<Self>;
+    type ChainExtension = ();
     type DeletionQueueDepth = DeletionQueueDepth;
     type DeletionWeightLimit = DeletionWeightLimit;
     type Schedule = Schedule;
@@ -436,10 +437,10 @@ parameter_types! {
     pub const RandomCollectUnsignedPriority: TransactionPriority = TransactionPriority::max_value();
 }
 
-impl randomness_collect::Config for Runtime {
-    type AuthorityId = RandomCollectId;
-    type UnsignedPriority = RandomCollectUnsignedPriority;
-}
+// impl randomness_collect::Config for Runtime {
+//     type AuthorityId = RandomCollectId;
+//     type UnsignedPriority = RandomCollectUnsignedPriority;
+// }
 
 impl pallet_randomness_collective_flip::Config for Runtime {}
 
@@ -449,6 +450,12 @@ impl pallet_aura::Config for Runtime {
     type AuthorityId = AuraId;
 }
 
+impl pallet_utility::Config for Runtime {
+    type Event = Event;
+    type Call = Call;
+    type WeightInfo = weights::pallet_utility::WeightInfo<Runtime>;
+}
+
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
     pub enum Runtime where
@@ -456,28 +463,29 @@ construct_runtime!(
         NodeBlock = jupiter_primitives::Block,
         UncheckedExtrinsic = UncheckedExtrinsic
     {
-        System: frame_system::{Pallet, Call, Config, Storage, Event<T>} = 0,
-        Timestamp: pallet_timestamp::{Pallet, Call, Storage, Inherent} = 1,
-        Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>} = 2,
-        Indices: pallet_indices::{Pallet, Call, Storage, Config<T>, Event<T>} = 3,
-        TransactionPayment: pallet_transaction_payment::{Pallet, Storage} = 4,
-        Contracts: pallet_contracts::{Pallet, Call, Storage, Event<T>} = 5,
-        Sudo: pallet_sudo::{Pallet, Call, Config<T>, Storage, Event<T>} = 6,
-        RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Pallet, Storage} = 7,
-
+        System: frame_system::{Pallet, Call, Config, Storage, Event<T>},
         ParachainSystem: cumulus_pallet_parachain_system::{Pallet, Call, Storage, Inherent, Event<T>},
+        RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Pallet, Storage},
+        Timestamp: pallet_timestamp::{Pallet, Call, Storage, Inherent},
         ParachainInfo: parachain_info::{Pallet, Storage, Config},
+        Sudo: pallet_sudo::{Pallet, Call, Config<T>, Storage, Event<T>},
+
+        Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>},
+        // Indices: pallet_indices::{Pallet, Call, Storage, Config<T>, Event<T>},
+        TransactionPayment: pallet_transaction_payment::{Pallet, Storage},
 
         Aura: pallet_aura::{Pallet, Config<T>},
         AuraExt: cumulus_pallet_aura_ext::{Pallet, Config},
+
+        Utility: pallet_utility::{Pallet, Call, Event},
+        Contracts: pallet_contracts::{Pallet, Call, Storage, Event<T>},
+        // RandomnessCollect: randomness_collect::{Pallet, Call, Storage, ValidateUnsigned},
 
         XcmpQueue: cumulus_pallet_xcmp_queue::{Pallet, Call, Storage, Event<T>},
         PolkadotXcm: pallet_xcm::{Pallet, Call, Event<T>, Origin},
         CumulusXcm: cumulus_pallet_xcm::{Pallet, Call, Origin, Event<T>},
         DmpQueue: cumulus_pallet_dmp_queue::{Pallet, Call, Storage, Event<T>},
         Spambot: cumulus_ping::{Pallet, Call, Storage, Event<T>},
-
-        RandomnessCollect: randomness_collect::{Pallet, Call, Storage, ValidateUnsigned},
     }
 );
 

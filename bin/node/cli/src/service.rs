@@ -14,7 +14,8 @@ use sc_service::{
 };
 
 use jupiter_primitives::Block;
-use jupiter_runtime::{self, RpcPort, RuntimeApi, OCW_DB_RANDOM};
+use jupiter_runtime::{self, RuntimeApi};
+use jupiter_runtime::{RpcPort, OCW_DB_RANDOM};
 
 use codec::Encode;
 use cumulus_client_consensus_aura::SlotProportion;
