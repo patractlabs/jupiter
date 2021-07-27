@@ -15,7 +15,7 @@ use sc_service::{
 
 use jupiter_primitives::Block;
 use jupiter_runtime::{self, RuntimeApi};
-use jupiter_runtime::{RpcPort, OCW_DB_RANDOM};
+// use jupiter_runtime::{RpcPort, OCW_DB_RANDOM};
 
 use codec::Encode;
 use cumulus_client_consensus_aura::SlotProportion;
@@ -241,19 +241,19 @@ async fn start_node_impl(
             telemetry.as_ref().map(|x| x.handle()),
         );
 
-        if let Some(rpc_port_addr) = rpc_port {
-            let rpc_port = RpcPort {
-                0: rpc_port_addr.to_string().into(),
-            };
-            let offchain_storage = backend.offchain_storage();
-            if let Some(mut offchain_storage) = offchain_storage {
-                offchain_storage.set(
-                    sp_offchain::STORAGE_PREFIX,
-                    OCW_DB_RANDOM,
-                    &rpc_port.encode(),
-                );
-            }
-        }
+        // if let Some(rpc_port_addr) = rpc_port {
+        //     let rpc_port = RpcPort {
+        //         0: rpc_port_addr.to_string().into(),
+        //     };
+        //     let offchain_storage = backend.offchain_storage();
+        //     if let Some(mut offchain_storage) = offchain_storage {
+        //         offchain_storage.set(
+        //             sp_offchain::STORAGE_PREFIX,
+        //             OCW_DB_RANDOM,
+        //             &rpc_port.encode(),
+        //         );
+        //     }
+        // }
 
         // the inherent data provider contains ParachainInherentData and timestamp
         let relay_chain_backend = relay_chain_node.backend.clone();

@@ -3969,7 +3969,7 @@ dependencies = [
 
 [[package]]
 name = "jupiter-runtime"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "cumulus-pallet-aura-ext",
  "cumulus-pallet-dmp-queue",
@@ -3986,19 +3986,24 @@ dependencies = [
  "frame-system-rpc-runtime-api",
  "getrandom 0.2.3",
  "hex",
+ "hex-literal",
  "jupiter-chain-extension",
  "jupiter-primitives",
- "jupiter-runtime-common",
+ "log",
+ "max-encoded-len",
+ "node-primitives",
+ "pallet-assets",
  "pallet-aura",
  "pallet-authorship",
  "pallet-balances",
+ "pallet-collator-selection",
  "pallet-contracts",
  "pallet-contracts-primitives",
  "pallet-contracts-rpc-runtime-api",
- "pallet-indices",
  "pallet-multisig",
- "pallet-offences",
+ "pallet-proxy",
  "pallet-randomness-collective-flip",
+ "pallet-session",
  "pallet-sudo",
  "pallet-timestamp",
  "pallet-transaction-payment",
@@ -4008,23 +4013,24 @@ dependencies = [
  "parachain-info",
  "parity-scale-codec",
  "polkadot-parachain",
+ "polkadot-runtime-common",
  "randomness_collect",
  "serde",
+ "smallvec 1.6.1",
  "sp-api",
  "sp-block-builder",
  "sp-consensus-aura",
  "sp-core",
  "sp-inherents",
  "sp-io",
- "sp-npos-elections",
  "sp-offchain",
  "sp-runtime",
  "sp-session",
  "sp-std",
  "sp-transaction-pool",
  "sp-version",
- "static_assertions",
- "substrate-wasm-builder 3.0.0",
+ "statemint-common",
+ "substrate-wasm-builder 4.0.0",
  "xcm",
  "xcm-builder",
  "xcm-executor",
@@ -5126,6 +5132,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "node-primitives"
+version = "2.0.0"
+source = "git+https://github.com/paritytech/substrate?branch=polkadot-v0.9.8#74101dc21cfffb4c2d014fcc28edc166d5ca1b16"
+dependencies = [
+ "frame-system",
+ "parity-scale-codec",
+ "sp-application-crypto",
+ "sp-core",
+ "sp-runtime",
+]
+
+[[package]]
 name = "nodrop"
 version = "0.1.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5298,6 +5316,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "pallet-assets"
+version = "3.0.0"
+source = "git+https://github.com/paritytech/substrate?branch=polkadot-v0.9.8#74101dc21cfffb4c2d014fcc28edc166d5ca1b16"
+dependencies = [
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "max-encoded-len",
+ "parity-scale-codec",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
 name = "pallet-aura"
 version = "3.0.0"
 source = "git+https://github.com/paritytech/substrate?branch=polkadot-v0.9.8#74101dc21cfffb4c2d014fcc28edc166d5ca1b16"
@@ -5406,6 +5438,24 @@ dependencies = [
  "pallet-treasury",
  "parity-scale-codec",
  "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
+name = "pallet-collator-selection"
+version = "3.0.0"
+source = "git+https://github.com/patractlabs/cumulus?branch=patract-sandbox-098#000054d10d0f230a2d3e7e9fbbb7f7b4a0d0e023"
+dependencies = [
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "log",
+ "pallet-authorship",
+ "pallet-session",
+ "parity-scale-codec",
+ "serde",
+ "sp-runtime",
+ "sp-staking",
  "sp-std",
 ]
 
@@ -6066,7 +6116,6 @@ dependencies = [
  "frame-support",
  "frame-system",
  "parity-scale-codec",
- "serde",
  "sp-runtime",
  "sp-std",
  "xcm",
@@ -10407,6 +10456,28 @@ name = "stable_deref_trait"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a8f112729512f8e442d81f95a8a7ddf2b7c6b8a1a6f509a95864142b30cab2d3"
+
+[[package]]
+name = "statemint-common"
+version = "1.0.0"
+source = "git+https://github.com/patractlabs/cumulus?branch=patract-sandbox-098#000054d10d0f230a2d3e7e9fbbb7f7b4a0d0e023"
+dependencies = [
+ "frame-executive",
+ "frame-support",
+ "frame-system",
+ "node-primitives",
+ "pallet-balances",
+ "pallet-collator-selection",
+ "parity-scale-codec",
+ "polkadot-primitives",
+ "polkadot-runtime-common",
+ "sp-consensus-aura",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
+ "substrate-wasm-builder 4.0.0",
+]
 
 [[package]]
 name = "static_assertions"

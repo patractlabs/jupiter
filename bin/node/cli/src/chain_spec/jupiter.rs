@@ -5,10 +5,10 @@ use serde_json::json;
 use sc_chain_spec::ChainSpecExtension;
 use sc_service::ChainType;
 use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public};
-use sp_runtime::traits::{IdentifyAccount, Verify};
+use sp_runtime::traits::{IdentifyAccount, Verify, Zero};
 
 use cumulus_primitives_core::ParaId;
-use jupiter_runtime::{AccountId, AuraId, Signature};
+use jupiter_runtime::common::{AccountId, AuraId, Signature};
 use jupiter_runtime::{
     BalancesConfig,
     GenesisConfig,
@@ -58,6 +58,10 @@ where
     AccountPublic::from(get_from_seed::<TPublic>(seed)).into_account()
 }
 
+pub fn get_collator_keys_from_seed(seed: &str) -> AuraId {
+    get_from_seed::<AuraId>(seed)
+}
+
 /// Jupiter Development Chain Config
 pub fn development_config(id: ParaId, relay_chain: &str) -> Result<ChainSpec, String> {
     Ok(ChainSpec::from_genesis(
@@ -71,8 +75,14 @@ pub fn development_config(id: ParaId, relay_chain: &str) -> Result<ChainSpec, St
                 // Sudo account
                 get_account_id_from_seed::<sr25519::Public>("Alice"),
                 vec![
-                    get_from_seed::<AuraId>("Alice"),
-                    get_from_seed::<AuraId>("Bob"),
+                    (
+                        get_account_id_from_seed::<sr25519::Public>("Alice"),
+                        get_collator_keys_from_seed("Alice"),
+                    ),
+                    (
+                        get_account_id_from_seed::<sr25519::Public>("Bob"),
+                        get_collator_keys_from_seed("Bob"),
+                    ),
                 ],
                 // Pre-funded accounts
                 vec![
@@ -121,10 +131,10 @@ pub fn staging_config(id: ParaId) -> Result<ChainSpec, String> {
                 hex!["426d8def6146e8ae997b24f81401e46e8439d7f392489549b10410bcca20b64e"].into(),
                 // for i in 1 2; do for j in aura; do subkey inspect --scheme Sr25519 "$SECRET//$i//$j"; done; done
                 vec![
-                    hex!["0a7d580f81d12479b6fd1e27af50cd67a1c95bfee8b9527d56915363d97f4618"]
-                        .unchecked_into(),
-                    hex!["e8780f81d1448511c7fedc40284070042bfc422f7863d1a8291fb15e4ef0f72f"]
-                        .unchecked_into(),
+                    // hex!["0a7d580f81d12479b6fd1e27af50cd67a1c95bfee8b9527d56915363d97f4618"]
+                    //     .unchecked_into(),
+                    // hex!["e8780f81d1448511c7fedc40284070042bfc422f7863d1a8291fb15e4ef0f72f"]
+                    //     .unchecked_into(),
                 ],
                 vec![
                     hex!["426d8def6146e8ae997b24f81401e46e8439d7f392489549b10410bcca20b64e"].into(),
@@ -160,10 +170,14 @@ pub fn jupiter_config() -> Result<ChainSpec, String> {
     ChainSpec::from_json_bytes(&include_bytes!("../../res/jupiter-westend-098.json")[..])
 }
 
+pub fn session_keys(keys: AuraId) -> jupiter_runtime::opaque::SessionKeys {
+    jupiter_runtime::opaque::SessionKeys { aura: keys }
+}
+
 /// Configure initial storage state for FRAME modules.
 fn testnet_genesis(
     root_key: AccountId,
-    initial_authorities: Vec<AuraId>,
+    initial_authorities: Vec<(AccountId, AuraId)>,
     endowed_accounts: Vec<AccountId>,
     id: ParaId,
 ) -> GenesisConfig {
@@ -180,7 +194,7 @@ fn testnet_genesis(
             balances: endowed_accounts
                 .iter()
                 .cloned()
-                .map(|k| (k, 1 << 60))
+                .map(|k| (k, 1 << 70))
                 .collect(),
         },
         // indices: IndicesConfig { indices: vec![] },
@@ -189,9 +203,33 @@ fn testnet_genesis(
             key: root_key,
         },
         parachain_info: ParachainInfoConfig { parachain_id: id },
-        aura: jupiter_runtime::AuraConfig {
-            authorities: initial_authorities,
+        collator_selection: jupiter_runtime::CollatorSelectionConfig {
+            invulnerables: initial_authorities
+                .iter()
+                .cloned()
+                .map(|(acc, _)| acc)
+                .collect(),
+            candidacy_bond: Zero::zero(),
+            ..Default::default()
         },
+        session: jupiter_runtime::SessionConfig {
+            keys: initial_authorities
+                .iter()
+                .cloned()
+                .map(|(acc, aura)| {
+                    (
+                        acc.clone(),        // account id
+                        acc.clone(),        // validator id
+                        session_keys(aura), // session keys
+                    )
+                })
+                .collect(),
+        },
+        aura: Default::default(),
+        // aura: jupiter_runtime::AuraConfig {
+        //     authorities: initial_authorities,
+        // },
         aura_ext: Default::default(),
+        parachain_system: Default::default(),
     }
 }
