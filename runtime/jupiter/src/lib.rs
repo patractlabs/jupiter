@@ -6,19 +6,15 @@
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 
 mod chain_extension;
-pub mod constants;
-mod weights;
-use crate::chain_extension::JupiterParaExtension;
-use randomness_collect::sr25519::AuthorityId as RandomCollectId;
-pub use randomness_collect::{RpcPort, OCW_DB_RANDOM};
 
 use sp_api::impl_runtime_apis;
+pub use sp_consensus_aura::sr25519::AuthorityId as AuraId;
 use sp_core::{crypto::KeyTypeId, OpaqueMetadata};
 use sp_runtime::{
     create_runtime_str, generic, impl_opaque_keys,
     traits::{AccountIdLookup, BlakeTwo256, Block as BlockT},
     transaction_validity::{TransactionPriority, TransactionSource, TransactionValidity},
-    ApplyExtrinsicResult,
+    ApplyExtrinsicResult, Perbill,
 };
 
 use sp_std::prelude::*;
@@ -26,32 +22,17 @@ use sp_std::prelude::*;
 use sp_version::NativeVersion;
 use sp_version::RuntimeVersion;
 
-use codec::{Decode, Encode};
-use constants::{currency::*, fee::WeightToFee};
 use frame_support::{
     construct_runtime, match_type, parameter_types,
-    traits::{All, InstanceFilter, MaxEncodedLen},
-    weights::{
-        constants::{BlockExecutionWeight, ExtrinsicBaseWeight},
-        DispatchClass, IdentityFee, Weight,
-    },
-    PalletId, RuntimeDebug,
+    traits::{All},
+    weights::{IdentityFee, Weight},
+    PalletId,
 };
-use frame_system::{
-    limits::{BlockLength, BlockWeights},
-    EnsureRoot,
-};
-use sp_runtime::Perbill;
-pub use statemint_common as common;
-use statemint_common::{
-    impls::DealWithFees, AccountId, AuraId, Balance, BlockNumber, Hash, Header, Index, Signature,
-    AVERAGE_ON_INITIALIZE_RATIO, HOURS, MAXIMUM_BLOCK_WEIGHT, NORMAL_DISPATCH_RATIO, SLOT_DURATION,
-};
+use frame_system::EnsureRoot;
 
 #[cfg(any(feature = "std", test))]
 pub use sp_runtime::BuildStorage;
 
-// Polkadot imports
 use pallet_xcm::XcmPassthrough;
 use polkadot_parachain::primitives::Sibling;
 use polkadot_runtime_common::{BlockHashCount, RocksDbWeight, SlowAdjustingFeeUpdate};
@@ -65,18 +46,24 @@ use xcm_builder::{
 };
 use xcm_executor::{Config, XcmExecutor};
 
+pub use jupiter_primitives::{AccountId, Balance, BlockNumber, Hash, Header, Index, Signature};
+use jupiter_runtime_common::{
+    constants::{constants::*, currency::*, fee::WeightToFee, time::*},
+    // impls::DealWithFees,
+    weights, BlockLength, BlockWeights,
+};
+
 use pallet_contracts::weights::WeightInfo;
 use pallet_contracts_primitives::ContractExecResult;
 
-/// Opaque types. These are used by the CLI to instantiate machinery that don't need to know
-/// the specifics of the runtime. They can then be made to be agnostic over specific formats
-/// of data like extrinsics, allowing for them to continue syncing the network through upgrades
-/// to even the core data structures.
+use crate::chain_extension::JupiterParaExtension;
+use randomness_collect::sr25519::AuthorityId as RandomCollectId;
+pub use randomness_collect::{RpcPort, OCW_DB_RANDOM};
+
 pub mod opaque {
     use super::*;
     pub use sp_runtime::OpaqueExtrinsic as UncheckedExtrinsic;
 
-    /// Opaque block type.
     pub type Block = generic::Block<Header, UncheckedExtrinsic>;
 
     pub type SessionHandlers = ();
@@ -99,7 +86,6 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
     transaction_version: 1,
 };
 
-/// The version information used to identify this runtime when compiled natively.
 #[cfg(feature = "std")]
 pub fn native_version() -> NativeVersion {
     NativeVersion {
@@ -110,35 +96,13 @@ pub fn native_version() -> NativeVersion {
 
 parameter_types! {
     pub const Version: RuntimeVersion = VERSION;
-    pub RuntimeBlockLength: BlockLength =
-        BlockLength::max_with_normal_ratio(5 * 1024 * 1024, NORMAL_DISPATCH_RATIO);
-    pub RuntimeBlockWeights: BlockWeights = BlockWeights::builder()
-        .base_block(BlockExecutionWeight::get())
-        .for_class(DispatchClass::all(), |weights| {
-            weights.base_extrinsic = ExtrinsicBaseWeight::get();
-        })
-        .for_class(DispatchClass::Normal, |weights| {
-            weights.max_total = Some(NORMAL_DISPATCH_RATIO * MAXIMUM_BLOCK_WEIGHT);
-        })
-        .for_class(DispatchClass::Operational, |weights| {
-            weights.max_total = Some(MAXIMUM_BLOCK_WEIGHT);
-            // Operational transactions have some extra reserved space, so that they
-            // are included even if block reached `MAXIMUM_BLOCK_WEIGHT`.
-            weights.reserved = Some(
-                MAXIMUM_BLOCK_WEIGHT - NORMAL_DISPATCH_RATIO * MAXIMUM_BLOCK_WEIGHT
-            );
-        })
-        .avg_block_initialization(AVERAGE_ON_INITIALIZE_RATIO)
-        .build_or_panic();
     pub const SS58Prefix: u8 = 26;
 }
 
-// Configure FRAME pallets to include in runtime.
-
 impl frame_system::Config for Runtime {
     type BaseCallFilter = ();
-    type BlockWeights = RuntimeBlockWeights;
-    type BlockLength = RuntimeBlockLength;
+    type BlockWeights = BlockWeights;
+    type BlockLength = BlockLength;
     type AccountId = AccountId;
     type Call = Call;
     type Lookup = AccountIdLookup<AccountId, ()>;
@@ -162,11 +126,10 @@ impl frame_system::Config for Runtime {
 }
 
 parameter_types! {
-    pub const MinimumPeriod: u64 = SLOT_DURATION / 2;
+    pub const MinimumPeriod: u64 = SLOT_DURATION;
 }
 
 impl pallet_timestamp::Config for Runtime {
-    /// A timestamp: milliseconds since the unix epoch.
     type Moment = u64;
     type OnTimestampSet = ();
     type MinimumPeriod = MinimumPeriod;
@@ -185,16 +148,14 @@ impl pallet_authorship::Config for Runtime {
 }
 
 parameter_types! {
-    pub const ExistentialDeposit: Balance = EXISTENTIAL_DEPOSIT;
+    pub const ExistentialDeposit: Balance = 0;
     pub const MaxLocks: u32 = 50;
     pub const MaxReserves: u32 = 50;
 }
 
 impl pallet_balances::Config for Runtime {
     type MaxLocks = MaxLocks;
-    /// The type for recording an account's balance.
     type Balance = Balance;
-    /// The ubiquitous event type.
     type Event = Event;
     type DustRemoval = ();
     type ExistentialDeposit = ExistentialDeposit;
@@ -209,12 +170,56 @@ parameter_types! {
     pub const TransactionByteFee: Balance = 1 * MILLICENTS;
 }
 
+// TODO: jupiter own currentcy
 impl pallet_transaction_payment::Config for Runtime {
-    type OnChargeTransaction =
-        pallet_transaction_payment::CurrencyAdapter<Balances, DealWithFees<Runtime>>;
+    // type OnChargeTransaction = pallet_transaction_payment::CurrencyAdapter<Balances, DealWithFees<Runtime>>;
+    type OnChargeTransaction = pallet_transaction_payment::CurrencyAdapter<Balances, ()>;
     type TransactionByteFee = TransactionByteFee;
     type WeightToFee = WeightToFee;
+    // type WeightToFee = JupiterWeight2Fee;
     type FeeMultiplierUpdate = SlowAdjustingFeeUpdate<Self>;
+}
+
+parameter_types! {
+    pub const TombstoneDeposit: Balance = 0;
+    pub const DepositPerContract: Balance = 0;
+    pub const DepositPerStorageByte: Balance = TombstoneDeposit::get();
+    pub const DepositPerStorageItem: Balance = 0;
+    pub RentFraction: Perbill = Perbill::zero();
+    pub const SurchargeReward: Balance = 0;
+    pub const SignedClaimHandicap: u32 = 0;
+    // The lazy deletion runs inside on_initialize.
+    pub DeletionWeightLimit: Weight = AVERAGE_ON_INITIALIZE_RATIO *
+        BlockWeights::get().max_block;
+    // The weight needed for decoding the queue should be less or equal than a fifth
+    // of the overall weight dedicated to the lazy deletion.
+    pub DeletionQueueDepth: u32 = ((DeletionWeightLimit::get() / (
+            <Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(1) -
+            <Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(0)
+        )) / 5) as u32;
+    pub Schedule: pallet_contracts::Schedule<Runtime> = Default::default();
+}
+
+impl pallet_contracts::Config for Runtime {
+    type Time = Timestamp;
+    type Randomness = RandomnessCollectiveFlip;
+    type Currency = Balances;
+    type Event = Event;
+    type RentPayment = ();
+    type SignedClaimHandicap = SignedClaimHandicap;
+    type TombstoneDeposit = TombstoneDeposit;
+    type DepositPerContract = DepositPerContract;
+    type DepositPerStorageByte = DepositPerStorageByte;
+    type DepositPerStorageItem = DepositPerStorageItem;
+    type RentFraction = RentFraction;
+    type SurchargeReward = SurchargeReward;
+    type CallStack = [pallet_contracts::Frame<Self>; 31];
+    type WeightPrice = pallet_transaction_payment::Pallet<Self>;
+    type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
+    type ChainExtension = JupiterParaExtension<Self>;
+    type DeletionQueueDepth = DeletionQueueDepth;
+    type DeletionWeightLimit = DeletionWeightLimit;
+    type Schedule = Schedule;
 }
 
 impl pallet_randomness_collective_flip::Config for Runtime {}
@@ -434,48 +439,6 @@ impl pallet_collator_selection::Config for Runtime {
     type ValidatorIdOf = pallet_collator_selection::IdentityCollator;
     type ValidatorRegistration = Session;
     type WeightInfo = weights::pallet_collator_selection::WeightInfo<Runtime>;
-}
-
-parameter_types! {
-    pub const TombstoneDeposit: Balance = 0;
-    pub const DepositPerContract: Balance = 0;
-    pub const DepositPerStorageByte: Balance = TombstoneDeposit::get();
-    pub const DepositPerStorageItem: Balance = 0;
-    pub RentFraction: Perbill = Perbill::zero();
-    pub const SurchargeReward: Balance = 0;
-    pub const SignedClaimHandicap: u32 = 0;
-    // The lazy deletion runs inside on_initialize.
-    pub DeletionWeightLimit: Weight = AVERAGE_ON_INITIALIZE_RATIO *
-        RuntimeBlockWeights::get().max_block;
-    // The weight needed for decoding the queue should be less or equal than a fifth
-    // of the overall weight dedicated to the lazy deletion.
-    pub DeletionQueueDepth: u32 = ((DeletionWeightLimit::get() / (
-            <Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(1) -
-            <Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(0)
-        )) / 5) as u32;
-    pub Schedule: pallet_contracts::Schedule<Runtime> = Default::default();
-}
-
-impl pallet_contracts::Config for Runtime {
-    type Time = Timestamp;
-    type Randomness = RandomnessCollectiveFlip;
-    type Currency = Balances;
-    type Event = Event;
-    type RentPayment = ();
-    type SignedClaimHandicap = SignedClaimHandicap;
-    type TombstoneDeposit = TombstoneDeposit;
-    type DepositPerContract = DepositPerContract;
-    type DepositPerStorageByte = DepositPerStorageByte;
-    type DepositPerStorageItem = DepositPerStorageItem;
-    type RentFraction = RentFraction;
-    type SurchargeReward = SurchargeReward;
-    type CallStack = [pallet_contracts::Frame<Self>; 31];
-    type WeightPrice = pallet_transaction_payment::Pallet<Self>;
-    type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
-    type ChainExtension = JupiterParaExtension<Self>;
-    type DeletionQueueDepth = DeletionQueueDepth;
-    type DeletionWeightLimit = DeletionWeightLimit;
-    type Schedule = Schedule;
 }
 
 impl<C> frame_system::offchain::SendTransactionTypes<C> for Runtime

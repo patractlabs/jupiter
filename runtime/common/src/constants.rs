@@ -2,7 +2,7 @@
 
 /// Money matters.
 pub mod jupiter_currency {
-    use super::fee::{Weight2FeeNumerator, WeightToFee};
+    use super::jupiter_fee::{Weight2FeeNumerator, WeightToFee};
     use jupiter_primitives::Balance;
 
     pub const DOTS: Balance = 1_000_000_000_000; // old dot, one Dot is 100 Dot(new) now
@@ -25,6 +25,23 @@ pub mod jupiter_currency {
     pub type JupiterWeight2Fee = WeightToFee<JupiterNumerator>;
 }
 
+pub mod currency {
+    use jupiter_primitives::Balance;
+
+    /// The existential deposit. Set to 1/10 of its parent Relay Chain.
+    pub const EXISTENTIAL_DEPOSIT: Balance = 100 * MILLICENTS;
+
+    pub const UNITS: Balance = 1_000_000_000_000;
+    pub const CENTS: Balance = UNITS / 100;
+    pub const MILLICENTS: Balance = CENTS / 1_000;
+    pub const GRAND: Balance = CENTS * 100_000;
+
+    pub const fn deposit(items: u32, bytes: u32) -> Balance {
+        // 1/10 of Westend testnet
+        (items as Balance * 100 * CENTS + (bytes as Balance) * 5 * MILLICENTS) / 10
+    }
+}
+
 /// Time.
 pub mod time {
     use jupiter_primitives::{BlockNumber, Moment};
@@ -44,8 +61,24 @@ pub mod time {
     pub const PRIMARY_PROBABILITY: (u64, u64) = (1, 4);
 }
 
+/// Common constants
+pub mod constants {
+    use frame_support::weights::{constants::WEIGHT_PER_SECOND, Weight};
+    use sp_runtime::Perbill;
+
+    /// We assume that ~5% of the block weight is consumed by `on_initialize` handlers. This is
+    /// used to limit the maximal weight of a single extrinsic.
+    pub const AVERAGE_ON_INITIALIZE_RATIO: Perbill = Perbill::from_percent(5);
+    /// We allow `Normal` extrinsics to fill up the block up to 75%, the rest can be used by
+    /// Operational  extrinsics.
+    pub const NORMAL_DISPATCH_RATIO: Perbill = Perbill::from_percent(75);
+
+    /// We allow for 0.5 seconds of compute with a 6 second average block time.
+    pub const MAXIMUM_BLOCK_WEIGHT: Weight = WEIGHT_PER_SECOND / 2;
+}
+
 /// Fee-related.
-pub mod fee {
+pub mod jupiter_fee {
     use frame_support::weights::{
         constants::ExtrinsicBaseWeight, WeightToFeeCoefficient, WeightToFeeCoefficients,
         WeightToFeePolynomial,
@@ -78,6 +111,33 @@ pub mod fee {
             // let p = super::jupiter_currency::CENTS;
             let p = A::NUMERATOR;
             let q = 10 * Balance::from(ExtrinsicBaseWeight::get());
+            smallvec![WeightToFeeCoefficient {
+                degree: 1,
+                negative: false,
+                coeff_frac: Perbill::from_rational(p % q, q),
+                coeff_integer: p / q,
+            }]
+        }
+    }
+}
+
+pub mod fee {
+    use frame_support::weights::{
+        constants::ExtrinsicBaseWeight, WeightToFeeCoefficient, WeightToFeeCoefficients,
+        WeightToFeePolynomial,
+    };
+    use jupiter_primitives::Balance;
+    use smallvec::smallvec;
+    pub use sp_runtime::Perbill;
+
+    pub const TARGET_BLOCK_FULLNESS: Perbill = Perbill::from_percent(25);
+
+    pub struct WeightToFee;
+    impl WeightToFeePolynomial for WeightToFee {
+        type Balance = Balance;
+        fn polynomial() -> WeightToFeeCoefficients<Self::Balance> {
+            let p = super::currency::CENTS;
+            let q = 100 * Balance::from(ExtrinsicBaseWeight::get());
             smallvec![WeightToFeeCoefficient {
                 degree: 1,
                 negative: false,
