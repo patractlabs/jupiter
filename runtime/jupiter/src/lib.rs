@@ -24,7 +24,7 @@ use sp_version::RuntimeVersion;
 
 use frame_support::{
     construct_runtime, match_type, parameter_types,
-    traits::{All},
+    traits::All,
     weights::{IdentityFee, Weight},
     PalletId,
 };
@@ -50,7 +50,9 @@ pub use jupiter_primitives::{AccountId, Balance, BlockNumber, Hash, Header, Inde
 use jupiter_runtime_common::{
     constants::{constants::*, currency::*, fee::WeightToFee, time::*},
     // impls::DealWithFees,
-    weights, BlockLength, BlockWeights,
+    weights,
+    BlockLength,
+    BlockWeights,
 };
 
 use pallet_contracts::weights::WeightInfo;

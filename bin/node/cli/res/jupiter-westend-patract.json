@@ -2,7 +2,10 @@
   "name": "Jupiter PC1",
   "id": "jupiter_pc1",
   "chainType": "Live",
-  "bootNodes": [],
+  "bootNodes": [
+    "/dns/1.p2p.jupiter.patract-westend.patract.cn/tcp/30360/p2p/12D3KooWGraFysJobg7hur5sCWcdjAca236ZKRCHUkgWHVJyJYfU",
+    "/dns/2.p2p.jupiter.patract-westend.patract.cn/tcp/30362/p2p/12D3KooWG8DUCLpqCqxq3me9PdXdAXx5p6x922YVEksKYz2ZGGz1"
+  ],
   "telemetryEndpoints": [
     [
       "/dns/telemetry.patract.io/tcp/443/x-parity-wss/%2Fsubmit",

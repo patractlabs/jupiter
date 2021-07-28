@@ -267,7 +267,7 @@ For now, we only running our own private parachain(collator) node use aura algor
 ```bash
 ./jupiter --chain ./jupiter-westend-patract.json --execution wasm --wasm-execution=compiled --force-authoring --parachain-id=2000 --tmp \
 --chain ./westend-patract.json --no-beefy --execution wasm --wasm-execution=compiled --tmp \
---bootnodes /dns/ws.patract-westend.patract.cn/tcp/30333/p2p/12D3KooWHsnvFSJyRN4MHui1RWZcR6oPAe2y52stfYUVRV4NV5u6
+--bootnodes /dns/ws.patract-westend.patract.cn/tcp/30333/p2p/12D3KooW9xfo1rf4i67TAPN3hTXASNvqytVQjAnKeB5SEjmkv1yz
 ```
 
 > Notice, currently we didn't make seed node into westend-patract.json, so you have to specify our private westend bootnode.

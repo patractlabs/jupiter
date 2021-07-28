@@ -138,11 +138,16 @@ pub fn staging_config(id: ParaId) -> Result<ChainSpec, String> {
                 // for i in 1 2; do for j in aura; do subkey inspect --scheme Sr25519 "$SECRET//$i//$j"; done; done
                 vec![
                     (
-                        hex!["b4ae25a975444e139b44bfe7fcdc4e8389c29687492b6c6958f4250e989cc877"].into(),
-                        hex!["0a7d580f81d12479b6fd1e27af50cd67a1c95bfee8b9527d56915363d97f4618"].unchecked_into(),
-                    ),(
-                        hex!["964974e3fb8dd02a34baa3381a7a7242e99a5677e807aab940437a22912e0f6b"].into(),
-                        hex!["e8780f81d1448511c7fedc40284070042bfc422f7863d1a8291fb15e4ef0f72f"].unchecked_into(),
+                        hex!["b4ae25a975444e139b44bfe7fcdc4e8389c29687492b6c6958f4250e989cc877"]
+                            .into(),
+                        hex!["0a7d580f81d12479b6fd1e27af50cd67a1c95bfee8b9527d56915363d97f4618"]
+                            .unchecked_into(),
+                    ),
+                    (
+                        hex!["964974e3fb8dd02a34baa3381a7a7242e99a5677e807aab940437a22912e0f6b"]
+                            .into(),
+                        hex!["e8780f81d1448511c7fedc40284070042bfc422f7863d1a8291fb15e4ef0f72f"]
+                            .unchecked_into(),
                     ),
                 ],
                 vec![
