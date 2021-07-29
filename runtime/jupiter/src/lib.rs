@@ -49,9 +49,7 @@ use xcm_executor::{Config, XcmExecutor};
 pub use jupiter_primitives::{AccountId, Balance, BlockNumber, Hash, Header, Index, Signature};
 use jupiter_runtime_common::{
     constants::{constants::*, currency::*, fee::WeightToFee, time::*},
-    weights,
-    BlockLength,
-    BlockWeights,
+    weights, BlockLength, BlockWeights,
 };
 
 use pallet_contracts::weights::WeightInfo;
