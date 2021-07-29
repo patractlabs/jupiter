@@ -49,7 +49,6 @@ use xcm_executor::{Config, XcmExecutor};
 pub use jupiter_primitives::{AccountId, Balance, BlockNumber, Hash, Header, Index, Signature};
 use jupiter_runtime_common::{
     constants::{constants::*, currency::*, fee::WeightToFee, time::*},
-    // impls::DealWithFees,
     weights,
     BlockLength,
     BlockWeights,
@@ -64,10 +63,6 @@ pub use randomness_collect::{RpcPort, OCW_DB_RANDOM};
 
 pub mod opaque {
     use super::*;
-    pub use sp_runtime::OpaqueExtrinsic as UncheckedExtrinsic;
-
-    pub type Block = generic::Block<Header, UncheckedExtrinsic>;
-
     pub type SessionHandlers = ();
 
     impl_opaque_keys! {
@@ -158,8 +153,8 @@ parameter_types! {
 impl pallet_balances::Config for Runtime {
     type MaxLocks = MaxLocks;
     type Balance = Balance;
-    type Event = Event;
     type DustRemoval = ();
+    type Event = Event;
     type ExistentialDeposit = ExistentialDeposit;
     type AccountStore = System;
     type WeightInfo = weights::pallet_balances::WeightInfo<Runtime>;
@@ -168,7 +163,6 @@ impl pallet_balances::Config for Runtime {
 }
 
 parameter_types! {
-    /// Relay Chain `TransactionByteFee` / 10
     pub const TransactionByteFee: Balance = 1 * MILLICENTS;
 }
 
@@ -463,38 +457,38 @@ impl randomness_collect::Config for Runtime {
 construct_runtime!(
     pub enum Runtime where
         Block = Block,
-        NodeBlock = opaque::Block,
-        UncheckedExtrinsic = UncheckedExtrinsic,
+        NodeBlock = jupiter_primitives::Block,
+        UncheckedExtrinsic = UncheckedExtrinsic
     {
         // System support stuff;
-        System: frame_system::{Pallet, Call, Config, Storage, Event<T>},
-        ParachainSystem: cumulus_pallet_parachain_system::{Pallet, Call, Config, Storage, Inherent, Event<T>},
-        RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Pallet, Storage},
-        Timestamp: pallet_timestamp::{Pallet, Call, Storage, Inherent},
-        ParachainInfo: parachain_info::{Pallet, Storage, Config},
-        Sudo: pallet_sudo::{Pallet, Call, Config<T>, Storage, Event<T>},
+        System: frame_system::{Pallet, Call, Config, Storage, Event<T>} = 0,
+        ParachainSystem: cumulus_pallet_parachain_system::{Pallet, Call, Config, Storage, Inherent, Event<T>} = 1,
+        RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Pallet, Storage} = 2,
+        Timestamp: pallet_timestamp::{Pallet, Call, Storage, Inherent} = 3,
+        ParachainInfo: parachain_info::{Pallet, Storage, Config} = 4,
+        Sudo: pallet_sudo::{Pallet, Call, Config<T>, Storage, Event<T>} = 5,
 
         // Monetary stuff;
-        Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>},
-        TransactionPayment: pallet_transaction_payment::{Pallet, Storage},
+        Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>} = 6,
+        TransactionPayment: pallet_transaction_payment::{Pallet, Storage} = 7,
 
         // Collator support. the order of these 4 are important and shall not change.
-        Authorship: pallet_authorship::{Pallet, Call, Storage},
-        CollatorSelection: pallet_collator_selection::{Pallet, Call, Storage, Event<T>, Config<T>},
-        Session: pallet_session::{Pallet, Call, Storage, Event, Config<T>},
-        Aura: pallet_aura::{Pallet, Storage, Config<T>},
-        AuraExt: cumulus_pallet_aura_ext::{Pallet, Storage, Config},
+        Authorship: pallet_authorship::{Pallet, Call, Storage} = 20,
+        CollatorSelection: pallet_collator_selection::{Pallet, Call, Storage, Event<T>, Config<T>} = 21,
+        Session: pallet_session::{Pallet, Call, Storage, Event, Config<T>} = 22,
+        Aura: pallet_aura::{Pallet, Storage, Config<T>} = 23,
+        AuraExt: cumulus_pallet_aura_ext::{Pallet, Storage, Config} = 24,
 
         // The main stage.
-        Utility: pallet_utility::{Pallet, Call, Event},
-        Contracts: pallet_contracts::{Pallet, Call, Storage, Event<T>},
-        RandomnessCollect: randomness_collect::{Pallet, Call, Storage, ValidateUnsigned},
+        Utility: pallet_utility::{Pallet, Call, Event} = 30,
+        Contracts: pallet_contracts::{Pallet, Call, Storage, Event<T>} = 31,
+        RandomnessCollect: randomness_collect::{Pallet, Call, Storage, ValidateUnsigned} = 32,
 
         // XCM helpers.
-        XcmpQueue: cumulus_pallet_xcmp_queue::{Pallet, Call, Storage, Event<T>},
-        PolkadotXcm: pallet_xcm::{Pallet, Call, Event<T>, Origin},
-        CumulusXcm: cumulus_pallet_xcm::{Pallet, Event<T>, Origin},
-        DmpQueue: cumulus_pallet_dmp_queue::{Pallet, Call, Storage, Event<T>},
+        XcmpQueue: cumulus_pallet_xcmp_queue::{Pallet, Call, Storage, Event<T>} = 40,
+        PolkadotXcm: pallet_xcm::{Pallet, Call, Event<T>, Origin} = 41,
+        CumulusXcm: cumulus_pallet_xcm::{Pallet, Event<T>, Origin} = 42,
+        DmpQueue: cumulus_pallet_dmp_queue::{Pallet, Call, Storage, Event<T>} = 43,
     }
 );
 
@@ -533,8 +527,7 @@ pub type Executive = frame_executive::Executive<
 pub struct OnRuntimeUpgrade;
 impl frame_support::traits::OnRuntimeUpgrade for OnRuntimeUpgrade {
     fn on_runtime_upgrade() -> u64 {
-        sp_io::storage::set(b":c", &[]);
-        RocksDbWeight::get().writes(1)
+        1
     }
 }
 
