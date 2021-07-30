@@ -208,7 +208,7 @@ More parameters please lookup from `--help` or Substrate Developer Hub [https://
 The blockchain produces blocks in `babe` algorithm for every **6 second**, and do finality by `grandpa` algorithm. 
 All people could join this testnet as a sync node. 
 
-**Welcome use this link [https://patrastore.io/](https://patrastore.io/) to claim some DOT from our faucet (in the accounts page)**
+**Welcome use this link [https://patrastore.io/](https://patrastore.io/) to claim some DOT from our faucet**
 
 ##### 4.1.1 join Jupiter PoA testnet
 Moving the execution file `jupiter-prep` to other place and launch the node by following steps:
@@ -267,7 +267,7 @@ For now, we only running our own private parachain(collator) node use aura algor
 ```bash
 ./jupiter --chain ./jupiter-westend-patract.json --execution wasm --wasm-execution=compiled --force-authoring --parachain-id=2000 --tmp \
 --chain ./westend-patract.json --no-beefy --execution wasm --wasm-execution=compiled --tmp \
---bootnodes /dns/ws.patract-westend.patract.cn/tcp/30333/p2p/12D3KooW9xfo1rf4i67TAPN3hTXASNvqytVQjAnKeB5SEjmkv1yz
+--bootnodes /dns/ws.patract-westend.patract.cn/tcp/30333/p2p/12D3KooWHfn9r5cLyVQRuLin1wsB3KUiVaMWPnnpFd7Hhff6rhUX
 ```
 
 > Notice, currently we didn't make seed node into westend-patract.json, so you have to specify our private westend bootnode.
