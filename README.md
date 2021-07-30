@@ -265,12 +265,12 @@ After running relaychain and parachain, upload parachain genenis file to relaych
 ##### 4.2.2 join Jupiter Parachain testnet
 For now, we only running our own private parachain(collator) node use aura algorithm, outside node should running in sync mode. 
 ```bash
-./jupiter --chain ./jupiter-westend-098.json --execution wasm --wasm-execution=compiled --force-authoring --parachain-id=2000 --tmp \
---chain ./westend-098.json --no-beefy --execution wasm --wasm-execution=compiled --tmp \
---bootnodes /dns/ws.patract-westend.patract.cn/tcp/30333/p2p/12D3KooWPuxozEWKs7D9Pno7wCd1WtmrEwQnMKQQ9oqZfvzSjmJY
+./jupiter --chain ./jupiter-westend-patract.json --execution wasm --wasm-execution=compiled --force-authoring --parachain-id=2000 --tmp \
+--chain ./westend-patract.json --no-beefy --execution wasm --wasm-execution=compiled --tmp \
+--bootnodes /dns/ws.patract-westend.patract.cn/tcp/30333/p2p/12D3KooW9xfo1rf4i67TAPN3hTXASNvqytVQjAnKeB5SEjmkv1yz
 ```
 
-> Notice, currently we didn't make seed node into westend-098.json, so you have to specify our private westend bootnode.
+> Notice, currently we didn't make seed node into westend-patract.json, so you have to specify our private westend bootnode.
 
 #### 4.3 Jupiter Dev Node
 `jupiter-dev` just use for local development, it providers a nice and quick experience for contract developing for developers 
