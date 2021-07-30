@@ -135,8 +135,13 @@ Now, Jupiter has launched following network:
 
     **Jupiter open provider links are:**
       - `wss://ws.jupiter.patract-westend.patract.cn`
+  
+    **Westend-Patract(Relaychain) open provider links are:**
+      - `wss://ws.patract-westend.patract.cn`
 
-    Jupiter Parachain open telemetry link is [https://telemetry.patract.io/](https://telemetry.patract.io/#list/Jupiter%20PC1)
+    Jupiter Parachain open telemetry link is [https://telemetry.patract.io/#list/Jupiter%20PC1](https://telemetry.patract.io/#list/Jupiter%20PC1)
+
+    Westend-Patract(Relaychain) open telemetry link is [https://telemetry.patract.io/#list/Westend-Patract](https://telemetry.patract.io/#list/Westend-Patract)
 
 * Jupiter Dev node: 
     
