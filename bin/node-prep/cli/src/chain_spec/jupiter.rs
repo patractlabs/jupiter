@@ -120,7 +120,7 @@ pub fn poa_development_config() -> Result<ChainSpec, String> {
         // Properties
         Some(
             json!({
-                "ss58Format": jupiter_runtime::SS58Prefix::get(),
+                "ss58Format": jupiter_runtime_common::SS58Prefix::get(),
                 "tokenDecimals": 10,
                 "tokenSymbol": "DOT"
             })
@@ -179,7 +179,7 @@ pub fn poa_local_config() -> Result<ChainSpec, String> {
         // Properties
         Some(
             json!({
-                "ss58Format": jupiter_runtime::SS58Prefix::get(),
+                "ss58Format": jupiter_runtime_common::SS58Prefix::get(),
                 "tokenDecimals": 10,
                 "tokenSymbol": "DOT"
             })
@@ -358,7 +358,7 @@ pub fn poa_staging_config() -> Result<ChainSpec, String> {
         // Properties
         Some(
             json!({
-                "ss58Format": jupiter_runtime::SS58Prefix::get(),
+                "ss58Format": jupiter_runtime_common::SS58Prefix::get(),
                 "tokenDecimals": 10,
                 "tokenSymbol": "DOT"
             })

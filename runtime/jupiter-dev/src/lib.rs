@@ -48,8 +48,9 @@ pub use jupiter_primitives::{
 };
 use jupiter_runtime_common::{
     constants::{jupiter_currency::*, time::*},
-    impls, weights, BlockHashCount, BlockLength, BlockWeights, AVERAGE_ON_INITIALIZE_RATIO,
+    impls, weights,
 };
+use jupiter_runtime_common::*;
 
 #[cfg(feature = "std")]
 /// Wasm binary unwrapped. If built with `BUILD_DUMMY_WASM_BINARY`, the function panics.
@@ -137,20 +138,12 @@ impl frame_system::Config for Runtime {
     type OnSetCode = ();
 }
 
-parameter_types! {
-    pub const UncleGenerations: u32 = 0;
-}
-
 impl pallet_authorship::Config for Runtime {
     type FindAuthor = ();
     // would set Default::default() for author
     type UncleGenerations = UncleGenerations;
     type FilterUncle = ();
     type EventHandler = ();
-}
-
-parameter_types! {
-    pub const MinimumPeriod: u64 = SLOT_DURATION / 2;
 }
 
 impl pallet_timestamp::Config for Runtime {
@@ -161,24 +154,12 @@ impl pallet_timestamp::Config for Runtime {
     type WeightInfo = pallet_timestamp::weights::SubstrateWeight<Runtime>;
 }
 
-parameter_types! {
-    pub const IndexDeposit: Balance = 1 * DOLLARS;
-}
-
 impl pallet_indices::Config for Runtime {
     type AccountIndex = AccountIndex;
     type Currency = Balances;
     type Deposit = IndexDeposit;
     type Event = Event;
     type WeightInfo = pallet_indices::weights::SubstrateWeight<Runtime>;
-}
-
-parameter_types! {
-    pub const ExistentialDeposit: Balance = 0;
-    // For weight estimation, we assume that the most locks on an individual account will be 50.
-    // This number may need to be adjusted in the future if this assumption no longer holds true.
-    pub const MaxLocks: u32 = 50;
-    pub const MaxReserves: u32 = 50;
 }
 
 impl pallet_balances::Config for Runtime {
@@ -195,10 +176,6 @@ impl pallet_balances::Config for Runtime {
     type ReserveIdentifier = [u8; 8];
 }
 
-parameter_types! {
-    pub const TransactionByteFee: Balance = 10 * MILLICENTS;
-}
-
 impl pallet_transaction_payment::Config for Runtime {
     type OnChargeTransaction = CurrencyAdapter<Balances, impls::ToAuthor<Self>>;
     type TransactionByteFee = TransactionByteFee;
@@ -207,21 +184,6 @@ impl pallet_transaction_payment::Config for Runtime {
 }
 
 parameter_types! {
-    pub TombstoneDeposit: Balance = tombstone_deposit(
-        1,
-        <pallet_contracts::Pallet<Runtime>>::contract_info_size(),
-    );
-    pub DepositPerContract: Balance = TombstoneDeposit::get();
-    pub const DepositPerStorageByte: Balance = 1 * MILLICENTS;
-    pub const DepositPerStorageItem: Balance = 10 * MILLICENTS;
-    pub RentFraction: Perbill = Perbill::from_rational(1u32, 60 * DAYS);
-    pub const SurchargeReward: Balance = 0;
-    pub const SignedClaimHandicap: u32 = 0;
-    // The lazy deletion runs inside on_initialize.
-    pub DeletionWeightLimit: Weight = AVERAGE_ON_INITIALIZE_RATIO *
-        BlockWeights::get().max_block;
-    // The weight needed for decoding the queue should be less or equal than a fifth
-    // of the overall weight dedicated to the lazy deletion.
     pub DeletionQueueDepth: u32 = ((DeletionWeightLimit::get() / (
             <Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(1) -
             <Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(0)

@@ -60,7 +60,6 @@ parachain-info = { git = "https://github.com/patractlabs/cumulus", branch = "pat
 
 # Polkadot dependencies
 polkadot-parachain = { git = "https://github.com/patractlabs/polkadot", branch = "patract-sandbox-098", default-features = false }
-polkadot-runtime-common = { git = "https://github.com/patractlabs/polkadot", branch = "patract-sandbox-098", default-features = false }
 xcm = { git = "https://github.com/patractlabs/polkadot", branch = "patract-sandbox-098", default-features = false }
 xcm-builder = { git = "https://github.com/patractlabs/polkadot", branch = "patract-sandbox-098", default-features = false }
 xcm-executor = { git = "https://github.com/patractlabs/polkadot", branch = "patract-sandbox-098", default-features = false }

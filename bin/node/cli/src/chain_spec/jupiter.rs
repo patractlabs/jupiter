@@ -108,7 +108,7 @@ pub fn development_config(id: ParaId, relay_chain: &str) -> Result<ChainSpec, St
         // Properties
         Some(
             json!({
-                "ss58Format": jupiter_runtime::SS58Prefix::get(),
+                "ss58Format": jupiter_runtime_common::SS58Prefix::get(),
                 "tokenDecimals": 10,
                 "tokenSymbol": "DOT"
             })
@@ -164,7 +164,7 @@ pub fn staging_config(id: ParaId) -> Result<ChainSpec, String> {
         Some("jupiter_pc1_staging"),
         Some(
             json!({
-                "ss58Format": jupiter_runtime::SS58Prefix::get(),
+                "ss58Format": jupiter_runtime_common::SS58Prefix::get(),
                 "tokenDecimals": 12,
                 "tokenSymbol": "WND"
             })

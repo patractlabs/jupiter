@@ -1,5 +1,7 @@
 //! A set of constant values used in substrate runtime.
 
+// pub use time::*;
+
 /// Money matters.
 pub mod jupiter_currency {
     use super::jupiter_fee::{Weight2FeeNumerator, WeightToFee};
@@ -61,21 +63,21 @@ pub mod time {
     pub const PRIMARY_PROBABILITY: (u64, u64) = (1, 4);
 }
 
-/// Common constants
-pub mod constants {
-    use frame_support::weights::{constants::WEIGHT_PER_SECOND, Weight};
-    use sp_runtime::Perbill;
-
-    /// We assume that ~5% of the block weight is consumed by `on_initialize` handlers. This is
-    /// used to limit the maximal weight of a single extrinsic.
-    pub const AVERAGE_ON_INITIALIZE_RATIO: Perbill = Perbill::from_percent(5);
-    /// We allow `Normal` extrinsics to fill up the block up to 75%, the rest can be used by
-    /// Operational  extrinsics.
-    pub const NORMAL_DISPATCH_RATIO: Perbill = Perbill::from_percent(75);
-
-    /// We allow for 0.5 seconds of compute with a 6 second average block time.
-    pub const MAXIMUM_BLOCK_WEIGHT: Weight = WEIGHT_PER_SECOND / 2;
-}
+// Common constants
+// pub mod constants {
+//     use frame_support::weights::{constants::WEIGHT_PER_SECOND, Weight};
+//     use sp_runtime::Perbill;
+// 
+//     /// We assume that ~5% of the block weight is consumed by `on_initialize` handlers. This is
+//     /// used to limit the maximal weight of a single extrinsic.
+//     pub const AVERAGE_ON_INITIALIZE_RATIO: Perbill = Perbill::from_percent(5);
+//     /// We allow `Normal` extrinsics to fill up the block up to 75%, the rest can be used by
+//     /// Operational  extrinsics.
+//     pub const NORMAL_DISPATCH_RATIO: Perbill = Perbill::from_percent(75);
+//     //
+//     /// We allow for 0.5 seconds of compute with a 6 second average block time.
+//     pub const MAXIMUM_BLOCK_WEIGHT: Weight = WEIGHT_PER_SECOND / 2;
+// }
 
 /// Fee-related.
 pub mod jupiter_fee {
