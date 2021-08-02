@@ -4,10 +4,7 @@ pub mod constants;
 pub mod impls;
 pub mod weights;
 
-use sp_runtime::{
-    Perbill,
-    transaction_validity::{TransactionPriority}
-};
+use sp_runtime::{transaction_validity::TransactionPriority, Perbill};
 
 pub use frame_support::{
     parameter_types,
@@ -19,8 +16,8 @@ pub use frame_support::{
 };
 use frame_system::limits;
 
-use constants::time::*;
 use constants::jupiter_currency::*;
+use constants::time::*;
 use jupiter_primitives::*;
 
 /// We assume that an on-initialize consumes 2.5% of the weight on average, hence a single extrinsic

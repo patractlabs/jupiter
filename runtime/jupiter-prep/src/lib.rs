@@ -66,11 +66,11 @@ pub use pallet_timestamp::Call as TimestampCall;
 pub use jupiter_primitives::{
     AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Signature,
 };
+use jupiter_runtime_common::*;
 use jupiter_runtime_common::{
     constants::{jupiter_currency::*, time::*},
-    impls, weights
+    impls, weights,
 };
-use jupiter_runtime_common::*;
 
 impl_opaque_keys! {
     pub struct SessionKeys {

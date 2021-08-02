@@ -29,7 +29,7 @@ fn load_spec(
             para_id,
             "westend-local",
         )?),
-        // "jupiter-staging" => Box::new(chain_spec::jupiter::staging_config(para_id)?),
+        "jupiter-staging" => Box::new(chain_spec::jupiter::staging_config(para_id)?),
         // "" | "jupiter" => Box::new(chain_spec::jupiter::jupiter_config()?),
         path => Box::new(chain_spec::jupiter::ChainSpec::from_json_file(path.into())?),
     })

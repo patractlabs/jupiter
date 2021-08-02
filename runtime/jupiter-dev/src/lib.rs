@@ -46,11 +46,8 @@ pub use pallet_timestamp::Call as TimestampCall;
 pub use jupiter_primitives::{
     AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Signature,
 };
-use jupiter_runtime_common::{
-    constants::{jupiter_currency::*},
-    impls, weights,
-};
 use jupiter_runtime_common::*;
+use jupiter_runtime_common::{constants::jupiter_currency::*, impls, weights};
 
 #[cfg(feature = "std")]
 /// Wasm binary unwrapped. If built with `BUILD_DUMMY_WASM_BINARY`, the function panics.
@@ -151,7 +148,7 @@ impl pallet_timestamp::Config for Runtime {
     type Moment = u64;
     type OnTimestampSet = ();
     type MinimumPeriod = MinimumPeriod;
-    type WeightInfo = pallet_timestamp::weights::SubstrateWeight<Runtime>;
+    type WeightInfo = weights::pallet_timestamp::WeightInfo<Runtime>;
 }
 
 impl pallet_indices::Config for Runtime {
@@ -159,7 +156,7 @@ impl pallet_indices::Config for Runtime {
     type Currency = Balances;
     type Deposit = IndexDeposit;
     type Event = Event;
-    type WeightInfo = pallet_indices::weights::SubstrateWeight<Runtime>;
+    type WeightInfo = weights::pallet_indices::WeightInfo<Runtime>;
 }
 
 impl pallet_balances::Config for Runtime {
@@ -171,7 +168,7 @@ impl pallet_balances::Config for Runtime {
     type Event = Event;
     type ExistentialDeposit = ExistentialDeposit;
     type AccountStore = System;
-    type WeightInfo = pallet_balances::weights::SubstrateWeight<Runtime>;
+    type WeightInfo = weights::pallet_balances::WeightInfo<Runtime>;
     type MaxReserves = MaxReserves;
     type ReserveIdentifier = [u8; 8];
 }

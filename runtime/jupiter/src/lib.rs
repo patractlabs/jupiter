@@ -25,7 +25,7 @@ use sp_version::RuntimeVersion;
 use frame_support::{
     construct_runtime, match_type, parameter_types,
     traits::All,
-    weights::{IdentityFee, Weight, constants::RocksDbWeight},
+    weights::{constants::RocksDbWeight, IdentityFee, Weight},
     PalletId,
 };
 use frame_system::EnsureRoot;
@@ -46,8 +46,11 @@ use xcm_builder::{
 use xcm_executor::{Config, XcmExecutor};
 
 pub use jupiter_primitives::{AccountId, Balance, BlockNumber, Hash, Header, Index, Signature};
-use jupiter_runtime_common::{constants::{time::*, jupiter_currency::*}, impls, weights};
 use jupiter_runtime_common::*;
+use jupiter_runtime_common::{
+    constants::{jupiter_currency::*, time::*},
+    impls, weights,
+};
 
 use pallet_contracts::weights::WeightInfo;
 use pallet_contracts_primitives::ContractExecResult;
@@ -147,7 +150,6 @@ impl pallet_balances::Config for Runtime {
     type ReserveIdentifier = [u8; 8];
 }
 
-// TODO: jupiter own currentcy
 impl pallet_transaction_payment::Config for Runtime {
     type OnChargeTransaction = pallet_transaction_payment::CurrencyAdapter<Balances, ()>;
     type TransactionByteFee = TransactionByteFee;

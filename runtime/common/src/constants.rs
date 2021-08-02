@@ -1,5 +1,24 @@
 //! A set of constant values used in substrate runtime.
 
+/// Time.
+pub mod time {
+    use jupiter_primitives::{BlockNumber, Moment};
+
+    pub const MILLISECS_PER_BLOCK: Moment = 6000;
+    pub const SECS_PER_BLOCK: Moment = MILLISECS_PER_BLOCK / 1000;
+
+    pub const SLOT_DURATION: Moment = MILLISECS_PER_BLOCK;
+    pub const EPOCH_DURATION_IN_BLOCKS: BlockNumber = 1 * HOURS;
+
+    // These time units are defined in number of blocks.
+    pub const MINUTES: BlockNumber = 60 / (SECS_PER_BLOCK as BlockNumber);
+    pub const HOURS: BlockNumber = MINUTES * 60;
+    pub const DAYS: BlockNumber = HOURS * 24;
+
+    // 1 in 4 blocks (on average, not counting collisions) will be primary babe blocks.
+    pub const PRIMARY_PROBABILITY: (u64, u64) = (1, 4);
+}
+
 /// Money matters.
 pub mod jupiter_currency {
     use super::jupiter_fee::{Weight2FeeNumerator, WeightToFee};
@@ -23,25 +42,6 @@ pub mod jupiter_currency {
         const NUMERATOR: u128 = CENTS;
     }
     pub type JupiterWeight2Fee = WeightToFee<JupiterNumerator>;
-}
-
-/// Time.
-pub mod time {
-    use jupiter_primitives::{BlockNumber, Moment};
-
-    pub const MILLISECS_PER_BLOCK: Moment = 6000;
-    pub const SECS_PER_BLOCK: Moment = MILLISECS_PER_BLOCK / 1000;
-
-    pub const SLOT_DURATION: Moment = MILLISECS_PER_BLOCK;
-    pub const EPOCH_DURATION_IN_BLOCKS: BlockNumber = 1 * HOURS;
-
-    // These time units are defined in number of blocks.
-    pub const MINUTES: BlockNumber = 60 / (SECS_PER_BLOCK as BlockNumber);
-    pub const HOURS: BlockNumber = MINUTES * 60;
-    pub const DAYS: BlockNumber = HOURS * 24;
-
-    // 1 in 4 blocks (on average, not counting collisions) will be primary babe blocks.
-    pub const PRIMARY_PROBABILITY: (u64, u64) = (1, 4);
 }
 
 /// Fee-related.
