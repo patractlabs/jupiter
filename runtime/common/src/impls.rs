@@ -2,15 +2,11 @@ use frame_support::{
     parameter_types,
     traits::{Currency, Imbalance, OnUnbalanced},
 };
-// use pallet_balances::NegativeImbalance;
+use pallet_balances::NegativeImbalance;
 use pallet_transaction_payment::{Multiplier, TargetedFeeAdjustment};
 use sp_runtime::{FixedPointNumber, Perquintill};
 
 use jupiter_primitives::AccountId;
-
-pub type NegativeImbalance<T> = <pallet_balances::Pallet<T> as Currency<
-    <T as frame_system::Config>::AccountId,
->>::NegativeImbalance;
 
 pub struct ToAuthor<R>(sp_std::marker::PhantomData<R>);
 impl<R> OnUnbalanced<NegativeImbalance<R>> for ToAuthor<R>

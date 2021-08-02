@@ -14,7 +14,7 @@ use sp_runtime::{
     create_runtime_str, generic, impl_opaque_keys,
     traits::{AccountIdLookup, BlakeTwo256, Block as BlockT},
     transaction_validity::{TransactionPriority, TransactionSource, TransactionValidity},
-    ApplyExtrinsicResult, Perbill,
+    ApplyExtrinsicResult,
 };
 
 use sp_std::prelude::*;
@@ -46,7 +46,7 @@ use xcm_builder::{
 use xcm_executor::{Config, XcmExecutor};
 
 pub use jupiter_primitives::{AccountId, Balance, BlockNumber, Hash, Header, Index, Signature};
-use jupiter_runtime_common::{constants::{fee::WeightToFee, time::*}, impls, weights};
+use jupiter_runtime_common::{constants::{time::*, jupiter_currency::*}, impls, weights};
 use jupiter_runtime_common::*;
 
 use pallet_contracts::weights::WeightInfo;
@@ -88,7 +88,6 @@ pub fn native_version() -> NativeVersion {
 
 parameter_types! {
     pub const Version: RuntimeVersion = VERSION;
-    // pub const SS58Prefix: u8 = 26;
 }
 
 impl frame_system::Config for Runtime {
@@ -117,6 +116,7 @@ impl frame_system::Config for Runtime {
     type OnSetCode = cumulus_pallet_parachain_system::ParachainSetCode<Self>;
 }
 
+// ParaChain slot duration
 parameter_types! {
     pub const MinimumPeriod: u64 = SLOT_DURATION;
 }
@@ -149,11 +149,9 @@ impl pallet_balances::Config for Runtime {
 
 // TODO: jupiter own currentcy
 impl pallet_transaction_payment::Config for Runtime {
-    // type OnChargeTransaction = pallet_transaction_payment::CurrencyAdapter<Balances, DealWithFees<Runtime>>;
     type OnChargeTransaction = pallet_transaction_payment::CurrencyAdapter<Balances, ()>;
     type TransactionByteFee = TransactionByteFee;
-    type WeightToFee = WeightToFee;
-    // type WeightToFee = JupiterWeight2Fee;
+    type WeightToFee = JupiterWeight2Fee;
     type FeeMultiplierUpdate = impls::SlowAdjustingFeeUpdate<Self>;
 }
 
@@ -354,12 +352,6 @@ impl cumulus_pallet_dmp_queue::Config for Runtime {
     type Event = Event;
     type XcmExecutor = XcmExecutor<XcmConfig>;
     type ExecuteOverweightOrigin = EnsureRoot<AccountId>;
-}
-
-parameter_types! {
-    pub const DisabledValidatorsThreshold: Perbill = Perbill::from_percent(33);
-    pub const Period: u32 = 6 * HOURS;
-    pub const Offset: u32 = 0;
 }
 
 impl pallet_session::Config for Runtime {

@@ -5,7 +5,7 @@ pub mod impls;
 pub mod weights;
 
 use sp_runtime::{
-    FixedPointNumber, Perbill, Perquintill,
+    Perbill,
     transaction_validity::{TransactionPriority}
 };
 
@@ -18,8 +18,6 @@ pub use frame_support::{
     RuntimeDebug, StorageValue,
 };
 use frame_system::limits;
-
-use pallet_transaction_payment::Multiplier;
 
 use constants::time::*;
 use constants::jupiter_currency::*;

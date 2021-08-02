@@ -47,7 +47,7 @@ pub use jupiter_primitives::{
     AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Signature,
 };
 use jupiter_runtime_common::{
-    constants::{jupiter_currency::*, time::*},
+    constants::{jupiter_currency::*},
     impls, weights,
 };
 use jupiter_runtime_common::*;
