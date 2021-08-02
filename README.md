@@ -246,32 +246,11 @@ but in same network, you should add `--bootnodes` parameter when start second no
 currently, we add [Sandbox HostFunction](https://github.com/patractlabs/polkadot/blob/patract-sandbox-098/node/core/pvf/src/executor_intf.rs#L95) in relaychain(westend) to support parachain contract,
 so if you want to running on test environment, you should add Sandbox HostFunction to relaychain.
 
-##### 4.2.1 start local test mode Jupiter Parachain
-export relaychain json:
-```bash
-./polkadot build-spec --chain westend-local --raw --disable-default-bootnode > westend-local.json
-```
-
-export parachain genesis:
-```bash
-./jupiter build-spec --chain jupiter-dev --disable-default-bootnode --raw > jupiter-dev.json
-./jupiter export-genesis-state --chain jupiter-dev --parachain-id 2000 > jupiter-dev-2000-genesis
-./jupiter export-genesis-wasm --chain jupiter-dev > jupiter-dev-wasm
-```
-
-run parachain:
-```bash
-./jupiter --chain ./jupiter-dev.json --force-authoring --parachain-id=2000 --collator --temp --alice -- --chain ./westend-local.json
-./jupiter --chain ./jupiter-dev.json --force-authoring --parachain-id=2000 --collator --temp --bob -- --chain ./westend-local.json
-```
-
-After running relaychain and parachain, upload parachain genenis file to relaychain. refere [this link](https://substrate.dev/cumulus-workshop/#/en/3-parachains/2-register).
-
-##### 4.2.2 join Jupiter Parachain testnet
+##### 4.2.1 join Jupiter Parachain testnet
 For now, we only running our own private parachain(collator) node use aura algorithm, outside node should running in sync mode. 
 ```bash
-./jupiter --chain ./jupiter-westend-patract.json --execution wasm --wasm-execution=compiled --force-authoring --parachain-id=2000 --tmp \
---chain ./westend-patract.json --no-beefy --execution wasm --wasm-execution=compiled --tmp \
+./jupiter --chain ./jupiter-westend-patract.json --execution wasm --wasm-execution=compiled --parachain-id=2000 --tmp \
+-- --chain ./westend-patract.json --execution wasm --wasm-execution=compiled --tmp \
 --bootnodes /dns/ws.patract-westend.patract.cn/tcp/30333/p2p/12D3KooWFBrd6SrevJ4vLi3SY7KRYQEVbRSeoENmdDouAW7wGCvZ
 ```
 
