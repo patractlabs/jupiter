@@ -22,8 +22,8 @@ use sp_runtime::{
         AccountIdLookup, BlakeTwo256, Block as BlockT, Extrinsic as ExtrinsicT, OpaqueKeys,
         SaturatedConversion, StaticLookup, Verify,
     },
-    transaction_validity::{TransactionPriority, TransactionSource, TransactionValidity},
-    ApplyExtrinsicResult, Perbill, Percent, Permill,
+    transaction_validity::{TransactionSource, TransactionValidity},
+    ApplyExtrinsicResult, Percent, Permill,
 };
 use sp_staking::SessionIndex;
 use sp_std::{collections::btree_map::BTreeMap, prelude::*};
@@ -66,9 +66,10 @@ pub use pallet_timestamp::Call as TimestampCall;
 pub use jupiter_primitives::{
     AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Signature,
 };
+use jupiter_runtime_common::*;
 use jupiter_runtime_common::{
     constants::{jupiter_currency::*, time::*},
-    impls, weights, BlockHashCount, BlockLength, BlockWeights, AVERAGE_ON_INITIALIZE_RATIO,
+    impls, weights,
 };
 
 impl_opaque_keys! {
@@ -125,7 +126,6 @@ type MoreThanHalfCouncil = EnsureOneOf<
 
 parameter_types! {
     pub const Version: RuntimeVersion = VERSION;
-    pub const SS58Prefix: u8 = 26;
 }
 impl frame_system::Config for Runtime {
     /// The basic call filter to use in dispatchable.
@@ -179,12 +179,6 @@ impl frame_system::Config for Runtime {
     type OnSetCode = ();
 }
 
-parameter_types! {
-    pub MaximumSchedulerWeight: Weight = Perbill::from_percent(80) *
-        BlockWeights::get().max_block;
-    pub const MaxScheduledPerBlock: u32 = 50;
-}
-
 impl pallet_scheduler::Config for Runtime {
     type Event = Event;
     type Origin = Origin;
@@ -196,10 +190,6 @@ impl pallet_scheduler::Config for Runtime {
     type WeightInfo = weights::pallet_scheduler::WeightInfo<Runtime>;
 }
 
-parameter_types! {
-    pub const UncleGenerations: u32 = 0;
-}
-
 impl pallet_authorship::Config for Runtime {
     type FindAuthor = pallet_session::FindAccountFromAuthorIndex<Self, Babe>;
     type UncleGenerations = UncleGenerations;
@@ -208,8 +198,6 @@ impl pallet_authorship::Config for Runtime {
 }
 
 parameter_types! {
-    pub const EpochDuration: u64 = EPOCH_DURATION_IN_BLOCKS as u64;
-    pub const ExpectedBlockTime: Moment = MILLISECS_PER_BLOCK;
     pub const ReportLongevity: u64 =
        SlashDeferDuration::get() as u64 * SessionsPerEra::get() as u64 * EpochDuration::get(); // TODO change this in future
 }
@@ -298,10 +286,6 @@ where
     type OverarchingCall = Call;
 }
 
-parameter_types! {
-    pub OffencesWeightSoftLimit: Weight = Perbill::from_percent(60) * BlockWeights::get().max_block;
-}
-
 impl pallet_offences::Config for Runtime {
     type Event = Event;
     type IdentificationTuple = pallet_session::historical::IdentificationTuple<Self>;
@@ -309,10 +293,6 @@ impl pallet_offences::Config for Runtime {
 }
 
 impl pallet_authority_discovery::Config for Runtime {}
-
-parameter_types! {
-    pub const ImOnlineUnsignedPriority: TransactionPriority = TransactionPriority::max_value();
-}
 
 impl pallet_im_online::Config for Runtime {
     type AuthorityId = ImOnlineId;
@@ -345,10 +325,6 @@ impl pallet_grandpa::Config for Runtime {
     >;
 
     type WeightInfo = ();
-}
-
-parameter_types! {
-    pub const DisabledValidatorsThreshold: Perbill = Perbill::from_percent(17);
 }
 
 impl pallet_session::Config for Runtime {
@@ -401,20 +377,6 @@ impl pallet_poa::Config for Runtime {
     type SessionInterface = Self;
     type Event = Event;
     type WeightInfo = (); //TODO change this
-}
-
-parameter_types! {
-    pub const LaunchPeriod: BlockNumber = 1 * DAYS;
-    pub const VotingPeriod: BlockNumber = 1 * DAYS;
-    pub const FastTrackVotingPeriod: BlockNumber = 3 * HOURS;
-    pub const MinimumDeposit: Balance = 1 * DOLLARS;
-    pub const EnactmentPeriod: BlockNumber = 1 * DAYS;
-    pub const CooloffPeriod: BlockNumber = 1 * DAYS;
-    // One cent: $10,000 / MB
-    pub const PreimageByteDeposit: Balance = 1 * CENTS;
-    pub const InstantAllowed: bool = true;
-    pub const MaxVotes: u32 = 100;
-    pub const MaxProposals: u32 = 100;
 }
 
 impl pallet_democracy::Config for Runtime {
@@ -471,12 +433,6 @@ impl pallet_democracy::Config for Runtime {
     type MaxProposals = MaxProposals;
 }
 
-parameter_types! {
-    pub const CouncilMotionDuration: BlockNumber = 3 * DAYS;
-    pub const CouncilMaxProposals: u32 = 100;
-    pub const CouncilMaxMembers: u32 = 100;
-}
-
 type CouncilCollective = pallet_collective::Instance1;
 impl pallet_collective::Config<CouncilCollective> for Runtime {
     type Origin = Origin;
@@ -487,12 +443,6 @@ impl pallet_collective::Config<CouncilCollective> for Runtime {
     type MaxMembers = CouncilMaxMembers;
     type DefaultVote = pallet_collective::PrimeDefaultVote;
     type WeightInfo = weights::pallet_collective::WeightInfo<Runtime>;
-}
-
-parameter_types! {
-    pub const TechnicalMotionDuration: BlockNumber = 3 * DAYS;
-    pub const TechnicalMaxProposals: u32 = 100;
-    pub const TechnicalMaxMembers: u32 = 100;
 }
 
 type TechnicalCollective = pallet_collective::Instance2;
@@ -604,24 +554,12 @@ impl pallet_tips::Config for Runtime {
     type WeightInfo = weights::pallet_tips::WeightInfo<Runtime>;
 }
 
-parameter_types! {
-    pub const MinimumPeriod: u64 = SLOT_DURATION / 2;
-}
-
 impl pallet_timestamp::Config for Runtime {
     /// A timestamp: milliseconds since the unix epoch.
     type Moment = u64;
     type OnTimestampSet = Babe;
     type MinimumPeriod = MinimumPeriod;
     type WeightInfo = weights::pallet_timestamp::WeightInfo<Runtime>;
-}
-
-parameter_types! {
-    pub const ExistentialDeposit: Balance = 0;
-    // For weight estimation, we assume that the most locks on an individual account will be 50.
-    // This number may need to be adjusted in the future if this assumption no longer holds true.
-    pub const MaxLocks: u32 = 50;
-       pub const MaxReserves: u32 = 50;
 }
 
 impl pallet_balances::Config for Runtime {
@@ -638,24 +576,11 @@ impl pallet_balances::Config for Runtime {
     type ReserveIdentifier = [u8; 8];
 }
 
-parameter_types! {
-    pub const TransactionByteFee: Balance = 10 * MILLICENTS;
-}
-
 impl pallet_transaction_payment::Config for Runtime {
     type OnChargeTransaction = CurrencyAdapter<Balances, impls::ToAuthor<Self>>;
     type TransactionByteFee = TransactionByteFee;
     type WeightToFee = JupiterWeight2Fee;
     type FeeMultiplierUpdate = impls::SlowAdjustingFeeUpdate<Self>;
-}
-
-parameter_types! {
-    pub const BasicDeposit: Balance = 10 * DOLLARS;       // 258 bytes on-chain
-    pub const FieldDeposit: Balance = 250 * CENTS;        // 66 bytes on-chain
-    pub const SubAccountDeposit: Balance = 2 * DOLLARS;   // 53 bytes on-chain
-    pub const MaxSubAccounts: u32 = 100;
-    pub const MaxAdditionalFields: u32 = 100;
-    pub const MaxRegistrars: u32 = 20;
 }
 
 impl pallet_identity::Config for Runtime {
@@ -674,18 +599,6 @@ impl pallet_identity::Config for Runtime {
 }
 
 parameter_types! {
-    pub const TombstoneDeposit: Balance = 0;
-    pub const DepositPerContract: Balance = 0;
-    pub const DepositPerStorageByte: Balance = TombstoneDeposit::get();
-    pub const DepositPerStorageItem: Balance = 0;
-    pub RentFraction: Perbill = Perbill::zero();
-    pub const SurchargeReward: Balance = 0;
-    pub const SignedClaimHandicap: u32 = 0;
-    // The lazy deletion runs inside on_initialize.
-    pub DeletionWeightLimit: Weight = AVERAGE_ON_INITIALIZE_RATIO *
-        BlockWeights::get().max_block;
-    // The weight needed for decoding the queue should be less or equal than a fifth
-    // of the overall weight dedicated to the lazy deletion.
     pub DeletionQueueDepth: u32 = ((DeletionWeightLimit::get() / (
             <Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(1) -
             <Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(0)

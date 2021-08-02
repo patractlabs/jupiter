@@ -14,7 +14,7 @@ use sp_runtime::{
     create_runtime_str, generic, impl_opaque_keys,
     traits::{AccountIdLookup, BlakeTwo256, Block as BlockT},
     transaction_validity::{TransactionPriority, TransactionSource, TransactionValidity},
-    ApplyExtrinsicResult, Perbill,
+    ApplyExtrinsicResult,
 };
 
 use sp_std::prelude::*;
@@ -25,7 +25,7 @@ use sp_version::RuntimeVersion;
 use frame_support::{
     construct_runtime, match_type, parameter_types,
     traits::All,
-    weights::{IdentityFee, Weight},
+    weights::{constants::RocksDbWeight, IdentityFee, Weight},
     PalletId,
 };
 use frame_system::EnsureRoot;
@@ -35,7 +35,6 @@ pub use sp_runtime::BuildStorage;
 
 use pallet_xcm::XcmPassthrough;
 use polkadot_parachain::primitives::Sibling;
-use polkadot_runtime_common::{BlockHashCount, RocksDbWeight, SlowAdjustingFeeUpdate};
 use xcm::v0::{Junction, MultiAsset, MultiLocation, NetworkId, Xcm};
 use xcm_builder::{
     AccountId32Aliases, AllowTopLevelPaidExecutionFrom, AllowUnpaidExecutionFrom, CurrencyAdapter,
@@ -47,9 +46,10 @@ use xcm_builder::{
 use xcm_executor::{Config, XcmExecutor};
 
 pub use jupiter_primitives::{AccountId, Balance, BlockNumber, Hash, Header, Index, Signature};
+use jupiter_runtime_common::*;
 use jupiter_runtime_common::{
-    constants::{constants::*, currency::*, fee::WeightToFee, time::*},
-    weights, BlockLength, BlockWeights,
+    constants::{jupiter_currency::*, time::*},
+    impls, weights,
 };
 
 use pallet_contracts::weights::WeightInfo;
@@ -91,7 +91,6 @@ pub fn native_version() -> NativeVersion {
 
 parameter_types! {
     pub const Version: RuntimeVersion = VERSION;
-    pub const SS58Prefix: u8 = 26;
 }
 
 impl frame_system::Config for Runtime {
@@ -120,6 +119,7 @@ impl frame_system::Config for Runtime {
     type OnSetCode = cumulus_pallet_parachain_system::ParachainSetCode<Self>;
 }
 
+// ParaChain slot duration
 parameter_types! {
     pub const MinimumPeriod: u64 = SLOT_DURATION;
 }
@@ -131,21 +131,11 @@ impl pallet_timestamp::Config for Runtime {
     type WeightInfo = weights::pallet_timestamp::WeightInfo<Runtime>;
 }
 
-parameter_types! {
-    pub const UncleGenerations: u32 = 0;
-}
-
 impl pallet_authorship::Config for Runtime {
     type FindAuthor = pallet_session::FindAccountFromAuthorIndex<Self, Aura>;
     type UncleGenerations = UncleGenerations;
     type FilterUncle = ();
     type EventHandler = (CollatorSelection,);
-}
-
-parameter_types! {
-    pub const ExistentialDeposit: Balance = 0;
-    pub const MaxLocks: u32 = 50;
-    pub const MaxReserves: u32 = 50;
 }
 
 impl pallet_balances::Config for Runtime {
@@ -160,33 +150,14 @@ impl pallet_balances::Config for Runtime {
     type ReserveIdentifier = [u8; 8];
 }
 
-parameter_types! {
-    pub const TransactionByteFee: Balance = 1 * MILLICENTS;
-}
-
-// TODO: jupiter own currentcy
 impl pallet_transaction_payment::Config for Runtime {
-    // type OnChargeTransaction = pallet_transaction_payment::CurrencyAdapter<Balances, DealWithFees<Runtime>>;
     type OnChargeTransaction = pallet_transaction_payment::CurrencyAdapter<Balances, ()>;
     type TransactionByteFee = TransactionByteFee;
-    type WeightToFee = WeightToFee;
-    // type WeightToFee = JupiterWeight2Fee;
-    type FeeMultiplierUpdate = SlowAdjustingFeeUpdate<Self>;
+    type WeightToFee = JupiterWeight2Fee;
+    type FeeMultiplierUpdate = impls::SlowAdjustingFeeUpdate<Self>;
 }
 
 parameter_types! {
-    pub const TombstoneDeposit: Balance = 0;
-    pub const DepositPerContract: Balance = 0;
-    pub const DepositPerStorageByte: Balance = TombstoneDeposit::get();
-    pub const DepositPerStorageItem: Balance = 0;
-    pub RentFraction: Perbill = Perbill::zero();
-    pub const SurchargeReward: Balance = 0;
-    pub const SignedClaimHandicap: u32 = 0;
-    // The lazy deletion runs inside on_initialize.
-    pub DeletionWeightLimit: Weight = AVERAGE_ON_INITIALIZE_RATIO *
-        BlockWeights::get().max_block;
-    // The weight needed for decoding the queue should be less or equal than a fifth
-    // of the overall weight dedicated to the lazy deletion.
     pub DeletionQueueDepth: u32 = ((DeletionWeightLimit::get() / (
             <Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(1) -
             <Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(0)
@@ -383,12 +354,6 @@ impl cumulus_pallet_dmp_queue::Config for Runtime {
     type Event = Event;
     type XcmExecutor = XcmExecutor<XcmConfig>;
     type ExecuteOverweightOrigin = EnsureRoot<AccountId>;
-}
-
-parameter_types! {
-    pub const DisabledValidatorsThreshold: Perbill = Perbill::from_percent(33);
-    pub const Period: u32 = 6 * HOURS;
-    pub const Offset: u32 = 0;
 }
 
 impl pallet_session::Config for Runtime {

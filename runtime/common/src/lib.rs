@@ -4,7 +4,7 @@ pub mod constants;
 pub mod impls;
 pub mod weights;
 
-use sp_runtime::{FixedPointNumber, Perbill, Perquintill};
+use sp_runtime::{transaction_validity::TransactionPriority, Perbill};
 
 pub use frame_support::{
     parameter_types,
@@ -16,9 +16,9 @@ pub use frame_support::{
 };
 use frame_system::limits;
 
-use pallet_transaction_payment::Multiplier;
-
-use jupiter_primitives::BlockNumber;
+use constants::jupiter_currency::*;
+use constants::time::*;
+use jupiter_primitives::*;
 
 /// We assume that an on-initialize consumes 2.5% of the weight on average, hence a single extrinsic
 /// will not be allowed to consume more than `AvailableBlockRatio - 2.5%`.
@@ -33,22 +33,14 @@ static_assertions::const_assert!(
     NORMAL_DISPATCH_RATIO.deconstruct() >= AVERAGE_ON_INITIALIZE_RATIO.deconstruct()
 );
 
-// Common constants used in all runtimes.
+// frame_system
 parameter_types! {
     pub const BlockHashCount: BlockNumber = 2400;
-    /// The portion of the `NORMAL_DISPATCH_RATIO` that we adjust the fees with. Blocks filled less
-    /// than this will decrease the weight and more will increase.
-    pub const TargetBlockFullness: Perquintill = Perquintill::from_percent(25);
-    /// The adjustment variable of the runtime. Higher values will cause `TargetBlockFullness` to
-    /// change the fees more rapidly.
-    pub AdjustmentVariable: Multiplier = Multiplier::saturating_from_rational(3, 100_000);
-    /// Minimum amount of the multiplier. This value cannot be too low. A test case should ensure
-    /// that combined with `AdjustmentVariable`, we can recover from the minimum.
-    /// See `multiplier_can_grow_from_zero`.
-    pub MinimumMultiplier: Multiplier = Multiplier::saturating_from_rational(1, 1_000_000_000u128);
+
     /// Maximum length of block. Up to 5MB.
     pub BlockLength: limits::BlockLength =
         limits::BlockLength::max_with_normal_ratio(5 * 1024 * 1024, NORMAL_DISPATCH_RATIO);
+
     /// Block weights base values and limits.
     pub BlockWeights: limits::BlockWeights = limits::BlockWeights::builder()
         .base_block(BlockExecutionWeight::get())
@@ -68,6 +60,122 @@ parameter_types! {
         })
         .avg_block_initialization(AVERAGE_ON_INITIALIZE_RATIO)
         .build_or_panic();
+
+    pub const SS58Prefix: u8 = 26;
+}
+
+// pallet_scheduler
+parameter_types! {
+    pub MaximumSchedulerWeight: Weight = Perbill::from_percent(80) *
+        BlockWeights::get().max_block;
+
+    pub const MaxScheduledPerBlock: u32 = 50;
+}
+
+// pallet_authorship
+parameter_types! {
+    pub const UncleGenerations: u32 = 0;
+}
+
+// pallet_babe
+parameter_types! {
+    pub const EpochDuration: u64 = EPOCH_DURATION_IN_BLOCKS as u64;
+    pub const ExpectedBlockTime: Moment = MILLISECS_PER_BLOCK;
+}
+
+// pallet_offences
+parameter_types! {
+    pub OffencesWeightSoftLimit: Weight = Perbill::from_percent(60) * BlockWeights::get().max_block;
+}
+
+// pallet_im_online
+parameter_types! {
+    pub const ImOnlineUnsignedPriority: TransactionPriority = TransactionPriority::max_value();
+}
+
+// pallet_session (Parachain:33)
+parameter_types! {
+    pub const DisabledValidatorsThreshold: Perbill = Perbill::from_percent(17);
+    pub const Period: u32 = 6 * HOURS;
+    pub const Offset: u32 = 0;
+}
+
+// pallet_democracy
+parameter_types! {
+    pub const LaunchPeriod: BlockNumber = 1 * DAYS;
+    pub const VotingPeriod: BlockNumber = 1 * DAYS;
+    pub const FastTrackVotingPeriod: BlockNumber = 3 * HOURS;
+    pub const MinimumDeposit: Balance = 1 * DOLLARS;
+    pub const EnactmentPeriod: BlockNumber = 1 * DAYS;
+    pub const CooloffPeriod: BlockNumber = 1 * DAYS;
+    // One cent: $10,000 / MB
+    pub const PreimageByteDeposit: Balance = 1 * CENTS;
+    pub const InstantAllowed: bool = true;
+    pub const MaxVotes: u32 = 100;
+    pub const MaxProposals: u32 = 100;
+}
+
+// pallet_collective<CouncilCollective>
+parameter_types! {
+    pub const CouncilMotionDuration: BlockNumber = 3 * DAYS;
+    pub const CouncilMaxProposals: u32 = 100;
+    pub const CouncilMaxMembers: u32 = 100;
+}
+
+// pallet_collective<TechnicalCollective>
+parameter_types! {
+    pub const TechnicalMotionDuration: BlockNumber = 3 * DAYS;
+    pub const TechnicalMaxProposals: u32 = 100;
+    pub const TechnicalMaxMembers: u32 = 100;
+}
+
+// pallet_timestamp
+parameter_types! {
+    pub const MinimumPeriod: u64 = SLOT_DURATION / 2;
+}
+
+// pallet_indices
+parameter_types! {
+    pub const IndexDeposit: Balance = 1 * DOLLARS;
+}
+
+// pallet_balances
+parameter_types! {
+    pub const ExistentialDeposit: Balance = 0;
+    // For weight estimation, we assume that the most locks on an individual account will be 50.
+    // This number may need to be adjusted in the future if this assumption no longer holds true.
+    pub const MaxLocks: u32 = 50;
+    pub const MaxReserves: u32 = 50;
+}
+
+// pallet_transaction_payment (Parachain:1)
+parameter_types! {
+    pub const TransactionByteFee: Balance = 10 * MILLICENTS;
+}
+
+// pallet_identity
+parameter_types! {
+    pub const BasicDeposit: Balance = 10 * DOLLARS;       // 258 bytes on-chain
+    pub const FieldDeposit: Balance = 250 * CENTS;        // 66 bytes on-chain
+    pub const SubAccountDeposit: Balance = 2 * DOLLARS;   // 53 bytes on-chain
+    pub const MaxSubAccounts: u32 = 100;
+    pub const MaxAdditionalFields: u32 = 100;
+    pub const MaxRegistrars: u32 = 20;
+}
+
+// pallet_contracts
+parameter_types! {
+    pub const TombstoneDeposit: Balance = 0;
+    pub const DepositPerContract: Balance = 0;
+    pub const DepositPerStorageByte: Balance = TombstoneDeposit::get();
+    pub const DepositPerStorageItem: Balance = 0;
+    pub RentFraction: Perbill = Perbill::zero();
+    pub const SurchargeReward: Balance = 0;
+    pub const SignedClaimHandicap: u32 = 0;
+
+    // The lazy deletion runs inside on_initialize.
+    pub DeletionWeightLimit: Weight = AVERAGE_ON_INITIALIZE_RATIO *
+        BlockWeights::get().max_block;
 }
 
 parameter_types! {

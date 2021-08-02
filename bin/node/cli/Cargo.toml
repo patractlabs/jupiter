@@ -73,6 +73,7 @@ polkadot-parachain = { git = "https://github.com/patractlabs/polkadot", branch =
 # Jupiter
 jupiter-io = { path = "../../../primitives/io" }
 jupiter-primitives = { path = "../../../primitives" }
+jupiter-runtime-common = { path = "../../../runtime/common" }
 jupiter-rpc = { path = "../../../rpc" }
 jupiter-runtime = { path = "../../../runtime/jupiter" }
 
