@@ -12,10 +12,14 @@ pub use sp_consensus_aura::sr25519::AuthorityId as AuraId;
 use sp_core::{crypto::KeyTypeId, OpaqueMetadata};
 use sp_runtime::{
     create_runtime_str, generic, impl_opaque_keys,
-    traits::{AccountIdLookup, BlakeTwo256, Block as BlockT},
+    traits::{AccountIdLookup, BlakeTwo256, Block as BlockT, Zero, Convert},
     transaction_validity::{TransactionPriority, TransactionSource, TransactionValidity},
-    ApplyExtrinsicResult,
+    ApplyExtrinsicResult, RuntimeDebug
 };
+
+use codec::{Encode, Decode};
+#[cfg(feature = "std")]
+use serde::{Deserialize, Serialize};
 
 use sp_std::prelude::*;
 #[cfg(feature = "std")]
@@ -24,7 +28,7 @@ use sp_version::RuntimeVersion;
 
 use frame_support::{
     construct_runtime, match_type, parameter_types,
-    traits::All,
+    traits::{All, Get},
     weights::{constants::RocksDbWeight, IdentityFee, Weight},
     PalletId,
 };
@@ -45,7 +49,7 @@ use xcm_builder::{
 };
 use xcm_executor::{Config, XcmExecutor};
 
-pub use jupiter_primitives::{AccountId, Balance, BlockNumber, Hash, Header, Index, Signature};
+pub use jupiter_primitives::{AccountId, Balance, BlockNumber, Hash, Header, Index, Signature, CurrencyId, Amount};
 use jupiter_runtime_common::*;
 use jupiter_runtime_common::{
     constants::{jupiter_currency::*, time::*},
@@ -58,6 +62,12 @@ use pallet_contracts_primitives::ContractExecResult;
 use crate::chain_extension::JupiterParaExtension;
 use randomness_collect::sr25519::AuthorityId as RandomCollectId;
 pub use randomness_collect::{RpcPort, OCW_DB_RANDOM};
+
+pub use cumulus_primitives_core::ParaId;
+
+use orml_currencies::BasicCurrencyAdapter;
+use orml_traits::parameter_type_with_key;
+use orml_xcm_support::{MultiCurrencyAdapter, IsNativeConcrete, MultiNativeAsset};
 
 pub mod opaque {
     use super::*;
@@ -239,19 +249,19 @@ pub type LocationToAccountId = (
     AccountId32Aliases<RelayNetwork, AccountId>,
 );
 
-/// Means for transacting assets on this chain.
-pub type LocalAssetTransactor = CurrencyAdapter<
-    // Use this currency:
-    Balances,
-    // Use this currency when it is a fungible asset matching the given location or name:
-    IsConcrete<WestendLocation>,
-    // Do a simple punn to convert an AccountId32 MultiLocation into a native chain account ID:
-    LocationToAccountId,
-    // Our chain's account ID type (we can't get away without mentioning it explicitly):
-    AccountId,
-    // We don't track any teleports.
-    (),
->;
+// /// Means for transacting assets on this chain.
+// pub type LocalAssetTransactor = CurrencyAdapter<
+//     // Use this currency:
+//     Balances,
+//     // Use this currency when it is a fungible asset matching the given location or name:
+//     IsConcrete<WestendLocation>,
+//     // Do a simple punn to convert an AccountId32 MultiLocation into a native chain account ID:
+//     LocationToAccountId,
+//     // Our chain's account ID type (we can't get away without mentioning it explicitly):
+//     AccountId,
+//     // We don't track any teleports.
+//     (),
+// >;
 
 /// This is the type we use to convert an (incoming) XCM origin into a local `Origin` instance,
 /// ready for dispatching a transaction with Xcm's `Transact`. There is an `OriginKind` which can
@@ -302,11 +312,13 @@ impl Config for XcmConfig {
     // How to withdraw and deposit an asset.
     type AssetTransactor = LocalAssetTransactor;
     type OriginConverter = XcmOriginToTransactDispatchOrigin;
-    type IsReserve = NativeAsset;
+    // type IsReserve = NativeAsset;
+    type IsReserve = MultiNativeAsset;
     type IsTeleporter = NativeAsset; // <- should be enough to allow teleportation of WND
     type LocationInverter = LocationInverter<Ancestry>;
     type Barrier = Barrier;
     type Weigher = FixedWeightBounds<UnitWeightCost, Call>;
+    // interBTC change the 4th type as orml_tokens::CurrencyAdapter
     type Trader = UsingComponents<IdentityFee<Balance>, WestendLocation, AccountId, Balances, ()>;
     type ResponseHandler = (); // Don't handle responses for now.
 }
@@ -416,6 +428,155 @@ impl randomness_collect::Config for Runtime {
     type UnsignedPriority = RandomCollectUnsignedPriority;
 }
 
+// currency constant, could use macro
+// #[derive(Encode, Decode, Eq, PartialEq, Copy, Clone, RuntimeDebug, PartialOrd, Ord)]
+// #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
+// pub enum CurrencyId {
+// 	Native,
+// 	DOT,
+// 	KSM,
+// 	WND,
+//     JIT
+// }
+
+// orml_xcm_support's multi CurrencyAdapter, replace the original xcm_builder's CurrencyAdapter
+pub type LocalAssetTransactor = MultiCurrencyAdapter<
+    // the original type is Balances, interBTC use Tokens, acala use Currencies
+    Currencies,
+    UnknownTokens,
+    IsNativeConcrete<CurrencyId, CurrencyIdConvert>,
+    AccountId,
+    LocationToAccountId,
+    CurrencyId,
+    CurrencyIdConvert,
+>;
+
+// orml_tokens
+parameter_type_with_key! {
+	pub ExistentialDeposits: |_currency_id: CurrencyId| -> Balance {
+		Zero::zero()
+	};
+}
+impl orml_tokens::Config for Runtime {
+	type Event = Event;
+	type Balance = Balance;
+	type Amount = Amount;
+	type CurrencyId = CurrencyId;
+	type WeightInfo = ();
+	type ExistentialDeposits = ExistentialDeposits;
+	type OnDust = ();
+    type MaxLocks = MaxLocks;
+}
+
+// orml_currencies
+parameter_types! {
+	pub const GetNativeCurrencyId: CurrencyId = CurrencyId::JIT;
+}
+impl orml_currencies::Config for Runtime {
+	type Event = Event;
+	type MultiCurrency = Tokens;
+	type NativeCurrency = BasicCurrencyAdapter<Runtime, Balances, Amount, BlockNumber>;
+	type GetNativeCurrencyId = GetNativeCurrencyId;
+	type WeightInfo = ();
+}
+
+// orml_xtokens
+pub use currency_id_convert::CurrencyIdConvert;
+
+mod currency_id_convert {
+    use super::*;
+    use codec::{Decode, Encode};
+    use xcm::v0::{Junction::*, MultiLocation::*};
+
+
+    //TODO: use token registry currency type encoding
+    // native means parachain token. for example, the Karura native currency is KAR
+    fn native_currency_location(id: CurrencyId) -> MultiLocation {
+        X3(Parent, Parachain(ParachainInfo::get().into()), GeneralKey(id.encode()))
+    }
+
+    pub struct CurrencyIdConvert;
+
+    const RELAY_CHAIN_CURRENCY_ID: CurrencyId = CurrencyId::WND;
+
+    impl Convert<CurrencyId, Option<MultiLocation>> for CurrencyIdConvert {
+        fn convert(id: CurrencyId) -> Option<MultiLocation> {
+            match id {
+                RELAY_CHAIN_CURRENCY_ID => Some(X1(Parent)),
+                CurrencyId::JIT => Some(native_currency_location(id)),
+                _ => None,
+            }
+        }
+    }
+    impl Convert<MultiLocation, Option<CurrencyId>> for CurrencyIdConvert {
+        fn convert(location: MultiLocation) -> Option<CurrencyId> {
+            match location {
+                X1(Parent) => Some(RELAY_CHAIN_CURRENCY_ID),
+                X3(Parent, Parachain(id), GeneralKey(key)) if ParaId::from(id) == ParachainInfo::get() => {
+                    // decode the general key
+                    if let Ok(currency_id) = CurrencyId::decode(&mut &key[..]) {
+                        // check `currency_id` is cross-chain asset
+                        match currency_id {
+                            CurrencyId::JIT => Some(currency_id),
+                            _ => None,
+                        }
+                    } else {
+                        None
+                    }
+                }
+                _ => None,
+            }
+        }
+    }
+    impl Convert<MultiAsset, Option<CurrencyId>> for CurrencyIdConvert {
+        fn convert(asset: MultiAsset) -> Option<CurrencyId> {
+            if let MultiAsset::ConcreteFungible { id, amount: _ } = asset {
+                Self::convert(id)
+            } else {
+                None
+            }
+        }
+    }
+}
+
+parameter_types! {
+	pub SelfLocation: MultiLocation = MultiLocation::X2(Junction::Parent, Junction::Parachain(ParachainInfo::get().into()));
+}
+
+pub struct AccountIdToMultiLocation;
+
+impl Convert<AccountId, MultiLocation> for AccountIdToMultiLocation {
+    fn convert(account: AccountId) -> MultiLocation {
+        MultiLocation::X1(Junction::AccountId32 {
+            network: NetworkId::Any,
+            id: account.into(),
+        })
+    }
+}
+
+impl orml_xtokens::Config for Runtime {
+    type Event = Event;
+    type Balance = Balance;
+    type CurrencyId = CurrencyId;
+    type CurrencyIdConvert = CurrencyIdConvert;
+    type AccountIdToMultiLocation = AccountIdToMultiLocation;
+    type SelfLocation = SelfLocation;
+    type XcmExecutor = XcmExecutor<XcmConfig>;
+    type Weigher = FixedWeightBounds<UnitWeightCost, Call>;
+    type BaseXcmWeight = UnitWeightCost;
+}
+
+// orml_unknown_tokens
+impl orml_unknown_tokens::Config for Runtime {
+    type Event = Event;
+}
+
+// orml_xcm
+impl orml_xcm::Config for Runtime {
+	type Event = Event;
+	type SovereignOrigin = EnsureRoot<AccountId>;
+}
+
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
     pub enum Runtime where
@@ -452,6 +613,12 @@ construct_runtime!(
         PolkadotXcm: pallet_xcm::{Pallet, Call, Event<T>, Origin} = 41,
         CumulusXcm: cumulus_pallet_xcm::{Pallet, Event<T>, Origin} = 42,
         DmpQueue: cumulus_pallet_dmp_queue::{Pallet, Call, Storage, Event<T>} = 43,
+
+        Currencies: orml_currencies::{Pallet, Call, Event<T>},
+		Tokens: orml_tokens::{Pallet, Storage, Event<T>, Config<T>},
+        XTokens: orml_xtokens::{Pallet, Storage, Call, Event<T>},
+		UnknownTokens: orml_unknown_tokens::{Pallet, Storage, Event},
+		OrmlXcm: orml_xcm::{Pallet, Call, Event<T>},
     }
 );
 

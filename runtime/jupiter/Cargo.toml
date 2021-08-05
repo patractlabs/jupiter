@@ -75,6 +75,16 @@ jupiter-runtime-common = { path = "../common", default-features = false }
 jupiter-chain-extension = { path = "../../primitives/chain-extension", default-features = false }
 randomness_collect = { path = "../../pallets/randomness_collect", default-features = false }
 
+# orml xcmp
+# ORML Dependencies
+orml-currencies = { git = 'https://github.com/patractlabs/open-runtime-module-library', branch = 'patract-sandbox-098', default-features = false }
+orml-unknown-tokens = { git = 'https://github.com/patractlabs/open-runtime-module-library', branch = 'patract-sandbox-098', default-features = false }
+orml-tokens = { git = 'https://github.com/patractlabs/open-runtime-module-library', branch = 'patract-sandbox-098', default-features = false }
+orml-xtokens = { git = 'https://github.com/patractlabs/open-runtime-module-library', branch = 'patract-sandbox-098', default-features = false }
+orml-xcm-support = { git = 'https://github.com/patractlabs/open-runtime-module-library', branch = 'patract-sandbox-098', default-features = false }
+orml-xcm = { git = 'https://github.com/patractlabs/open-runtime-module-library', branch = 'patract-sandbox-098', default-features = false }
+orml-traits = { git = 'https://github.com/patractlabs/open-runtime-module-library', branch = 'patract-sandbox-098', default-features = false }
+
 [dev-dependencies]
 hex-literal = "0.3.1"
 hex = "0.4.3"
@@ -141,4 +151,11 @@ std = [
     "jupiter-chain-extension/std",
     "randomness_collect/std",
     "getrandom/std",
+
+    "orml-currencies/std",
+    "orml-unknown-tokens/std",
+    "orml-tokens/std",
+    "orml-xtokens/std",
+    "orml-xcm-support/std",
+    "orml-traits/std",
 ]

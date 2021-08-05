@@ -18,6 +18,7 @@ use jupiter_runtime::{
     SystemConfig, //ContractsConfig,
 };
 use sc_service::config::TelemetryEndpoints;
+use jupiter_runtime_common::constants::jupiter_currency::DOLLARS;
 
 // The URL for the telemetry server.
 const PATRACT_TELEMETRY_URL: &str = "wss://telemetry.patract.io/submit";
@@ -110,7 +111,7 @@ pub fn development_config(id: ParaId, relay_chain: &str) -> Result<ChainSpec, St
             json!({
                 "ss58Format": jupiter_runtime_common::SS58Prefix::get(),
                 "tokenDecimals": 10,
-                "tokenSymbol": "DOT"
+                "tokenSymbol": "JIT"
             })
             .as_object()
             .expect("network properties generation can not fail; qed")
@@ -191,6 +192,8 @@ fn testnet_genesis(
     endowed_accounts: Vec<AccountId>,
     id: ParaId,
 ) -> GenesisConfig {
+    const ENDOWMENT: u128 = 10_000 * DOLLARS;
+
     GenesisConfig {
         system: SystemConfig {
             // Add Wasm runtime to storage.
@@ -204,7 +207,7 @@ fn testnet_genesis(
             balances: endowed_accounts
                 .iter()
                 .cloned()
-                .map(|k| (k, 1 << 100))
+                .map(|k| (k, ENDOWMENT))
                 .collect(),
         },
         // indices: IndicesConfig { indices: vec![] },
@@ -241,5 +244,7 @@ fn testnet_genesis(
         // },
         aura_ext: Default::default(),
         parachain_system: Default::default(),
+        // orml_tokens: Default::default(),
+        tokens: jupiter_runtime::TokensConfig { balances: vec![] },
     }
 }
