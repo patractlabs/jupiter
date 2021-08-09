@@ -33,7 +33,7 @@ sc-chain-spec = { version = "3.0.0", git = "https://github.com/paritytech/substr
 sc-telemetry = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.8" }
 
 sp-consensus-aura = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.8" }
-cumulus-client-consensus-aura = { git = "https://github.com/patractlabs/cumulus", branch = "patract-sandbox-098" }
+cumulus-client-consensus-aura = { git = "https://github.com/patractlabs/cumulus", branch = "patract-sandbox-xcmp" }
 
 sp-core = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.8"}
 sp-inherents = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.8"}
@@ -56,19 +56,19 @@ sc-tracing = { version = "3.0.0", git = "https://github.com/paritytech/substrate
 pallet-contracts = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.8" }
 
 # Cumulus dependencies
-cumulus-client-cli = { git = "https://github.com/patractlabs/cumulus", branch = "patract-sandbox-098"}
-cumulus-client-consensus-relay-chain = { git = "https://github.com/patractlabs/cumulus", branch = "patract-sandbox-098"}
-cumulus-client-collator = { git = "https://github.com/patractlabs/cumulus", branch = "patract-sandbox-098"}
-cumulus-client-service = { git = "https://github.com/patractlabs/cumulus", branch = "patract-sandbox-098"}
-cumulus-client-network = { git = "https://github.com/patractlabs/cumulus", branch = "patract-sandbox-098"}
-cumulus-primitives-core = { git = "https://github.com/patractlabs/cumulus", branch = "patract-sandbox-098"}
-cumulus-primitives-parachain-inherent = { git = "https://github.com/patractlabs/cumulus", branch = "patract-sandbox-098"}
+cumulus-client-cli = { git = "https://github.com/patractlabs/cumulus", branch = "patract-sandbox-xcmp"}
+cumulus-client-consensus-relay-chain = { git = "https://github.com/patractlabs/cumulus", branch = "patract-sandbox-xcmp"}
+cumulus-client-collator = { git = "https://github.com/patractlabs/cumulus", branch = "patract-sandbox-xcmp"}
+cumulus-client-service = { git = "https://github.com/patractlabs/cumulus", branch = "patract-sandbox-xcmp"}
+cumulus-client-network = { git = "https://github.com/patractlabs/cumulus", branch = "patract-sandbox-xcmp"}
+cumulus-primitives-core = { git = "https://github.com/patractlabs/cumulus", branch = "patract-sandbox-xcmp"}
+cumulus-primitives-parachain-inherent = { git = "https://github.com/patractlabs/cumulus", branch = "patract-sandbox-xcmp"}
 
 # Polkadot dependencies
-polkadot-primitives = { git = "https://github.com/patractlabs/polkadot", branch = "patract-sandbox-098"}
-polkadot-service = { git = "https://github.com/patractlabs/polkadot", branch = "patract-sandbox-098"}
-polkadot-cli = { git = "https://github.com/patractlabs/polkadot", branch = "patract-sandbox-098"}
-polkadot-parachain = { git = "https://github.com/patractlabs/polkadot", branch = "patract-sandbox-098"}
+polkadot-primitives = { git = "https://github.com/patractlabs/polkadot", branch = "patract-sandbox-xcmp"}
+polkadot-service = { git = "https://github.com/patractlabs/polkadot", branch = "patract-sandbox-xcmp"}
+polkadot-cli = { git = "https://github.com/patractlabs/polkadot", branch = "patract-sandbox-xcmp"}
+polkadot-parachain = { git = "https://github.com/patractlabs/polkadot", branch = "patract-sandbox-xcmp"}
 
 # Jupiter
 jupiter-io = { path = "../../../primitives/io" }

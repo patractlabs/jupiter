@@ -18,7 +18,7 @@ use jupiter_runtime::{
     SystemConfig, //ContractsConfig,
 };
 use sc_service::config::TelemetryEndpoints;
-use jupiter_runtime_common::constants::jupiter_currency::DOLLARS;
+use jupiter_runtime_common::constants::jupiter_currency::DOTS;
 
 // The URL for the telemetry server.
 const PATRACT_TELEMETRY_URL: &str = "wss://telemetry.patract.io/submit";
@@ -69,7 +69,7 @@ pub fn session_keys(keys: AuraId) -> jupiter_runtime::opaque::SessionKeys {
 }
 
 /// Jupiter Development Chain Config
-pub fn development_config(id: ParaId, relay_chain: &str) -> Result<ChainSpec, String> {
+pub fn development_config(id: ParaId, relay_chain: &str, token: &str) -> Result<ChainSpec, String> {
     Ok(ChainSpec::from_genesis(
         // Name
         "Development",
@@ -110,8 +110,8 @@ pub fn development_config(id: ParaId, relay_chain: &str) -> Result<ChainSpec, St
         Some(
             json!({
                 "ss58Format": jupiter_runtime_common::SS58Prefix::get(),
-                "tokenDecimals": 10,
-                "tokenSymbol": "JIT"
+                "tokenDecimals": 12,
+                "tokenSymbol": token.to_string()
             })
             .as_object()
             .expect("network properties generation can not fail; qed")
@@ -192,7 +192,7 @@ fn testnet_genesis(
     endowed_accounts: Vec<AccountId>,
     id: ParaId,
 ) -> GenesisConfig {
-    const ENDOWMENT: u128 = 10_000 * DOLLARS;
+    const ENDOWMENT: u128 = 10_000 * DOTS;
 
     GenesisConfig {
         system: SystemConfig {

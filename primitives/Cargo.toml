@@ -17,6 +17,8 @@ sp-std = { version = "3.0.0", git = "https://github.com/paritytech/substrate", b
 
 # Substrate pallets
 frame-system = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.8", default-features = false }
+#frame-support = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.8", default-features = false }
+max-encoded-len = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.8", default-features = false }
 
 [features]
 default = ["std"]
@@ -30,4 +32,6 @@ std = [
   "sp-std/std",
 
   "frame-system/std",
+#  "frame-support/std",
+  "max-encoded-len/std",
 ]

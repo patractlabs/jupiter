@@ -13,6 +13,8 @@ use sp_std::{
     convert::{Into, TryFrom},
     prelude::*,
 };
+// pub use frame_support::traits::MaxEncodedLen;
+use max_encoded_len::MaxEncodedLen;
 
 #[cfg(feature = "std")]
 use serde::{Deserialize, Serialize};
@@ -93,6 +95,16 @@ pub mod report {
     }
 }
 
+#[derive(Encode, Decode, Eq, PartialEq, Copy, Clone, RuntimeDebug, PartialOrd, Ord, MaxEncodedLen)]
+#[repr(u8)]
+pub enum ReserveIdentifier {
+    CollatorSelection,
+    TransactionPayment,
+
+    // always the last, indicate number of variants
+    Count,
+}
+
 macro_rules! create_currency_id {
     ($(#[$meta:meta])*
 	$vis:vis enum CurrencyId {
@@ -130,6 +142,6 @@ create_currency_id! {
         KAR("Karura", 12),
         INTERBTC("interBTC", 8),
         INTR("Interlay", 10),
-        JIT("Jupiter", 10),
+        JIT("Jupiter", 12), // jupiter para-chain native currency
     }
 }
