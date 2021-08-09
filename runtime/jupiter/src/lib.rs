@@ -184,20 +184,6 @@ parameter_types! {
 	pub AllNonNativeCurrencyIds: Vec<CurrencyId> = vec![CurrencyId::WND];
 }
 
-type NegativeImbalance = <Balances as frame_support::traits::Currency<AccountId>>::NegativeImbalance;
-pub struct DealWithFees;
-impl OnUnbalanced<NegativeImbalance> for DealWithFees {
-    fn on_unbalanceds<B>(mut fees_then_tips: impl Iterator<Item = NegativeImbalance>) {
-        if let Some(mut fees) = fees_then_tips.next() {
-            if let Some(tips) = fees_then_tips.next() {
-                tips.merge_into(&mut fees);
-            }
-            // for fees and tips, 100% to treasury
-            // Treasury::on_unbalanced(fees);
-        }
-    }
-}
-
 parameter_types! {
 	// pub TransactionByteFee: Balance = millicent(KAR);
 	/// The portion of the `NORMAL_DISPATCH_RATIO` that we adjust the fees with. Blocks filled less
@@ -219,7 +205,7 @@ impl module_transaction_payment::Config for Runtime {
     type NativeCurrencyId = GetNativeCurrencyId;
     type Currency = Balances;
     type MultiCurrency = Currencies;
-    type OnTransactionPayment = DealWithFees;
+    type OnTransactionPayment = ();
     type TransactionByteFee = TransactionByteFee;
     type WeightToFee = JupiterWeight2Fee;
     // type FeeMultiplierUpdate = impls::SlowAdjustingFeeUpdate<Self>;
@@ -526,17 +512,6 @@ impl randomness_collect::Config for Runtime {
     type UnsignedPriority = RandomCollectUnsignedPriority;
 }
 
-// currency constant, could use macro
-// #[derive(Encode, Decode, Eq, PartialEq, Copy, Clone, RuntimeDebug, PartialOrd, Ord)]
-// #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
-// pub enum CurrencyId {
-// 	Native,
-// 	DOT,
-// 	KSM,
-// 	WND,
-//     JIT
-// }
-
 // Means for transacting assets on this chain.
 pub type LocalAssetTransactor = CurrencyAdapter<
     // Use this currency:
@@ -583,7 +558,7 @@ impl orml_tokens::Config for Runtime {
 
 // orml_currencies
 parameter_types! {
-	pub const GetNativeCurrencyId: CurrencyId = CurrencyId::JIT;
+	pub const GetNativeCurrencyId: CurrencyId = CurrencyId::WND;
 	pub const GetCollateralCurrencyId: CurrencyId = CurrencyId::WND;
 }
 // impl orml_currencies::Config for Runtime {
@@ -626,7 +601,7 @@ mod currency_id_convert {
         fn convert(id: CurrencyId) -> Option<MultiLocation> {
             match id {
                 RELAY_CHAIN_CURRENCY_ID => Some(X1(Parent)),
-                CurrencyId::JIT => Some(native_currency_location(id)),
+                // CurrencyId::JIT => Some(native_currency_location(id)),
                 _ => None,
             }
         }
@@ -640,7 +615,7 @@ mod currency_id_convert {
                     if let Ok(currency_id) = CurrencyId::decode(&mut &key[..]) {
                         // check `currency_id` is cross-chain asset
                         match currency_id {
-                            CurrencyId::JIT => Some(currency_id),
+                            // CurrencyId::JIT => Some(currency_id),
                             _ => None,
                         }
                     } else {

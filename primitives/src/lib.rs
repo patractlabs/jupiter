@@ -135,13 +135,9 @@ create_currency_id! {
     #[derive(Encode, Decode, Eq, PartialEq, Copy, Clone, PartialOrd, Ord, RuntimeDebug)]
     #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
     pub enum CurrencyId {
-        DOT("Polkadot", 10),
-        KSM("Kusama", 12),
+        // DOT("Polkadot", 10),
+        // KSM("Kusama", 12),
         WND("Westend", 12),
-        ACA("Acala", 12),
-        KAR("Karura", 12),
-        INTERBTC("interBTC", 8),
-        INTR("Interlay", 10),
-        JIT("Jupiter", 12), // jupiter para-chain native currency
+        // JIT("Jupiter", 12), // jupiter para-chain native currency
     }
 }
