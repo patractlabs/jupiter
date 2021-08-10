@@ -12,15 +12,11 @@ pub use sp_consensus_aura::sr25519::AuthorityId as AuraId;
 use sp_core::{crypto::KeyTypeId, OpaqueMetadata};
 use sp_runtime::{
     create_runtime_str, generic, impl_opaque_keys,
-    traits::{AccountIdLookup, BlakeTwo256, Block as BlockT, Zero, Convert},
+    traits::{AccountIdLookup, BlakeTwo256, Block as BlockT, Convert},
     transaction_validity::{TransactionPriority, TransactionSource, TransactionValidity},
-    ApplyExtrinsicResult, RuntimeDebug, FixedPointNumber
+    ApplyExtrinsicResult,
 };
 use sp_std::marker::PhantomData;
-
-use codec::{Encode, Decode};
-#[cfg(feature = "std")]
-use serde::{Deserialize, Serialize};
 
 use sp_std::prelude::*;
 #[cfg(feature = "std")]
@@ -29,7 +25,7 @@ use sp_version::RuntimeVersion;
 
 use frame_support::{
     construct_runtime, match_type, parameter_types,
-    traits::{All, Get, Contains, Imbalance},
+    traits::{All, Contains, Get},
     weights::{constants::RocksDbWeight, IdentityFee, Weight},
     PalletId,
 };
@@ -48,9 +44,15 @@ use xcm_builder::{
     SiblingParachainConvertsVia, SignedAccountId32AsNative, SignedToAccountId32,
     SovereignSignedViaLocation, TakeWeightCredit, UsingComponents,
 };
-use xcm_executor::{Config, XcmExecutor, traits::{ShouldExecute, FilterAssetLocation}};
+use xcm_executor::{
+    traits::{FilterAssetLocation, ShouldExecute},
+    Config, XcmExecutor,
+};
 
-pub use jupiter_primitives::{AccountId, Balance, BlockNumber, Hash, Header, Index, Signature, CurrencyId, Amount, ReserveIdentifier};
+pub use jupiter_primitives::{
+    AccountId, Amount, Balance, BlockNumber, CurrencyId, Hash, Header, Index, ReserveIdentifier,
+    Signature,
+};
 use jupiter_runtime_common::*;
 use jupiter_runtime_common::{
     constants::{jupiter_currency::*, time::*},
@@ -66,11 +68,8 @@ pub use randomness_collect::{RpcPort, OCW_DB_RANDOM};
 
 pub use cumulus_primitives_core::ParaId;
 
-use orml_currencies::BasicCurrencyAdapter;
-use orml_traits::parameter_type_with_key;
-use orml_xcm_support::{MultiCurrencyAdapter, IsNativeConcrete, MultiNativeAsset};
+use orml_xcm_support::MultiNativeAsset;
 
-use module_transaction_payment::{Multiplier, TargetedFeeAdjustment};
 pub use sp_runtime::{Perbill, Percent, Permill, Perquintill};
 
 pub mod opaque {
@@ -89,7 +88,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
     spec_name: create_runtime_str!("jupiter-westend"),
     impl_name: create_runtime_str!("patract-jupiter-westend"),
     authoring_version: 1,
-    spec_version: 1,
+    spec_version: 2,
     impl_version: 1,
     apis: RUNTIME_API_VERSIONS,
     transaction_version: 1,
@@ -165,52 +164,11 @@ impl pallet_balances::Config for Runtime {
     type ReserveIdentifier = ReserveIdentifier;
 }
 
-// impl pallet_transaction_payment::Config for Runtime {
-//     type OnChargeTransaction = pallet_transaction_payment::CurrencyAdapter<Balances, ()>;
-//     type TransactionByteFee = TransactionByteFee;
-//     type WeightToFee = JupiterWeight2Fee;
-//     type FeeMultiplierUpdate = impls::SlowAdjustingFeeUpdate<Self>;
-// }
-
-// impl pallet_transaction_payment::Config for Runtime {
-//     type OnChargeTransaction = currency::PaymentCurrencyAdapter<Runtime, GetCollateralCurrencyId, ()>;
-//     type TransactionByteFee = TransactionByteFee;
-//     type WeightToFee = IdentityFee<Balance>;
-//     type FeeMultiplierUpdate = ();
-// }
-
-parameter_types! {
-	// All currency types except for native currency, Sort by fee charge order
-	pub AllNonNativeCurrencyIds: Vec<CurrencyId> = vec![CurrencyId::WND];
-}
-
-parameter_types! {
-	// pub TransactionByteFee: Balance = millicent(KAR);
-	/// The portion of the `NORMAL_DISPATCH_RATIO` that we adjust the fees with. Blocks filled less
-	/// than this will decrease the weight and more will increase.
-	pub const TargetBlockFullness: Perquintill = Perquintill::from_percent(25);
-	/// The adjustment variable of the runtime. Higher values will cause `TargetBlockFullness` to
-	/// change the fees more rapidly.
-	pub AdjustmentVariable: Multiplier = Multiplier::saturating_from_rational(3, 100_000);
-	/// Minimum amount of the multiplier. This value cannot be too low. A test case should ensure
-	/// that combined with `AdjustmentVariable`, we can recover from the minimum.
-	/// See `multiplier_can_grow_from_zero`.
-	pub MinimumMultiplier: Multiplier = Multiplier::saturating_from_rational(1, 1_000_000u128);
-}
-
-pub type SlowAdjustingFeeUpdate<R> = TargetedFeeAdjustment<R, TargetBlockFullness, AdjustmentVariable, MinimumMultiplier>;
-
-impl module_transaction_payment::Config for Runtime {
-    type AllNonNativeCurrencyIds = AllNonNativeCurrencyIds;
-    type NativeCurrencyId = GetNativeCurrencyId;
-    type Currency = Balances;
-    type MultiCurrency = Currencies;
-    type OnTransactionPayment = ();
+impl pallet_transaction_payment::Config for Runtime {
+    type OnChargeTransaction = pallet_transaction_payment::CurrencyAdapter<Balances, ()>;
     type TransactionByteFee = TransactionByteFee;
     type WeightToFee = JupiterWeight2Fee;
-    // type FeeMultiplierUpdate = impls::SlowAdjustingFeeUpdate<Self>;
-    type FeeMultiplierUpdate = SlowAdjustingFeeUpdate<Self>;
-    type WeightInfo = ();
+    type FeeMultiplierUpdate = impls::SlowAdjustingFeeUpdate<Self>;
 }
 
 parameter_types! {
@@ -235,8 +193,8 @@ impl pallet_contracts::Config for Runtime {
     type RentFraction = RentFraction;
     type SurchargeReward = SurchargeReward;
     type CallStack = [pallet_contracts::Frame<Self>; 31];
-    // type WeightPrice = pallet_transaction_payment::Pallet<Self>;
-    type WeightPrice = module_transaction_payment::Pallet<Self>;
+    type WeightPrice = pallet_transaction_payment::Pallet<Self>;
+    // type WeightPrice = module_transaction_payment::Pallet<Self>;
     type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
     type ChainExtension = JupiterParaExtension<Self>;
     type DeletionQueueDepth = DeletionQueueDepth;
@@ -343,8 +301,12 @@ impl<T: Contains<MultiLocation>> ShouldExecute for AllowXcmTransactFrom<T> {
         _weight_credit: &mut Weight,
     ) -> Result<(), ()> {
         match message {
-            Xcm::Transact { origin_type: _ , require_weight_at_most: _, call: _ } => Ok(()),
-            _ => Err(())
+            Xcm::Transact {
+                origin_type: _,
+                require_weight_at_most: _,
+                call: _,
+            } => Ok(()),
+            _ => Err(()),
         }
     }
 }
@@ -352,38 +314,30 @@ impl<T: Contains<MultiLocation>> ShouldExecute for AllowXcmTransactFrom<T> {
 pub struct CrosschainConcreteAsset;
 impl FilterAssetLocation for CrosschainConcreteAsset {
     fn filter_asset_location(asset: &MultiAsset, origin: &MultiLocation) -> bool {
-        use xcm::v0::{
-            MultiAsset::{All, ConcreteFungible}, Junction::*,
-            MultiLocation::*
-        };
+        use xcm::v0::{Junction::*, MultiLocation::*};
         match asset {
-            MultiAsset::ConcreteFungible {..} => {
-                match origin {
-                    Null | X1(Plurality { .. }) => true,
-                    X1(AccountId32 { .. }) => true,
-                    X1(Parent { .. }) => true,
-                    X1(Parachain { .. }) => true,
-                    X2(Parachain{..}, _ ) => true,
-                    X2(Parent{..}, _ ) => true,
-                    _ => false
-                }
+            MultiAsset::ConcreteFungible { .. } => match origin {
+                Null | X1(Plurality { .. }) => true,
+                X1(AccountId32 { .. }) => true,
+                X1(Parent { .. }) => true,
+                X1(Parachain { .. }) => true,
+                X2(Parachain { .. }, _) => true,
+                X2(Parent { .. }, _) => true,
+                _ => false,
             },
-            _ => false
+            _ => false,
         }
     }
 }
 
-pub type CrosschainAsset = (
-    NativeAsset,
-    CrosschainConcreteAsset,
-);
+pub type CrosschainAsset = (NativeAsset, CrosschainConcreteAsset);
 
 pub type Barrier = (
     TakeWeightCredit,
     AllowTopLevelPaidExecutionFrom<All<MultiLocation>>,
     AllowUnpaidExecutionFrom<ParentOrParentsPlurality>,
     // ^^^ Parent & its plurality gets free execution
-    AllowXcmTransactFrom<All<MultiLocation>>
+    AllowXcmTransactFrom<All<MultiLocation>>,
 );
 
 pub struct XcmConfig;
@@ -393,21 +347,12 @@ impl Config for XcmConfig {
     // How to withdraw and deposit an asset.
     type AssetTransactor = LocalAssetTransactor;
     type OriginConverter = XcmOriginToTransactDispatchOrigin;
-    // type IsReserve = NativeAsset;
     type IsReserve = MultiNativeAsset; // NativeAsset --> MultiNativeAsset --> CrosschainAsset
     type IsTeleporter = NativeAsset; // <- should be enough to allow teleportation of WND
     type LocationInverter = LocationInverter<Ancestry>;
-    type Barrier = (); // Barrier -> ()
+    type Barrier = ();
     type Weigher = FixedWeightBounds<UnitWeightCost, Call>;
-    type Trader = UsingComponents<
-        IdentityFee<Balance>, 
-        WestendLocation, 
-        AccountId, 
-        Balances,
-        //orml_tokens::CurrencyAdapter<Runtime, GetCollateralCurrencyId>,
-        ()
-    >;
-    // type Trader = FixedRateOfConcreteFungible<KsmPerSecond, ToTreasury>;
+    type Trader = UsingComponents<IdentityFee<Balance>, WestendLocation, AccountId, Balances, ()>;
     type ResponseHandler = (); // Don't handle responses for now.
 }
 
@@ -512,7 +457,6 @@ impl randomness_collect::Config for Runtime {
     type UnsignedPriority = RandomCollectUnsignedPriority;
 }
 
-// Means for transacting assets on this chain.
 pub type LocalAssetTransactor = CurrencyAdapter<
     // Use this currency:
     Balances,
@@ -526,72 +470,12 @@ pub type LocalAssetTransactor = CurrencyAdapter<
     (),
 >;
 
-// orml_xcm_support's multi CurrencyAdapter, replace the original xcm_builder's CurrencyAdapter
-// pub type LocalAssetTransactor = MultiCurrencyAdapter<
-//     // the original type is Balances, interBTC use Tokens, acala use Currencies
-//     Currencies,
-//     // Tokens,
-//     UnknownTokens,
-//     IsNativeConcrete<CurrencyId, CurrencyIdConvert>,
-//     AccountId,
-//     LocationToAccountId,
-//     CurrencyId,
-//     CurrencyIdConvert,
-// >;
-
-// orml_tokens
-parameter_type_with_key! {
-	pub ExistentialDeposits: |_currency_id: CurrencyId| -> Balance {
-		Zero::zero()
-	};
-}
-impl orml_tokens::Config for Runtime {
-	type Event = Event;
-	type Balance = Balance;
-	type Amount = Amount;
-	type CurrencyId = CurrencyId;
-	type WeightInfo = ();
-	type ExistentialDeposits = ExistentialDeposits;
-	type OnDust = ();
-    type MaxLocks = MaxLocks;
-}
-
-// orml_currencies
-parameter_types! {
-	pub const GetNativeCurrencyId: CurrencyId = CurrencyId::WND;
-	pub const GetCollateralCurrencyId: CurrencyId = CurrencyId::WND;
-}
-// impl orml_currencies::Config for Runtime {
-// 	type Event = Event;
-// 	type MultiCurrency = Tokens;
-// 	type NativeCurrency = BasicCurrencyAdapter<Runtime, Balances, Amount, BlockNumber>;
-// 	type GetNativeCurrencyId = GetNativeCurrencyId;
-// 	type WeightInfo = ();
-// }
-
-impl currencies::Config for Runtime {
-    type Event = Event;
-    type MultiCurrency = Tokens;                       // 🐱
-    type NativeCurrency = currencies::BasicCurrencyAdapter<Runtime, Balances, Amount, BlockNumber>;
-    type GetNativeCurrencyId = GetNativeCurrencyId;
-    type WeightInfo = ();
-}
-
 // orml_xtokens
 pub use currency_id_convert::CurrencyIdConvert;
-use frame_support::traits::OnUnbalanced;
 
 mod currency_id_convert {
     use super::*;
-    use codec::{Decode, Encode};
     use xcm::v0::{Junction::*, MultiLocation::*};
-
-
-    //TODO: use token registry currency type encoding
-    // native means parachain token. for example, the Karura native currency is KAR
-    fn native_currency_location(id: CurrencyId) -> MultiLocation {
-        X3(Parent, Parachain(ParachainInfo::get().into()), GeneralKey(id.encode()))
-    }
 
     pub struct CurrencyIdConvert;
 
@@ -601,7 +485,6 @@ mod currency_id_convert {
         fn convert(id: CurrencyId) -> Option<MultiLocation> {
             match id {
                 RELAY_CHAIN_CURRENCY_ID => Some(X1(Parent)),
-                // CurrencyId::JIT => Some(native_currency_location(id)),
                 _ => None,
             }
         }
@@ -610,18 +493,6 @@ mod currency_id_convert {
         fn convert(location: MultiLocation) -> Option<CurrencyId> {
             match location {
                 X1(Parent) => Some(RELAY_CHAIN_CURRENCY_ID),
-                X3(Parent, Parachain(id), GeneralKey(key)) if ParaId::from(id) == ParachainInfo::get() => {
-                    // decode the general key
-                    if let Ok(currency_id) = CurrencyId::decode(&mut &key[..]) {
-                        // check `currency_id` is cross-chain asset
-                        match currency_id {
-                            // CurrencyId::JIT => Some(currency_id),
-                            _ => None,
-                        }
-                    } else {
-                        None
-                    }
-                }
                 _ => None,
             }
         }
@@ -638,7 +509,7 @@ mod currency_id_convert {
 }
 
 parameter_types! {
-	pub SelfLocation: MultiLocation = MultiLocation::X2(Junction::Parent, Junction::Parachain(ParachainInfo::get().into()));
+    pub SelfLocation: MultiLocation = MultiLocation::X2(Junction::Parent, Junction::Parachain(ParachainInfo::get().into()));
 }
 
 pub struct AccountIdToMultiLocation;
@@ -664,16 +535,11 @@ impl orml_xtokens::Config for Runtime {
     type BaseXcmWeight = UnitWeightCost;
 }
 
-// orml_unknown_tokens
-impl orml_unknown_tokens::Config for Runtime {
-    type Event = Event;
-}
-
 // orml_xcm
-impl orml_xcm::Config for Runtime {
-	type Event = Event;
-	type SovereignOrigin = EnsureRoot<AccountId>;
-}
+// impl orml_xcm::Config for Runtime {
+//     type Event = Event;
+//     type SovereignOrigin = EnsureRoot<AccountId>;
+// }
 
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
@@ -692,11 +558,7 @@ construct_runtime!(
 
         // Monetary stuff;
         Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>} = 6,
-        // Currencies: orml_currencies::{Pallet, Call, Event<T>},
-        Currencies: currencies::{Pallet, Call, Event<T>} = 7,
-		Tokens: orml_tokens::{Pallet, Storage, Event<T>, Config<T>} = 8,
-        // TransactionPayment: pallet_transaction_payment::{Pallet, Storage} = 9,
-        TransactionPayment: module_transaction_payment::{Pallet, Call, Storage} = 9,
+        TransactionPayment: pallet_transaction_payment::{Pallet, Storage} = 9,
 
         // Collator support. the order of these 4 are important and shall not change.
         Authorship: pallet_authorship::{Pallet, Call, Storage} = 20,
@@ -717,8 +579,7 @@ construct_runtime!(
         DmpQueue: cumulus_pallet_dmp_queue::{Pallet, Call, Storage, Event<T>} = 43,
 
         XTokens: orml_xtokens::{Pallet, Storage, Call, Event<T>},
-		UnknownTokens: orml_unknown_tokens::{Pallet, Storage, Event},
-		OrmlXcm: orml_xcm::{Pallet, Call, Event<T>},
+        // OrmlXcm: orml_xcm::{Pallet, Call, Event<T>},
     }
 );
 
@@ -738,8 +599,7 @@ pub type SignedExtra = (
     frame_system::CheckEra<Runtime>,
     frame_system::CheckNonce<Runtime>,
     frame_system::CheckWeight<Runtime>,
-    // pallet_transaction_payment::ChargeTransactionPayment<Runtime>,
-    module_transaction_payment::ChargeTransactionPayment<Runtime>,
+    pallet_transaction_payment::ChargeTransactionPayment<Runtime>,
 );
 /// Unchecked extrinsic type as expected by this runtime.
 pub type UncheckedExtrinsic = generic::UncheckedExtrinsic<Address, Call, Signature, SignedExtra>;

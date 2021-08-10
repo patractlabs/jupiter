@@ -74,15 +74,13 @@ jupiter-primitives = { path = "../../primitives", default-features = false }
 jupiter-runtime-common = { path = "../common", default-features = false }
 jupiter-chain-extension = { path = "../../primitives/chain-extension", default-features = false }
 randomness_collect = { path = "../../pallets/randomness_collect", default-features = false }
-currency = { path = "../../pallets/currency", default-features = false }
 currencies = { path = "../../pallets/currencies", default-features = false }
-module-transaction-payment = { path = "../../pallets/transaction-payment", default-features = false }
 
 # orml xcmp
 # ORML Dependencies
-orml-currencies = { git = 'https://github.com/patractlabs/open-runtime-module-library', branch = 'patract-sandbox-xcmp', default-features = false }
-orml-unknown-tokens = { git = 'https://github.com/patractlabs/open-runtime-module-library', branch = 'patract-sandbox-xcmp', default-features = false }
-orml-tokens = { git = 'https://github.com/patractlabs/open-runtime-module-library', branch = 'patract-sandbox-xcmp', default-features = false }
+#orml-currencies = { git = 'https://github.com/patractlabs/open-runtime-module-library', branch = 'patract-sandbox-xcmp', default-features = false }
+#orml-unknown-tokens = { git = 'https://github.com/patractlabs/open-runtime-module-library', branch = 'patract-sandbox-xcmp', default-features = false }
+#orml-tokens = { git = 'https://github.com/patractlabs/open-runtime-module-library', branch = 'patract-sandbox-xcmp', default-features = false }
 orml-xtokens = { git = 'https://github.com/patractlabs/open-runtime-module-library', branch = 'patract-sandbox-xcmp', default-features = false }
 orml-xcm-support = { git = 'https://github.com/patractlabs/open-runtime-module-library', branch = 'patract-sandbox-xcmp', default-features = false }
 orml-xcm = { git = 'https://github.com/patractlabs/open-runtime-module-library', branch = 'patract-sandbox-xcmp', default-features = false }
@@ -155,13 +153,11 @@ std = [
     "randomness_collect/std",
     "getrandom/std",
 
-    "orml-currencies/std",
-    "orml-unknown-tokens/std",
-    "orml-tokens/std",
+#    "orml-currencies/std",
+#    "orml-unknown-tokens/std",
+#    "orml-tokens/std",
     "orml-xtokens/std",
     "orml-xcm-support/std",
     "orml-traits/std",
-    "currency/std",
     "currencies/std",
-    "module-transaction-payment/std",
 ]

@@ -17,8 +17,8 @@ use jupiter_runtime::{
     SudoConfig,
     SystemConfig, //ContractsConfig,
 };
-use sc_service::config::TelemetryEndpoints;
 use jupiter_runtime_common::constants::jupiter_currency::DOTS;
+use sc_service::config::TelemetryEndpoints;
 
 // The URL for the telemetry server.
 const PATRACT_TELEMETRY_URL: &str = "wss://telemetry.patract.io/submit";
@@ -239,12 +239,7 @@ fn testnet_genesis(
                 .collect(),
         },
         aura: Default::default(),
-        // aura: jupiter_runtime::AuraConfig {
-        //     authorities: initial_authorities,
-        // },
         aura_ext: Default::default(),
         parachain_system: Default::default(),
-        // orml_tokens: Default::default(),
-        tokens: jupiter_runtime::TokensConfig { balances: vec![] },
     }
 }

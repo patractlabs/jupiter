@@ -28,7 +28,7 @@ fn load_spec(
         "jupiter-dev" => Box::new(chain_spec::jupiter::development_config(
             para_id,
             "westend-local",
-            "WND"
+            "WND",
         )?),
         // "jupiter-staging" => Box::new(chain_spec::jupiter::staging_config(para_id)?),
         // "" | "jupiter" => Box::new(chain_spec::jupiter::jupiter_config()?),

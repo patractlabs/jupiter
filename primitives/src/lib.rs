@@ -3,7 +3,7 @@
 use sp_runtime::{
     generic,
     traits::{BlakeTwo256, IdentifyAccount, Verify},
-    MultiSignature, OpaqueExtrinsic, RuntimeDebug
+    MultiSignature, OpaqueExtrinsic, RuntimeDebug,
 };
 
 use bstringify::bstringify;
@@ -95,7 +95,9 @@ pub mod report {
     }
 }
 
-#[derive(Encode, Decode, Eq, PartialEq, Copy, Clone, RuntimeDebug, PartialOrd, Ord, MaxEncodedLen)]
+#[derive(
+    Encode, Decode, Eq, PartialEq, Copy, Clone, RuntimeDebug, PartialOrd, Ord, MaxEncodedLen,
+)]
 #[repr(u8)]
 pub enum ReserveIdentifier {
     CollatorSelection,
@@ -135,9 +137,8 @@ create_currency_id! {
     #[derive(Encode, Decode, Eq, PartialEq, Copy, Clone, PartialOrd, Ord, RuntimeDebug)]
     #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
     pub enum CurrencyId {
-        // DOT("Polkadot", 10),
-        // KSM("Kusama", 12),
         WND("Westend", 12),
-        // JIT("Jupiter", 12), // jupiter para-chain native currency
+        KSM("Kusama", 12),
+        DOT("Polkadot", 10),
     }
 }
