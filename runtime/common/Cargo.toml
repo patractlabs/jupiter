@@ -32,7 +32,7 @@ pallet-treasury = { version = "3.0.0", git = "https://github.com/paritytech/subs
 pallet-bounties = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.8", default-features = false }
 pallet-tips = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.8", default-features = false }
 pallet-utility = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.8", default-features = false }
-pallet-collator-selection = { version = "3.0.0", git = "https://github.com/patractlabs/cumulus", branch = "patract-sandbox-098", default-features = false }
+pallet-collator-selection = { version = "3.0.0", git = "https://github.com/patractlabs/cumulus", branch = "patract-sandbox-xcmp", default-features = false }
 
 jupiter-primitives = { path = "../../primitives", default-features = false }
 

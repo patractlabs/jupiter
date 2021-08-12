@@ -3,8 +3,21 @@
 use sp_runtime::{
     generic,
     traits::{BlakeTwo256, IdentifyAccount, Verify},
-    MultiSignature, OpaqueExtrinsic,
+    MultiSignature, OpaqueExtrinsic, RuntimeDebug,
 };
+
+use bstringify::bstringify;
+use codec::{Decode, Encode};
+
+use sp_std::{
+    convert::{Into, TryFrom},
+    prelude::*,
+};
+// pub use frame_support::traits::MaxEncodedLen;
+use max_encoded_len::MaxEncodedLen;
+
+#[cfg(feature = "std")]
+use serde::{Deserialize, Serialize};
 
 /// An index to a block.
 pub type BlockNumber = u32;
@@ -48,6 +61,9 @@ pub type Block = generic::Block<Header, OpaqueExtrinsic>;
 /// Block ID.
 pub type BlockId = generic::BlockId<Block>;
 
+/// Signed version of Balance
+pub type Amount = i128;
+
 /// App-specific crypto used for reporting equivocation/misbehavior in BABE and
 /// GRANDPA. Any rewards for misbehavior reporting will be paid out to this
 /// account.
@@ -76,5 +92,53 @@ pub mod report {
         type RuntimeAppPublic = ReporterId;
         type GenericPublic = sp_core::sr25519::Public;
         type GenericSignature = sp_core::sr25519::Signature;
+    }
+}
+
+#[derive(
+    Encode, Decode, Eq, PartialEq, Copy, Clone, RuntimeDebug, PartialOrd, Ord, MaxEncodedLen,
+)]
+#[repr(u8)]
+pub enum ReserveIdentifier {
+    CollatorSelection,
+    TransactionPayment,
+
+    // always the last, indicate number of variants
+    Count,
+}
+
+macro_rules! create_currency_id {
+    ($(#[$meta:meta])*
+	$vis:vis enum CurrencyId {
+        $($(#[$vmeta:meta])* $symbol:ident($name:expr, $deci:literal),)*
+    }) => {
+		$(#[$meta])*
+		$vis enum CurrencyId {
+			$($(#[$vmeta])* $symbol,)*
+		}
+
+        $(pub const $symbol: CurrencyId = CurrencyId::$symbol;)*
+
+		impl TryFrom<Vec<u8>> for CurrencyId {
+			type Error = ();
+			fn try_from(v: Vec<u8>) -> Result<CurrencyId, ()> {
+				match v.as_slice() {
+					$(bstringify!($symbol) => Ok(CurrencyId::$symbol),)*
+					_ => Err(()),
+				}
+			}
+		}
+
+    }
+}
+
+// todo: should change chain spec properties's tokenSymbol related to here native currency which is JIT
+create_currency_id! {
+    #[derive(Encode, Decode, Eq, PartialEq, Copy, Clone, PartialOrd, Ord, RuntimeDebug)]
+    #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
+    pub enum CurrencyId {
+        WND("Westend", 12),
+        KSM("Kusama", 12),
+        DOT("Polkadot", 10),
     }
 }

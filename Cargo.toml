@@ -17,6 +17,7 @@ members = [
   "pallets/poa",
   "pallets/poa/rpc",
   "pallets/poa/rpc/runtime-api",
+  "pallets/currencies",
   "rpc",
 ]
 exclude = ["vendor/substrate"]

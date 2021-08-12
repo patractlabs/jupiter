@@ -17,6 +17,7 @@ use jupiter_runtime::{
     SudoConfig,
     SystemConfig, //ContractsConfig,
 };
+use jupiter_runtime_common::constants::jupiter_currency::DOTS;
 use sc_service::config::TelemetryEndpoints;
 
 // The URL for the telemetry server.
@@ -68,7 +69,7 @@ pub fn session_keys(keys: AuraId) -> jupiter_runtime::opaque::SessionKeys {
 }
 
 /// Jupiter Development Chain Config
-pub fn development_config(id: ParaId, relay_chain: &str) -> Result<ChainSpec, String> {
+pub fn development_config(id: ParaId, relay_chain: &str, token: &str) -> Result<ChainSpec, String> {
     Ok(ChainSpec::from_genesis(
         // Name
         "Development",
@@ -109,8 +110,8 @@ pub fn development_config(id: ParaId, relay_chain: &str) -> Result<ChainSpec, St
         Some(
             json!({
                 "ss58Format": jupiter_runtime_common::SS58Prefix::get(),
-                "tokenDecimals": 10,
-                "tokenSymbol": "DOT"
+                "tokenDecimals": 12,
+                "tokenSymbol": token.to_string()
             })
             .as_object()
             .expect("network properties generation can not fail; qed")
@@ -191,6 +192,8 @@ fn testnet_genesis(
     endowed_accounts: Vec<AccountId>,
     id: ParaId,
 ) -> GenesisConfig {
+    const ENDOWMENT: u128 = 10_000 * DOTS;
+
     GenesisConfig {
         system: SystemConfig {
             // Add Wasm runtime to storage.
@@ -204,7 +207,7 @@ fn testnet_genesis(
             balances: endowed_accounts
                 .iter()
                 .cloned()
-                .map(|k| (k, 1 << 100))
+                .map(|k| (k, ENDOWMENT))
                 .collect(),
         },
         // indices: IndicesConfig { indices: vec![] },
@@ -236,9 +239,6 @@ fn testnet_genesis(
                 .collect(),
         },
         aura: Default::default(),
-        // aura: jupiter_runtime::AuraConfig {
-        //     authorities: initial_authorities,
-        // },
         aura_ext: Default::default(),
         parachain_system: Default::default(),
     }
