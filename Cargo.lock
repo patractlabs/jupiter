@@ -4095,6 +4095,7 @@ dependencies = [
  "pallet-scheduler",
  "pallet-session",
  "pallet-staking",
+ "pallet-sudo",
  "pallet-timestamp",
  "pallet-tips",
  "pallet-transaction-payment",
