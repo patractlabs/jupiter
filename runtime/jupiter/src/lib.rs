@@ -88,7 +88,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
     spec_name: create_runtime_str!("jupiter-westend"),
     impl_name: create_runtime_str!("patract-jupiter-westend"),
     authoring_version: 1,
-    spec_version: 2,
+    spec_version: 3,
     impl_version: 1,
     apis: RUNTIME_API_VERSIONS,
     transaction_version: 1,
@@ -165,7 +165,7 @@ impl pallet_balances::Config for Runtime {
 }
 
 impl pallet_transaction_payment::Config for Runtime {
-    type OnChargeTransaction = pallet_transaction_payment::CurrencyAdapter<Balances, ()>;
+    type OnChargeTransaction = pallet_transaction_payment::CurrencyAdapter<Balances, impls::ToRoot<Self>>;
     type TransactionByteFee = TransactionByteFee;
     type WeightToFee = JupiterWeight2Fee;
     type FeeMultiplierUpdate = impls::SlowAdjustingFeeUpdate<Self>;
@@ -352,7 +352,7 @@ impl Config for XcmConfig {
     type LocationInverter = LocationInverter<Ancestry>;
     type Barrier = ();
     type Weigher = FixedWeightBounds<UnitWeightCost, Call>;
-    type Trader = UsingComponents<IdentityFee<Balance>, WestendLocation, AccountId, Balances, ()>;
+    type Trader = UsingComponents<IdentityFee<Balance>, WestendLocation, AccountId, Balances, impls::ToRoot<Runtime>>;
     type ResponseHandler = (); // Don't handle responses for now.
 }
 
