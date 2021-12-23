@@ -1,4 +1,4 @@
 [submodule "vendor/substrate"]
 	path = vendor/substrate
 	url = https://github.com/patractlabs/substrate.git
-	branch = polkadot-v0.9.10-patch
+	branch = patract/rococo-v1
