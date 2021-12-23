@@ -5,7 +5,7 @@ authors = ["Patract <https://github.com/patractlabs>"]
 edition = "2018"
 
 [dependencies]
-codec = { package = "parity-scale-codec", version = "2.1.0", default-features = false }
+codec = { package = "parity-scale-codec", version = "2.2.0", default-features = false, features = ["derive", "max-encoded-len"]}
 bstringify = "0.1.2"
 serde = { version = "1.0", optional = true }
 
@@ -17,8 +17,8 @@ sp-std = { version = "4.0.0-dev", git = "https://github.com/paritytech/substrate
 
 # Substrate pallets
 frame-system = { version = "4.0.0-dev", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.14", default-features = false }
-#frame-support = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.14", default-features = false }
-max-encoded-len = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.8", default-features = false }
+frame-support = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.14", default-features = false }
+# max-encoded-len = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.14", default-features = false }
 
 [features]
 default = ["std"]
@@ -32,6 +32,6 @@ std = [
   "sp-std/std",
 
   "frame-system/std",
-#  "frame-support/std",
-  "max-encoded-len/std",
+ "frame-support/std",
+  # "max-encoded-len/std",
 ]

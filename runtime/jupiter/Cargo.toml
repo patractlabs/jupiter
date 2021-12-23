@@ -26,7 +26,7 @@ sp-block-builder = { version = "4.0.0-dev", git = "https://github.com/paritytech
 sp-transaction-pool = { version = "4.0.0-dev", git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.14" }
 sp-inherents = { version = "4.0.0-dev", git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.14" }
 sp-consensus-aura = { version = "0.10.0-dev", git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.14" }
-max-encoded-len = { version = "3.0.0", git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.8" }
+# max-encoded-len = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.14" }
 
 frame-support = { version = "4.0.0-dev", git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.14" }
 frame-executive = { version = "4.0.0-dev", git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.14" }
@@ -47,26 +47,26 @@ pallet-transaction-payment-rpc-runtime-api = { version = "4.0.0-dev", git = "htt
 pallet-utility = { version = "4.0.0-dev", git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.14" }
 
 # Cumulus dependencies
-cumulus-pallet-aura-ext = { git = "https://github.com/patractlabs/cumulus", branch = "patract-sandbox-xcmp", default-features = false }
-cumulus-pallet-parachain-system = { git = "https://github.com/patractlabs/cumulus", branch = "patract-sandbox-xcmp", default-features = false }
-cumulus-primitives-core = { git = "https://github.com/patractlabs/cumulus", branch = "patract-sandbox-xcmp", default-features = false }
-cumulus-primitives-timestamp = { git = "https://github.com/patractlabs/cumulus", branch = "patract-sandbox-xcmp", default-features = false }
-cumulus-primitives-utility = { git = "https://github.com/patractlabs/cumulus", branch = "patract-sandbox-xcmp", default-features = false }
-cumulus-pallet-dmp-queue = { git = "https://github.com/patractlabs/cumulus", branch = "patract-sandbox-xcmp", default-features = false }
-cumulus-pallet-xcmp-queue = { git = "https://github.com/patractlabs/cumulus", branch = "patract-sandbox-xcmp", default-features = false }
-cumulus-pallet-xcm = { git = "https://github.com/patractlabs/cumulus", branch = "patract-sandbox-xcmp", default-features = false }
-cumulus-ping = { git = "https://github.com/patractlabs/cumulus", branch = "patract-sandbox-xcmp", default-features = false }
-pallet-collator-selection = { git = "https://github.com/patractlabs/cumulus", branch = "patract-sandbox-xcmp", default-features = false }
-parachain-info = { git = "https://github.com/patractlabs/cumulus", branch = "patract-sandbox-xcmp", default-features = false }
+cumulus-pallet-aura-ext = { git = "https://github.com/paritytech/cumulus", branch = "polkadot-v0.9.13", default-features = false }
+cumulus-pallet-parachain-system = { git = "https://github.com/paritytech/cumulus", branch = "polkadot-v0.9.13", default-features = false }
+cumulus-primitives-core = { git = "https://github.com/paritytech/cumulus", branch = "polkadot-v0.9.13", default-features = false }
+cumulus-primitives-timestamp = { git = "https://github.com/paritytech/cumulus", branch = "polkadot-v0.9.13", default-features = false }
+cumulus-primitives-utility = { git = "https://github.com/paritytech/cumulus", branch = "polkadot-v0.9.13", default-features = false }
+cumulus-pallet-dmp-queue = { git = "https://github.com/paritytech/cumulus", branch = "polkadot-v0.9.13", default-features = false }
+cumulus-pallet-xcmp-queue = { git = "https://github.com/paritytech/cumulus", branch = "polkadot-v0.9.13", default-features = false }
+cumulus-pallet-xcm = { git = "https://github.com/paritytech/cumulus", branch = "polkadot-v0.9.13", default-features = false }
+cumulus-ping = { git = "https://github.com/paritytech/cumulus", branch = "polkadot-v0.9.13", default-features = false }
+pallet-collator-selection = { git = "https://github.com/paritytech/cumulus", branch = "polkadot-v0.9.13", default-features = false }
+parachain-info = { git = "https://github.com/paritytech/cumulus", branch = "polkadot-v0.9.13", default-features = false }
 
 # Polkadot dependencies
-# polkadot-parachain = { git = "https://github.com/patractlabs/polkadot", branch = "patract-sandbox-xcmp", default-features = false } # TODO
-polkadot-parachain = { git = "https://github.com/paritytech/polkadot"}
+polkadot-parachain = { git = "https://github.com/paritytech/polkadot", branch = "release-v0.9.14", default-features = false } # TODO
+# polkadot-parachain = { git = "https://github.com/paritytech/polkadot"}
 
-xcm = { git = "https://github.com/patractlabs/polkadot", branch = "patract-sandbox-xcmp", default-features = false }
-xcm-builder = { git = "https://github.com/patractlabs/polkadot", branch = "patract-sandbox-xcmp", default-features = false }
-xcm-executor = { git = "https://github.com/patractlabs/polkadot", branch = "patract-sandbox-xcmp", default-features = false }
-pallet-xcm = { git = "https://github.com/patractlabs/polkadot", branch = "patract-sandbox-xcmp", default-features = false }
+xcm = { git = "https://github.com/paritytech/polkadot", branch = "release-v0.9.14", default-features = false }
+xcm-builder = { git = "https://github.com/paritytech/polkadot", branch = "release-v0.9.14", default-features = false }
+xcm-executor = { git = "https://github.com/paritytech/polkadot", branch = "release-v0.9.14", default-features = false }
+pallet-xcm = { git = "https://github.com/paritytech/polkadot", branch = "release-v0.9.14", default-features = false }
 
 # contracts
 pallet-contracts = { version = "4.0.0-dev", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.14", default-features = false }
@@ -81,13 +81,13 @@ currencies = { path = "../../pallets/currencies", default-features = false }
 
 # orml xcmp
 # ORML Dependencies
-#orml-currencies = { git = 'https://github.com/patractlabs/open-runtime-module-library', branch = 'patract-sandbox-xcmp', default-features = false }
-#orml-unknown-tokens = { git = 'https://github.com/patractlabs/open-runtime-module-library', branch = 'patract-sandbox-xcmp', default-features = false }
-#orml-tokens = { git = 'https://github.com/patractlabs/open-runtime-module-library', branch = 'patract-sandbox-xcmp', default-features = false }
-orml-xtokens = { git = 'https://github.com/patractlabs/open-runtime-module-library', branch = 'patract-sandbox-xcmp', default-features = false }
-orml-xcm-support = { git = 'https://github.com/patractlabs/open-runtime-module-library', branch = 'patract-sandbox-xcmp', default-features = false }
-orml-xcm = { git = 'https://github.com/patractlabs/open-runtime-module-library', branch = 'patract-sandbox-xcmp', default-features = false }
-orml-traits = { git = 'https://github.com/patractlabs/open-runtime-module-library', branch = 'patract-sandbox-xcmp', default-features = false }
+orml-currencies = { git = 'https://github.com/open-web3-stack/open-runtime-module-library', branch = 'polkadot-v0.9.13', default-features = false }
+orml-unknown-tokens = { git = 'https://github.com/open-web3-stack/open-runtime-module-library', branch = 'polkadot-v0.9.13', default-features = false }
+orml-tokens = { git = 'https://github.com/open-web3-stack/open-runtime-module-library', branch = 'polkadot-v0.9.13', default-features = false }
+orml-xtokens = { git = 'https://github.com/open-web3-stack/open-runtime-module-library', branch = 'polkadot-v0.9.13', default-features = false }
+orml-xcm-support = { git = 'https://github.com/open-web3-stack/open-runtime-module-library', branch = 'polkadot-v0.9.13', default-features = false }
+orml-xcm = { git = 'https://github.com/open-web3-stack/open-runtime-module-library', branch = 'polkadot-v0.9.13', default-features = false }
+orml-traits = { git = 'https://github.com/open-web3-stack/open-runtime-module-library', branch = 'polkadot-v0.9.13', default-features = false }
 
 [dev-dependencies]
 hex-literal = "0.3.1"
@@ -117,7 +117,7 @@ std = [
     "frame-executive/std",
     "frame-system/std",
     "frame-system-rpc-runtime-api/std",
-    "max-encoded-len/std",
+    # "max-encoded-len/std",
     "pallet-assets/std",
     "pallet-authorship/std",
     "pallet-aura/std",
@@ -156,9 +156,9 @@ std = [
     "randomness_collect/std",
     "getrandom/std",
 
-#    "orml-currencies/std",
-#    "orml-unknown-tokens/std",
-#    "orml-tokens/std",
+   "orml-currencies/std",
+   "orml-unknown-tokens/std",
+   "orml-tokens/std",
     "orml-xtokens/std",
     "orml-xcm-support/std",
     "orml-traits/std",

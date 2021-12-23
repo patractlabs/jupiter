@@ -8,7 +8,7 @@ edition = "2018"
 targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
-codec = { package = "parity-scale-codec", version = "2.1.0", default-features = false, features = ["derive"] }
+codec = { package = "parity-scale-codec", version = "2.1.0", default-features = false, features = ["derive", "max-encoded-len"] }
 log = { version = "0.4", default-features = false }
 serde = { version = "1.0.101", optional = true, features = ["derive"] }
 static_assertions = "1.1.0"
@@ -58,7 +58,7 @@ pallet-bounties = { version = "4.0.0-dev", git = "https://github.com/paritytech/
 pallet-tips = { version = "4.0.0-dev", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.14", default-features = false }
 pallet-timestamp = { version = "4.0.0-dev", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.14", default-features = false }
 pallet-utility = { version = "4.0.0-dev", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.14", default-features = false }
-max-encoded-len = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.8", default-features = false, features = [ "derive" ] }
+# max-encoded-len = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.8", default-features = false, features = [ "derive" ] }
 
 # contracts
 pallet-contracts = { version = "4.0.0-dev", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.14", default-features = false }

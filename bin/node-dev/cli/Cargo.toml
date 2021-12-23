@@ -41,7 +41,7 @@ jupiter-rpc = { path = "../../../rpc" }
 jupiter-dev-runtime = { path = "../../../runtime/jupiter-dev" }
 
 [build-dependencies]
-substrate-build-script-utils = { version = "3.0.0", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.8" }
+substrate-build-script-utils = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.14" }
 
 [features]
 runtime-benchmarks = [
