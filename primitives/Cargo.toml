@@ -8,6 +8,7 @@ edition = "2018"
 codec = { package = "parity-scale-codec", version = "2.2.0", default-features = false, features = ["derive", "max-encoded-len"]}
 bstringify = "0.1.2"
 serde = { version = "1.0", optional = true }
+scale-info = { version = "1.0", default-features = false, features = ["derive"] }
 
 # Substrate primitives
 sp-application-crypto = { version = "4.0.0-dev", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.14", default-features = false }
@@ -25,6 +26,8 @@ default = ["std"]
 std = [
   "codec/std",
   "serde",
+  # "scale-info",
+  "scale-info/std",
 
   "sp-application-crypto/std",
   "sp-core/std",
@@ -32,6 +35,6 @@ std = [
   "sp-std/std",
 
   "frame-system/std",
- "frame-support/std",
+  "frame-support/std",
   # "max-encoded-len/std",
 ]

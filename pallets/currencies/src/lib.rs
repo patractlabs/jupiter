@@ -50,7 +50,7 @@ use frame_support::{
     },
     transactional,
 };
-use frame_system::{ensure_root, ensure_signed, pallet_prelude::*};
+use frame_system::{ensure_root, ensure_signed, pallet_prelude::*, Config, Error, Event, Pallet};
 use jupiter_primitives::CurrencyId;
 use orml_traits::{
     arithmetic::{Signed, SimpleArithmetic},
@@ -123,7 +123,7 @@ pub mod module {
     #[pallet::event]
     #[pallet::generate_deposit(pub(crate) fn deposit_event)]
     // #[pallet::metadata(CurrencyIdOf<T> = "Currency", T::AccountId = "AccountId", BalanceOf<T> = "Balance", AmountOf<T> = "Amount")]
-    #[pallet::metadata(T::AccountId = "AccountId", BalanceOf<T> = "Balance", CurrencyIdOf<T> = "CurrencyId")]
+    // #[pallet::metadata(T::AccountId = "AccountId", BalanceOf<T> = "Balance", CurrencyIdOf<T> = "CurrencyId")]
     pub enum Event<T: Config> {
         /// Currency transfer success. \[currency_id, from, to, amount\]
         Transferred(CurrencyIdOf<T>, T::AccountId, T::AccountId, BalanceOf<T>),

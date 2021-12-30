@@ -7,14 +7,9 @@ use sp_runtime::{
 };
 
 use bstringify::bstringify;
-use codec::{Decode, Encode};
+use codec::{Decode, Encode, MaxEncodedLen};
 
-use sp_std::{
-    convert::{Into, TryFrom},
-    prelude::*,
-};
-// pub use frame_support::traits::MaxEncodedLen;
-use max_encoded_len::MaxEncodedLen;
+use sp_std::{convert::TryFrom, prelude::*};
 
 #[cfg(feature = "std")]
 use serde::{Deserialize, Serialize};
@@ -50,7 +45,8 @@ pub type Hash = sp_core::H256;
 pub type Timestamp = u64;
 
 /// Digest item type.
-pub type DigestItem = generic::DigestItem<Hash>;
+pub type DigestItem = generic::DigestItem;
+// pub type DigestItem = generic::DigestItem<Hash>;
 
 /// Header type.
 pub type Header = generic::Header<BlockNumber, BlakeTwo256>;

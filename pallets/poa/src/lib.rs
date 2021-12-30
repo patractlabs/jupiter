@@ -37,6 +37,7 @@ mod session;
 mod slashing;
 pub mod weights;
 
+use frame_system::{Config, Event, Pallet};
 #[cfg(feature = "std")]
 use serde::{Deserialize, Serialize};
 
@@ -47,6 +48,7 @@ use sp_std::{collections::btree_map::BTreeMap, prelude::*};
 pub use self::pallet::*;
 pub use self::session::SimpleValidatorIdConverter;
 pub use self::weights::WeightInfo;
+// pub use frame_system::pallet::*;
 
 pub type EraIndex = u32;
 pub(crate) const LOG_TARGET: &'static str = "poa";

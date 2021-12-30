@@ -7,6 +7,8 @@ edition = "2018"
 [dependencies]
 serde = { version = "1.0.124", optional = true }
 codec = { package = "parity-scale-codec", version = "2.2.0", default-features = false }
+scale-info = { version = "1.0", default-features = false, features = ["derive"] }
+
 sp-core = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.14", default-features = false }
 sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.14", default-features = false }
 sp-io = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.14", default-features = false }
@@ -24,7 +26,6 @@ jupiter-primitives = { path = "../../primitives", default-features = false }
 sp-core = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.14" }
 pallet-balances = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.14" }
 pallet-timestamp = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.14" }
-# tokens = { package = "orml-tokens", git = 'https://github.com/patractlabs/open-runtime-module-library', branch = 'patract-sandbox-xcmp' }
 tokens = { package = "orml-tokens", git = 'https://github.com/open-web3-stack/open-runtime-module-library', branch = 'polkadot-v0.9.13' }
 
 [features]
@@ -32,6 +33,7 @@ default = ["std"]
 std = [
 	"serde",
 	"codec/std",
+	"scale-info/std",
 	"sp-core/std",
 	"sp-runtime/std",
 	"sp-std/std",
