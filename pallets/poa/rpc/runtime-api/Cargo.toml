@@ -2,7 +2,7 @@
 name = "pallet-poa-rpc-runtime-api"
 version = "0.1.0"
 authors = ["Patract <https://github.com/patractlabs>"]
-edition = "2018"
+edition = "2021"
 
 [dependencies]
 codec = { package = "parity-scale-codec", version = "2.3.1", default-features = false }

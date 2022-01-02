@@ -2,7 +2,7 @@
 name = "pallet-randomness-provider"
 version = "0.1.0"
 authors = ["Patract <https://github.com/patractlabs>"]
-edition = "2018"
+edition = "2021"
 license = "Apache-2.0"
 homepage = "https://patract.io"
 repository = "https://github.com/patractlabs/jupiter"

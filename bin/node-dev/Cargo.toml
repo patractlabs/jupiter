@@ -2,7 +2,7 @@
 name = "jupiter-dev"
 version = "1.0.3"
 authors = ["Patract <https://github.com/patractlabs>"]
-edition = "2018"
+edition = "2021"
 description = ""
 
 [dependencies]
