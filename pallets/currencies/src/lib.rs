@@ -50,7 +50,7 @@ use frame_support::{
     },
     transactional,
 };
-use frame_system::{ensure_root, ensure_signed, pallet_prelude::*, Config, Error, Event, Pallet};
+use frame_system::{ensure_root, ensure_signed, pallet_prelude::*};
 use jupiter_primitives::CurrencyId;
 use orml_traits::{
     arithmetic::{Signed, SimpleArithmetic},

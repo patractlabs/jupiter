@@ -25,7 +25,7 @@ use sp_version::RuntimeVersion;
 
 use frame_support::{
     construct_runtime, match_type, parameter_types,
-    traits::{All, Contains, Get},
+    traits::{Contains, Get},
     weights::{constants::RocksDbWeight, IdentityFee, Weight},
     PalletId,
 };

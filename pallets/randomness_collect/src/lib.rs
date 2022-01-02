@@ -19,7 +19,6 @@ use frame_support::{
     traits::{Get, Randomness as RandomnessT},
     Parameter,
 };
-
 use scale_info::TypeInfo;
 use sp_consensus_babe::{Epoch, VRF_OUTPUT_LENGTH};
 use sp_consensus_vrf::schnorrkel;
@@ -350,25 +349,20 @@ impl<T: Config> frame_support::unsigned::ValidateUnsigned for Module<T> {
     type Call = Call<T>;
 
     fn validate_unsigned(_source: TransactionSource, call: &Self::Call) -> TransactionValidity {
-        if let Call::set_randomness {
-            epoch_record,
-            _signature,
-            _index,
-        } = call
-        {
+        if let Call::set_randomness(ref epoch_record, ref signature, index) = call {
             // check signature
-            match Keys::<T>::get().get(*_index as usize) {
+            match Keys::<T>::get().get(*index as usize) {
                 None => InvalidTransaction::Call.into(),
                 Some(privileged_key) => {
                     let signature_valid = epoch_record.using_encoded(|encoded_epoch_record| {
-                        privileged_key.verify(&encoded_epoch_record, _signature)
+                        privileged_key.verify(&encoded_epoch_record, &signature)
                     });
                     if !signature_valid {
                         InvalidTransaction::BadProof.into()
                     } else {
                         ValidTransaction::with_tag_prefix("RandomnessCollect")
                             .priority(T::UnsignedPriority::get())
-                            .and_provides((epoch_record.current_epoch.epoch, *_index))
+                            .and_provides((epoch_record.current_epoch.epoch, *index))
                             .longevity(5)
                             .propagate(true)
                             .build()

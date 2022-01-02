@@ -199,4 +199,8 @@ impl<T: frame_system::Config> pallet_democracy::WeightInfo for WeightInfo<T> {
             .saturating_add(T::DbWeight::get().reads(2 as Weight))
             .saturating_add(T::DbWeight::get().writes(2 as Weight))
     }
+
+    fn on_initialize_base_with_launch_period(r: u32) -> Weight {
+        todo!()
+    }
 }

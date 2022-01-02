@@ -11,6 +11,8 @@ use codec::{Decode, Encode, MaxEncodedLen};
 
 use sp_std::{convert::TryFrom, prelude::*};
 
+use scale_info::TypeInfo;
+
 #[cfg(feature = "std")]
 use serde::{Deserialize, Serialize};
 
@@ -130,7 +132,7 @@ macro_rules! create_currency_id {
 
 // todo: should change chain spec properties's tokenSymbol related to here native currency which is JIT
 create_currency_id! {
-    #[derive(Encode, Decode, Eq, PartialEq, Copy, Clone, PartialOrd, Ord, RuntimeDebug)]
+    #[derive(Encode, Decode, Eq, PartialEq, Copy, Clone, PartialOrd, Ord, RuntimeDebug, TypeInfo)]
     #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
     pub enum CurrencyId {
         WND("Westend", 12),
