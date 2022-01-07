@@ -4,7 +4,9 @@ use sp_runtime::{
     AccountId32, Perbill,
 };
 
-use frame_support::{parameter_types, traits::Currency, weights::Weight};
+use frame_support::{
+    parameter_types, traits::Currency, traits::Everything, traits::Nothing, weights::Weight,
+};
 use pallet_contracts::Frame;
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
@@ -42,7 +44,7 @@ parameter_types! {
 }
 
 impl frame_system::Config for Test {
-    type BaseCallFilter = ();
+    type BaseCallFilter = Everything;
     type Origin = Origin;
     type Call = Call;
     type Index = u64;
@@ -111,14 +113,14 @@ impl pallet_contracts::Config for Test {
     type Randomness = Randomness;
     type Currency = Balances;
     type Event = Event;
-    type RentPayment = ();
-    type SignedClaimHandicap = SignedClaimHandicap;
-    type TombstoneDeposit = TombstoneDeposit;
-    type DepositPerContract = DepositPerContract;
-    type DepositPerStorageByte = DepositPerStorageByte;
-    type DepositPerStorageItem = DepositPerStorageItem;
-    type RentFraction = RentFraction;
-    type SurchargeReward = SurchargeReward;
+    // type RentPayment = ();
+    // type SignedClaimHandicap = SignedClaimHandicap;
+    // type TombstoneDeposit = TombstoneDeposit;
+    // type DepositPerContract = DepositPerContract;
+    // type DepositPerStorageByte = DepositPerStorageByte;
+    // type DepositPerStorageItem = DepositPerStorageItem;
+    // type RentFraction = RentFraction;
+    // type SurchargeReward = SurchargeReward;
     type CallStack = [Frame<Self>; 31];
     type WeightPrice = Self;
     type WeightInfo = ();
@@ -126,6 +128,9 @@ impl pallet_contracts::Config for Test {
     type DeletionQueueDepth = DeletionQueueDepth;
     type DeletionWeightLimit = DeletionWeightLimit;
     type Schedule = Schedule;
+    type Call = Call;
+    type CallFilter = Nothing;
+    type ContractDeposit = (); // we use zero for ContractDeposit
 }
 
 impl pallet_template::Config for Test {

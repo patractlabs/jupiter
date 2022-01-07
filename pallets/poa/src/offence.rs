@@ -7,8 +7,8 @@
 use frame_support::{traits::Get, weights::Weight};
 use sp_runtime::{traits::Convert, Perbill};
 use sp_staking::{
-    offence::{OffenceDetails, OnOffenceHandler},
-    DisableStrategy, SessionIndex,
+    offence::{DisableStrategy, OffenceDetails, OnOffenceHandler},
+    SessionIndex,
 };
 
 use crate::{

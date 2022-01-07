@@ -4,7 +4,6 @@
 // Make the WASM binary available.
 #[cfg(feature = "std")]
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
-
 mod chain_extension;
 
 use sp_api::impl_runtime_apis;
@@ -25,7 +24,7 @@ use sp_version::RuntimeVersion;
 
 use frame_support::{
     construct_runtime, match_type, parameter_types,
-    traits::{Contains, Get},
+    traits::{Contains, Everything, Get, Nothing},
     weights::{constants::RocksDbWeight, IdentityFee, Weight},
     PalletId,
 };
@@ -168,6 +167,7 @@ impl pallet_transaction_payment::Config for Runtime {
     type OnChargeTransaction =
         pallet_transaction_payment::CurrencyAdapter<Balances, impls::ToRoot<Self>>;
     type TransactionByteFee = TransactionByteFee;
+    type OperationalFeeMultiplier = OperationalFeeMultiplier;
     type WeightToFee = JupiterWeight2Fee;
     type FeeMultiplierUpdate = impls::SlowAdjustingFeeUpdate<Self>;
 }
@@ -185,14 +185,14 @@ impl pallet_contracts::Config for Runtime {
     type Randomness = RandomnessCollectiveFlip;
     type Currency = Balances;
     type Event = Event;
-    type RentPayment = ();
-    type SignedClaimHandicap = SignedClaimHandicap;
-    type TombstoneDeposit = TombstoneDeposit;
-    type DepositPerContract = DepositPerContract;
-    type DepositPerStorageByte = DepositPerStorageByte;
-    type DepositPerStorageItem = DepositPerStorageItem;
-    type RentFraction = RentFraction;
-    type SurchargeReward = SurchargeReward;
+    // type RentPayment = ();
+    // type SignedClaimHandicap = SignedClaimHandicap;
+    // type TombstoneDeposit = TombstoneDeposit;
+    // type DepositPerContract = DepositPerContract;
+    // type DepositPerStorageByte = DepositPerStorageByte;
+    // type DepositPerStorageItem = DepositPerStorageItem;
+    // type RentFraction = RentFraction;
+    // type SurchargeReward = SurchargeReward;
     type CallStack = [pallet_contracts::Frame<Self>; 31];
     type WeightPrice = pallet_transaction_payment::Pallet<Self>;
     // type WeightPrice = module_transaction_payment::Pallet<Self>;
@@ -201,6 +201,9 @@ impl pallet_contracts::Config for Runtime {
     type DeletionQueueDepth = DeletionQueueDepth;
     type DeletionWeightLimit = DeletionWeightLimit;
     type Schedule = Schedule;
+    type Call = Call;
+    type CallFilter = Nothing;
+    type ContractDeposit = (); // we use zero for ContractDeposit
 }
 
 impl pallet_randomness_collective_flip::Config for Runtime {}
@@ -335,11 +338,17 @@ pub type CrosschainAsset = (NativeAsset, CrosschainConcreteAsset);
 
 pub type Barrier = (
     TakeWeightCredit,
-    AllowTopLevelPaidExecutionFrom<All<MultiLocation>>,
-    AllowUnpaidExecutionFrom<ParentOrParentsPlurality>,
+    // AllowTopLevelPaidExecutionFrom<All<MultiLocation>>,
+    AllowTopLevelPaidExecutionFrom<Everything>,
     // ^^^ Parent & its plurality gets free execution
-    AllowXcmTransactFrom<All<MultiLocation>>,
+    // AllowXcmTransactFrom<All<MultiLocation>>,
+    AllowXcmTransactFrom<Everything>,
 );
+
+parameter_types! {
+    // One XCM operation is 200_000_000 weight, cross-chain transfer ~= 2x of transfer.
+    pub const MaxInstructions: u32 = 100;
+}
 
 pub struct XcmConfig;
 impl Config for XcmConfig {
@@ -352,7 +361,7 @@ impl Config for XcmConfig {
     type IsTeleporter = NativeAsset; // <- should be enough to allow teleportation of WND
     type LocationInverter = LocationInverter<Ancestry>;
     type Barrier = ();
-    type Weigher = FixedWeightBounds<UnitWeightCost, Call>;
+    type Weigher = FixedWeightBounds<UnitWeightCost, Call, MaxInstructions>;
     type Trader = UsingComponents<
         IdentityFee<Balance>,
         WestendLocation,
@@ -360,6 +369,8 @@ impl Config for XcmConfig {
         Balances,
         impls::ToRoot<Runtime>,
     >;
+
+    // UsingComponents<IdentityFee<Balance>, RelayChainLocation, AccountId, Balances, ()>;
     type ResponseHandler = (); // Don't handle responses for now.
 }
 
@@ -371,7 +382,7 @@ parameter_types! {
 pub type LocalOriginToLocation = SignedToAccountId32<Origin, AccountId, RelayNetwork>;
 
 pub type XcmRouter = (
-    cumulus_primitives_utility::ParentAsUmp<ParachainSystem>,
+    cumulus_primitives_utility::ParentAsUmp<ParachainSystem, PolkadotXcm>,
     XcmpQueue,
 );
 
@@ -380,11 +391,14 @@ impl pallet_xcm::Config for Runtime {
     type SendXcmOrigin = EnsureXcmOrigin<Origin, LocalOriginToLocation>;
     type XcmRouter = XcmRouter;
     type ExecuteXcmOrigin = EnsureXcmOrigin<Origin, LocalOriginToLocation>;
-    type XcmExecuteFilter = All<(MultiLocation, Xcm<Call>)>;
+    // type XcmExecuteFilter = All<(MultiLocation, Xcm<Call>)>;
+    type XcmExecuteFilter = Nothing;
     type XcmExecutor = XcmExecutor<XcmConfig>;
-    type XcmTeleportFilter = All<(MultiLocation, Vec<MultiAsset>)>;
-    type XcmReserveTransferFilter = All<(MultiLocation, Vec<MultiAsset>)>;
-    type Weigher = FixedWeightBounds<UnitWeightCost, Call>;
+    // type XcmTeleportFilter = All<(MultiLocation, Vec<MultiAsset>)>;
+    type XcmTeleportFilter = Nothing;
+    // type XcmReserveTransferFilter = All<(MultiLocation, Vec<MultiAsset>)>;
+    type XcmReserveTransferFilter = Everything;
+    type Weigher = FixedWeightBounds<UnitWeightCost, Call, MaxInstructions>;
 }
 
 impl cumulus_pallet_xcm::Config for Runtime {
@@ -416,7 +430,7 @@ impl pallet_session::Config for Runtime {
     type SessionHandler =
         <opaque::SessionKeys as sp_runtime::traits::OpaqueKeys>::KeyTypeIdProviders;
     type Keys = opaque::SessionKeys;
-    type DisabledValidatorsThreshold = DisabledValidatorsThreshold;
+    // type DisabledValidatorsThreshold = DisabledValidatorsThreshold;
     type WeightInfo = weights::pallet_session::WeightInfo<Runtime>;
 }
 
@@ -538,7 +552,7 @@ impl orml_xtokens::Config for Runtime {
     type AccountIdToMultiLocation = AccountIdToMultiLocation;
     type SelfLocation = SelfLocation;
     type XcmExecutor = XcmExecutor<XcmConfig>;
-    type Weigher = FixedWeightBounds<UnitWeightCost, Call>;
+    type Weigher = FixedWeightBounds<UnitWeightCost, Call, MaxInstructions>;
     type BaseXcmWeight = UnitWeightCost;
 }
 
@@ -646,7 +660,7 @@ impl_runtime_apis! {
 
     impl sp_api::Metadata<Block> for Runtime {
         fn metadata() -> OpaqueMetadata {
-            Runtime::metadata().into()
+            OpaqueMetadata::new(Runtime::metadata().into())
         }
     }
 
@@ -740,9 +754,9 @@ impl_runtime_apis! {
             code: pallet_contracts_primitives::Code<Hash>,
             data: Vec<u8>,
             salt: Vec<u8>,
-        ) -> pallet_contracts_primitives::ContractInstantiateResult<AccountId, BlockNumber>
+        ) -> pallet_contracts_primitives::ContractInstantiateResult<AccountId>
         {
-            Contracts::bare_instantiate(origin, endowment, gas_limit, code, data, salt, true, true)
+            Contracts::bare_instantiate(origin, endowment, gas_limit, code, data, salt, true)
         }
 
         fn get_storage(
@@ -752,11 +766,11 @@ impl_runtime_apis! {
             Contracts::get_storage(address, key)
         }
 
-        fn rent_projection(
-            address: AccountId,
-        ) -> pallet_contracts_primitives::RentProjectionResult<BlockNumber> {
-            Contracts::rent_projection(address)
-        }
+        // fn rent_projection(
+        //     address: AccountId,
+        // ) -> pallet_contracts_primitives::RentProjectionResult<BlockNumber> {
+        //     Contracts::rent_projection(address)
+        // }
     }
 
     impl sp_consensus_aura::AuraApi<Block, AuraId> for Runtime {
