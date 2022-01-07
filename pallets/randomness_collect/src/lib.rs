@@ -303,7 +303,12 @@ impl<T: Config> Module<T> {
                             let signature = signer
                                 .sign(&epoch_record.encode())
                                 .ok_or("Failed to sign.")?;
-                            let call = Call::set_randomness(epoch_record, signature, index);
+                            // let call = Call::set_randomness(epoch_record, signature, index);
+                            let call = Call::set_randomness {
+                                epoch_record: epoch_record,
+                                _signature: signature,
+                                _index: index,
+                            };
                             SubmitTransaction::<T, Call<T>>::submit_unsigned_transaction(
                                 call.into(),
                             )
@@ -349,20 +354,25 @@ impl<T: Config> frame_support::unsigned::ValidateUnsigned for Module<T> {
     type Call = Call<T>;
 
     fn validate_unsigned(_source: TransactionSource, call: &Self::Call) -> TransactionValidity {
-        if let Call::set_randomness(ref epoch_record, ref signature, index) = call {
+        if let Call::set_randomness {
+            epoch_record,
+            _signature,
+            _index,
+        } = call
+        {
             // check signature
-            match Keys::<T>::get().get(*index as usize) {
+            match Keys::<T>::get().get(*_index as usize) {
                 None => InvalidTransaction::Call.into(),
                 Some(privileged_key) => {
                     let signature_valid = epoch_record.using_encoded(|encoded_epoch_record| {
-                        privileged_key.verify(&encoded_epoch_record, &signature)
+                        privileged_key.verify(&encoded_epoch_record, &_signature)
                     });
                     if !signature_valid {
                         InvalidTransaction::BadProof.into()
                     } else {
                         ValidTransaction::with_tag_prefix("RandomnessCollect")
                             .priority(T::UnsignedPriority::get())
-                            .and_provides((epoch_record.current_epoch.epoch, *index))
+                            .and_provides((epoch_record.current_epoch.epoch, *_index))
                             .longevity(5)
                             .propagate(true)
                             .build()

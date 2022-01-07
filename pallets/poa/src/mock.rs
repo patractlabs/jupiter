@@ -17,6 +17,7 @@ use sp_staking::SessionIndex;
 
 use frame_support::{
     parameter_types,
+    traits::Everything,
     traits::{FindAuthor, Get, OnFinalize, OnInitialize, OneSessionHandler},
     weights::constants::RocksDbWeight,
 };
@@ -115,7 +116,8 @@ parameter_types! {
 }
 
 impl frame_system::Config for Test {
-    type BaseCallFilter = ();
+    type BaseCallFilter = Everything;
+    // type BaseCallFilter = ();
     type BlockWeights = ();
     type BlockLength = ();
     type DbWeight = RocksDbWeight;

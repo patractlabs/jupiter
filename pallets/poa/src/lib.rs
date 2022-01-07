@@ -44,16 +44,15 @@ use frame_support::pallet_prelude::*;
 use sp_runtime::RuntimeDebug;
 use sp_std::{collections::btree_map::BTreeMap, prelude::*};
 
-// pub use self::pallet::*;
+pub use self::pallet::*;
 pub use self::session::SimpleValidatorIdConverter;
 pub use self::weights::WeightInfo;
-pub use module::*;
 
 pub type EraIndex = u32;
 pub(crate) const LOG_TARGET: &'static str = "poa";
 
 #[frame_support::pallet]
-pub mod module {
+pub mod pallet {
     use super::*;
 
     use frame_system::pallet_prelude::*;
@@ -111,7 +110,10 @@ pub mod module {
     // #[pallet::event]
     // #[pallet::generate_deposit(pub(super) fn deposit_event)]
     #[pallet::event]
-    #[pallet::generate_deposit(fn deposit_event)]
+    // #[pallet::generate_deposit(fn deposit_event)]
+    // #[pallet::generate_deposit(pub(crate) fn deposit_event)]
+    #[pallet::generate_deposit(pub(super) fn deposit_event)]
+
     // #[pallet::metadata(T::AccountId = "AccountId", T::Balance = "Balance")]
     pub enum Event<T: Config> {
         /// Add a new authority.
