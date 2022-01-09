@@ -95,7 +95,6 @@ parameter_types! {
 
 // pallet_session (Parachain:33)
 parameter_types! {
-    pub const DisabledValidatorsThreshold: Perbill = Perbill::from_percent(17);
     pub const Period: u32 = 6 * HOURS;
     pub const Offset: u32 = 0;
 }

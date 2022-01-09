@@ -41,7 +41,6 @@ std = [
   "sp-runtime/std",
   "sp-std/std",
   "sp-staking/std",
-  "sp-io/std",
 
   "frame-support/std",
   "frame-system/std",
