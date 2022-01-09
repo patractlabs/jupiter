@@ -2,6 +2,8 @@
 
 use std::sync::Arc;
 
+use sc_client_api::CallExecutor;
+use sc_executor::RuntimeVersionOf;
 use sc_service::{error::Error as ServiceError, Configuration, TaskManager};
 use sc_telemetry::{Telemetry, TelemetryWorker};
 
@@ -15,6 +17,7 @@ type FullSelectChain = sc_consensus::LongestChain<FullBackend, Block>;
 
 // Declare an instance of the native executor named `Executor`. Include the wasm binary as the
 // equivalent wasm code.
+// #[derive(sc_client_api::CallExecutor, RuntimeVersionOf)]
 pub struct Executor;
 
 impl sc_executor::NativeExecutionDispatch for Executor {
@@ -38,7 +41,7 @@ pub fn new_partial(
         FullClient,
         FullBackend,
         FullSelectChain,
-        sp_consensus::DefaultImportQueue<Block, FullClient>,
+        sc_consensus::DefaultImportQueue<Block, FullClient>,
         sc_transaction_pool::FullPool<Block, FullClient>,
         (Option<Telemetry>,),
     >,
@@ -215,79 +218,80 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
     Ok(task_manager)
 }
 
-/// Builds a new service for a light client.
-pub fn new_light(config: Configuration) -> Result<TaskManager, ServiceError> {
-    let telemetry = config
-        .telemetry_endpoints
-        .clone()
-        .filter(|x| !x.is_empty())
-        .map(|endpoints| -> Result<_, sc_telemetry::Error> {
-            let worker = TelemetryWorker::new(16)?;
-            let telemetry = worker.handle().new_telemetry(endpoints);
-            Ok((worker, telemetry))
-        })
-        .transpose()?;
+// TODO: remove light client
+// Builds a new service for a light client.
+// pub fn new_light(config: Configuration) -> Result<TaskManager, ServiceError> {
+//     let telemetry = config
+//         .telemetry_endpoints
+//         .clone()
+//         .filter(|x| !x.is_empty())
+//         .map(|endpoints| -> Result<_, sc_telemetry::Error> {
+//             let worker = TelemetryWorker::new(16)?;
+//             let telemetry = worker.handle().new_telemetry(endpoints);
+//             Ok((worker, telemetry))
+//         })
+//         .transpose()?;
 
-    let (client, backend, keystore_container, mut task_manager, on_demand) =
-        sc_service::new_light_parts::<Block, RuntimeApi, Executor>(
-            &config,
-            telemetry.as_ref().map(|(_, telemetry)| telemetry.handle()),
-        )?;
+//     let (client, backend, keystore_container, mut task_manager, on_demand) =
+//         sc_service::new_light_parts::<Block, RuntimeApi, Executor>(
+//             &config,
+//             telemetry.as_ref().map(|(_, telemetry)| telemetry.handle()),
+//         )?;
 
-    let mut telemetry = telemetry.map(|(worker, telemetry)| {
-        task_manager.spawn_handle().spawn("telemetry", worker.run());
-        telemetry
-    });
+//     let mut telemetry = telemetry.map(|(worker, telemetry)| {
+//         task_manager.spawn_handle().spawn("telemetry", worker.run());
+//         telemetry
+//     });
 
-    let transaction_pool = Arc::new(sc_transaction_pool::BasicPool::new_light(
-        config.transaction_pool.clone(),
-        config.prometheus_registry(),
-        task_manager.spawn_essential_handle(),
-        client.clone(),
-        on_demand.clone(),
-    ));
+//     let transaction_pool = Arc::new(sc_transaction_pool::BasicPool::new_light(
+//         config.transaction_pool.clone(),
+//         config.prometheus_registry(),
+//         task_manager.spawn_essential_handle(),
+//         client.clone(),
+//         on_demand.clone(),
+//     ));
 
-    let import_queue = sc_consensus_manual_seal::import_queue(
-        Box::new(client.clone()),
-        &task_manager.spawn_essential_handle(),
-        config.prometheus_registry(),
-    );
+//     let import_queue = sc_consensus_manual_seal::import_queue(
+//         Box::new(client.clone()),
+//         &task_manager.spawn_essential_handle(),
+//         config.prometheus_registry(),
+//     );
 
-    let (network, system_rpc_tx, network_starter) =
-        sc_service::build_network(sc_service::BuildNetworkParams {
-            config: &config,
-            client: client.clone(),
-            transaction_pool: transaction_pool.clone(),
-            spawn_handle: task_manager.spawn_handle(),
-            import_queue,
-            block_announce_validator_builder: None,
-            warp_sync: None,
-        })?;
+//     let (network, system_rpc_tx, network_starter) =
+//         sc_service::build_network(sc_service::BuildNetworkParams {
+//             config: &config,
+//             client: client.clone(),
+//             transaction_pool: transaction_pool.clone(),
+//             spawn_handle: task_manager.spawn_handle(),
+//             import_queue,
+//             block_announce_validator_builder: None,
+//             warp_sync: None,
+//         })?;
 
-    if config.offchain_worker.enabled {
-        sc_service::build_offchain_workers(
-            &config,
-            task_manager.spawn_handle(),
-            client.clone(),
-            network.clone(),
-        );
-    }
+//     if config.offchain_worker.enabled {
+//         sc_service::build_offchain_workers(
+//             &config,
+//             task_manager.spawn_handle(),
+//             client.clone(),
+//             network.clone(),
+//         );
+//     }
 
-    sc_service::spawn_tasks(sc_service::SpawnTasksParams {
-        transaction_pool,
-        task_manager: &mut task_manager,
-        rpc_extensions_builder: Box::new(|_, _| ()),
-        config,
-        client,
-        keystore: keystore_container.sync_keystore(),
-        backend,
-        network,
-        // network_status_sinks,
-        system_rpc_tx,
-        telemetry: telemetry.as_mut(),
-    })?;
+//     sc_service::spawn_tasks(sc_service::SpawnTasksParams {
+//         transaction_pool,
+//         task_manager: &mut task_manager,
+//         rpc_extensions_builder: Box::new(|_, _| ()),
+//         config,
+//         client,
+//         keystore: keystore_container.sync_keystore(),
+//         backend,
+//         network,
+//         // network_status_sinks,
+//         system_rpc_tx,
+//         telemetry: telemetry.as_mut(),
+//     })?;
 
-    network_starter.start_network();
+//     network_starter.start_network();
 
-    Ok(task_manager)
-}
+//     Ok(task_manager)
+// }
