@@ -94,7 +94,17 @@ pub mod report {
 }
 
 #[derive(
-    Encode, Decode, Eq, PartialEq, Copy, Clone, RuntimeDebug, PartialOrd, Ord, MaxEncodedLen,
+    Encode,
+    Decode,
+    Eq,
+    PartialEq,
+    Copy,
+    Clone,
+    RuntimeDebug,
+    PartialOrd,
+    Ord,
+    MaxEncodedLen,
+    scale_info::TypeInfo,
 )]
 #[repr(u8)]
 pub enum ReserveIdentifier {

@@ -15,7 +15,6 @@ use sp_runtime::{
     transaction_validity::{TransactionPriority, TransactionSource, TransactionValidity},
     ApplyExtrinsicResult,
 };
-use sp_std::marker::PhantomData;
 
 use sp_std::prelude::*;
 #[cfg(feature = "std")]
@@ -23,8 +22,8 @@ use sp_version::NativeVersion;
 use sp_version::RuntimeVersion;
 
 use frame_support::{
-    construct_runtime, match_type, parameter_types,
-    traits::{Contains, Everything, Get, Nothing},
+    construct_runtime, parameter_types,
+    traits::{Everything, Get, Nothing},
     weights::{constants::RocksDbWeight, IdentityFee, Weight},
     PalletId,
 };
@@ -35,18 +34,16 @@ pub use sp_runtime::BuildStorage;
 
 use pallet_xcm::XcmPassthrough;
 use polkadot_parachain::primitives::Sibling;
-use xcm::v0::{Junction, MultiAsset, MultiLocation, NetworkId, Xcm};
+use xcm::latest::prelude::*;
 use xcm_builder::{
-    AccountId32Aliases, AllowTopLevelPaidExecutionFrom, AllowUnpaidExecutionFrom, CurrencyAdapter,
-    EnsureXcmOrigin, FixedWeightBounds, IsConcrete, LocationInverter, NativeAsset,
-    ParentAsSuperuser, ParentIsDefault, RelayChainAsNative, SiblingParachainAsNative,
-    SiblingParachainConvertsVia, SignedAccountId32AsNative, SignedToAccountId32,
-    SovereignSignedViaLocation, TakeWeightCredit, UsingComponents,
+    AccountId32Aliases, AllowKnownQueryResponses, AllowSubscriptionsFrom,
+    AllowTopLevelPaidExecutionFrom, CurrencyAdapter, EnsureXcmOrigin, FixedWeightBounds,
+    IsConcrete, LocationInverter, NativeAsset, ParentAsSuperuser, ParentIsDefault,
+    RelayChainAsNative, SiblingParachainAsNative, SiblingParachainConvertsVia,
+    SignedAccountId32AsNative, SignedToAccountId32, SovereignSignedViaLocation, TakeWeightCredit,
+    UsingComponents,
 };
-use xcm_executor::{
-    traits::{FilterAssetLocation, ShouldExecute},
-    Config, XcmExecutor,
-};
+use xcm_executor::{Config, XcmExecutor};
 
 pub use jupiter_primitives::{
     AccountId, Amount, Balance, BlockNumber, CurrencyId, Hash, Header, Index, ReserveIdentifier,
@@ -106,7 +103,7 @@ parameter_types! {
 }
 
 impl frame_system::Config for Runtime {
-    type BaseCallFilter = ();
+    type BaseCallFilter = Everything;
     type BlockWeights = BlockWeights;
     type BlockLength = BlockLength;
     type AccountId = AccountId;
@@ -216,6 +213,7 @@ impl pallet_sudo::Config for Runtime {
 impl pallet_utility::Config for Runtime {
     type Event = Event;
     type Call = Call;
+    type PalletsOrigin = OriginCaller;
     type WeightInfo = weights::pallet_utility::WeightInfo<Runtime>;
 }
 
@@ -240,7 +238,7 @@ impl parachain_info::Config for Runtime {}
 impl cumulus_pallet_aura_ext::Config for Runtime {}
 
 parameter_types! {
-    pub const WestendLocation: MultiLocation = MultiLocation::X1(Junction::Parent);
+    pub const WestendLocation: MultiLocation = MultiLocation::parent();
     pub RelayNetwork: NetworkId = NetworkId::Named(b"Westend".to_vec());
     pub RelayChainOrigin: Origin = cumulus_pallet_xcm::Origin::Relay.into();
     pub Ancestry: MultiLocation = Junction::Parachain(ParachainInfo::parachain_id().into()).into();
@@ -286,55 +284,55 @@ parameter_types! {
     pub UnitWeightCost: Weight = 1_000;
 }
 
-match_type! {
-    pub type ParentOrParentsPlurality: impl Contains<MultiLocation> = {
-        MultiLocation::X1(Junction::Parent) |
-        MultiLocation::X2(Junction::Parent, Junction::Plurality { .. })
-    };
-}
+// match_type! {
+//     pub type ParentOrParentsPlurality: impl Contains<MultiLocation> = {
+//         MultiLocation::X1(Junction::Parent) |
+//         MultiLocation::X2(Junction::Parent, Junction::Plurality { .. })
+//     };
+// }
 
-/// Transparent XcmTransact Barrier for sybil demo. Polkadot will probably come up with a
-/// better solution for this. Currently, they have not setup a barrier config for `XcmTransact`
-pub struct AllowXcmTransactFrom<T>(PhantomData<T>);
-impl<T: Contains<MultiLocation>> ShouldExecute for AllowXcmTransactFrom<T> {
-    fn should_execute<Call>(
-        _origin: &MultiLocation,
-        _top_level: bool,
-        message: &Xcm<Call>,
-        _shallow_weight: Weight,
-        _weight_credit: &mut Weight,
-    ) -> Result<(), ()> {
-        match message {
-            Xcm::Transact {
-                origin_type: _,
-                require_weight_at_most: _,
-                call: _,
-            } => Ok(()),
-            _ => Err(()),
-        }
-    }
-}
+// /// Transparent XcmTransact Barrier for sybil demo. Polkadot will probably come up with a
+// /// better solution for this. Currently, they have not setup a barrier config for `XcmTransact`
+// pub struct AllowXcmTransactFrom<T>(PhantomData<T>);
+// impl<T: Contains<MultiLocation>> ShouldExecute for AllowXcmTransactFrom<T> {
+//     fn should_execute<Call>(
+//         _origin: &MultiLocation,
+//         _top_level: bool,
+//         message: &Xcm<Call>,
+//         _shallow_weight: Weight,
+//         _weight_credit: &mut Weight,
+//     ) -> Result<(), ()> {
+//         match message {
+//             Xcm::Transact {
+//                 origin_type: _,
+//                 require_weight_at_most: _,
+//                 call: _,
+//             } => Ok(()),
+//             _ => Err(()),
+//         }
+//     }
+// }
 
-pub struct CrosschainConcreteAsset;
-impl FilterAssetLocation for CrosschainConcreteAsset {
-    fn filter_asset_location(asset: &MultiAsset, origin: &MultiLocation) -> bool {
-        use xcm::v0::{Junction::*, MultiLocation::*};
-        match asset {
-            MultiAsset::ConcreteFungible { .. } => match origin {
-                Null | X1(Plurality { .. }) => true,
-                X1(AccountId32 { .. }) => true,
-                X1(Parent { .. }) => true,
-                X1(Parachain { .. }) => true,
-                X2(Parachain { .. }, _) => true,
-                X2(Parent { .. }, _) => true,
-                _ => false,
-            },
-            _ => false,
-        }
-    }
-}
+// pub struct CrosschainConcreteAsset;
+// impl FilterAssetLocation for CrosschainConcreteAsset {
+//     fn filter_asset_location(asset: &MultiAsset, origin: &MultiLocation) -> bool {
+//         use xcm::v0::{Junction::*, MultiLocation::*};
+//         match asset {
+//             MultiAsset::ConcreteFungible { .. } => match origin {
+//                 Null | X1(Plurality { .. }) => true,
+//                 X1(AccountId32 { .. }) => true,
+//                 X1(Parent { .. }) => true,
+//                 X1(Parachain { .. }) => true,
+//                 X2(Parachain { .. }, _) => true,
+//                 X2(Parent { .. }, _) => true,
+//                 _ => false,
+//             },
+//             _ => false,
+//         }
+//     }
+// }
 
-pub type CrosschainAsset = (NativeAsset, CrosschainConcreteAsset);
+// pub type CrosschainAsset = (NativeAsset, CrosschainConcreteAsset);
 
 pub type Barrier = (
     TakeWeightCredit,
@@ -342,7 +340,11 @@ pub type Barrier = (
     AllowTopLevelPaidExecutionFrom<Everything>,
     // ^^^ Parent & its plurality gets free execution
     // AllowXcmTransactFrom<All<MultiLocation>>,
-    AllowXcmTransactFrom<Everything>,
+    // AllowXcmTransactFrom<Everything>,
+    // Expected responses are OK.
+    AllowKnownQueryResponses<PolkadotXcm>,
+    // Subscriptions for version tracking are OK.
+    AllowSubscriptionsFrom<Everything>,
 );
 
 parameter_types! {
@@ -360,18 +362,19 @@ impl Config for XcmConfig {
     type IsReserve = MultiNativeAsset; // NativeAsset --> MultiNativeAsset --> CrosschainAsset
     type IsTeleporter = NativeAsset; // <- should be enough to allow teleportation of WND
     type LocationInverter = LocationInverter<Ancestry>;
-    type Barrier = ();
+    type Barrier = Barrier;
     type Weigher = FixedWeightBounds<UnitWeightCost, Call, MaxInstructions>;
     type Trader = UsingComponents<
         IdentityFee<Balance>,
         WestendLocation,
         AccountId,
         Balances,
-        impls::ToRoot<Runtime>,
+        (), // impls::ToRoot<Runtime>,
     >;
-
-    // UsingComponents<IdentityFee<Balance>, RelayChainLocation, AccountId, Balances, ()>;
-    type ResponseHandler = (); // Don't handle responses for now.
+    type ResponseHandler = PolkadotXcm;
+    type AssetTrap = PolkadotXcm;
+    type AssetClaims = PolkadotXcm;
+    type SubscriptionService = PolkadotXcm;
 }
 
 parameter_types! {
@@ -399,6 +402,11 @@ impl pallet_xcm::Config for Runtime {
     // type XcmReserveTransferFilter = All<(MultiLocation, Vec<MultiAsset>)>;
     type XcmReserveTransferFilter = Everything;
     type Weigher = FixedWeightBounds<UnitWeightCost, Call, MaxInstructions>;
+    type LocationInverter = LocationInverter<Ancestry>;
+    type Origin = Origin;
+    type Call = Call;
+    const VERSION_DISCOVERY_QUEUE_SIZE: u32 = 100;
+    type AdvertisedXcmVersion = pallet_xcm::CurrentXcmVersion;
 }
 
 impl cumulus_pallet_xcm::Config for Runtime {
@@ -410,6 +418,7 @@ impl cumulus_pallet_xcmp_queue::Config for Runtime {
     type Event = Event;
     type XcmExecutor = XcmExecutor<XcmConfig>;
     type ChannelInfo = ParachainSystem;
+    type VersionWrapper = PolkadotXcm;
 }
 
 impl cumulus_pallet_dmp_queue::Config for Runtime {
@@ -433,9 +442,13 @@ impl pallet_session::Config for Runtime {
     // type DisabledValidatorsThreshold = DisabledValidatorsThreshold;
     type WeightInfo = weights::pallet_session::WeightInfo<Runtime>;
 }
-
+parameter_types! {
+    pub const MaxAuthorities: u32 = 32;
+}
 impl pallet_aura::Config for Runtime {
     type AuthorityId = AuraId;
+    type MaxAuthorities = MaxAuthorities;
+    type DisabledValidators = ();
 }
 
 parameter_types! {
@@ -496,7 +509,6 @@ pub use currency_id_convert::CurrencyIdConvert;
 
 mod currency_id_convert {
     use super::*;
-    use xcm::v0::{Junction::*, MultiLocation::*};
 
     pub struct CurrencyIdConvert;
 
@@ -505,23 +517,33 @@ mod currency_id_convert {
     impl Convert<CurrencyId, Option<MultiLocation>> for CurrencyIdConvert {
         fn convert(id: CurrencyId) -> Option<MultiLocation> {
             match id {
-                RELAY_CHAIN_CURRENCY_ID => Some(X1(Parent)),
+                RELAY_CHAIN_CURRENCY_ID => Some(MultiLocation::parent()),
                 _ => None,
             }
         }
     }
     impl Convert<MultiLocation, Option<CurrencyId>> for CurrencyIdConvert {
         fn convert(location: MultiLocation) -> Option<CurrencyId> {
-            match location {
-                X1(Parent) => Some(RELAY_CHAIN_CURRENCY_ID),
-                _ => None,
+            // match location {
+            //     X1(Parent) => Some(RELAY_CHAIN_CURRENCY_ID),
+            //     _ => None,
+            // }
+            // TODO not sure this, need to check what multiloction mean.
+            if location.parent_count() == 1 {
+                Some(RELAY_CHAIN_CURRENCY_ID)
+            } else {
+                None
             }
         }
     }
     impl Convert<MultiAsset, Option<CurrencyId>> for CurrencyIdConvert {
         fn convert(asset: MultiAsset) -> Option<CurrencyId> {
-            if let MultiAsset::ConcreteFungible { id, amount: _ } = asset {
-                Self::convert(id)
+            if let MultiAsset {
+                id: Concrete(location),
+                ..
+            } = asset
+            {
+                Self::convert(location)
             } else {
                 None
             }
@@ -530,17 +552,18 @@ mod currency_id_convert {
 }
 
 parameter_types! {
-    pub SelfLocation: MultiLocation = MultiLocation::X2(Junction::Parent, Junction::Parachain(ParachainInfo::get().into()));
+    pub SelfLocation: MultiLocation = MultiLocation::new(1, X1(Parachain(ParachainInfo::get().into())));
 }
 
 pub struct AccountIdToMultiLocation;
 
 impl Convert<AccountId, MultiLocation> for AccountIdToMultiLocation {
     fn convert(account: AccountId) -> MultiLocation {
-        MultiLocation::X1(Junction::AccountId32 {
+        X1(AccountId32 {
             network: NetworkId::Any,
             id: account.into(),
         })
+        .into()
     }
 }
 
@@ -554,6 +577,7 @@ impl orml_xtokens::Config for Runtime {
     type XcmExecutor = XcmExecutor<XcmConfig>;
     type Weigher = FixedWeightBounds<UnitWeightCost, Call, MaxInstructions>;
     type BaseXcmWeight = UnitWeightCost;
+    type LocationInverter = LocationInverter<Ancestry>;
 }
 
 // orml_xcm
@@ -779,7 +803,7 @@ impl_runtime_apis! {
         }
 
         fn authorities() -> Vec<AuraId> {
-            Aura::authorities()
+            Aura::authorities().into_inner()
         }
     }
 
