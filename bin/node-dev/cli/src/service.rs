@@ -2,9 +2,6 @@
 
 use std::sync::Arc;
 
-use sc_client_api::RemoteBackend;
-use sc_executor::native_executor_instance;
-pub use sc_executor::NativeExecutor;
 use sc_service::{error::Error as ServiceError, Configuration, TaskManager};
 use sc_telemetry::{Telemetry, TelemetryWorker};
 
@@ -18,12 +15,19 @@ type FullSelectChain = sc_consensus::LongestChain<FullBackend, Block>;
 
 // Declare an instance of the native executor named `Executor`. Include the wasm binary as the
 // equivalent wasm code.
-native_executor_instance!(
-    pub Executor,
-    jupiter_dev_runtime::api::dispatch,
-    jupiter_dev_runtime::native_version,
-    (frame_benchmarking::benchmarking::HostFunctions, jupiter_io::pairing::HostFunctions),
-);
+pub struct Executor;
+
+impl sc_executor::NativeExecutionDispatch for Executor {
+    type ExtendHostFunctions = frame_benchmarking::benchmarking::HostFunctions;
+
+    fn dispatch(method: &str, data: &[u8]) -> Option<Vec<u8>> {
+        node_template_runtime::api::dispatch(method, data)
+    }
+
+    fn native_version() -> sc_executor::NativeVersion {
+        node_template_runtime::native_version()
+    }
+}
 
 /// Returns most parts of a service. Not enough to run a full chain,
 /// But enough to perform chain operations like purge-chain
@@ -54,6 +58,7 @@ pub fn new_partial(
     let (client, backend, keystore_container, task_manager) =
         sc_service::new_full_parts::<Block, RuntimeApi, Executor>(
             &config,
+            None,
             telemetry.as_ref().map(|(_, telemetry)| telemetry.handle()),
         )?;
     let client = Arc::new(client);
@@ -61,7 +66,9 @@ pub fn new_partial(
     let select_chain = sc_consensus::LongestChain::new(backend.clone());
 
     let telemetry = telemetry.map(|(worker, telemetry)| {
-        task_manager.spawn_handle().spawn("telemetry", worker.run());
+        task_manager
+            .spawn_handle()
+            .spawn("telemetry", None, worker.run());
         telemetry
     });
 
@@ -131,8 +138,8 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
             transaction_pool: transaction_pool.clone(),
             spawn_handle: task_manager.spawn_handle(),
             import_queue,
-            on_demand: None,
             block_announce_validator_builder: None,
+            warp_sync: None,
         })?;
 
     if config.offchain_worker.enabled {
@@ -170,8 +177,6 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
         task_manager: &mut task_manager,
         transaction_pool: transaction_pool.clone(),
         rpc_extensions_builder,
-        on_demand: None,
-        remote_blockchain: None,
         backend,
         // network_status_sinks,
         system_rpc_tx,
@@ -255,8 +260,8 @@ pub fn new_light(config: Configuration) -> Result<TaskManager, ServiceError> {
             transaction_pool: transaction_pool.clone(),
             spawn_handle: task_manager.spawn_handle(),
             import_queue,
-            on_demand: Some(on_demand.clone()),
             block_announce_validator_builder: None,
+            warp_sync: None,
         })?;
 
     if config.offchain_worker.enabled {
@@ -269,10 +274,8 @@ pub fn new_light(config: Configuration) -> Result<TaskManager, ServiceError> {
     }
 
     sc_service::spawn_tasks(sc_service::SpawnTasksParams {
-        remote_blockchain: Some(backend.remote_blockchain()),
         transaction_pool,
         task_manager: &mut task_manager,
-        on_demand: Some(on_demand),
         rpc_extensions_builder: Box::new(|_, _| ()),
         config,
         client,
