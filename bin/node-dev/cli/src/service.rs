@@ -3,6 +3,7 @@
 use std::sync::Arc;
 
 use sc_client_api::CallExecutor;
+pub use sc_executor::NativeElseWasmExecutor;
 use sc_executor::RuntimeVersionOf;
 use sc_service::{error::Error as ServiceError, Configuration, TaskManager};
 use sc_telemetry::{Telemetry, TelemetryWorker};
@@ -11,26 +12,30 @@ use jupiter_primitives::Block;
 
 use jupiter_dev_runtime::{self, RuntimeApi};
 
-type FullClient = sc_service::TFullClient<Block, RuntimeApi, Executor>;
-type FullBackend = sc_service::TFullBackend<Block>;
-type FullSelectChain = sc_consensus::LongestChain<FullBackend, Block>;
-
 // Declare an instance of the native executor named `Executor`. Include the wasm binary as the
 // equivalent wasm code.
-// #[derive(sc_client_api::CallExecutor, RuntimeVersionOf)]
 pub struct Executor;
 
 impl sc_executor::NativeExecutionDispatch for Executor {
+    // type ExtendHostFunctions = frame_benchmarking::benchmarking::HostFunctions;
+    #[cfg(feature = "runtime-benchmarks")]
     type ExtendHostFunctions = frame_benchmarking::benchmarking::HostFunctions;
+    /// Otherwise we only use the default Substrate host functions.
+    #[cfg(not(feature = "runtime-benchmarks"))]
+    type ExtendHostFunctions = ();
 
     fn dispatch(method: &str, data: &[u8]) -> Option<Vec<u8>> {
-        node_template_runtime::api::dispatch(method, data)
+        jupiter_dev_runtime::api::dispatch(method, data)
     }
 
     fn native_version() -> sc_executor::NativeVersion {
-        node_template_runtime::native_version()
+        jupiter_dev_runtime::native_version()
     }
 }
+
+type FullClient = sc_service::TFullClient<Block, RuntimeApi, NativeElseWasmExecutor<Executor>>;
+type FullBackend = sc_service::TFullBackend<Block>;
+type FullSelectChain = sc_consensus::LongestChain<FullBackend, Block>;
 
 /// Returns most parts of a service. Not enough to run a full chain,
 /// But enough to perform chain operations like purge-chain
@@ -58,11 +63,17 @@ pub fn new_partial(
         })
         .transpose()?;
 
+    let executor = NativeElseWasmExecutor::<Executor>::new(
+        config.wasm_method,
+        config.default_heap_pages,
+        config.max_runtime_instances,
+    );
+
     let (client, backend, keystore_container, task_manager) =
-        sc_service::new_full_parts::<Block, RuntimeApi, Executor>(
+        sc_service::new_full_parts::<Block, RuntimeApi, NativeElseWasmExecutor<Executor>>(
             &config,
-            None,
             telemetry.as_ref().map(|(_, telemetry)| telemetry.handle()),
+            executor,
         )?;
     let client = Arc::new(client);
 
@@ -168,7 +179,7 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
                 deny_unsafe,
             };
 
-            jupiter_rpc::create_basic(deps)
+            Ok(jupiter_rpc::create_basic(deps))
         })
     };
 
@@ -195,23 +206,25 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
             telemetry.as_ref().map(|x| x.handle()),
         );
 
-        let params = sc_consensus_manual_seal::InstantSealParams {
-            block_import: client.clone(),
-            env: proposer,
-            client: client.clone(),
-            pool: transaction_pool.pool().clone(),
-            select_chain,
-            consensus_data_provider: None,
-            create_inherent_data_providers: move |_, ()| async move {
-                let timestamp = sp_timestamp::InherentDataProvider::from_system_time();
-                Ok((timestamp, ()))
+        let authorship_future = sc_consensus_manual_seal::run_instant_seal(
+            sc_consensus_manual_seal::InstantSealParams {
+                block_import: client.clone(),
+                env: proposer,
+                client: client.clone(),
+                pool: transaction_pool.clone(),
+                select_chain,
+                consensus_data_provider: None,
+                create_inherent_data_providers: |_, _| async {
+                    Ok((sp_timestamp::InherentDataProvider::from_system_time(), ()))
+                },
             },
-        };
-        let authorship_future = sc_consensus_manual_seal::run_instant_seal(params);
+        );
 
-        task_manager
-            .spawn_essential_handle()
-            .spawn_blocking("instant-seal", authorship_future);
+        task_manager.spawn_essential_handle().spawn_blocking(
+            "instant-seal",
+            Some("block-authoring"),
+            authorship_future,
+        );
     };
 
     network_starter.start_network();
