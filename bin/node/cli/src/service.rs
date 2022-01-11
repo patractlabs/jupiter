@@ -4,14 +4,12 @@ use cumulus_client_service::{
     prepare_node_config, start_collator, start_full_node, StartCollatorParams, StartFullNodeParams,
 };
 use cumulus_primitives_core::ParaId;
-use sc_telemetry::{Telemetry, TelemetryWorker, TelemetryWorkerHandle};
-use std::sync::Arc;
-
-use sc_executor::native_executor_instance;
-pub use sc_executor::NativeExecutor;
+use sc_executor::NativeElseWasmExecutor;
 use sc_service::{
     error::Error as ServiceError, Configuration, PartialComponents, Role, TaskManager,
 };
+use sc_telemetry::{Telemetry, TelemetryWorker, TelemetryWorkerHandle};
+use std::sync::Arc;
 
 use jupiter_primitives::Block;
 use jupiter_runtime::{self, RuntimeApi};
@@ -25,14 +23,26 @@ use sp_core::offchain::OffchainStorage;
 
 // Declare an instance of the native executor named `Executor`. Include the wasm binary as the
 // equivalent wasm code.
-native_executor_instance!(
-    pub Executor,
-    jupiter_runtime::api::dispatch,
-    jupiter_runtime::native_version,
-    (frame_benchmarking::benchmarking::HostFunctions, jupiter_io::pairing::HostFunctions),
-);
+pub struct Executor;
 
-type FullClient = sc_service::TFullClient<Block, RuntimeApi, Executor>;
+impl sc_executor::NativeExecutionDispatch for Executor {
+    // type ExtendHostFunctions = frame_benchmarking::benchmarking::HostFunctions;
+    #[cfg(feature = "runtime-benchmarks")]
+    type ExtendHostFunctions = frame_benchmarking::benchmarking::HostFunctions;
+    /// Otherwise we only use the default Substrate host functions.
+    #[cfg(not(feature = "runtime-benchmarks"))]
+    type ExtendHostFunctions = ();
+
+    fn dispatch(method: &str, data: &[u8]) -> Option<Vec<u8>> {
+        jupiter_runtime::api::dispatch(method, data)
+    }
+
+    fn native_version() -> sc_executor::NativeVersion {
+        jupiter_runtime::native_version()
+    }
+}
+
+type FullClient = sc_service::TFullClient<Block, RuntimeApi, NativeElseWasmExecutor<Executor>>;
 type FullBackend = sc_service::TFullBackend<Block>;
 
 pub fn new_partial(
@@ -42,7 +52,7 @@ pub fn new_partial(
         FullClient,
         FullBackend,
         (),
-        sp_consensus::DefaultImportQueue<Block, FullClient>,
+        sc_consensus::DefaultImportQueue<Block, FullClient>,
         sc_transaction_pool::FullPool<Block, FullClient>,
         (Option<Telemetry>, Option<TelemetryWorkerHandle>),
     >,
@@ -59,17 +69,26 @@ pub fn new_partial(
         })
         .transpose()?;
 
+    let executor = NativeElseWasmExecutor::<Executor>::new(
+        config.wasm_method,
+        config.default_heap_pages,
+        config.max_runtime_instances,
+    );
+
     let (client, backend, keystore_container, task_manager) =
-        sc_service::new_full_parts::<Block, RuntimeApi, Executor>(
+        sc_service::new_full_parts::<Block, RuntimeApi, NativeElseWasmExecutor<Executor>>(
             &config,
             telemetry.as_ref().map(|(_, telemetry)| telemetry.handle()),
+            executor,
         )?;
     let client = Arc::new(client);
 
     let telemetry_worker_handle = telemetry.as_ref().map(|(worker, _)| worker.handle());
 
     let telemetry = telemetry.map(|(worker, telemetry)| {
-        task_manager.spawn_handle().spawn("telemetry", worker.run());
+        task_manager
+            .spawn_handle()
+            .spawn("telemetry", None, worker.run());
         telemetry
     });
 
@@ -177,8 +196,8 @@ async fn start_node_impl(
             transaction_pool: transaction_pool.clone(),
             spawn_handle: task_manager.spawn_handle(),
             import_queue: import_queue.clone(),
-            on_demand: None,
             block_announce_validator_builder: Some(Box::new(|_| block_announce_validator)),
+            warp_sync: None,
         })?;
 
     if parachain_config.offchain_worker.enabled {
@@ -202,13 +221,11 @@ async fn start_node_impl(
                 pool: pool.clone(),
                 deny_unsafe,
             };
-            jupiter_rpc::create_basic(deps)
+            Ok(jupiter_rpc::create_basic(deps))
         })
     };
 
     sc_service::spawn_tasks(sc_service::SpawnTasksParams {
-        on_demand: None,
-        remote_blockchain: None,
         rpc_extensions_builder,
         client: client.clone(),
         transaction_pool: transaction_pool.clone(),

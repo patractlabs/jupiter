@@ -200,7 +200,6 @@ fn testnet_genesis(
             code: jupiter_runtime::WASM_BINARY
                 .expect("WASM binary was not build, please build it!")
                 .to_vec(),
-            changes_trie_config: Default::default(),
         },
         balances: BalancesConfig {
             // Configure endowed accounts with initial balance of 1 << 60.

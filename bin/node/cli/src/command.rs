@@ -100,12 +100,12 @@ impl SubstrateCli for RelayChainCli {
     }
 
     fn load_spec(&self, id: &str) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
-        polkadot_cli::Cli::from_iter([RelayChainCli::executable_name().to_string()].iter())
+        crate::cli::Cli::from_iter([RelayChainCli::executable_name().to_string()].iter())
             .load_spec(id)
     }
 
     fn native_runtime_version(chain_spec: &Box<dyn ChainSpec>) -> &'static RuntimeVersion {
-        polkadot_cli::Cli::native_runtime_version(chain_spec)
+        crate::cli::Cli::native_runtime_version(chain_spec)
     }
 }
 
@@ -220,7 +220,7 @@ pub fn run() -> Result<()> {
                 let polkadot_config = SubstrateCli::create_configuration(
                     &polkadot_cli,
                     &polkadot_cli,
-                    config.task_executor.clone(),
+                    config.tokio_handle.clone(),
                 )
                 .map_err(|err| format!("Relay chain argument error: {}", err))?;
 
@@ -307,9 +307,9 @@ pub fn run() -> Result<()> {
                     generate_genesis_block(&config.chain_spec).map_err(|e| format!("{:?}", e))?;
                 let genesis_state = format!("0x{:?}", HexDisplay::from(&block.header().encode()));
 
-                let task_executor = config.task_executor.clone();
+                let tokio_handle = config.tokio_handle.clone();
                 let polkadot_config =
-                    SubstrateCli::create_configuration(&polkadot_cli, &polkadot_cli, task_executor)
+                    SubstrateCli::create_configuration(&polkadot_cli, &polkadot_cli, tokio_handle)
                         .map_err(|err| format!("Relay chain argument error: {}", err))?;
                 let collator = cli.run.base.validator || cli.run.collator;
                 let _collator = config.role.is_authority();
@@ -424,9 +424,9 @@ impl CliConfiguration<Self> for RelayChainCli {
         self.base.base.prometheus_config(default_listen_port)
     }
 
-    fn telemetry_external_transport(&self) -> Result<Option<sc_service::config::ExtTransport>> {
-        self.base.base.telemetry_external_transport()
-    }
+    // fn telemetry_external_transport(&self) -> Result<Option<sc_service::config::ExtTransport>> {
+    //     self.base.base.telemetry_external_transport()
+    // }
 
     fn default_heap_pages(&self) -> Result<Option<u64>> {
         self.base.base.default_heap_pages()
@@ -454,9 +454,9 @@ impl CliConfiguration<Self> for RelayChainCli {
 }
 
 fn set_default_ss58_version() {
-    use sp_core::crypto::Ss58AddressFormat;
+    use sp_core::crypto::Ss58AddressFormatRegistry;
 
-    let ss58_version = Ss58AddressFormat::Custom(26);
+    let ss58_version = Ss58AddressFormatRegistry::SubstrateAccount;
 
-    sp_core::crypto::set_default_ss58_version(ss58_version);
+    sp_core::crypto::set_default_ss58_version(ss58_version.into());
 }
