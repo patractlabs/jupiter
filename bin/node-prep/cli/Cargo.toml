@@ -16,6 +16,7 @@ serde_json = "1.0"
 hex-literal = "0.3.1"
 
 sc-authority-discovery = { version = "0.10.0-dev", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.13" }
+sc-executor = { version = "0.10.0-dev", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.13" }
 sc-basic-authorship = { version = "0.10.0-dev", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.13" }
 sc-transaction-pool = { version = "4.0.0-dev", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.13" }
 sc-network = { version = "0.10.0-dev", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.13" }
@@ -27,8 +28,6 @@ sc-finality-grandpa = { version = "0.10.0-dev", git = "https://github.com/parity
 sc-client-api = { version = "4.0.0-dev", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.13" }
 sc-rpc = { version = "4.0.0-dev", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.13" }
 sc-telemetry = { version = "4.0.0-dev", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.13" }
-sc-finality-grandpa-warp-sync = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.13", optional = true } # TODO
-# sc-finality-grandpa-warp-sync = { version = "0.9.0", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.8", optional = true } # TODO
 
 sp-authority-discovery = { version = "4.0.0-dev", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.13" }
 sp-authorship = { version = "4.0.0-dev", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.13" }
@@ -62,7 +61,6 @@ default = ["cli"]
 cli = [
   "sc-cli",
   "sc-service/db",
-  # "sc-finality-grandpa-warp-sync",
   "jupiter-executor/wasmi-errno",
 ]
 wasmtime = [

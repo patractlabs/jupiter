@@ -1,11 +1,18 @@
-use sc_executor::native_executor_instance;
-pub use sc_executor::NativeExecutor;
+pub struct Executor;
 
-// Declare an instance of the native executor named `Executor`. Include the wasm binary as the
-// equivalent wasm code.
-native_executor_instance!(
-    pub Executor,
-    jupiter_runtime::api::dispatch,
-    jupiter_runtime::native_version,
-    (frame_benchmarking::benchmarking::HostFunctions, jupiter_io::pairing::HostFunctions),
-);
+impl sc_executor::NativeExecutionDispatch for Executor {
+    // type ExtendHostFunctions = frame_benchmarking::benchmarking::HostFunctions;
+    #[cfg(feature = "runtime-benchmarks")]
+    type ExtendHostFunctions = frame_benchmarking::benchmarking::HostFunctions;
+    /// Otherwise we only use the default Substrate host functions.
+    #[cfg(not(feature = "runtime-benchmarks"))]
+    type ExtendHostFunctions = ();
+
+    fn dispatch(method: &str, data: &[u8]) -> Option<Vec<u8>> {
+        jupiter_runtime::api::dispatch(method, data)
+    }
+
+    fn native_version() -> sc_executor::NativeVersion {
+        jupiter_runtime::native_version()
+    }
+}
