@@ -10,9 +10,9 @@ members = [
    "runtime/jupiter-dev",
 
    "primitives",
-   "primitives/io",
+  #  "primitives/io",
    "primitives/chain-extension",
-   "pallets/template",
+  #  "pallets/template",
    "pallets/randomness-provider",
    "pallets/poa",
    "pallets/poa/rpc",
@@ -24,4 +24,3 @@ exclude = ["vendor/substrate"]
 
 [profile.release]
 panic = "unwind"
-

@@ -12,17 +12,16 @@ log = { version = "0.4", default-features = false }
 # Substrate primitives
 sp-runtime = { version = "4.0.0-dev", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.13", default-features = false }
 sp-std = { version = "4.0.0-dev", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.13", default-features = false }
-# max-encoded-len = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.13", default-features = false, features = [ "derive" ] }
 
 # Substrate pallets
 frame-support = { version = "4.0.0-dev", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.13", default-features = false }
 pallet-contracts = { version = "4.0.0-dev", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.13", default-features = false }
 
 # zkMega
-curve = { package = "zkmega-arkworks", git = "https://github.com/patractlabs/zkmega.git", branch = "master", default-features = false }
+# curve = { package = "zkmega-arkworks", git = "https://github.com/patractlabs/zkmega.git", branch = "master", default-features = false }
 
 # Jupiter primitives
-jupiter-io = { path = "../io", default-features = false, optional = true }
+# jupiter-io = { path = "../io", default-features = false, optional = true }
 
 [features]
 default = ["std"]
@@ -30,7 +29,6 @@ std = [
   "codec/std",
   "hex/std",
   "log/std",
-  # "max-encoded-len/std",
 
   "sp-runtime/std",
   "sp-std/std",
@@ -38,8 +36,8 @@ std = [
   "frame-support/std",
   "pallet-contracts/std",
 
-  "jupiter-io/std",
+  # "jupiter-io/std",
 ]
-native-support = [
-  "jupiter-io"
-]
+# native-support = [
+#   "jupiter-io"
+# ]

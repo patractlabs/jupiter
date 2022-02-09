@@ -6,7 +6,7 @@
 #[cfg(feature = "std")]
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 
-mod chain_extension;
+// mod chain_extension;
 
 use codec::{Decode, Encode, MaxEncodedLen};
 use sp_api::impl_runtime_apis;
@@ -59,10 +59,10 @@ pub use frame_support::{
     PalletId, RuntimeDebug, StorageValue,
 };
 
-pub use pallet_balances::Call as BalancesCall;
+// pub use pallet_balances::Call as BalancesCall;
 pub use pallet_poa::Forcing;
 pub use pallet_session::historical as pallet_session_historical;
-pub use pallet_timestamp::Call as TimestampCall;
+// pub use pallet_timestamp::Call as TimestampCall;
 
 pub use jupiter_primitives::{
     AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Signature,
@@ -623,7 +623,8 @@ impl pallet_contracts::Config for Runtime {
     type CallStack = [pallet_contracts::Frame<Self>; 31];
     type WeightPrice = pallet_transaction_payment::Pallet<Self>;
     type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
-    type ChainExtension = chain_extension::JupiterExtension<Self>;
+    // type ChainExtension = chain_extension::JupiterExtension<Self>;
+    type ChainExtension = ();
     type DeletionQueueDepth = DeletionQueueDepth;
     type DeletionWeightLimit = DeletionWeightLimit;
     type Schedule = Schedule;

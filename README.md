@@ -261,8 +261,8 @@ export parachain genesis:
 
 run parachain:
 ```bash
-./jupiter --chain ./jupiter-dev.json --force-authoring --parachain-id=2000 --collator --temp --alice -- --chain ./westend-local.json
-./jupiter --chain ./jupiter-dev.json --force-authoring --parachain-id=2000 --collator --temp --bob -- --chain ./westend-local.json
+./jupiter --chain ./jupiter-dev.json --force-authoring --parachain-id=2000 --collator --tmp --alice -- --chain ./westend-local.json
+./jupiter --chain ./jupiter-dev.json --force-authoring --parachain-id=2000 --collator --tmp --bob -- --chain ./westend-local.json
 ```
 
 After running relaychain and parachain, upload parachain genenis file to relaychain. refere [this link](https://substrate.dev/cumulus-workshop/#/en/3-parachains/2-register).

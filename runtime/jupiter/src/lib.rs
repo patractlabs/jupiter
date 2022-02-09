@@ -4,7 +4,7 @@
 // Make the WASM binary available.
 #[cfg(feature = "std")]
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
-mod chain_extension;
+// mod chain_extension;
 
 use sp_api::impl_runtime_apis;
 pub use sp_consensus_aura::sr25519::AuthorityId as AuraId;
@@ -58,7 +58,7 @@ use jupiter_runtime_common::{
 use pallet_contracts::weights::WeightInfo;
 use pallet_contracts_primitives::ContractExecResult;
 
-use crate::chain_extension::JupiterParaExtension;
+// use crate::chain_extension::JupiterParaExtension;
 use randomness_collect::sr25519::AuthorityId as RandomCollectId;
 pub use randomness_collect::{RpcPort, OCW_DB_RANDOM};
 
@@ -194,7 +194,8 @@ impl pallet_contracts::Config for Runtime {
     type WeightPrice = pallet_transaction_payment::Pallet<Self>;
     // type WeightPrice = module_transaction_payment::Pallet<Self>;
     type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
-    type ChainExtension = JupiterParaExtension<Self>;
+    // type ChainExtension = JupiterParaExtension<Self>;
+    type ChainExtension = ();
     type DeletionQueueDepth = DeletionQueueDepth;
     type DeletionWeightLimit = DeletionWeightLimit;
     type Schedule = Schedule;

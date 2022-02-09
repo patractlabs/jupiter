@@ -325,9 +325,9 @@ impl<T: Config> Module<T> {
         Ok(())
     }
 
-    pub fn randomness_of(epoch: u64) -> schnorrkel::Randomness {
-        <HistoricalRandomness>::get(&epoch)
-    }
+    // pub fn randomness_of(epoch: u64) -> schnorrkel::Randomness {
+    //     <HistoricalRandomness>::get(&epoch)
+    // }
 
     pub fn random(subject: &[u8]) -> (T::Hash, T::BlockNumber) {
         let random = {
