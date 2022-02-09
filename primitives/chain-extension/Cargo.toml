@@ -17,12 +17,6 @@ sp-std = { version = "4.0.0-dev", git = "https://github.com/paritytech/substrate
 frame-support = { version = "4.0.0-dev", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.13", default-features = false }
 pallet-contracts = { version = "4.0.0-dev", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.13", default-features = false }
 
-# zkMega
-# curve = { package = "zkmega-arkworks", git = "https://github.com/patractlabs/zkmega.git", branch = "master", default-features = false }
-
-# Jupiter primitives
-# jupiter-io = { path = "../io", default-features = false, optional = true }
-
 [features]
 default = ["std"]
 std = [
@@ -35,9 +29,4 @@ std = [
 
   "frame-support/std",
   "pallet-contracts/std",
-
-  # "jupiter-io/std",
 ]
-# native-support = [
-#   "jupiter-io"
-# ]

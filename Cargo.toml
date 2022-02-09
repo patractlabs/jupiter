@@ -10,9 +10,7 @@ members = [
    "runtime/jupiter-dev",
 
    "primitives",
-  #  "primitives/io",
    "primitives/chain-extension",
-  #  "pallets/template",
    "pallets/randomness-provider",
    "pallets/poa",
    "pallets/poa/rpc",

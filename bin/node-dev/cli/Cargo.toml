@@ -36,7 +36,6 @@ pallet-contracts = { version = "4.0.0-dev", git = "https://github.com/paritytech
 
 # Jupiter
 jupiter-primitives = { path = "../../../primitives" }
-# jupiter-io = { path = "../../../primitives/io" }
 jupiter-rpc = { path = "../../../rpc" }
 jupiter-dev-runtime = { path = "../../../runtime/jupiter-dev" }
 

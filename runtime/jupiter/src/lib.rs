@@ -4,7 +4,6 @@
 // Make the WASM binary available.
 #[cfg(feature = "std")]
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
-// mod chain_extension;
 
 use sp_api::impl_runtime_apis;
 pub use sp_consensus_aura::sr25519::AuthorityId as AuraId;
@@ -790,12 +789,6 @@ impl_runtime_apis! {
         ) -> pallet_contracts_primitives::GetStorageResult {
             Contracts::get_storage(address, key)
         }
-
-        // fn rent_projection(
-        //     address: AccountId,
-        // ) -> pallet_contracts_primitives::RentProjectionResult<BlockNumber> {
-        //     Contracts::rent_projection(address)
-        // }
     }
 
     impl sp_consensus_aura::AuraApi<Block, AuraId> for Runtime {

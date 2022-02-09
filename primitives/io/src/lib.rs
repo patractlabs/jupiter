@@ -24,34 +24,29 @@ pub trait Pairing {
         // None
     }
 
-    fn bls12_377_add(input: &[u8]) -> Option<Vec<u8>> {
-        curve::add(0x2a, input).ok()
-
+    fn bls12_377_add() {
+        // curve::add(0x2a);
     }
 
-    // fn bls12_377_add() {
-    //     curve::add(0x2a);
-    // }
+    fn bls12_377_mul() {
+        // curve::mul(0x2a);
+    }
 
-    // fn bls12_377_mul() {
-    //     curve::mul(0x2a);
-    // }
+    fn bls12_377_pairing_two() {
+        // curve::pairing(0x2a);
+    }
 
-    // fn bls12_377_pairing_two() {
-    //     curve::pairing(0x2a);
-    // }
+    fn bls12_377_pairing_six() {
+        // curve::pairing_six(0x2a);
+    }
 
-    // fn bls12_377_pairing_six() {
-    //     curve::pairing_six(0x2a);
-    // }
+    fn bls12_377_verify() {
+        // curve::verify(0x2a);
+    }
 
-    // fn bls12_377_verify() {
-    //     curve::verify(0x2a);
-    // }
-
-    // fn bls12_381_add() {
-    //     curve::add(0x2b);
-    // }
+    fn bls12_381_add() {
+        // curve::add(0x2b);
+    }
 
     fn bls12_381_mul() {
         // curve::tests::mul(0x2b);

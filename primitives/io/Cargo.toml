@@ -19,7 +19,7 @@ sp-std = { version = "4.0.0-dev", git = "https://github.com/paritytech/substrate
 #default-features = false
 #features = ["tests"]
 
-# curve = { package = "zkmega-arkworks", git = "https://github.com/patractlabs/zkmega.git", branch = "master", default-features = false }
+curve = { package = "zkmega-arkworks", git = "https://github.com/patractlabs/zkmega.git", branch = "master", default-features = false }
 
 [features]
 default = ["std"]

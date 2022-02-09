@@ -71,7 +71,6 @@ polkadot-cli = { git = "https://github.com/paritytech/polkadot", branch = "relea
 polkadot-parachain = { git = "https://github.com/paritytech/polkadot", branch = "release-v0.9.13" }
 
 # Jupiter
-# jupiter-io = { path = "../../../primitives/io" }
 jupiter-primitives = { path = "../../../primitives" }
 jupiter-runtime-common = { path = "../../../runtime/common" }
 jupiter-rpc = { path = "../../../rpc" }
