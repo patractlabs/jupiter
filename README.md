@@ -213,7 +213,9 @@ More parameters please lookup from `--help` or Substrate Developer Hub [https://
 The blockchain produces blocks in `babe` algorithm for every **6 second**, and do finality by `grandpa` algorithm. 
 All people could join this testnet as a sync node. 
 
-**Welcome use this link [https://patrastore.io/](https://patrastore.io/) to claim some DOT from our faucet**
+**Welcome use this link [https://app.element.io/#/room/#jupiter-faucet-room:matrix.org
+](https://app.element.io/#/room/#jupiter-faucet-room:matrix.org
+) to claim some DOT from our faucet**
 
 ##### 4.1.1 join Jupiter PoA testnet
 Moving the execution file `jupiter-prep` to other place and launch the node by following steps:
