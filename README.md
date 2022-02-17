@@ -249,22 +249,54 @@ currently, we add [Sandbox HostFunction](https://github.com/patractlabs/polkadot
 so if you want to running on test environment, you should add Sandbox HostFunction to relaychain.
 
 ##### 4.2.1 start local test mode Jupiter Parachain
-export relaychain json:
+Export relaychain json:
 ```bash
-./polkadot build-spec --chain westend-local --raw --disable-default-bootnode > westend-local.json
+./target/release/polkadot build-spec --chain westend-local --disable-default-bootnode --raw > westend-local.json
 ```
 
-export parachain genesis:
+Custom parachain specification:
 ```bash
-./jupiter build-spec --chain jupiter-dev --disable-default-bootnode --raw > jupiter-dev.json
-./jupiter export-genesis-state --chain jupiter-dev --parachain-id 2000 > jupiter-dev-2000-genesis
-./jupiter export-genesis-wasm --chain jupiter-dev > jupiter-dev-wasm
+./target/release/jupiter build-spec --chain jupiter-dev --disable-default-bootnode > westend-local-parachain-plain.json
+```
+Default para ID is 1000 from Cumulus, so you must correctly set it for your parachain based on the reserved para ID from above. Assuming your reserved para ID is 2000, you will open rococo-local-parachain-plain.json and modify two fields:
+
+```json
+// --snip--
+  "para_id": 2000, // <--- your already registered ID
+  // --snip--
+      "parachainInfo": {
+        "parachainId": 2000 // <--- your already registered ID
+      },
+  // --snip--
+```
+Then generate a raw chain spec derived from your modified plain chain spec:
+```bash
+./target/release/jupiter build-spec --chain westend-local-parachain-plain.json --raw --disable-default-bootnode > westend-local-parachain-2000-raw.json
+```
+Obtain Wasm runtime validation function:
+```bash
+./target/release/jupiter export-genesis-wasm --chain westend-local-parachain-2000-raw.json > para-wasm
+```
+Generate a parachain genesis state:
+```bash
+./target/release/jupiter export-genesis-state --chain westend-local-parachain-2000-raw.json > para-genesis
 ```
 
-run parachain:
+Run parachain:
 ```bash
-./jupiter --chain ./jupiter-dev.json --force-authoring --parachain-id=2000 --collator --tmp --alice -- --chain ./westend-local.json
-./jupiter --chain ./jupiter-dev.json --force-authoring --parachain-id=2000 --collator --tmp --bob -- --chain ./westend-local.json
+./target/release/jupiter \
+  --alice \
+  --collator \
+  --force-authoring \
+  --chain westend-local-parachain-2000-raw.json \
+  --tmp \
+  --port 40333 \
+  --ws-port 8844 \
+  -- \
+  --execution wasm \
+  --chain westend-local.json \
+  --port 30343 \
+  --ws-port 9977
 ```
 
 After running relaychain and parachain, upload parachain genenis file to relaychain. refere [this link](https://substrate.dev/cumulus-workshop/#/en/3-parachains/2-register).
