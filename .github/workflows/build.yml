@@ -65,8 +65,8 @@ jobs:
 #            ./target
 #          key: ${{ runner.os }}-cargo-${{ hashFiles('./Cargo.lock') }}
 
-      - name: Fetch Git Submodule
-        run: git submodule update --init --remote
+      # - name: Fetch Git Submodule
+      #   run: git submodule update --init --remote
 
       - name: Build
         run: cargo build --all -vv
