@@ -1,5 +1,5 @@
 use jupiter_dev_runtime::Block;
-use sc_cli::{ChainSpec, Role, RuntimeVersion, SubstrateCli};
+use sc_cli::{ChainSpec, RuntimeVersion, SubstrateCli};
 use sc_service::PartialComponents;
 
 use crate::chain_spec;
@@ -88,7 +88,6 @@ pub fn run() -> sc_cli::Result<()> {
         }
     }
 }
-
 
 fn set_default_ss58_version() {
     use sp_core::crypto::Ss58AddressFormatRegistry;

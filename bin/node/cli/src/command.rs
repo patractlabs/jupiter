@@ -19,10 +19,11 @@ use sp_runtime::traits::Block as BlockT;
 use std::{io::Write, net::SocketAddr};
 
 fn load_spec(id: &str) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
+    let para_id = 5000_u32.into();
     Ok(match id {
-        "jupiter-dev" => Box::new(chain_spec::jupiter::development_config()),
-        // "jupiter-staging" => Box::new(chain_spec::jupiter::staging_config()),
-        "" | "jupiter" => Box::new(chain_spec::jupiter::jupiter_config()),
+        "jupiter-dev" => Box::new(chain_spec::jupiter::development_config(para_id)),
+        "jupiter-staging" => Box::new(chain_spec::jupiter::staging_config(para_id)),
+        "" | "jupiter" => Box::new(chain_spec::jupiter::jupiter_config()?),
         path => Box::new(chain_spec::jupiter::ChainSpec::from_json_file(
             std::path::PathBuf::from(path),
         )?),
@@ -189,9 +190,8 @@ pub fn run() -> Result<()> {
             builder.with_profiling(sc_tracing::TracingReceiver::Log, "");
             let _ = builder.init();
 
-            let block: Block = generate_genesis_block(&load_spec(
-                &params.chain.clone().unwrap_or_default(), // params.parachain_id.into(),
-            )?)?;
+            let block: Block =
+                generate_genesis_block(&load_spec(&params.chain.clone().unwrap_or_default())?)?;
 
             let raw_header = block.header().encode();
             let output_buf = if params.raw {

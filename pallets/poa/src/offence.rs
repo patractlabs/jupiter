@@ -40,7 +40,7 @@ where
         >],
         slash_fraction: &[Perbill],
         slash_session: SessionIndex,
-        disable_strategy: DisableStrategy,
+        _disable_strategy: DisableStrategy,
     ) -> Weight {
         // let reward_proportion = SlashRewardFraction::get();
         let mut consumed_weight: Weight = 0;

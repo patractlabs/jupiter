@@ -1,5 +1,5 @@
 //! Service and ServiceFactory implementation. Specialized wrapper over substrate service.
-use jupiter_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Index as Nonce};
+use jupiter_primitives::{AccountId, Balance, Block, Hash, Index as Nonce};
 use jupiter_runtime::RuntimeApi;
 use std::sync::Arc;
 

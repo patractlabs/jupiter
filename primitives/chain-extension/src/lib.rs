@@ -2,9 +2,7 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use codec::Encode;
 use sp_runtime::DispatchError;
-use sp_std::vec::Vec;
 
 use pallet_contracts::chain_extension::{
     ChainExtension, Environment, Ext, InitState, RetVal, SysConfig, UncheckedFrom,
@@ -14,7 +12,7 @@ use pallet_contracts::chain_extension::{
 pub struct JupiterExt;
 
 impl<C: pallet_contracts::Config> ChainExtension<C> for JupiterExt {
-    fn call<E>(func_id: u32, env: Environment<E, InitState>) -> Result<RetVal, DispatchError>
+    fn call<E>(_func_id: u32, _env: Environment<E, InitState>) -> Result<RetVal, DispatchError>
     where
         E: Ext<T = C>,
         <E::T as SysConfig>::AccountId: UncheckedFrom<<E::T as SysConfig>::Hash> + AsRef<[u8]>,

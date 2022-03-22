@@ -2,9 +2,7 @@
 
 use std::sync::Arc;
 
-use sc_client_api::CallExecutor;
 pub use sc_executor::NativeElseWasmExecutor;
-use sc_executor::RuntimeVersionOf;
 use sc_service::{error::Error as ServiceError, Configuration, TaskManager};
 use sc_telemetry::{Telemetry, TelemetryWorker};
 
@@ -17,15 +15,15 @@ use jupiter_dev_runtime::{self, RuntimeApi};
 pub struct Executor;
 
 impl sc_executor::NativeExecutionDispatch for Executor {
-	type ExtendHostFunctions = frame_benchmarking::benchmarking::HostFunctions;
+    type ExtendHostFunctions = frame_benchmarking::benchmarking::HostFunctions;
 
-	fn dispatch(method: &str, data: &[u8]) -> Option<Vec<u8>> {
-		jupiter_dev_runtime::api::dispatch(method, data)
-	}
+    fn dispatch(method: &str, data: &[u8]) -> Option<Vec<u8>> {
+        jupiter_dev_runtime::api::dispatch(method, data)
+    }
 
-	fn native_version() -> sc_executor::NativeVersion {
-		jupiter_dev_runtime::native_version()
-	}
+    fn native_version() -> sc_executor::NativeVersion {
+        jupiter_dev_runtime::native_version()
+    }
 }
 
 type FullClient = sc_service::TFullClient<Block, RuntimeApi, NativeElseWasmExecutor<Executor>>;
