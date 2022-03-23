@@ -41,7 +41,7 @@ jobs:
       fail-fast: false
       matrix:
         platform: [ ubuntu-latest ]
-        toolchain: [ nightly-2021-05-12 ]
+        toolchain: [ nightly-2022-01-01 ]
     runs-on: ${{ matrix.platform }}
 
     steps:
@@ -64,9 +64,6 @@ jobs:
 #            ~/.cargo
 #            ./target
 #          key: ${{ runner.os }}-cargo-${{ hashFiles('./Cargo.lock') }}
-
-      # - name: Fetch Git Submodule
-      #   run: git submodule update --init --remote
 
       - name: Build
         run: cargo build --all -vv

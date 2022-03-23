@@ -2,7 +2,7 @@
 name = 'jupiter-runtime'
 version = '1.0.0'
 authors = ["Patract <https://github.com/patractlabs>"]
-edition = '2018'
+edition = "2021"
 
 [dependencies]
 serde = { version = "1.0.101", optional = true, features = ["derive"] }
