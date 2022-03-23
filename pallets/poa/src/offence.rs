@@ -7,7 +7,7 @@
 use frame_support::{traits::Get, weights::Weight};
 use sp_runtime::{traits::Convert, Perbill};
 use sp_staking::{
-    offence::{OffenceDetails, OnOffenceHandler},
+    offence::{DisableStrategy, OffenceDetails, OnOffenceHandler},
     SessionIndex,
 };
 
@@ -40,6 +40,7 @@ where
         >],
         slash_fraction: &[Perbill],
         slash_session: SessionIndex,
+        _disable_strategy: DisableStrategy,
     ) -> Weight {
         // let reward_proportion = SlashRewardFraction::get();
         let mut consumed_weight: Weight = 0;

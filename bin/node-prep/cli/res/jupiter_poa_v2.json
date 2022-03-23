@@ -21,7 +21,6 @@
     "tokenSymbol": "DOT"
   },
   "consensusEngine": null,
-  "lightSyncState": null,
   "codeSubstitutes": {},
   "genesis": {
     "raw": {

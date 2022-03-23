@@ -38,28 +38,15 @@ use sc_finality_grandpa::{
     FinalityProofProvider, GrandpaJustificationStream, SharedAuthoritySet, SharedVoterState,
 };
 use sc_finality_grandpa_rpc::GrandpaRpcHandler;
-use sc_rpc::SubscriptionTaskExecutor;
-pub use sc_rpc_api::DenyUnsafe;
+pub use sc_rpc::{DenyUnsafe, SubscriptionTaskExecutor};
+use sc_transaction_pool_api::TransactionPool;
 use sp_api::ProvideRuntimeApi;
 use sp_block_builder::BlockBuilder;
 use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
 use sp_consensus::SelectChain;
 use sp_consensus_babe::BabeApi;
-use sp_transaction_pool::TransactionPool;
 
-use jupiter_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Index};
-
-/// Light client extra dependencies.
-pub struct LightDeps<C, F, P> {
-    /// The client instance to use.
-    pub client: Arc<C>,
-    /// Transaction pool instance.
-    pub pool: Arc<P>,
-    /// Remote access to the blockchain (async).
-    pub remote_blockchain: Arc<dyn sc_client_api::light::RemoteBlockchain<Block>>,
-    /// Fetcher instance.
-    pub fetcher: Arc<F>,
-}
+use jupiter_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Index as Nonce};
 
 /// Extra dependencies for BABE.
 pub struct BabeDeps {
@@ -111,12 +98,12 @@ pub struct FullDeps<C, P, SC, B> {
 pub type IoHandler = jsonrpc_core::IoHandler<sc_rpc::Metadata>;
 
 /// Instantiate Basic RPC extensions.
-pub fn create_basic<C, P>(deps: BasicDeps<C, P>) -> jsonrpc_core::IoHandler<sc_rpc_api::Metadata>
+pub fn create_basic<C, P>(deps: BasicDeps<C, P>) -> jsonrpc_core::IoHandler<sc_rpc::Metadata>
 where
     C: ProvideRuntimeApi<Block>,
     C: HeaderBackend<Block> + HeaderMetadata<Block, Error = BlockChainError> + 'static,
     C: Send + Sync + 'static,
-    C::Api: substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Index>,
+    C::Api: substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Nonce>,
     C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance>,
     C::Api: pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance, BlockNumber, Hash>,
     C::Api: BlockBuilder<Block>,
@@ -153,12 +140,12 @@ where
 /// Instantiate all Full RPC extensions.
 pub fn create_full<C, P, SC, B>(
     deps: FullDeps<C, P, SC, B>,
-) -> jsonrpc_core::IoHandler<sc_rpc_api::Metadata>
+) -> jsonrpc_core::IoHandler<sc_rpc::Metadata>
 where
     C: ProvideRuntimeApi<Block>,
     C: HeaderBackend<Block> + HeaderMetadata<Block, Error = BlockChainError> + 'static,
     C: Send + Sync + 'static,
-    C::Api: substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Index>,
+    C::Api: substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Nonce>,
     C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance>,
     C::Api: pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance, BlockNumber, Hash>,
     C::Api: BabeApi<Block>,
@@ -210,31 +197,6 @@ where
             subscription_executor,
             finality_provider,
         ),
-    ));
-
-    io
-}
-
-/// Instantiate all Light RPC extensions.
-pub fn create_light<C, P, M, F>(deps: LightDeps<C, F, P>) -> jsonrpc_core::IoHandler<M>
-where
-    C: sp_blockchain::HeaderBackend<Block>,
-    C: Send + Sync + 'static,
-    F: sc_client_api::light::Fetcher<Block> + 'static,
-    P: TransactionPool + 'static,
-    M: jsonrpc_core::Metadata + Default,
-{
-    use substrate_frame_rpc_system::{LightSystem, SystemApi};
-
-    let LightDeps {
-        client,
-        pool,
-        remote_blockchain,
-        fetcher,
-    } = deps;
-    let mut io = jsonrpc_core::IoHandler::default();
-    io.extend_with(SystemApi::<Hash, AccountId, Index>::to_delegate(
-        LightSystem::new(client, remote_blockchain, fetcher, pool),
     ));
 
     io

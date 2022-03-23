@@ -6,9 +6,9 @@
 #[cfg(feature = "std")]
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 
-mod chain_extension;
+// mod chain_extension;
 
-use codec::{Decode, Encode};
+use codec::{Decode, Encode, MaxEncodedLen};
 use sp_api::impl_runtime_apis;
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_core::{
@@ -48,8 +48,9 @@ pub use sp_runtime::BuildStorage;
 pub use frame_support::{
     construct_runtime, parameter_types,
     traits::{
-        Contains, ContainsLengthBound, Filter, InstanceFilter, KeyOwnerProofSystem, LockIdentifier,
-        MaxEncodedLen, Randomness, SortedMembers, U128CurrencyToVote,
+        Contains, ContainsLengthBound, EqualPrivilegeOnly, Everything, InstanceFilter,
+        KeyOwnerProofSystem, LockIdentifier, Nothing, Randomness, SortedMembers,
+        U128CurrencyToVote,
     },
     weights::{
         constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_PER_SECOND},
@@ -58,10 +59,10 @@ pub use frame_support::{
     PalletId, RuntimeDebug, StorageValue,
 };
 
-pub use pallet_balances::Call as BalancesCall;
+// pub use pallet_balances::Call as BalancesCall;
 pub use pallet_poa::Forcing;
 pub use pallet_session::historical as pallet_session_historical;
-pub use pallet_timestamp::Call as TimestampCall;
+// pub use pallet_timestamp::Call as TimestampCall;
 
 pub use jupiter_primitives::{
     AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Signature,
@@ -110,13 +111,6 @@ pub fn native_version() -> NativeVersion {
         can_author_with: Default::default(),
     }
 }
-/// Avoid processing transactions from slots and parachain registrar.
-pub struct BaseFilter;
-impl Filter<Call> for BaseFilter {
-    fn filter(_: &Call) -> bool {
-        true
-    }
-}
 
 type MoreThanHalfCouncil = EnsureOneOf<
     AccountId,
@@ -126,10 +120,14 @@ type MoreThanHalfCouncil = EnsureOneOf<
 
 parameter_types! {
     pub const Version: RuntimeVersion = VERSION;
+    pub const MaxAuthorities: u32 = 100;
+    pub const MaxKeys: u32 = 10_000;
+    pub const MaxPeerInHeartbeats: u32 = 10_000;
+    pub const MaxPeerDataEncodingSize: u32 = 1_000;
 }
 impl frame_system::Config for Runtime {
     /// The basic call filter to use in dispatchable.
-    type BaseCallFilter = BaseFilter;
+    type BaseCallFilter = Everything;
     /// Block & extrinsics weights: base values and limits.
     type BlockWeights = BlockWeights;
     /// The maximum length of a block (in bytes).
@@ -186,6 +184,7 @@ impl pallet_scheduler::Config for Runtime {
     type Call = Call;
     type MaximumWeight = MaximumSchedulerWeight;
     type ScheduleOrigin = EnsureRoot<AccountId>;
+    type OriginPrivilegeCmp = EqualPrivilegeOnly;
     type MaxScheduledPerBlock = MaxScheduledPerBlock;
     type WeightInfo = weights::pallet_scheduler::WeightInfo<Runtime>;
 }
@@ -206,8 +205,7 @@ impl pallet_babe::Config for Runtime {
     type EpochDuration = EpochDuration;
     type ExpectedBlockTime = ExpectedBlockTime;
     type EpochChangeTrigger = pallet_babe::ExternalTrigger;
-
-    type KeyOwnerProofSystem = Historical;
+    type DisabledValidators = Session;
 
     type KeyOwnerProof = <Self::KeyOwnerProofSystem as KeyOwnerProofSystem<(
         KeyTypeId,
@@ -219,10 +217,14 @@ impl pallet_babe::Config for Runtime {
         pallet_babe::AuthorityId,
     )>>::IdentificationTuple;
 
+    type KeyOwnerProofSystem = Historical;
+
     type HandleEquivocation =
         pallet_babe::EquivocationHandler<Self::KeyOwnerIdentification, Offences, ReportLongevity>;
 
     type WeightInfo = ();
+
+    type MaxAuthorities = MaxAuthorities;
 }
 
 /// Submits transaction with the node's public and signature type. Adheres to the signed extension
@@ -292,10 +294,15 @@ impl pallet_offences::Config for Runtime {
     type OnOffenceHandler = PoA;
 }
 
-impl pallet_authority_discovery::Config for Runtime {}
+impl pallet_authority_discovery::Config for Runtime {
+    type MaxAuthorities = MaxAuthorities;
+}
 
 impl pallet_im_online::Config for Runtime {
     type AuthorityId = ImOnlineId;
+    type MaxKeys = MaxKeys;
+    type MaxPeerInHeartbeats = MaxPeerInHeartbeats;
+    type MaxPeerDataEncodingSize = MaxPeerDataEncodingSize;
     type Event = Event;
     type ValidatorSet = Historical;
     type NextSessionRotation = Babe;
@@ -308,8 +315,6 @@ impl pallet_grandpa::Config for Runtime {
     type Event = Event;
     type Call = Call;
 
-    type KeyOwnerProofSystem = Historical;
-
     type KeyOwnerProof =
         <Self::KeyOwnerProofSystem as KeyOwnerProofSystem<(KeyTypeId, GrandpaId)>>::Proof;
 
@@ -318,6 +323,8 @@ impl pallet_grandpa::Config for Runtime {
         GrandpaId,
     )>>::IdentificationTuple;
 
+    type KeyOwnerProofSystem = Historical;
+
     type HandleEquivocation = pallet_grandpa::EquivocationHandler<
         Self::KeyOwnerIdentification,
         Offences,
@@ -325,6 +332,7 @@ impl pallet_grandpa::Config for Runtime {
     >;
 
     type WeightInfo = ();
+    type MaxAuthorities = MaxAuthorities;
 }
 
 impl pallet_session::Config for Runtime {
@@ -339,7 +347,6 @@ impl pallet_session::Config for Runtime {
     >;
     type SessionHandler = <SessionKeys as OpaqueKeys>::KeyTypeIdProviders;
     type Keys = SessionKeys;
-    type DisabledValidatorsThreshold = DisabledValidatorsThreshold;
     type WeightInfo = weights::pallet_session::WeightInfo<Runtime>;
 }
 
@@ -386,6 +393,7 @@ impl pallet_democracy::Config for Runtime {
     type EnactmentPeriod = EnactmentPeriod;
     type LaunchPeriod = LaunchPeriod;
     type VotingPeriod = VotingPeriod;
+    type VoteLockingPeriod = EnactmentPeriod;
     type MinimumDeposit = MinimumDeposit;
     /// A straight majority of the council can decide what their next motion is.
     type ExternalOrigin =
@@ -411,6 +419,7 @@ impl pallet_democracy::Config for Runtime {
         EnsureRoot<AccountId>,
         pallet_collective::EnsureProportionAtLeast<_2, _3, AccountId, CouncilCollective>,
     >;
+    type BlacklistOrigin = EnsureRoot<AccountId>;
     // To cancel a proposal before it has been passed, the technical committee must be unanimous or
     // Root must agree.
     type CancelProposalOrigin = EnsureOneOf<
@@ -418,19 +427,18 @@ impl pallet_democracy::Config for Runtime {
         EnsureRoot<AccountId>,
         pallet_collective::EnsureProportionAtLeast<_1, _1, AccountId, TechnicalCollective>,
     >;
-    type BlacklistOrigin = EnsureRoot<AccountId>;
     // Any single technical committee member may veto a coming council proposal, however they can
     // only do it once and it lasts only for the cooloff period.
     type VetoOrigin = pallet_collective::EnsureMember<AccountId, TechnicalCollective>;
     type CooloffPeriod = CooloffPeriod;
     type PreimageByteDeposit = PreimageByteDeposit;
+    type OperationalPreimageOrigin = pallet_collective::EnsureMember<AccountId, CouncilCollective>;
     type Slash = Treasury;
     type Scheduler = Scheduler;
     type PalletsOrigin = OriginCaller;
     type MaxVotes = MaxVotes;
-    type OperationalPreimageOrigin = pallet_collective::EnsureMember<AccountId, CouncilCollective>;
     type WeightInfo = weights::pallet_democracy::WeightInfo<Runtime>;
-    type MaxProposals = MaxProposals;
+    type MaxProposals = MaxProposals; // Same as EnactmentPeriod
 }
 
 type CouncilCollective = pallet_collective::Instance1;
@@ -579,6 +587,7 @@ impl pallet_balances::Config for Runtime {
 impl pallet_transaction_payment::Config for Runtime {
     type OnChargeTransaction = CurrencyAdapter<Balances, impls::ToAuthor<Self>>;
     type TransactionByteFee = TransactionByteFee;
+    type OperationalFeeMultiplier = OperationalFeeMultiplier;
     type WeightToFee = JupiterWeight2Fee;
     type FeeMultiplierUpdate = impls::SlowAdjustingFeeUpdate<Self>;
 }
@@ -611,26 +620,23 @@ impl pallet_contracts::Config for Runtime {
     type Randomness = pallet_babe::RandomnessFromTwoEpochsAgo<Self>;
     type Currency = Balances;
     type Event = Event;
-    type RentPayment = Treasury;
-    type SignedClaimHandicap = SignedClaimHandicap;
-    type TombstoneDeposit = TombstoneDeposit;
-    type DepositPerContract = DepositPerContract;
-    type DepositPerStorageByte = DepositPerStorageByte;
-    type DepositPerStorageItem = DepositPerStorageItem;
-    type RentFraction = RentFraction;
-    type SurchargeReward = SurchargeReward;
     type CallStack = [pallet_contracts::Frame<Self>; 31];
     type WeightPrice = pallet_transaction_payment::Pallet<Self>;
     type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
-    type ChainExtension = chain_extension::JupiterExtension<Self>;
+    // type ChainExtension = chain_extension::JupiterExtension<Self>;
+    type ChainExtension = ();
     type DeletionQueueDepth = DeletionQueueDepth;
     type DeletionWeightLimit = DeletionWeightLimit;
     type Schedule = Schedule;
+    type Call = Call;
+    type CallFilter = Nothing;
+    type ContractDeposit = (); // we use zero for ContractDeposit
 }
 
 impl pallet_utility::Config for Runtime {
     type Event = Event;
     type Call = Call;
+    type PalletsOrigin = OriginCaller;
     type WeightInfo = weights::pallet_utility::WeightInfo<Runtime>;
 }
 
@@ -665,7 +671,17 @@ parameter_types! {
 
 /// The type used to represent the kinds of proxying allowed.
 #[derive(
-    Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Encode, Decode, RuntimeDebug, MaxEncodedLen,
+    Copy,
+    Clone,
+    Eq,
+    PartialEq,
+    Ord,
+    PartialOrd,
+    Encode,
+    Decode,
+    RuntimeDebug,
+    MaxEncodedLen,
+    scale_info::TypeInfo,
 )]
 pub enum ProxyType {
     Any,
@@ -723,7 +739,7 @@ impl InstanceFilter<Call> for ProxyType {
             }
             ProxyType::IdentityJudgement => matches!(
                 c,
-                Call::Identity(pallet_identity::Call::provide_judgement(..)) | Call::Utility(..)
+                Call::Identity(pallet_identity::Call::provide_judgement { .. }) | Call::Utility(..)
             ),
         }
     }
@@ -875,7 +891,7 @@ impl_runtime_apis! {
 
     impl sp_api::Metadata<Block> for Runtime {
         fn metadata() -> OpaqueMetadata {
-            Runtime::metadata().into()
+            OpaqueMetadata::new(Runtime::metadata().into())
         }
     }
 
@@ -927,7 +943,7 @@ impl_runtime_apis! {
                 slot_duration: Babe::slot_duration(),
                 epoch_length: EpochDuration::get(),
                 c: PRIMARY_PROBABILITY,
-                genesis_authorities: Babe::authorities(),
+                genesis_authorities: Babe::authorities().to_vec(),
                 randomness: Babe::randomness(),
                 allowed_slots: sp_consensus_babe::AllowedSlots::PrimaryAndSecondaryVRFSlots,
             }
@@ -990,6 +1006,10 @@ impl_runtime_apis! {
     impl fg_primitives::GrandpaApi<Block> for Runtime {
         fn grandpa_authorities() -> GrandpaAuthorityList {
             Grandpa::grandpa_authorities()
+        }
+
+        fn current_set_id() -> fg_primitives::SetId {
+            Grandpa::current_set_id()
         }
 
         fn submit_report_equivocation_unsigned_extrinsic(
@@ -1057,9 +1077,9 @@ impl_runtime_apis! {
             code: pallet_contracts_primitives::Code<Hash>,
             data: Vec<u8>,
             salt: Vec<u8>,
-        ) -> pallet_contracts_primitives::ContractInstantiateResult<AccountId, BlockNumber>
+        ) -> pallet_contracts_primitives::ContractInstantiateResult<AccountId>
         {
-            Contracts::bare_instantiate(origin, endowment, gas_limit, code, data, salt, true, true)
+            Contracts::bare_instantiate(origin, endowment, gas_limit, code, data, salt, true)
         }
 
         fn get_storage(
@@ -1067,12 +1087,6 @@ impl_runtime_apis! {
             key: [u8; 32],
         ) -> pallet_contracts_primitives::GetStorageResult {
             Contracts::get_storage(address, key)
-        }
-
-        fn rent_projection(
-            address: AccountId,
-        ) -> pallet_contracts_primitives::RentProjectionResult<BlockNumber> {
-            Contracts::rent_projection(address)
         }
     }
 

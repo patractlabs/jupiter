@@ -21,7 +21,6 @@
   "relay_chain": "westend-patract",
   "para_id": 2000,
   "consensusEngine": null,
-  "lightSyncState": null,
   "codeSubstitutes": {},
   "genesis": {
     "raw": {

@@ -12,11 +12,12 @@ use sp_runtime::{
     traits::{IdentityLookup, Zero},
     Perbill,
 };
-use sp_staking::offence::{OffenceDetails, OnOffenceHandler};
+use sp_staking::offence::{DisableStrategy, OffenceDetails, OnOffenceHandler};
 use sp_staking::SessionIndex;
 
 use frame_support::{
     parameter_types,
+    traits::Everything,
     traits::{FindAuthor, Get, OnFinalize, OnInitialize, OneSessionHandler},
     weights::constants::RocksDbWeight,
 };
@@ -60,13 +61,15 @@ impl OneSessionHandler<AccountId> for OtherSessionHandler {
         });
     }
 
-    fn on_disabled(validator_index: usize) {
-        SESSION.with(|d| {
-            let mut d = d.borrow_mut();
-            let value = d.0[validator_index];
-            d.1.insert(value);
-        })
-    }
+    fn on_disabled(validator_index: u32) {}
+
+    // fn on_disabled(validator_index: u32) {
+    //     SESSION.with(|d| {
+    //         let mut d = d.borrow_mut();
+    //         let value = d.0[validator_index];
+    //         d.1.insert(value);
+    //     })
+    // }
 }
 
 impl sp_runtime::BoundToRuntimeAppPublic for OtherSessionHandler {
@@ -115,7 +118,8 @@ parameter_types! {
 }
 
 impl frame_system::Config for Test {
-    type BaseCallFilter = ();
+    type BaseCallFilter = Everything;
+    // type BaseCallFilter = ();
     type BlockWeights = ();
     type BlockLength = ();
     type DbWeight = RocksDbWeight;
@@ -171,7 +175,7 @@ impl pallet_session::Config for Test {
     type Event = Event;
     type ValidatorId = AccountId;
     type ValidatorIdOf = poa::SimpleValidatorIdConverter<AccountId>;
-    type DisabledValidatorsThreshold = DisabledValidatorsThreshold;
+    // type DisabledValidatorsThreshold = DisabledValidatorsThreshold;
     type NextSessionRotation = pallet_session::PeriodicSessions<Period, Offset>;
     type WeightInfo = ();
 }
@@ -305,7 +309,8 @@ impl ExtBuilder {
             // session length is 1, then it is already triggered.
             ext.execute_with(|| {
                 System::set_block_number(1);
-                Session::on_initialize(1);
+                // Session::on_initialize(1);
+                <pallet_session::Pallet<mock::Test> as OnInitialize<BlockNumber>>::on_initialize(1);
                 Timestamp::set_timestamp(INIT_TIMESTAMP);
             });
         }
@@ -335,7 +340,8 @@ pub(crate) fn run_to_block(n: BlockNumber) {
     <PoA as OnFinalize<u64>>::on_finalize(System::block_number());
     for b in (System::block_number() + 1)..=n {
         System::set_block_number(b);
-        Session::on_initialize(b);
+        // Session::on_initialize(b);
+        <pallet_session::Pallet<mock::Test> as OnInitialize<BlockNumber>>::on_initialize(b);
         Timestamp::set_timestamp(System::block_number() * BLOCK_TIME + INIT_TIMESTAMP);
         if b != n {
             <PoA as OnFinalize<u64>>::on_finalize(System::block_number());
@@ -377,12 +383,14 @@ pub(crate) fn on_offence_in_era(
     >],
     slash_fraction: &[Perbill],
     era: EraIndex,
+    disable_strategy: DisableStrategy,
 ) {
     if active_era() == era {
         let _ = PoA::on_offence(
             offenders,
             slash_fraction,
             PoA::eras_start_session_index(era).unwrap(),
+            disable_strategy,
         );
     } else {
         panic!("cannot slash in era {}", era);
@@ -397,7 +405,8 @@ pub(crate) fn on_offence_now(
     slash_fraction: &[Perbill],
 ) {
     let now = active_era();
-    on_offence_in_era(offenders, slash_fraction, now)
+    let disable_strategy = DisableStrategy::Never;
+    on_offence_in_era(offenders, slash_fraction, now, disable_strategy)
 }
 
 pub(crate) fn add_slash(who: &AccountId) {

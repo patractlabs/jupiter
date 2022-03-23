@@ -41,7 +41,7 @@ pub mod weights;
 use serde::{Deserialize, Serialize};
 
 use frame_support::pallet_prelude::*;
-use sp_runtime::{traits::StaticLookup, RuntimeDebug, SaturatedConversion};
+use sp_runtime::RuntimeDebug;
 use sp_std::{collections::btree_map::BTreeMap, prelude::*};
 
 pub use self::pallet::*;
@@ -53,11 +53,12 @@ pub(crate) const LOG_TARGET: &'static str = "poa";
 
 #[frame_support::pallet]
 pub mod pallet {
-    use frame_support::pallet_prelude::*;
+    use super::*;
+
     use frame_system::pallet_prelude::*;
+    use sp_runtime::{traits::StaticLookup, SaturatedConversion};
     use sp_staking::SessionIndex;
 
-    use super::*;
     use frame_support::traits::UnixTime;
 
     #[pallet::config]
@@ -106,9 +107,14 @@ pub mod pallet {
         NotSortedAndUnique,
     }
 
+    // #[pallet::event]
+    // #[pallet::generate_deposit(pub(super) fn deposit_event)]
     #[pallet::event]
+    // #[pallet::generate_deposit(fn deposit_event)]
+    // #[pallet::generate_deposit(pub(crate) fn deposit_event)]
     #[pallet::generate_deposit(pub(super) fn deposit_event)]
-    #[pallet::metadata(T::AccountId = "AccountId", T::Balance = "Balance")]
+
+    // #[pallet::metadata(T::AccountId = "AccountId", T::Balance = "Balance")]
     pub enum Event<T: Config> {
         /// Add a new authority.
         AddAuthority(T::AccountId),
@@ -447,7 +453,7 @@ pub mod pallet {
 }
 
 /// Mode of era-forcing.
-#[derive(Copy, Clone, PartialEq, Eq, Encode, Decode, RuntimeDebug)]
+#[derive(Copy, Clone, PartialEq, Eq, Encode, Decode, RuntimeDebug, TypeInfo)]
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 pub enum Forcing {
     /// Not forcing anything - just let whatever happen.
@@ -466,7 +472,7 @@ impl Default for Forcing {
     }
 }
 
-#[derive(Encode, Decode, Clone, Copy, PartialEq, Eq, RuntimeDebug)]
+#[derive(Encode, Decode, Clone, Copy, PartialEq, Eq, RuntimeDebug, TypeInfo)]
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 pub enum AuthorityState {
     Working,
@@ -474,7 +480,7 @@ pub enum AuthorityState {
 }
 
 /// Information regarding the active era (era in used in session).
-#[derive(Encode, Decode, RuntimeDebug, PartialEq)]
+#[derive(Encode, Decode, RuntimeDebug, PartialEq, TypeInfo)]
 pub struct ActiveEraInfo {
     /// Index of era.
     pub index: EraIndex,
@@ -487,7 +493,7 @@ pub struct ActiveEraInfo {
 
 /// A pending slash record. The value of the slash has been computed but not applied yet,
 /// rather deferred for several eras.
-#[derive(Encode, Decode, Default, RuntimeDebug, PartialEq)]
+#[derive(Encode, Decode, Default, RuntimeDebug, PartialEq, TypeInfo)]
 pub struct UnappliedSlash<AccountId> {
     /// The stash ID of the offending validator.
     validator: AccountId,

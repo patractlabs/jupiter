@@ -25,27 +25,27 @@ pub trait Pairing {
     }
 
     fn bls12_377_add() {
-        // curve::tests::add(0x2a);
+        // curve::add(0x2a);
     }
 
     fn bls12_377_mul() {
-        // curve::tests::mul(0x2a);
+        // curve::mul(0x2a);
     }
 
     fn bls12_377_pairing_two() {
-        // curve::tests::pairing(0x2a);
+        // curve::pairing(0x2a);
     }
 
     fn bls12_377_pairing_six() {
-        // curve::tests::pairing_six(0x2a);
+        // curve::pairing_six(0x2a);
     }
 
     fn bls12_377_verify() {
-        // curve::tests::verify(0x2a);
+        // curve::verify(0x2a);
     }
 
     fn bls12_381_add() {
-        // curve::tests::add(0x2b);
+        // curve::add(0x2b);
     }
 
     fn bls12_381_mul() {

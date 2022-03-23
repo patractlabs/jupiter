@@ -396,7 +396,6 @@ fn testnet_genesis(
         system: SystemConfig {
             // Add Wasm runtime to storage.
             code: wasm_binary.to_vec(),
-            changes_trie_config: Default::default(),
         },
         balances: BalancesConfig {
             balances: endowed_accounts

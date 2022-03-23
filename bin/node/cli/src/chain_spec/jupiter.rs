@@ -69,8 +69,8 @@ pub fn session_keys(keys: AuraId) -> jupiter_runtime::opaque::SessionKeys {
 }
 
 /// Jupiter Development Chain Config
-pub fn development_config(id: ParaId, relay_chain: &str, token: &str) -> Result<ChainSpec, String> {
-    Ok(ChainSpec::from_genesis(
+pub fn development_config(id: ParaId) -> ChainSpec {
+    ChainSpec::from_genesis(
         // Name
         "Development",
         // ID
@@ -111,7 +111,7 @@ pub fn development_config(id: ParaId, relay_chain: &str, token: &str) -> Result<
             json!({
                 "ss58Format": jupiter_runtime_common::SS58Prefix::get(),
                 "tokenDecimals": 12,
-                "tokenSymbol": token.to_string()
+                "tokenSymbol": "WND"
             })
             .as_object()
             .expect("network properties generation can not fail; qed")
@@ -119,15 +119,15 @@ pub fn development_config(id: ParaId, relay_chain: &str, token: &str) -> Result<
         ),
         // Extensions
         Extensions {
-            relay_chain: relay_chain.into(),
+            relay_chain: "westend-local".into(),
             para_id: id.into(),
         },
-    ))
+    )
 }
 
 /// Jupiter PC1 Staging Chain Config
-pub fn staging_config(id: ParaId) -> Result<ChainSpec, String> {
-    Ok(ChainSpec::from_genesis(
+pub fn staging_config(id: ParaId) -> ChainSpec {
+    ChainSpec::from_genesis(
         "Jupiter PC1 Staging",
         "jupiter_pc1_staging",
         ChainType::Live,
@@ -177,7 +177,7 @@ pub fn staging_config(id: ParaId) -> Result<ChainSpec, String> {
             relay_chain: "westend-staging".into(),
             para_id: id.into(),
         },
-    ))
+    )
 }
 
 /// Jupiter Chain Config
@@ -200,7 +200,6 @@ fn testnet_genesis(
             code: jupiter_runtime::WASM_BINARY
                 .expect("WASM binary was not build, please build it!")
                 .to_vec(),
-            changes_trie_config: Default::default(),
         },
         balances: BalancesConfig {
             // Configure endowed accounts with initial balance of 1 << 60.

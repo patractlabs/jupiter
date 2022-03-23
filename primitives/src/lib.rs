@@ -7,14 +7,11 @@ use sp_runtime::{
 };
 
 use bstringify::bstringify;
-use codec::{Decode, Encode};
+use codec::{Decode, Encode, MaxEncodedLen};
 
-use sp_std::{
-    convert::{Into, TryFrom},
-    prelude::*,
-};
-// pub use frame_support::traits::MaxEncodedLen;
-use max_encoded_len::MaxEncodedLen;
+use sp_std::{convert::TryFrom, prelude::*};
+
+use scale_info::TypeInfo;
 
 #[cfg(feature = "std")]
 use serde::{Deserialize, Serialize};
@@ -50,7 +47,8 @@ pub type Hash = sp_core::H256;
 pub type Timestamp = u64;
 
 /// Digest item type.
-pub type DigestItem = generic::DigestItem<Hash>;
+pub type DigestItem = generic::DigestItem;
+// pub type DigestItem = generic::DigestItem<Hash>;
 
 /// Header type.
 pub type Header = generic::Header<BlockNumber, BlakeTwo256>;
@@ -96,7 +94,17 @@ pub mod report {
 }
 
 #[derive(
-    Encode, Decode, Eq, PartialEq, Copy, Clone, RuntimeDebug, PartialOrd, Ord, MaxEncodedLen,
+    Encode,
+    Decode,
+    Eq,
+    PartialEq,
+    Copy,
+    Clone,
+    RuntimeDebug,
+    PartialOrd,
+    Ord,
+    MaxEncodedLen,
+    scale_info::TypeInfo,
 )]
 #[repr(u8)]
 pub enum ReserveIdentifier {
@@ -134,7 +142,7 @@ macro_rules! create_currency_id {
 
 // todo: should change chain spec properties's tokenSymbol related to here native currency which is JIT
 create_currency_id! {
-    #[derive(Encode, Decode, Eq, PartialEq, Copy, Clone, PartialOrd, Ord, RuntimeDebug)]
+    #[derive(Encode, Decode, Eq, PartialEq, Copy, Clone, PartialOrd, Ord, RuntimeDebug, TypeInfo)]
     #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
     pub enum CurrencyId {
         WND("Westend", 12),

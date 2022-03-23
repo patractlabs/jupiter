@@ -2,11 +2,10 @@ use frame_support::{
     parameter_types,
     traits::{Currency, Imbalance, OnUnbalanced},
 };
+use jupiter_primitives::AccountId;
 use pallet_balances::NegativeImbalance;
 use pallet_transaction_payment::{Multiplier, TargetedFeeAdjustment};
 use sp_runtime::{FixedPointNumber, Perquintill};
-
-use jupiter_primitives::AccountId;
 
 pub struct ToAuthor<R>(sp_std::marker::PhantomData<R>);
 impl<R> OnUnbalanced<NegativeImbalance<R>> for ToAuthor<R>
@@ -23,10 +22,10 @@ where
             &<pallet_authorship::Pallet<R>>::author(),
             amount,
         );
-        <frame_system::Pallet<R>>::deposit_event(pallet_balances::Event::Deposit(
-            author,
-            numeric_amount,
-        ));
+        <frame_system::Pallet<R>>::deposit_event(pallet_balances::Event::Deposit {
+            who: author,
+            amount: numeric_amount,
+        });
     }
 }
 
@@ -42,10 +41,10 @@ where
         let numeric_amount = amount.peek();
         let author = <pallet_sudo::Pallet<R>>::key();
         <pallet_balances::Pallet<R>>::resolve_creating(&author, amount);
-        <frame_system::Pallet<R>>::deposit_event(pallet_balances::Event::Deposit(
-            author,
-            numeric_amount,
-        ));
+        <frame_system::Pallet<R>>::deposit_event(pallet_balances::Event::Deposit {
+            who: author,
+            amount: numeric_amount,
+        });
     }
 }
 
@@ -62,10 +61,10 @@ where
         let numeric_amount = amount.peek();
         let staking_pot = <pallet_collator_selection::Pallet<R>>::account_id();
         <pallet_balances::Pallet<R>>::resolve_creating(&staking_pot, amount);
-        <frame_system::Pallet<R>>::deposit_event(pallet_balances::Event::Deposit(
-            staking_pot,
-            numeric_amount,
-        ));
+        <frame_system::Pallet<R>>::deposit_event(pallet_balances::Event::Deposit {
+            who: staking_pot,
+            amount: numeric_amount,
+        });
     }
 }
 

@@ -6,7 +6,7 @@
 #[cfg(feature = "std")]
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 
-mod chain_extension;
+// mod chain_extension;
 
 use sp_api::impl_runtime_apis;
 use sp_core::OpaqueMetadata;
@@ -30,6 +30,7 @@ use pallet_transaction_payment_rpc_runtime_api::RuntimeDispatchInfo;
 pub use sp_runtime::BuildStorage;
 pub use sp_runtime::{Perbill, Permill};
 
+use frame_support::traits::{Everything, Nothing};
 pub use frame_support::{
     construct_runtime, parameter_types,
     traits::{KeyOwnerProofSystem, Randomness},
@@ -39,9 +40,6 @@ pub use frame_support::{
     },
     StorageValue,
 };
-pub use pallet_balances::Call as BalancesCall;
-pub use pallet_template::Call as TemplateCall;
-pub use pallet_timestamp::Call as TimestampCall;
 
 pub use jupiter_primitives::{
     AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Signature,
@@ -85,7 +83,7 @@ parameter_types! {
 }
 impl frame_system::Config for Runtime {
     /// The basic call filter to use in dispatchable.
-    type BaseCallFilter = ();
+    type BaseCallFilter = Everything;
     /// Block & extrinsics weights: base values and limits.
     type BlockWeights = BlockWeights;
     /// The maximum length of a block (in bytes).
@@ -176,11 +174,24 @@ impl pallet_balances::Config for Runtime {
 impl pallet_transaction_payment::Config for Runtime {
     type OnChargeTransaction = CurrencyAdapter<Balances, impls::ToAuthor<Self>>;
     type TransactionByteFee = TransactionByteFee;
+    type OperationalFeeMultiplier = OperationalFeeMultiplier;
     type WeightToFee = JupiterWeight2Fee;
     type FeeMultiplierUpdate = impls::SlowAdjustingFeeUpdate<Self>;
 }
 
+const AVERAGE_ON_INITIALIZE_RATIO: Perbill = Perbill::from_percent(5);
+
 parameter_types! {
+    pub ContractDeposit: Balance = deposit(
+        1,
+        <pallet_contracts::Pallet<Runtime>>::contract_info_size(),
+    );
+    pub const MaxValueSize: u32 = 16 * 1024;
+    // The lazy deletion runs inside on_initialize.
+    pub DeletionWeightLimit: Weight = AVERAGE_ON_INITIALIZE_RATIO *
+        BlockWeights::get().max_block;
+    // The weight needed for decoding the queue should be less or equal than a fifth
+    // of the overall weight dedicated to the lazy deletion.
     pub DeletionQueueDepth: u32 = ((DeletionWeightLimit::get() / (
             <Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(1) -
             <Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(0)
@@ -193,18 +204,19 @@ impl pallet_contracts::Config for Runtime {
     type Randomness = RandomnessCollectiveFlip;
     type Currency = Balances;
     type Event = Event;
-    type RentPayment = ();
-    type SignedClaimHandicap = SignedClaimHandicap;
-    type TombstoneDeposit = TombstoneDeposit;
-    type DepositPerContract = DepositPerContract;
-    type DepositPerStorageByte = DepositPerStorageByte;
-    type DepositPerStorageItem = DepositPerStorageItem;
-    type RentFraction = RentFraction;
-    type SurchargeReward = SurchargeReward;
+    type Call = Call;
+    /// The safest default is to allow no calls at all.
+    ///
+    /// Runtimes should whitelist dispatchables that are allowed to be called from contracts
+    /// and make sure they are stable. Dispatchables exposed to contracts are not allowed to
+    /// change because that would break already deployed contracts. The `Call` structure itself
+    /// is not allowed to change the indices of existing pallets, too.
+    type CallFilter = Nothing;
+    type ContractDeposit = ContractDeposit;
     type CallStack = [pallet_contracts::Frame<Self>; 31];
     type WeightPrice = pallet_transaction_payment::Pallet<Self>;
     type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
-    type ChainExtension = chain_extension::DevExtension<Self>;
+    type ChainExtension = ();
     type DeletionQueueDepth = DeletionQueueDepth;
     type DeletionWeightLimit = DeletionWeightLimit;
     type Schedule = Schedule;
@@ -213,10 +225,6 @@ impl pallet_contracts::Config for Runtime {
 impl pallet_sudo::Config for Runtime {
     type Event = Event;
     type Call = Call;
-}
-
-impl pallet_template::Config for Runtime {
-    type Event = Event;
 }
 
 impl pallet_randomness_collective_flip::Config for Runtime {}
@@ -240,14 +248,17 @@ construct_runtime!(
         Indices: pallet_indices::{Pallet, Call, Storage, Config<T>, Event<T>},
         TransactionPayment: pallet_transaction_payment::{Pallet, Storage},
 
+        // Contracts: pallet_contracts::{Pallet, Call, Storage, Event<T>},
+        // Smart Contracts.
         Contracts: pallet_contracts::{Pallet, Call, Storage, Event<T>},
 
         Sudo: pallet_sudo::{Pallet, Call, Config<T>, Storage, Event<T>},
-
-        // Test
-        Template: pallet_template::{Pallet, Call, Storage, Event<T>},
     }
 );
+
+// Prints debug output of the `contracts` pallet to stdout if the node is
+// started with `-lruntime::contracts=debug`.
+pub const CONTRACTS_DEBUG_OUTPUT: bool = true;
 
 /// The address format for describing accounts.
 pub type Address = sp_runtime::MultiAddress<AccountId, ()>;
@@ -299,7 +310,7 @@ impl_runtime_apis! {
 
     impl sp_api::Metadata<Block> for Runtime {
         fn metadata() -> OpaqueMetadata {
-            Runtime::metadata().into()
+            OpaqueMetadata::new(Runtime::metadata().into())
         }
     }
 
@@ -358,7 +369,9 @@ impl_runtime_apis! {
         }
     }
 
-    impl pallet_contracts_rpc_runtime_api::ContractsApi<Block, AccountId, Balance, BlockNumber, Hash>
+    impl pallet_contracts_rpc_runtime_api::ContractsApi<
+        Block, AccountId, Balance, BlockNumber, Hash,
+    >
         for Runtime
     {
         fn call(
@@ -378,9 +391,9 @@ impl_runtime_apis! {
             code: pallet_contracts_primitives::Code<Hash>,
             data: Vec<u8>,
             salt: Vec<u8>,
-        ) -> pallet_contracts_primitives::ContractInstantiateResult<AccountId, BlockNumber>
+        ) -> pallet_contracts_primitives::ContractInstantiateResult<AccountId>
         {
-            Contracts::bare_instantiate(origin, endowment, gas_limit, code, data, salt, true, true)
+            Contracts::bare_instantiate(origin, endowment, gas_limit, code, data, salt, true)
         }
 
         fn get_storage(
@@ -388,12 +401,6 @@ impl_runtime_apis! {
             key: [u8; 32],
         ) -> pallet_contracts_primitives::GetStorageResult {
             Contracts::get_storage(address, key)
-        }
-
-        fn rent_projection(
-            address: AccountId,
-        ) -> pallet_contracts_primitives::RentProjectionResult<BlockNumber> {
-            Contracts::rent_projection(address)
         }
     }
 
@@ -450,7 +457,6 @@ impl_runtime_apis! {
             add_benchmark!(params, batches, pallet_contracts, Contracts);
             add_benchmark!(params, batches, pallet_indices, Indices);
             add_benchmark!(params, batches, pallet_timestamp, Timestamp);
-            add_benchmark!(params, batches, pallet_template, Template);
 
             if batches.is_empty() { return Err("Benchmark not found for this pallet.".into()) }
             Ok(batches)

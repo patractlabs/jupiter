@@ -1,4 +1,0 @@
-[submodule "vendor/substrate"]
-	path = vendor/substrate
-	url = https://github.com/patractlabs/substrate.git
-	branch = patract/rococo-v1

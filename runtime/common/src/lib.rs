@@ -95,7 +95,6 @@ parameter_types! {
 
 // pallet_session (Parachain:33)
 parameter_types! {
-    pub const DisabledValidatorsThreshold: Perbill = Perbill::from_percent(17);
     pub const Period: u32 = 6 * HOURS;
     pub const Offset: u32 = 0;
 }
@@ -151,6 +150,7 @@ parameter_types! {
 // pallet_transaction_payment (Parachain:1)
 parameter_types! {
     pub const TransactionByteFee: Balance = 10 * MILLICENTS;
+    pub const OperationalFeeMultiplier: u8 = 5;
 }
 
 // pallet_identity
@@ -165,14 +165,6 @@ parameter_types! {
 
 // pallet_contracts
 parameter_types! {
-    pub const TombstoneDeposit: Balance = 0;
-    pub const DepositPerContract: Balance = 0;
-    pub const DepositPerStorageByte: Balance = TombstoneDeposit::get();
-    pub const DepositPerStorageItem: Balance = 0;
-    pub RentFraction: Perbill = Perbill::zero();
-    pub const SurchargeReward: Balance = 0;
-    pub const SignedClaimHandicap: u32 = 0;
-
     // The lazy deletion runs inside on_initialize.
     pub DeletionWeightLimit: Weight = AVERAGE_ON_INITIALIZE_RATIO *
         BlockWeights::get().max_block;
