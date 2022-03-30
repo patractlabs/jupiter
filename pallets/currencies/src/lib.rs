@@ -40,7 +40,7 @@
 #![allow(clippy::unused_unit)]
 // #![allow(clippy::upper_case_acronyms)]
 
-use codec::Codec;
+use codec::{Codec, MaxEncodedLen};
 use frame_support::{
     pallet_prelude::*,
     traits::{
@@ -713,6 +713,7 @@ where
         + Codec
         + Copy
         + MaybeSerializeDeserialize
+        + MaxEncodedLen
         + Debug
         + Default,
     Currency: PalletCurrency<AccountId>,

@@ -1,6 +1,5 @@
 use hex_literal::hex;
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 
 use sc_chain_spec::ChainSpecExtension;
 use sc_service::ChainType;
@@ -23,7 +22,7 @@ use sc_service::config::TelemetryEndpoints;
 // The URL for the telemetry server.
 const PATRACT_TELEMETRY_URL: &str = "wss://telemetry.patract.io/submit";
 
-/// Specialized `ChainSpec`. This is a specialization of the general Substrate ChainSpec type.
+/// Specialized `ChainSpec` for the normal parachain runtime.
 pub type ChainSpec = sc_service::GenericChainSpec<GenesisConfig, Extensions>;
 
 /// Generate a crypto pair from seed.
@@ -107,16 +106,8 @@ pub fn development_config(id: ParaId) -> ChainSpec {
         // Protocol ID
         Some("jupiter_dev"),
         // Properties
-        Some(
-            json!({
-                "ss58Format": jupiter_runtime_common::SS58Prefix::get(),
-                "tokenDecimals": 12,
-                "tokenSymbol": "WND"
-            })
-            .as_object()
-            .expect("network properties generation can not fail; qed")
-            .to_owned(),
-        ),
+        None,
+        None,
         // Extensions
         Extensions {
             relay_chain: "westend-local".into(),
@@ -163,16 +154,8 @@ pub fn staging_config(id: ParaId) -> ChainSpec {
                 .expect("Polkadot Staging telemetry url is valid; qed"),
         ),
         Some("jupiter_pc1_staging"),
-        Some(
-            json!({
-                "ss58Format": jupiter_runtime_common::SS58Prefix::get(),
-                "tokenDecimals": 12,
-                "tokenSymbol": "WND"
-            })
-            .as_object()
-            .expect("network properties generation can not fail; qed")
-            .to_owned(),
-        ),
+        None,
+        None,
         Extensions {
             relay_chain: "westend-staging".into(),
             para_id: id.into(),
@@ -212,7 +195,7 @@ fn testnet_genesis(
         // indices: IndicesConfig { indices: vec![] },
         sudo: SudoConfig {
             // Assign network admin rights.
-            key: root_key,
+            key: Some(root_key),
         },
         parachain_info: ParachainInfoConfig { parachain_id: id },
         collator_selection: jupiter_runtime::CollatorSelectionConfig {

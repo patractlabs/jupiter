@@ -23,7 +23,7 @@ use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 // The URL for the telemetry server.
 const JUPITER_TELEMETRY_URL: &str = "wss://telemetry.patract.io/submit";
 
-/// Specialized `ChainSpec`. This is a specialization of the general Substrate ChainSpec type.
+/// Specialized `ChainSpec` for the normal parachain runtime.
 pub type ChainSpec = sc_service::GenericChainSpec<GenesisConfig>;
 
 /// Generate a crypto pair from seed.
@@ -118,17 +118,9 @@ pub fn poa_development_config() -> Result<ChainSpec, String> {
         // Protocol ID
         None,
         // Properties
-        Some(
-            json!({
-                "ss58Format": jupiter_runtime_common::SS58Prefix::get(),
-                "tokenDecimals": 10,
-                "tokenSymbol": "DOT"
-            })
-            .as_object()
-            .expect("network properties generation can not fail; qed")
-            .to_owned(),
-        ),
+        None,
         // Extensions
+        None,
         None,
     ))
 }
@@ -177,17 +169,9 @@ pub fn poa_local_config() -> Result<ChainSpec, String> {
         // Protocol ID
         None,
         // Properties
-        Some(
-            json!({
-                "ss58Format": jupiter_runtime_common::SS58Prefix::get(),
-                "tokenDecimals": 10,
-                "tokenSymbol": "DOT"
-            })
-            .as_object()
-            .expect("network properties generation can not fail; qed")
-            .to_owned(),
-        ),
+        None,
         // Extensions
+        None,
         None,
     ))
 }
@@ -356,17 +340,9 @@ pub fn poa_staging_config() -> Result<ChainSpec, String> {
         // Protocol ID
         Some("jupiter_poa_staging"),
         // Properties
-        Some(
-            json!({
-                "ss58Format": jupiter_runtime_common::SS58Prefix::get(),
-                "tokenDecimals": 10,
-                "tokenSymbol": "DOT"
-            })
-            .as_object()
-            .expect("network properties generation can not fail; qed")
-            .to_owned(),
-        ),
+        None,
         // Extensions
+        None,
         None,
     ))
 }
@@ -431,8 +407,10 @@ fn testnet_genesis(
             members: vec![],
             phantom: Default::default(),
         },
-        technical_membership: Default::default(),
-        sudo: SudoConfig { key: root_key },
+        // technical_membership: Default::default(),
+        sudo: SudoConfig {
+            key: Some(root_key),
+        },
         po_a: PoAConfig {
             minimum_authority_count: initial_authorities.len() as u32,
             init_authorities: initial_authorities

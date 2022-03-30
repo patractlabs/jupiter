@@ -1,12 +1,12 @@
 [workspace]
 members = [
   "bin/node",
-  "bin/node-prep",
-  "bin/node-prep/executor",
+#  "bin/node-prep",
+#  "bin/node-prep/executor",
   "bin/node-dev",
   
    "runtime/jupiter",
-   "runtime/jupiter-prep",
+#   "runtime/jupiter-prep",
    "runtime/jupiter-dev",
 
    "primitives",
@@ -18,7 +18,6 @@ members = [
    "pallets/currencies",
    "rpc",
 ]
-exclude = ["vendor/substrate"]
 
 [profile.release]
 panic = "unwind"

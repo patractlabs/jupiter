@@ -95,7 +95,7 @@ pub struct BabeRandomness {
 }
 
 pub trait Config: SendTransactionTypes<Call<Self>> + frame_system::Config {
-    type AuthorityId: Member + Parameter + RuntimeAppPublic + Default + Ord;
+    type AuthorityId: Member + Parameter + RuntimeAppPublic + Ord;
 
     type UnsignedPriority: Get<TransactionPriority>;
 }
