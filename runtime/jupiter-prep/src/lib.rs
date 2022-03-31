@@ -19,8 +19,8 @@ use sp_core::{
 use sp_runtime::{
     create_runtime_str, generic, impl_opaque_keys,
     traits::{
-        AccountIdLookup, BlakeTwo256, Block as BlockT, Extrinsic as ExtrinsicT, OpaqueKeys,
-        SaturatedConversion, StaticLookup, Verify,
+        AccountIdLookup, BlakeTwo256, Block as BlockT, ConvertInto, Extrinsic as ExtrinsicT,
+        Extrinsic, OpaqueKeys, SaturatedConversion, StaticLookup, Verify,
     },
     transaction_validity::{TransactionSource, TransactionValidity},
     ApplyExtrinsicResult, Percent, Permill,
@@ -48,9 +48,9 @@ pub use sp_runtime::BuildStorage;
 pub use frame_support::{
     construct_runtime, parameter_types,
     traits::{
-        Contains, ContainsLengthBound, EnsureOneOf, EqualPrivilegeOnly, Everything, InstanceFilter,
-        KeyOwnerProofSystem, LockIdentifier, Nothing, Randomness, SortedMembers,
-        U128CurrencyToVote,
+        fungibles::CreditOf, ConstU128, Contains, ContainsLengthBound, EnsureOneOf,
+        EqualPrivilegeOnly, Everything, InstanceFilter, KeyOwnerProofSystem, LockIdentifier,
+        Nothing, Randomness, SortedMembers, U128CurrencyToVote,
     },
     weights::{
         constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_PER_SECOND},
@@ -67,11 +67,13 @@ pub use pallet_session::historical as pallet_session_historical;
 pub use jupiter_primitives::{
     AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Signature,
 };
-use jupiter_runtime_common::*;
+pub use jupiter_runtime_common::*;
 use jupiter_runtime_common::{
     constants::{jupiter_currency::*, time::*},
     impls, weights,
 };
+
+// use pallet_asset_tx_payment::HandleCredit;
 
 impl_opaque_keys! {
     pub struct SessionKeys {
@@ -112,12 +114,6 @@ pub fn native_version() -> NativeVersion {
         can_author_with: Default::default(),
     }
 }
-
-// type MoreThanHalfCouncil = EnsureOneOf<
-//     AccountId,
-//     EnsureRoot<AccountId>,
-//     pallet_collective::EnsureProportionMoreThan<_1, _2, AccountId, CouncilCollective>,
-// >;
 
 pub type EnsureRootOrThreeFourthsGeneralCouncil = EnsureOneOf<
     EnsureRoot<AccountId>,
@@ -248,29 +244,28 @@ where
         account: AccountId,
         nonce: <Runtime as frame_system::Config>::Index,
     ) -> Option<(Call, <UncheckedExtrinsic as ExtrinsicT>::SignaturePayload)> {
+        let tip = 0;
         // take the biggest period possible.
         let period = BlockHashCount::get()
             .checked_next_power_of_two()
             .map(|c| c / 2)
             .unwrap_or(2) as u64;
-
         let current_block = System::block_number()
             .saturated_into::<u64>()
             // The `System::block_number` is initialized with `n+1`,
             // so the actual block number is `n`.
             .saturating_sub(1);
-        let tip = 0;
-        let extra: SignedExtra = (
+        let era = generic::Era::mortal(period, current_block);
+        let extra = (
+            frame_system::CheckNonZeroSender::<Runtime>::new(),
             frame_system::CheckSpecVersion::<Runtime>::new(),
             frame_system::CheckTxVersion::<Runtime>::new(),
             frame_system::CheckGenesis::<Runtime>::new(),
-            frame_system::CheckMortality::<Runtime>::from(generic::Era::mortal(
-                period,
-                current_block,
-            )),
+            frame_system::CheckEra::<Runtime>::from(era),
             frame_system::CheckNonce::<Runtime>::from(nonce),
             frame_system::CheckWeight::<Runtime>::new(),
             pallet_transaction_payment::ChargeTransactionPayment::<Runtime>::from(tip),
+            // pallet_asset_tx_payment::ChargeAssetTxPayment::<Runtime>::from(tip, None),
         );
         let raw_payload = SignedPayload::new(call, extra)
             .map_err(|e| {
@@ -280,7 +275,7 @@ where
         let signature = raw_payload.using_encoded(|payload| C::sign(payload, public))?;
         let address = AccountIdLookup::<AccountId, ()>::unlookup(account);
         let (call, extra, _) = raw_payload.deconstruct();
-        Some((call, (address, signature, extra)))
+        Some((call, (address, signature.into(), extra)))
     }
 }
 
@@ -661,6 +656,15 @@ impl pallet_contracts::Config for Runtime {
     type AddressGenerator = pallet_contracts::DefaultAddressGenerator;
 }
 
+impl pallet_mmr::Config for Runtime {
+    const INDEXING_PREFIX: &'static [u8] = b"mmr";
+    type Hashing = <Runtime as frame_system::Config>::Hashing;
+    type Hash = <Runtime as frame_system::Config>::Hash;
+    type LeafData = frame_system::Pallet<Self>;
+    type OnNewRoot = ();
+    type WeightInfo = ();
+}
+
 impl pallet_utility::Config for Runtime {
     type Event = Event;
     type Call = Call;
@@ -867,6 +871,7 @@ construct_runtime!(
         Contracts: pallet_contracts::{Pallet, Call, Storage, Event<T>} = 30,
 
         RandomnessProvider: pallet_randomness_provider::{Pallet, Storage} = 31,
+        Mmr: pallet_mmr = 32,
     }
 );
 
@@ -882,10 +887,11 @@ pub type SignedBlock = generic::SignedBlock<Block>;
 pub type BlockId = generic::BlockId<Block>;
 /// The SignedExtension to the basic transaction logic.
 pub type SignedExtra = (
+    frame_system::CheckNonZeroSender<Runtime>,
     frame_system::CheckSpecVersion<Runtime>,
     frame_system::CheckTxVersion<Runtime>,
     frame_system::CheckGenesis<Runtime>,
-    frame_system::CheckMortality<Runtime>,
+    frame_system::CheckEra<Runtime>,
     frame_system::CheckNonce<Runtime>,
     frame_system::CheckWeight<Runtime>,
     pallet_transaction_payment::ChargeTransactionPayment<Runtime>,
@@ -904,6 +910,16 @@ pub type Executive = frame_executive::Executive<
 >;
 /// The payload being signed in the transactions.
 pub type SignedPayload = generic::SignedPayload<Call, SignedExtra>;
+
+/// MMR helper types.
+mod mmr {
+    use super::Runtime;
+    pub use pallet_mmr::primitives::*;
+
+    pub type Leaf = <<Runtime as pallet_mmr::Config>::LeafData as LeafDataProvider>::LeafData;
+    pub type Hash = <Runtime as pallet_mmr::Config>::Hash;
+    pub type Hashing = <Runtime as pallet_mmr::Config>::Hashing;
+}
 
 impl_runtime_apis! {
     impl sp_api::Core<Block> for Runtime {
@@ -1085,6 +1101,37 @@ impl_runtime_apis! {
         }
         fn query_fee_details(uxt: <Block as BlockT>::Extrinsic, len: u32) -> FeeDetails<Balance> {
             TransactionPayment::query_fee_details(uxt, len)
+        }
+    }
+
+    impl pallet_mmr::primitives::MmrApi<
+        Block,
+        mmr::Hash,
+    > for Runtime {
+        fn generate_proof(leaf_index: pallet_mmr::primitives::LeafIndex)
+            -> Result<(mmr::EncodableOpaqueLeaf, mmr::Proof<mmr::Hash>), mmr::Error>
+        {
+            Mmr::generate_proof(leaf_index)
+                .map(|(leaf, proof)| (mmr::EncodableOpaqueLeaf::from_leaf(&leaf), proof))
+        }
+
+        fn verify_proof(leaf: mmr::EncodableOpaqueLeaf, proof: mmr::Proof<mmr::Hash>)
+            -> Result<(), mmr::Error>
+        {
+            let leaf: mmr::Leaf = leaf
+                .into_opaque_leaf()
+                .try_decode()
+                .ok_or(mmr::Error::Verify)?;
+            Mmr::verify_leaf(leaf, proof)
+        }
+
+        fn verify_proof_stateless(
+            root: mmr::Hash,
+            leaf: mmr::EncodableOpaqueLeaf,
+            proof: mmr::Proof<mmr::Hash>
+        ) -> Result<(), mmr::Error> {
+            let node = mmr::DataOrHash::Data(leaf.into_opaque_leaf());
+            pallet_mmr::verify_leaf_proof::<mmr::Hashing, _>(root, node, proof)
         }
     }
 

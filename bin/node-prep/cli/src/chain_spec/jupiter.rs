@@ -1,14 +1,12 @@
 //! Jupiter chain configurations.
 
-use serde_json::json;
-
 use hex_literal::hex;
 
+use grandpa::AuthorityId as GrandpaId;
 use sc_service::{config::TelemetryEndpoints, ChainType};
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_consensus_babe::AuthorityId as BabeId;
 use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public};
-use sp_finality_grandpa::AuthorityId as GrandpaId;
 use sp_runtime::traits::{IdentifyAccount, Verify};
 
 use jupiter_runtime::Forcing;
@@ -407,7 +405,7 @@ fn testnet_genesis(
             members: vec![],
             phantom: Default::default(),
         },
-        // technical_membership: Default::default(),
+        technical_committee_membership: Default::default(),
         sudo: SudoConfig {
             key: Some(root_key),
         },
