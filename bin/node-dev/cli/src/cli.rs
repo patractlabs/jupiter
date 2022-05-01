@@ -1,19 +1,20 @@
-use sc_cli::{KeySubcommand, RunCmd, SignCmd, VanityCmd, VerifyCmd};
-use structopt::StructOpt;
+use clap::Parser;
+use sc_cli::{clap, KeySubcommand, RunCmd, SignCmd, VanityCmd, VerifyCmd};
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, Parser)]
 pub struct Cli {
-    #[structopt(subcommand)]
+    #[clap(subcommand)]
     pub subcommand: Option<Subcommand>,
 
-    #[structopt(flatten)]
+    #[clap(flatten)]
     pub run: RunCmd,
 }
 
 /// Possible subcommands of the main binary.
-#[derive(Debug, StructOpt)]
+#[derive(Debug, Parser)]
 pub enum Subcommand {
     /// Key management cli utilities
+    #[clap(subcommand)]
     Key(KeySubcommand),
 
     /// Verify a signature for a message, provided on STDIN, with a given (public or secret) key.
@@ -29,6 +30,6 @@ pub enum Subcommand {
     ExportState(sc_cli::ExportStateCmd),
 
     /// The custom benchmark subcommmand benchmarking runtime pallets.
-    #[structopt(name = "benchmark", about = "Benchmark runtime pallets.")]
+    #[clap(name = "benchmark", about = "Benchmark runtime pallets.")]
     Benchmark(frame_benchmarking_cli::BenchmarkCmd),
 }

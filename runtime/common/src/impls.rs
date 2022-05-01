@@ -19,11 +19,11 @@ where
         let numeric_amount = amount.peek();
         let author = <pallet_authorship::Pallet<R>>::author();
         <pallet_balances::Pallet<R>>::resolve_creating(
-            &<pallet_authorship::Pallet<R>>::author(),
+            &<pallet_authorship::Pallet<R>>::author().unwrap(),
             amount,
         );
         <frame_system::Pallet<R>>::deposit_event(pallet_balances::Event::Deposit {
-            who: author,
+            who: author.unwrap(),
             amount: numeric_amount,
         });
     }
@@ -39,7 +39,7 @@ where
 {
     fn on_nonzero_unbalanced(amount: NegativeImbalance<R>) {
         let numeric_amount = amount.peek();
-        let author = <pallet_sudo::Pallet<R>>::key();
+        let author = <pallet_sudo::Pallet<R>>::key().clone().unwrap();
         <pallet_balances::Pallet<R>>::resolve_creating(&author, amount);
         <frame_system::Pallet<R>>::deposit_event(pallet_balances::Event::Deposit {
             who: author,

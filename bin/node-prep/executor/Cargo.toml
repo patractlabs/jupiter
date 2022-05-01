@@ -5,8 +5,8 @@ authors = ["Patract <https://github.com/patractlabs>"]
 edition = "2021"
 
 [dependencies]
-frame-benchmarking = { version = "4.0.0-dev", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.13" }
-sc-executor = { version = "0.10.0-dev", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.13" }
+frame-benchmarking = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.17" }
+sc-executor = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.17" }
 
 jupiter-runtime = { package = "jupiter-prep-runtime", path = "../../../runtime/jupiter-prep" }
 

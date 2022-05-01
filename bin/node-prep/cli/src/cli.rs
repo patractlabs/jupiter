@@ -1,18 +1,19 @@
+use clap::Parser;
 use sc_cli::{KeySubcommand, SignCmd, VanityCmd, VerifyCmd};
-use structopt::StructOpt;
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, Parser)]
 pub struct Cli {
-    #[structopt(subcommand)]
+    #[clap(subcommand)]
     pub subcommand: Option<Subcommand>,
 
-    #[structopt(flatten)]
+    #[clap(flatten)]
     pub run: RunCmd,
 }
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, Parser)]
 pub enum Subcommand {
     /// Key management cli utilities
+    #[clap(subcommand)]
     Key(KeySubcommand),
 
     /// Verify a signature for a message, provided on STDIN, with a given (public or secret) key.
@@ -47,12 +48,12 @@ pub enum Subcommand {
 }
 
 #[allow(missing_docs)]
-#[derive(Debug, StructOpt)]
+#[derive(Debug, Parser)]
 pub struct RunCmd {
     #[allow(missing_docs)]
-    #[structopt(flatten)]
+    #[clap(flatten)]
     pub base: sc_cli::RunCmd,
     /// Force using Jupiter native runtime.
-    #[structopt(long = "force-jupiter")]
+    #[clap(long = "force-jupiter")]
     pub force_jupiter: bool,
 }

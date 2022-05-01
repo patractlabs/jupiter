@@ -13,14 +13,14 @@ use sp_api::impl_runtime_apis;
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_core::{
     crypto::KeyTypeId,
-    u32_trait::{_1, _2, _3, _5},
+    u32_trait::{_1, _2, _3, _4, _5},
     OpaqueMetadata,
 };
 use sp_runtime::{
     create_runtime_str, generic, impl_opaque_keys,
     traits::{
-        AccountIdLookup, BlakeTwo256, Block as BlockT, Extrinsic as ExtrinsicT, OpaqueKeys,
-        SaturatedConversion, StaticLookup, Verify,
+        AccountIdLookup, BlakeTwo256, Block as BlockT, ConvertInto, Extrinsic as ExtrinsicT,
+        Extrinsic, OpaqueKeys, SaturatedConversion, StaticLookup, Verify,
     },
     transaction_validity::{TransactionSource, TransactionValidity},
     ApplyExtrinsicResult, Percent, Permill,
@@ -31,7 +31,7 @@ use sp_std::{collections::btree_map::BTreeMap, prelude::*};
 use sp_version::NativeVersion;
 use sp_version::RuntimeVersion;
 
-use frame_system::{EnsureOneOf, EnsureRoot};
+use frame_system::EnsureRoot;
 use pallet_contracts::weights::WeightInfo;
 use pallet_contracts_primitives::ContractExecResult;
 use pallet_grandpa::{
@@ -48,9 +48,9 @@ pub use sp_runtime::BuildStorage;
 pub use frame_support::{
     construct_runtime, parameter_types,
     traits::{
-        Contains, ContainsLengthBound, EqualPrivilegeOnly, Everything, InstanceFilter,
-        KeyOwnerProofSystem, LockIdentifier, Nothing, Randomness, SortedMembers,
-        U128CurrencyToVote,
+        fungibles::CreditOf, ConstU128, Contains, ContainsLengthBound, EnsureOneOf,
+        EqualPrivilegeOnly, Everything, InstanceFilter, KeyOwnerProofSystem, LockIdentifier,
+        Nothing, Randomness, SortedMembers, U128CurrencyToVote,
     },
     weights::{
         constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_PER_SECOND},
@@ -67,11 +67,13 @@ pub use pallet_session::historical as pallet_session_historical;
 pub use jupiter_primitives::{
     AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Signature,
 };
-use jupiter_runtime_common::*;
+pub use jupiter_runtime_common::*;
 use jupiter_runtime_common::{
     constants::{jupiter_currency::*, time::*},
     impls, weights,
 };
+
+// use pallet_asset_tx_payment::HandleCredit;
 
 impl_opaque_keys! {
     pub struct SessionKeys {
@@ -101,6 +103,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
     impl_version: 1,
     apis: RUNTIME_API_VERSIONS,
     transaction_version: 1,
+    state_version: 0,
 };
 
 /// Native version.
@@ -112,10 +115,9 @@ pub fn native_version() -> NativeVersion {
     }
 }
 
-type MoreThanHalfCouncil = EnsureOneOf<
-    AccountId,
+pub type EnsureRootOrThreeFourthsGeneralCouncil = EnsureOneOf<
     EnsureRoot<AccountId>,
-    pallet_collective::EnsureProportionMoreThan<_1, _2, AccountId, CouncilCollective>,
+    pallet_collective::EnsureProportionAtLeast<_3, _4, AccountId, GeneralCouncilInstance>,
 >;
 
 parameter_types! {
@@ -175,6 +177,7 @@ impl frame_system::Config for Runtime {
     /// What to do if the user wants the code set to something. Just use `()` unless you are in
     /// cumulus.
     type OnSetCode = ();
+    type MaxConsumers = frame_support::traits::ConstU32<16>;
 }
 
 impl pallet_scheduler::Config for Runtime {
@@ -187,6 +190,8 @@ impl pallet_scheduler::Config for Runtime {
     type OriginPrivilegeCmp = EqualPrivilegeOnly;
     type MaxScheduledPerBlock = MaxScheduledPerBlock;
     type WeightInfo = weights::pallet_scheduler::WeightInfo<Runtime>;
+    type PreimageProvider = ();
+    type NoPreimagePostponement = ();
 }
 
 impl pallet_authorship::Config for Runtime {
@@ -239,29 +244,28 @@ where
         account: AccountId,
         nonce: <Runtime as frame_system::Config>::Index,
     ) -> Option<(Call, <UncheckedExtrinsic as ExtrinsicT>::SignaturePayload)> {
+        let tip = 0;
         // take the biggest period possible.
         let period = BlockHashCount::get()
             .checked_next_power_of_two()
             .map(|c| c / 2)
             .unwrap_or(2) as u64;
-
         let current_block = System::block_number()
             .saturated_into::<u64>()
             // The `System::block_number` is initialized with `n+1`,
             // so the actual block number is `n`.
             .saturating_sub(1);
-        let tip = 0;
-        let extra: SignedExtra = (
+        let era = generic::Era::mortal(period, current_block);
+        let extra = (
+            frame_system::CheckNonZeroSender::<Runtime>::new(),
             frame_system::CheckSpecVersion::<Runtime>::new(),
             frame_system::CheckTxVersion::<Runtime>::new(),
             frame_system::CheckGenesis::<Runtime>::new(),
-            frame_system::CheckMortality::<Runtime>::from(generic::Era::mortal(
-                period,
-                current_block,
-            )),
+            frame_system::CheckEra::<Runtime>::from(era),
             frame_system::CheckNonce::<Runtime>::from(nonce),
             frame_system::CheckWeight::<Runtime>::new(),
             pallet_transaction_payment::ChargeTransactionPayment::<Runtime>::from(tip),
+            // pallet_asset_tx_payment::ChargeAssetTxPayment::<Runtime>::from(tip, None),
         );
         let raw_payload = SignedPayload::new(call, extra)
             .map_err(|e| {
@@ -271,7 +275,7 @@ where
         let signature = raw_payload.using_encoded(|payload| C::sign(payload, public))?;
         let address = AccountIdLookup::<AccountId, ()>::unlookup(account);
         let (call, extra, _) = raw_payload.deconstruct();
-        Some((call, (address, signature, extra)))
+        Some((call, (address, signature.into(), extra)))
     }
 }
 
@@ -364,14 +368,12 @@ parameter_types! {
 }
 
 type CouncilOrigin = EnsureOneOf<
-    AccountId,
     EnsureRoot<AccountId>,
-    pallet_collective::EnsureProportionAtLeast<_2, _3, AccountId, CouncilCollective>,
+    pallet_collective::EnsureProportionAtLeast<_2, _3, AccountId, GeneralCouncilInstance>,
 >;
 type SlashCancelOrigin = EnsureOneOf<
-    AccountId,
     EnsureRoot<AccountId>,
-    pallet_collective::EnsureProportionAtLeast<_1, _2, AccountId, CouncilCollective>,
+    pallet_collective::EnsureProportionAtLeast<_1, _2, AccountId, GeneralCouncilInstance>,
 >;
 
 impl pallet_poa::Config for Runtime {
@@ -397,42 +399,41 @@ impl pallet_democracy::Config for Runtime {
     type MinimumDeposit = MinimumDeposit;
     /// A straight majority of the council can decide what their next motion is.
     type ExternalOrigin =
-        pallet_collective::EnsureProportionAtLeast<_1, _2, AccountId, CouncilCollective>;
+        pallet_collective::EnsureProportionAtLeast<_1, _2, AccountId, GeneralCouncilInstance>;
     /// A majority can have the next scheduled referendum be a straight majority-carries vote.
     type ExternalMajorityOrigin =
-        pallet_collective::EnsureProportionAtLeast<_1, _2, AccountId, CouncilCollective>;
+        pallet_collective::EnsureProportionAtLeast<_1, _2, AccountId, GeneralCouncilInstance>;
     /// A unanimous council can have the next scheduled referendum be a straight default-carries
     /// (NTB) vote.
     type ExternalDefaultOrigin =
-        pallet_collective::EnsureProportionAtLeast<_1, _1, AccountId, CouncilCollective>;
+        pallet_collective::EnsureProportionAtLeast<_1, _1, AccountId, GeneralCouncilInstance>;
     /// Two thirds of the technical committee can have an ExternalMajority/ExternalDefault vote
     /// be tabled immediately and with a shorter voting/enactment period.
     type FastTrackOrigin =
-        pallet_collective::EnsureProportionAtLeast<_2, _3, AccountId, TechnicalCollective>;
+        pallet_collective::EnsureProportionAtLeast<_2, _3, AccountId, TechnicalCommitteeInstance>;
     type InstantOrigin =
-        pallet_collective::EnsureProportionAtLeast<_1, _1, AccountId, TechnicalCollective>;
+        pallet_collective::EnsureProportionAtLeast<_1, _1, AccountId, TechnicalCommitteeInstance>;
     type InstantAllowed = InstantAllowed;
     type FastTrackVotingPeriod = FastTrackVotingPeriod;
     // To cancel a proposal which has been passed, 2/3 of the council must agree to it.
     type CancellationOrigin = EnsureOneOf<
-        AccountId,
         EnsureRoot<AccountId>,
-        pallet_collective::EnsureProportionAtLeast<_2, _3, AccountId, CouncilCollective>,
+        pallet_collective::EnsureProportionAtLeast<_2, _3, AccountId, GeneralCouncilInstance>,
     >;
     type BlacklistOrigin = EnsureRoot<AccountId>;
     // To cancel a proposal before it has been passed, the technical committee must be unanimous or
     // Root must agree.
     type CancelProposalOrigin = EnsureOneOf<
-        AccountId,
         EnsureRoot<AccountId>,
-        pallet_collective::EnsureProportionAtLeast<_1, _1, AccountId, TechnicalCollective>,
+        pallet_collective::EnsureProportionAtLeast<_1, _1, AccountId, TechnicalCommitteeInstance>,
     >;
     // Any single technical committee member may veto a coming council proposal, however they can
     // only do it once and it lasts only for the cooloff period.
-    type VetoOrigin = pallet_collective::EnsureMember<AccountId, TechnicalCollective>;
+    type VetoOrigin = pallet_collective::EnsureMember<AccountId, TechnicalCommitteeInstance>;
     type CooloffPeriod = CooloffPeriod;
     type PreimageByteDeposit = PreimageByteDeposit;
-    type OperationalPreimageOrigin = pallet_collective::EnsureMember<AccountId, CouncilCollective>;
+    type OperationalPreimageOrigin =
+        pallet_collective::EnsureMember<AccountId, GeneralCouncilInstance>;
     type Slash = Treasury;
     type Scheduler = Scheduler;
     type PalletsOrigin = OriginCaller;
@@ -441,8 +442,19 @@ impl pallet_democracy::Config for Runtime {
     type MaxProposals = MaxProposals; // Same as EnactmentPeriod
 }
 
-type CouncilCollective = pallet_collective::Instance1;
-impl pallet_collective::Config<CouncilCollective> for Runtime {
+pub type GeneralCouncilInstance = pallet_collective::Instance1;
+// pub type FinancialCouncilInstance = pallet_collective::Instance2;
+// pub type HomaCouncilInstance = pallet_collective::Instance3;
+pub type TechnicalCommitteeInstance = pallet_collective::Instance4;
+
+pub type TechnicalCommitteeMembershipInstance = pallet_membership::Instance4;
+pub type EnsureRootOrTwoThirdsGeneralCouncil = EnsureOneOf<
+    EnsureRoot<AccountId>,
+    pallet_collective::EnsureProportionAtLeast<_2, _3, AccountId, GeneralCouncilInstance>,
+>;
+
+// type CouncilCollective = pallet_collective::Instance1;
+impl pallet_collective::Config<GeneralCouncilInstance> for Runtime {
     type Origin = Origin;
     type Proposal = Call;
     type Event = Event;
@@ -453,8 +465,8 @@ impl pallet_collective::Config<CouncilCollective> for Runtime {
     type WeightInfo = weights::pallet_collective::WeightInfo<Runtime>;
 }
 
-type TechnicalCollective = pallet_collective::Instance2;
-impl pallet_collective::Config<TechnicalCollective> for Runtime {
+// type TechnicalCollective = pallet_collective::Instance2;
+impl pallet_collective::Config<TechnicalCommitteeInstance> for Runtime {
     type Origin = Origin;
     type Proposal = Call;
     type Event = Event;
@@ -465,13 +477,13 @@ impl pallet_collective::Config<TechnicalCollective> for Runtime {
     type WeightInfo = weights::pallet_collective::WeightInfo<Runtime>;
 }
 
-impl pallet_membership::Config<pallet_membership::Instance1> for Runtime {
+impl pallet_membership::Config<TechnicalCommitteeMembershipInstance> for Runtime {
     type Event = Event;
-    type AddOrigin = MoreThanHalfCouncil;
-    type RemoveOrigin = MoreThanHalfCouncil;
-    type SwapOrigin = MoreThanHalfCouncil;
-    type ResetOrigin = MoreThanHalfCouncil;
-    type PrimeOrigin = MoreThanHalfCouncil;
+    type AddOrigin = EnsureRootOrThreeFourthsGeneralCouncil;
+    type RemoveOrigin = EnsureRootOrThreeFourthsGeneralCouncil;
+    type SwapOrigin = EnsureRootOrThreeFourthsGeneralCouncil;
+    type ResetOrigin = EnsureRootOrThreeFourthsGeneralCouncil;
+    type PrimeOrigin = EnsureRootOrThreeFourthsGeneralCouncil;
     type MembershipInitialized = TechnicalCommittee;
     type MembershipChanged = TechnicalCommittee;
     type MaxMembers = TechnicalMaxMembers;
@@ -481,6 +493,7 @@ impl pallet_membership::Config<pallet_membership::Instance1> for Runtime {
 parameter_types! {
     pub const ProposalBond: Permill = Permill::from_percent(5);
     pub const ProposalBondMinimum: Balance = 20 * DOLLARS;
+    pub const ProposalBondMaximum: Balance = 50 * DOLLARS;
     pub const SpendPeriod: BlockNumber = 1 * DAYS;
     pub const Burn: Permill = Permill::from_perthousand(2);
     pub const TreasuryPalletId: PalletId = PalletId(*b"pt/trsry");
@@ -498,23 +511,28 @@ parameter_types! {
     pub const MaxApprovals: u32 = 100;
 }
 
-type ApproveOrigin = EnsureOneOf<
-    AccountId,
+// type ApproveOrigin = EnsureOneOf<
+//     EnsureRoot<AccountId>,
+//     pallet_collective::EnsureProportionAtLeast<_3, _5, AccountId, GeneralCouncilInstance>,
+// >;
+
+pub type EnsureRootOrHalfGeneralCouncil = EnsureOneOf<
     EnsureRoot<AccountId>,
-    pallet_collective::EnsureProportionAtLeast<_3, _5, AccountId, CouncilCollective>,
+    pallet_collective::EnsureProportionAtLeast<_1, _2, AccountId, GeneralCouncilInstance>,
 >;
 
 impl pallet_treasury::Config for Runtime {
-    type PalletId = TreasuryPalletId;
     type Currency = Balances;
-    type ApproveOrigin = ApproveOrigin;
-    type RejectOrigin = MoreThanHalfCouncil;
+    type ApproveOrigin = EnsureRootOrHalfGeneralCouncil;
+    type RejectOrigin = EnsureRootOrHalfGeneralCouncil;
     type Event = Event;
     type OnSlash = Treasury;
     type ProposalBond = ProposalBond;
     type ProposalBondMinimum = ProposalBondMinimum;
+    type ProposalBondMaximum = ProposalBondMaximum;
     type SpendPeriod = SpendPeriod;
     type Burn = Burn;
+    type PalletId = TreasuryPalletId;
     type BurnDestination = ();
     type WeightInfo = weights::pallet_treasury::WeightInfo<Runtime>;
     type SpendFunds = Bounties;
@@ -531,6 +549,7 @@ impl pallet_bounties::Config for Runtime {
     type Event = Event;
     type MaximumReasonLength = MaximumReasonLength;
     type WeightInfo = weights::pallet_bounties::WeightInfo<Runtime>;
+    type ChildBountyManager = ();
 }
 
 pub struct CouncilMembers;
@@ -552,13 +571,13 @@ impl ContainsLengthBound for CouncilMembers {
 }
 
 impl pallet_tips::Config for Runtime {
+    type Event = Event;
     type MaximumReasonLength = MaximumReasonLength;
     type DataDepositPerByte = DataDepositPerByte;
-    type Tippers = CouncilMembers;
     type TipCountdown = TipCountdown;
     type TipFindersFee = TipFindersFee;
     type TipReportDepositBase = TipReportDepositBase;
-    type Event = Event;
+    type Tippers = CouncilMembers;
     type WeightInfo = weights::pallet_tips::WeightInfo<Runtime>;
 }
 
@@ -571,7 +590,6 @@ impl pallet_timestamp::Config for Runtime {
 }
 
 impl pallet_balances::Config for Runtime {
-    type MaxLocks = MaxLocks;
     /// The type for recording an account's balance.
     type Balance = Balance;
     type DustRemoval = ();
@@ -580,6 +598,7 @@ impl pallet_balances::Config for Runtime {
     type ExistentialDeposit = ExistentialDeposit;
     type AccountStore = System;
     type WeightInfo = weights::pallet_balances::WeightInfo<Runtime>;
+    type MaxLocks = MaxLocks;
     type MaxReserves = MaxReserves;
     type ReserveIdentifier = [u8; 8];
 }
@@ -595,19 +614,21 @@ impl pallet_transaction_payment::Config for Runtime {
 impl pallet_identity::Config for Runtime {
     type Event = Event;
     type Currency = Balances;
-    type Slashed = Treasury;
     type BasicDeposit = BasicDeposit;
     type FieldDeposit = FieldDeposit;
     type SubAccountDeposit = SubAccountDeposit;
     type MaxSubAccounts = MaxSubAccounts;
     type MaxAdditionalFields = MaxAdditionalFields;
     type MaxRegistrars = MaxRegistrars;
-    type RegistrarOrigin = MoreThanHalfCouncil;
-    type ForceOrigin = MoreThanHalfCouncil;
+    type Slashed = Treasury;
+    type ForceOrigin = EnsureRootOrThreeFourthsGeneralCouncil;
+    type RegistrarOrigin = EnsureRootOrThreeFourthsGeneralCouncil;
     type WeightInfo = weights::pallet_identity::WeightInfo<Runtime>;
 }
 
 parameter_types! {
+    pub const DepositPerItem: Balance = deposit(1, 0);
+    pub const DepositPerByte: Balance = deposit(0, 1);
     pub DeletionQueueDepth: u32 = ((DeletionWeightLimit::get() / (
             <Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(1) -
             <Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(0)
@@ -620,17 +641,28 @@ impl pallet_contracts::Config for Runtime {
     type Randomness = pallet_babe::RandomnessFromTwoEpochsAgo<Self>;
     type Currency = Balances;
     type Event = Event;
-    type CallStack = [pallet_contracts::Frame<Self>; 31];
+    type Call = Call;
+    type CallFilter = Nothing;
     type WeightPrice = pallet_transaction_payment::Pallet<Self>;
     type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
     // type ChainExtension = chain_extension::JupiterExtension<Self>;
     type ChainExtension = ();
+    type Schedule = Schedule;
+    type CallStack = [pallet_contracts::Frame<Self>; 31];
     type DeletionQueueDepth = DeletionQueueDepth;
     type DeletionWeightLimit = DeletionWeightLimit;
-    type Schedule = Schedule;
-    type Call = Call;
-    type CallFilter = Nothing;
-    type ContractDeposit = (); // we use zero for ContractDeposit
+    type DepositPerByte = DepositPerByte;
+    type DepositPerItem = DepositPerItem;
+    type AddressGenerator = pallet_contracts::DefaultAddressGenerator;
+}
+
+impl pallet_mmr::Config for Runtime {
+    const INDEXING_PREFIX: &'static [u8] = b"mmr";
+    type Hashing = <Runtime as frame_system::Config>::Hashing;
+    type Hash = <Runtime as frame_system::Config>::Hash;
+    type LeafData = frame_system::Pallet<Self>;
+    type OnNewRoot = ();
+    type WeightInfo = ();
 }
 
 impl pallet_utility::Config for Runtime {
@@ -716,7 +748,7 @@ impl InstanceFilter<Call> for ProxyType {
                 Call::Democracy(..) |
                 Call::Council(..) |
                 Call::TechnicalCommittee(..) |
-                Call::TechnicalMembership(..) |
+                // Call::TechnicalMembership(..) |
                 Call::Treasury(..) |
                 Call::Utility(..) |
                 // Specifically omitting Vesting `vested_transfer`, and `force_vested_transfer`
@@ -808,8 +840,11 @@ construct_runtime!(
         // Governance stuff; uncallable initially.
         Democracy: pallet_democracy::{Pallet, Call, Storage, Event<T>} = 14,
         Council: pallet_collective::<Instance1>::{Pallet, Call, Storage, Origin<T>, Event<T>, Config<T>} = 15,
-        TechnicalCommittee: pallet_collective::<Instance2>::{Pallet, Call, Storage, Origin<T>, Event<T>, Config<T>} = 16,
-        TechnicalMembership: pallet_membership::<Instance1>::{Pallet, Call, Storage, Event<T>, Config<T>} = 18,
+
+        TechnicalCommittee: pallet_collective::<Instance4>::{Pallet, Call, Storage, Origin<T>, Event<T>, Config<T>} = 16,
+        TechnicalCommitteeMembership: pallet_membership::<Instance4>::{Pallet, Call, Storage, Event<T>, Config<T>} = 17,
+        // TechnicalCommittee: pallet_collective::<Instance2>::{Pallet, Call, Storage, Origin<T>, Event<T>, Config<T>} = 16,
+        // TechnicalMembership: pallet_membership::<Instance1>::{Pallet, Call, Storage, Event<T>, Config<T>} = 18,
         Treasury: pallet_treasury::{Pallet, Call, Storage, Event<T>} = 19,
         // Bounties module.
         Bounties: pallet_bounties::{Pallet, Call, Storage, Event<T>} = 20,
@@ -836,6 +871,7 @@ construct_runtime!(
         Contracts: pallet_contracts::{Pallet, Call, Storage, Event<T>} = 30,
 
         RandomnessProvider: pallet_randomness_provider::{Pallet, Storage} = 31,
+        Mmr: pallet_mmr = 32,
     }
 );
 
@@ -851,10 +887,11 @@ pub type SignedBlock = generic::SignedBlock<Block>;
 pub type BlockId = generic::BlockId<Block>;
 /// The SignedExtension to the basic transaction logic.
 pub type SignedExtra = (
+    frame_system::CheckNonZeroSender<Runtime>,
     frame_system::CheckSpecVersion<Runtime>,
     frame_system::CheckTxVersion<Runtime>,
     frame_system::CheckGenesis<Runtime>,
-    frame_system::CheckMortality<Runtime>,
+    frame_system::CheckEra<Runtime>,
     frame_system::CheckNonce<Runtime>,
     frame_system::CheckWeight<Runtime>,
     pallet_transaction_payment::ChargeTransactionPayment<Runtime>,
@@ -873,6 +910,16 @@ pub type Executive = frame_executive::Executive<
 >;
 /// The payload being signed in the transactions.
 pub type SignedPayload = generic::SignedPayload<Call, SignedExtra>;
+
+/// MMR helper types.
+mod mmr {
+    use super::Runtime;
+    pub use pallet_mmr::primitives::*;
+
+    pub type Leaf = <<Runtime as pallet_mmr::Config>::LeafData as LeafDataProvider>::LeafData;
+    pub type Hash = <Runtime as pallet_mmr::Config>::Hash;
+    pub type Hashing = <Runtime as pallet_mmr::Config>::Hashing;
+}
 
 impl_runtime_apis! {
     impl sp_api::Core<Block> for Runtime {
@@ -1057,6 +1104,37 @@ impl_runtime_apis! {
         }
     }
 
+    impl pallet_mmr::primitives::MmrApi<
+        Block,
+        mmr::Hash,
+    > for Runtime {
+        fn generate_proof(leaf_index: pallet_mmr::primitives::LeafIndex)
+            -> Result<(mmr::EncodableOpaqueLeaf, mmr::Proof<mmr::Hash>), mmr::Error>
+        {
+            Mmr::generate_proof(leaf_index)
+                .map(|(leaf, proof)| (mmr::EncodableOpaqueLeaf::from_leaf(&leaf), proof))
+        }
+
+        fn verify_proof(leaf: mmr::EncodableOpaqueLeaf, proof: mmr::Proof<mmr::Hash>)
+            -> Result<(), mmr::Error>
+        {
+            let leaf: mmr::Leaf = leaf
+                .into_opaque_leaf()
+                .try_decode()
+                .ok_or(mmr::Error::Verify)?;
+            Mmr::verify_leaf(leaf, proof)
+        }
+
+        fn verify_proof_stateless(
+            root: mmr::Hash,
+            leaf: mmr::EncodableOpaqueLeaf,
+            proof: mmr::Proof<mmr::Hash>
+        ) -> Result<(), mmr::Error> {
+            let node = mmr::DataOrHash::Data(leaf.into_opaque_leaf());
+            pallet_mmr::verify_leaf_proof::<mmr::Hashing, _>(root, node, proof)
+        }
+    }
+
     impl pallet_contracts_rpc_runtime_api::ContractsApi<Block, AccountId, Balance, BlockNumber, Hash>
         for Runtime
     {
@@ -1065,21 +1143,32 @@ impl_runtime_apis! {
             dest: AccountId,
             value: Balance,
             gas_limit: u64,
+            storage_deposit_limit: Option<Balance>,
             input_data: Vec<u8>,
-        ) -> ContractExecResult {
-            Contracts::bare_call(origin, dest, value, gas_limit, input_data, true)
+        ) -> ContractExecResult<Balance> {
+            Contracts::bare_call(origin, dest, value, gas_limit, storage_deposit_limit, input_data, true)
         }
 
         fn instantiate(
             origin: AccountId,
             endowment: Balance,
             gas_limit: u64,
+            storage_deposit_limit: Option<Balance>,
             code: pallet_contracts_primitives::Code<Hash>,
             data: Vec<u8>,
             salt: Vec<u8>,
-        ) -> pallet_contracts_primitives::ContractInstantiateResult<AccountId>
+        ) -> pallet_contracts_primitives::ContractInstantiateResult<AccountId, Balance>
         {
-            Contracts::bare_instantiate(origin, endowment, gas_limit, code, data, salt, true)
+            Contracts::bare_instantiate(origin, endowment, gas_limit, storage_deposit_limit, code, data, salt, true)
+        }
+
+        fn upload_code(
+            origin: AccountId,
+            code: Vec<u8>,
+            storage_deposit_limit: Option<Balance>,
+        ) -> pallet_contracts_primitives::CodeUploadResult<Hash, Balance>
+        {
+            Contracts::bare_upload_code(origin, code, storage_deposit_limit)
         }
 
         fn get_storage(

@@ -42,6 +42,46 @@ use sp_std::marker::PhantomData;
 /// Weight functions for pallet_scheduler.
 pub struct WeightInfo<T>(PhantomData<T>);
 impl<T: frame_system::Config> pallet_scheduler::WeightInfo for WeightInfo<T> {
+    fn on_initialize_periodic_named_resolved(_s: u32) -> Weight {
+        todo!()
+    }
+
+    fn on_initialize_named_resolved(_s: u32) -> Weight {
+        todo!()
+    }
+
+    fn on_initialize_periodic_resolved(_s: u32) -> Weight {
+        todo!()
+    }
+
+    fn on_initialize_resolved(_s: u32) -> Weight {
+        todo!()
+    }
+
+    fn on_initialize_named_aborted(_s: u32) -> Weight {
+        todo!()
+    }
+
+    fn on_initialize_aborted(_s: u32) -> Weight {
+        todo!()
+    }
+
+    fn on_initialize_periodic_named(_s: u32) -> Weight {
+        todo!()
+    }
+
+    fn on_initialize_periodic(_s: u32) -> Weight {
+        todo!()
+    }
+
+    fn on_initialize_named(_s: u32) -> Weight {
+        todo!()
+    }
+
+    fn on_initialize(_s: u32) -> Weight {
+        todo!()
+    }
+
     fn schedule(s: u32) -> Weight {
         (23_905_000 as Weight)
             // Standard Error: 0

@@ -1,14 +1,12 @@
 //! Jupiter chain configurations.
 
-use serde_json::json;
-
 use hex_literal::hex;
 
+use grandpa::AuthorityId as GrandpaId;
 use sc_service::{config::TelemetryEndpoints, ChainType};
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_consensus_babe::AuthorityId as BabeId;
 use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public};
-use sp_finality_grandpa::AuthorityId as GrandpaId;
 use sp_runtime::traits::{IdentifyAccount, Verify};
 
 use jupiter_runtime::Forcing;
@@ -23,7 +21,7 @@ use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 // The URL for the telemetry server.
 const JUPITER_TELEMETRY_URL: &str = "wss://telemetry.patract.io/submit";
 
-/// Specialized `ChainSpec`. This is a specialization of the general Substrate ChainSpec type.
+/// Specialized `ChainSpec` for the normal parachain runtime.
 pub type ChainSpec = sc_service::GenericChainSpec<GenesisConfig>;
 
 /// Generate a crypto pair from seed.
@@ -118,17 +116,9 @@ pub fn poa_development_config() -> Result<ChainSpec, String> {
         // Protocol ID
         None,
         // Properties
-        Some(
-            json!({
-                "ss58Format": jupiter_runtime_common::SS58Prefix::get(),
-                "tokenDecimals": 10,
-                "tokenSymbol": "DOT"
-            })
-            .as_object()
-            .expect("network properties generation can not fail; qed")
-            .to_owned(),
-        ),
+        None,
         // Extensions
+        None,
         None,
     ))
 }
@@ -177,17 +167,9 @@ pub fn poa_local_config() -> Result<ChainSpec, String> {
         // Protocol ID
         None,
         // Properties
-        Some(
-            json!({
-                "ss58Format": jupiter_runtime_common::SS58Prefix::get(),
-                "tokenDecimals": 10,
-                "tokenSymbol": "DOT"
-            })
-            .as_object()
-            .expect("network properties generation can not fail; qed")
-            .to_owned(),
-        ),
+        None,
         // Extensions
+        None,
         None,
     ))
 }
@@ -356,17 +338,9 @@ pub fn poa_staging_config() -> Result<ChainSpec, String> {
         // Protocol ID
         Some("jupiter_poa_staging"),
         // Properties
-        Some(
-            json!({
-                "ss58Format": jupiter_runtime_common::SS58Prefix::get(),
-                "tokenDecimals": 10,
-                "tokenSymbol": "DOT"
-            })
-            .as_object()
-            .expect("network properties generation can not fail; qed")
-            .to_owned(),
-        ),
+        None,
         // Extensions
+        None,
         None,
     ))
 }
@@ -431,8 +405,10 @@ fn testnet_genesis(
             members: vec![],
             phantom: Default::default(),
         },
-        technical_membership: Default::default(),
-        sudo: SudoConfig { key: root_key },
+        technical_committee_membership: Default::default(),
+        sudo: SudoConfig {
+            key: Some(root_key),
+        },
         po_a: PoAConfig {
             minimum_authority_count: initial_authorities.len() as u32,
             init_authorities: initial_authorities

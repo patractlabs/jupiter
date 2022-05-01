@@ -5,9 +5,9 @@ members = [
   "bin/node-prep/executor",
   "bin/node-dev",
   
-   "runtime/jupiter",
-   "runtime/jupiter-prep",
-   "runtime/jupiter-dev",
+  "runtime/jupiter",
+  "runtime/jupiter-prep",
+  "runtime/jupiter-dev",
 
    "primitives",
    "primitives/chain-extension",
@@ -18,7 +18,6 @@ members = [
    "pallets/currencies",
    "rpc",
 ]
-exclude = ["vendor/substrate"]
 
 [profile.release]
 panic = "unwind"

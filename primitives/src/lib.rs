@@ -72,7 +72,7 @@ pub mod report {
 
     /// Key type for the reporting module. Used for reporting BABE and GRANDPA
     /// equivocations.
-    pub const KEY_TYPE: KeyTypeId = key_types::REPORTING;
+    pub const KEY_TYPE: KeyTypeId = key_types::DUMMY;
 
     mod app {
         use sp_application_crypto::{app_crypto, sr25519};
@@ -142,7 +142,7 @@ macro_rules! create_currency_id {
 
 // todo: should change chain spec properties's tokenSymbol related to here native currency which is JIT
 create_currency_id! {
-    #[derive(Encode, Decode, Eq, PartialEq, Copy, Clone, PartialOrd, Ord, RuntimeDebug, TypeInfo)]
+    #[derive(Encode, Decode, Eq, PartialEq, Copy, Clone, PartialOrd, Ord, RuntimeDebug, MaxEncodedLen, TypeInfo)]
     #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
     pub enum CurrencyId {
         WND("Westend", 12),
